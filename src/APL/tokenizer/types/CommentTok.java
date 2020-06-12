@@ -8,6 +8,6 @@ public class CommentTok extends Token {
   }
   
   @Override public String toRepr() {
-    return null;
+    return source();
   }
 }

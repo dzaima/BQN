@@ -7,16 +7,16 @@ public abstract class Token implements Tokenable {
   public final int spos; // incl
   public       int epos; // excl
   public static final int EPOS_DEF = -12345;
-  protected Token(String raw, int spos) {
-    this.raw = raw;
-    this.spos = spos;
-    epos = EPOS_DEF;
-  }
-  
   public Token(String raw, int spos, int epos) {
     this.raw = raw;
     this.spos = spos;
     this.epos = epos;
+  }
+  
+  protected Token(String raw, int spos) {
+    this.raw = raw;
+    this.spos = spos;
+    epos = EPOS_DEF;
   }
   
   protected void end(int i) {

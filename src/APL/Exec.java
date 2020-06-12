@@ -687,16 +687,15 @@ public class Exec {
         // case 'ℝ': // the lone double-struck..
         case 55349: // double-struck surrogate pair
           Obj o;
-          System.out.println("HI");
           switch (t1.op) { // +TODO clean up
             case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
-            case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o;
+            case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o.asFun();
             case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
-            case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o;
+            case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o.asFun();
             case "𝕗": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
-            case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o;
+            case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o.asFun();
             case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
-            case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o;
+            case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o.asFun();
             // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
           }
           /* fallthrough! */

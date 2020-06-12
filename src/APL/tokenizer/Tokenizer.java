@@ -87,7 +87,7 @@ public class Tokenizer {
       Line tokens = lines.get(lines.size() - 1);
       try {
         char c = raw.charAt(i);
-        char next = i + 1 < len? raw.charAt(i + 1) : ' ';
+        char next = i+1 < len? raw.charAt(i + 1) : ' ';
         String cS = String.valueOf(c);
         if (c == '(' || c == '{' || c == '[') {
           char match;
@@ -126,13 +126,13 @@ public class Tokenizer {
           Token r;
           switch (c) {
             case ')':
-              r = new ParenTok(raw, closed.pos, i + 1, lineTokens, closed.hasDmd);
+              r = new ParenTok(raw, closed.pos, i+1, lineTokens, closed.hasDmd);
               break;
             case '}':
-              r = new DfnTok(raw, closed.pos, i + 1, lineTokens);
+              r = new DfnTok(raw, closed.pos, i+1, lineTokens);
               break;
             case ']':
-              r = new BracketTok(raw, closed.pos, i + 1, lineTokens, closed.hasDmd);
+              r = new BracketTok(raw, closed.pos, i+1, lineTokens, closed.hasDmd);
               break;
             default:
               throw new Error("this should really not happen "+c);
@@ -206,9 +206,9 @@ public class Tokenizer {
           i++;
         } else if (c == 55349) { // low surrogate pair of double-struck chars
           if (i+1==len) throw new SyntaxError("expression ended with low surrogate \\uD835");
-          if (surrogateOps.indexOf(raw.charAt(i+1)) == -1) {
-            String hex = Integer.toHexString(raw.charAt(i+1)).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
-            throw new SyntaxError("unknown token `\uD835" + raw.charAt(i+1) + "` (\\uD835\\u"+hex+")");
+          if (surrogateOps.indexOf(next) == -1) {
+            String hex = Integer.toHexString(next).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
+            throw new SyntaxError("unknown token `\uD835" + next + "` (\\uD835\\u"+hex+")");
           }
           tokens.add(new OpTok(raw, i, i+2, raw.substring(i, i+2)));
           i+= 2;
@@ -218,6 +218,9 @@ public class Tokenizer {
         } else if (c == '`') {
           if (tokens.annoyingBacktickPos != null) throw new SyntaxError("` after `");
           tokens.annoyingBacktickPos = i;
+          i++;
+        } else if (c == '‿') {
+          tokens.add(new StranderTok(raw, i, i+1));
           i++;
         } else if (c == ':') {
           if (next == ':') {
@@ -311,9 +314,8 @@ public class Tokenizer {
         //}
         assert li < i; // error if nothing changed!
       } catch (Throwable e) {
-        // System.out.println("BAD");
-        // e.printStackTrace();
         if (!pointless) throw e;
+        
         if (li == i) i = li + 1; // lazy exit out of infinite loops
         tokens.add(new ErrTok(raw, li, i));
       }

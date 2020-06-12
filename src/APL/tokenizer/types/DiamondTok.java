@@ -8,6 +8,6 @@ public class DiamondTok extends Token {
   }
   
   @Override public String toRepr() {
-    return null;
+    return "⋄";
   }
 }
