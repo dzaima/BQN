@@ -47,10 +47,32 @@ public class Tokenizer {
       }
     }
     
-    LineTok tok() {
+    LineTok tok() { // also handles strands because why not
       if (annoyingBacktickPos != null) throw new SyntaxError("Nothing after backtick");
       int epos = size() == 0? pos : ts.get(size()-1).epos;
-      return new LineTok(line, pos, epos, ts);
+      ArrayList<Token> pts = new ArrayList<>();
+      
+      ArrayList<Token> cstr = new ArrayList<>();
+  
+      for (int i = 0; i < ts.size(); i++) {
+        Token t1 = ts.get(i);
+        if (t1 instanceof StranderTok) throw new SyntaxError("Bad strand syntax", t1);
+        
+        while (i+2<ts.size() && ts.get(i+1) instanceof StranderTok) {
+          cstr.add(ts.get(i));
+          i+= 2;
+        }
+        if (cstr.size() > 0) {
+          cstr.add(ts.get(i));
+          for (Token t : cstr) if (t instanceof StranderTok) throw new SyntaxError("Bad strand syntax", t);
+          pts.add(new StrandTok(t1.raw, t1.spos, cstr.get(cstr.size()-1).epos, cstr));
+          cstr = new ArrayList<>();
+        } else {
+          pts.add(t1);
+        }
+      }
+  
+      return new LineTok(line, pos, epos, pts);
     }
   }
   static class Block { // temp storage of multiple lines
@@ -76,8 +98,8 @@ public class Tokenizer {
   @SuppressWarnings("StringConcatenationInLoop") public static BasicLines tokenize(String raw, boolean pointless) { // pointless means unevaled things get tokens; mainly for syntax highlighting
     int li = 0;
     int len = raw.length();
-    
-    var levels = new ArrayList<Block>();
+  
+    ArrayList<Block> levels = new ArrayList<Block>();
     levels.add(new Block(new ArrayList<>(), '⋄', 0));
     levels.get(0).a.add(new Line(raw, 0, new ArrayList<>()));
     

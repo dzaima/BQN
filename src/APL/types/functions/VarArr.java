@@ -15,7 +15,6 @@ public class VarArr extends Settable {
     super(null);
     ia = arr.size();
     if (arr.size() > 0) this.token = arr.get(0).token;
-    Collections.reverse(arr);
     this.arr = arr;
   }
   
@@ -44,23 +43,20 @@ public class VarArr extends Settable {
     return get().toString();
   }
   
-  public static Obj of (ArrayList<Obj> vs) {
+  public static Obj of(ArrayList<Obj> vs) {
     int sz = vs.size();
     if (sz == 0) return EmptyArr.SHAPE0Q;
     Obj fst = vs.get(0);
     if (fst instanceof Num) {
       if (((Num) fst).num == 0 || ((Num) fst).num == 1) {
         BitArr.BA bc = new BitArr.BA(sz);
-        int i = sz-1;
-        while (i >= 0) {
-          Obj c = vs.get(i);
+        for (Obj c : vs) {
           if (c instanceof Num) {
             double n = ((Num) c).num;
             if (Double.doubleToRawLongBits(n)==0 || n == 1) { // don't convert negative zero!
               bc.add(n == 1);
             } else { bc = null; break; }
           } else { bc = null; break; }
-          i--;
         }
         if (bc != null) return bc.finish();
       }
@@ -69,7 +65,7 @@ public class VarArr extends Settable {
       while (i < a.length) {
         Obj c = vs.get(i);
         if (c instanceof Num) {
-          a[a.length-i-1] = ((Num) c).num;
+          a[i] = ((Num) c).num;
           i++;
         } else {
           a = null;
@@ -79,12 +75,9 @@ public class VarArr extends Settable {
       if (a != null) return new DoubleArr(a);
     } else if (fst instanceof Char) {
       String s = "";
-      int i = sz -1;
-      while (i >= 0) {
-        Obj c = vs.get(i);
+      for (Obj c : vs) {
         if (c instanceof Char) {
-          s+= ((Char) c).chr;
-          i--;
+          s += ((Char) c).chr;
         } else {
           s = null;
           break;

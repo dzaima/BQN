@@ -56,77 +56,11 @@ public class Exec {
       printlvl();
     }
     reset();
-    ArrayList<Obj> arr = null;
     while (left.size() > 0) {
       Token t = left.pop();
-      Obj c;
-      if (t instanceof NameTok && left.size() >= 2
-        && left.peek() instanceof OpTok
-        && ((OpTok) left.peek()).op.equals(".")
-        && left.get(left.size() - 2) instanceof NameTok) {
-        int ptr = left.size() - 2;
-        while (ptr >= 2) {
-          if (left.get(ptr - 1) instanceof OpTok
-            && ((OpTok) left.get(ptr - 1)).op.equals(".")
-            && left.get(ptr - 2) instanceof NameTok) ptr -= 2;
-          else break;
-        }
-        String[] names = new String[(left.size() - ptr >> 1) + 1];
-        names[names.length - 1] = ((NameTok) t).name;
-        for (int i = names.length - 2; i >= 0; i--) {
-          OpTok dot = (OpTok) left.pop();
-          assert dot.op.equals(".");
-          NameTok name = (NameTok) left.pop();
-          names[i] = name.name;
-        }
-        
-        if (Main.debug) printlvl("dotnot", Arrays.toString(names)); // todo fix (m).a (m).b0
-        Obj d = null;
-        Settable r = sc.getVar(names[0]);
-        for (int i = 1; i < names.length; i++) {
-          if (r == null) {
-            r = sc.getVar(names[i]);
-            if (Main.debug) printlvl(":start", d, r, names[i]);
-          } else {
-            var got = r.getOrThis();
-            if (got instanceof Fun) {
-              if (Main.debug) printlvl(":fn", d, r, names[i]);
-              if (d == null) d = got;
-              else d = new DotBuiltin().derive(d, got);
-              r = sc.getVar(names[i]);
-            } else if (got instanceof APLMap) {
-              if (Main.debug) printlvl(":map", d, r, names[i]);
-              r = ((APLMap) got).get(names[i]);
-            } else throw new SyntaxError("dot-chain contained non-fn/map");
-          }
-        }
-        if (r != null) {
-          if (d == null) d = r;
-          else d = new DotBuiltin().derive(d, r.get());
-        } else if (d == null) throw new SyntaxError("what?");
-        c = d;
-        if (Main.debug) printlvl(llToString());
-        
-      } else {
-        c = valueOf(t);
-      }
-      if (c.isObj() || c.type() == Type.gettable && (left.size() == 0 || !(left.get(0) instanceof SetTok))) {
-        if (arr == null) arr = new ArrayList<>();
-        arr.add(c);
-      } else {
-        if (arr != null) {
-          if (arr.size() == 1) addS(arr.get(0));
-          else addS(VarArr.of(arr));
-          update(false);
-          arr = null;
-        }
-        addS(c);
-        update(false);
-      }
-    }
-    if (arr != null) {
-      if (arr.size() == 1) addS(arr.get(0));
-      else addS(VarArr.of(arr));
+      Obj c = valueOf(t);
+      addS(c);
+      update(false);
     }
     update(true);
     
@@ -147,6 +81,9 @@ public class Exec {
         } else if (obj instanceof Settable) {
           Settable settable = (Settable) obj;
           if (settable.getOrThis() == obj) throw new SyntaxError("Couldn't find the value of " + obj, obj);
+        }
+        if (cn.type=='N' && cn.l.type=='N') {
+          throw new SyntaxError("Two adjacent arrays outside strand", obj);
         }
       }
       
@@ -304,7 +241,7 @@ public class Exec {
       }
       break;
     }
-    if (end && llSize == 2) {
+    if (end && llSize==2 && LN.l.type == 'F') {
       if (Main.debug) printlvl("g h");
       var h = lastFun();
       var g = lastObj();
@@ -755,6 +692,14 @@ public class Exec {
           return new FunArr(os);
         } else throw new DomainError("⋄-array contained " + fo.humanType(true), fo);
       }
+    }
+    if (t instanceof StrandTok) {
+      List<Token> tks = ((StrandTok) t).tokens;
+      ArrayList<Obj> parts = new ArrayList<>();
+      for (Token tk : tks) {
+        parts.add(valueOf(tk));
+      }
+      return VarArr.of(parts);
     }
     if (t instanceof DfnTok) return UserDefined.of((DfnTok) t, sc);
     if (t instanceof BracketTok) return Brackets.of((BracketTok) t, sc);
