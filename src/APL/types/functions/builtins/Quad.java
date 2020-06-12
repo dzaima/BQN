@@ -23,6 +23,6 @@ public class Quad extends Settable {
   }
   
   public String toString() {
-    return "⎕";
+    return "•";
   }
 }

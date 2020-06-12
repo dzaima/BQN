@@ -14,4 +14,8 @@ public abstract class AbstractSet extends Callable {
   public Type type() {
     return Type.set;
   }
+  
+  public Fun asFun() {
+    throw new AssertionError("this object shouldn't be accessible");
+  }
 }

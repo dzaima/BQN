@@ -251,4 +251,20 @@ public abstract class Value extends Obj implements Iterable<Value> {
     if (anyBetter) return new HArr(optimized, shape);
     return this;
   }
+  
+  public Fun asFun() {
+    return new Fun() {
+      public String repr() {
+        return Value.this.toString();
+      }
+  
+      public Value call(Value w) {
+        return Value.this;
+      }
+  
+      public Value call(Value a, Value w) {
+        return Value.this;
+      }
+    };
+  }
 }

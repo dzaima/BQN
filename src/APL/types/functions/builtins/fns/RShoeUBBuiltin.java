@@ -18,7 +18,7 @@ public class RShoeUBBuiltin extends Builtin {
     return on(a, w, sc.IO, this);
   }
   
-  public static Value on(Value a, Value w, int IO, Callable blame) {
+  public static Value on(Value a, Value w, int IO, Callable blame) { // +TODO remove usage of, moved to ⊏
     if (w instanceof APLMap) {
       Value[] res = new Value[a.ia];
       APLMap map = (APLMap) w;
@@ -37,7 +37,7 @@ public class RShoeUBBuiltin extends Builtin {
     return on(Indexer.poss(a, w.shape, IO, blame), w);
   }
   
-  public static Value on(Indexer.PosSh poss, Value w) {
+  public static Value on(Indexer.PosSh poss, Value w) { // +TODO ↑
     if (w.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
       double[] wd = w.asDoubleArr();;

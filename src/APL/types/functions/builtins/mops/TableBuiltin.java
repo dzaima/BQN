@@ -6,7 +6,7 @@ import APL.types.functions.*;
 
 public final class TableBuiltin extends Mop {
   @Override public String repr() {
-    return "∘.";
+    return "⌜";
   }
   
   

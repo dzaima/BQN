@@ -5,6 +5,7 @@ import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.CeilingBuiltin;
 import APL.types.functions.builtins.mops.ReduceBuiltin;
 
 public class IotaUBBuiltin extends Builtin {

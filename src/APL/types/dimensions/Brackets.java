@@ -3,7 +3,7 @@ package APL.types.dimensions;
 import APL.*;
 import APL.tokenizer.types.*;
 import APL.types.*;
-import APL.types.functions.builtins.fns.UpArrowBuiltin;
+import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
 
 public class Brackets extends Callable {
   
@@ -31,6 +31,10 @@ public class Brackets extends Callable {
     return "["+val+"]";
   }
   
+  public Fun asFun() {
+    throw new AssertionError("this object shouldn't be accessible");
+  }
+  
   public static Obj of(BracketTok t, Scope sc) {
     if (t.array) {
       Value[] lns = new Value[t.tokens.size()];
@@ -38,7 +42,7 @@ public class Brackets extends Callable {
         LineTok tk = t.tokens.get(i);
         lns[i] = Main.vexec(tk, sc);
       }
-      return UpArrowBuiltin.merge(lns, new int[]{lns.length}, t);
+      return OldUpArrowBuiltin.merge(lns, new int[]{lns.length}, t);
     } else {
       if (t.tokens.size() == 0) return new Brackets(null);
       assert t.tokens.size() == 1; // t.array is true if size>1

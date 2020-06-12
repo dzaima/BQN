@@ -6,7 +6,7 @@ import APL.types.functions.*;
 
 public class SelfieBuiltin extends Mop {
   @Override public String repr() {
-    return "⍨";
+    return "˜";
   }
   
   
@@ -22,11 +22,11 @@ public class SelfieBuiltin extends Mop {
   
   @Override public Value callInvW(Obj f, Value a, Value w) {
     if (f instanceof Fun) return ((Fun) f).callInvA(w, a);
-    throw new DomainError("A⍨ cannot be inverted", this);
+    throw new DomainError("A˜ cannot be inverted", this);
   }
   
   @Override public Value callInvA(Obj f, Value a, Value w) {
     if (f instanceof Fun) return ((Fun) f).callInvW(w, a);
-    throw new DomainError("A⍨ cannot be inverted", this);
+    throw new DomainError("A˜ cannot be inverted", this);
   }
 }

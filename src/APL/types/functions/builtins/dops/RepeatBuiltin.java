@@ -7,12 +7,9 @@ import APL.types.functions.*;
 
 public class RepeatBuiltin extends Dop {
   @Override public String repr() {
-    return "⍣";
+    return "⍟";
   }
   
-  public RepeatBuiltin(Scope sc) {
-    super(sc);
-  }
   public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     if (ww instanceof Fun) {

@@ -28,10 +28,10 @@ public class Ddop extends Dop {
   public Obj callObj(Obj aa, Obj ww, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", w);
     Scope nsc = new Scope(sc);
-    nsc.set("⍶", aa);
-    nsc.set("⍹", ww);
-    nsc.set("⍺", new Variable(nsc, "⍺"));
-    nsc.set("⍵", w);
+    nsc.set("𝕗", aa);
+    nsc.set("𝕘", ww);
+    nsc.set("𝕨", new Variable(nsc, "𝕨"));
+    nsc.set("𝕩", w);
     nsc.set("∇", derv);
     var res = Main.execLines(code, nsc);
     if (res instanceof VarArr) return ((VarArr)res).get();
@@ -47,10 +47,10 @@ public class Ddop extends Dop {
   public Obj callObj(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", a, w);
     Scope nsc = new Scope(sc);
-    nsc.set("⍶", aa);
-    nsc.set("⍹", ww);
-    nsc.set("⍺", a);
-    nsc.set("⍵", w);
+    nsc.set("𝕗", aa);
+    nsc.set("𝕘", ww);
+    nsc.set("𝕨", a);
+    nsc.set("𝕩", w);
     nsc.set("∇", derv);
     nsc.alphaDefined = true;
     var res = Main.execLines(code, nsc);

@@ -11,6 +11,7 @@ import APL.types.functions.builtins.AbstractSet;
 import APL.types.functions.builtins.*;
 import APL.types.functions.builtins.dops.*;
 import APL.types.functions.builtins.fns.*;
+import APL.types.functions.builtins.fns2.*;
 import APL.types.functions.builtins.mops.*;
 import APL.types.functions.trains.*;
 import APL.types.functions.userDefined.UserDefined;
@@ -40,8 +41,8 @@ public class Exec {
   public Obj exec() {
     if (tokens.size() > 0) Main.faulty = tokens.get(0);
     else Main.faulty = allToken;
-    if (sc.alphaDefined && tokens.size() >= 2 && tokens.get(0) instanceof OpTok && ((OpTok) tokens.get(0)).op.equals("⍺") && tokens.get(1) instanceof SetTok) {
-      if (Main.debug) printlvl("skipping cuz it's ⍺←");
+    if (sc.alphaDefined && tokens.size() >= 2 && tokens.get(0) instanceof OpTok && ((OpTok) tokens.get(0)).op.equals("𝕨") && tokens.get(1) instanceof SetTok) {
+      if (Main.debug) printlvl("skipping cuz it's 𝕨←");
       return null;
     }
     left = new Stack<>();
@@ -299,18 +300,6 @@ public class Exec {
         var h = lastFun();
         var g = lastObj();
         addE(new Atop(g, h));
-        continue;
-      }
-      if (llSize >= 3 && pollS() instanceof JotBuiltin && FN.r.r.val instanceof DotBuiltin) {
-        if (Main.debug) printlvl("∘.");
-        var jot = popS();
-        popS();
-        var fn = popS();
-        if (fn instanceof Settable) fn = ((Settable) fn).get();
-        if (fn instanceof VarArr) fn = ((VarArr) fn).get();
-        var TB = new TableBuiltin();
-        TB.token = jot.token;
-        addS(TB.derive(fn));
         continue;
       }
       break;
@@ -572,60 +561,81 @@ public class Exec {
         // slashes: / - reduce; ⌿ - replicate; \ - reduce (r[3]←(r[2] ← (r[1]←a) f b) f c); ⍀ - extend
         // in Dyalog but not at least partially implemented: ⊆⌹→  &⌶⌺
         // fns
-        case '+': return new PlusBuiltin();
-        case '-': return new MinusBuiltin();
-        case '×': return new MulBuiltin();
-        case '÷': return new DivBuiltin();
-        case '*': return new StarBuiltin();
-        case '⍟': return new LogBuiltin();
-        case '√': return new RootBuiltin();
-        case '⌈': return new CeilingBuiltin();
-        case '⌊': return new FloorBuiltin();
-        case '|': return new StileBuiltin();
-        case '∧': return new AndBuiltin();
-        case '∨': return new OrBuiltin();
-        case '⍲': return new NandBuiltin(sc);
-        case '⍱': return new NorBuiltin(sc);
+        // case '⍟': return new LogBuiltin()
+        // case '⍲': return new NandBuiltin(sc);
+        // case '⍱': return new NorBuiltin(sc);
         case '⊥': return new UTackBuiltin();
         case '⊤': return new DTackBuiltin();
-        case '~': return new TildeBuiltin();
-        case '○': return new TrigBuiltin();
-        case '!': return new ExclBuiltin();
+        // case '○': return new TrigBuiltin();
+        // case '!': return new ExclBuiltin();
         
-        case '∊': return new EpsilonBuiltin();
-        case '⍷': return new FindBuiltin();
-        case '⊂': return new LShoeBuiltin();
-        case '⊇': return new RShoeUBBuiltin(sc);
-        case '⊃': return new RShoeBuiltin(sc);
-        case '∪': return new DShoeBuiltin();
-        case '∩': return new UShoeBuiltin();
-        case '⌷': return new SquadBuiltin(sc);
-        case '⍳': return new IotaBuiltin(sc);
-        case '⍸': return new IotaUBBuiltin(sc);
-        case '⍴': return new RhoBuiltin();
-        case ',': return new CatBuiltin();
-        case '≢': return new TallyBuiltin();
-        case '≡': return new DepthBuiltin();
-        case '⊢': return new RTackBuiltin();
-        case '⊣': return new LTackBuiltin();
-        case '↑': return new UpArrowBuiltin();
-        case '↓': return new DownArrowBuiltin();
-        case '?': return new RandBuiltin(sc);
-        case '⍪': return new CommaBarBuiltin();
-        case '⍉': return new TransposeBuiltin();
-        case '⊖': return new FlipBuiltin();
-        case '⌽': return new ReverseBuiltin();
+        // case '⊂': return new LShoeBuiltin();
+        // case '⊇': return new RShoeUBBuiltin(sc);
+        // case '⊃': return new RShoeBuiltin(sc);
+        // case '∪': return new DShoeBuiltin();
+        // case '∩': return new UShoeBuiltin();
+        // case '⌷': return new SquadBuiltin(sc);
+        // case '⍳': return new IotaBuiltin(sc);
+        // case '⍸': return new IotaUBBuiltin(sc);
+        // case '⍴': return new RhoBuiltin();
+        // case ',': return new OldCatBuiltin();
+        // case '?': return new RandBuiltin(sc);
+        // case '⍪': return new CommaBarBuiltin();
+        // case '⊖': return new FlipBuiltin();
+        // case '⌽': return new ReverseBuiltin();
         
         case '…': return new EllipsisBuiltin();
         case '⍮': return new SemiUBBuiltin();
         case '⍕': return new FormatBuiltin();
         case '⍎': return new EvalBuiltin(sc);
-        case '⍋': return new GradeUpBuiltin(sc);
-        case '⍒': return new GradeDownBuiltin(sc);
         case '⌿': return new ReplicateBuiltin();
         case '⍀': return new ExpandBuiltin();
         case '⍧': return new LShoeStileBuiltin();
         case '%': return new MergeBuiltin(sc);
+        
+        
+        
+        
+        case '+': return new PlusBuiltin();
+        case '-': return new MinusBuiltin();
+        case '×': return new MulBuiltin();
+        case '÷': return new DivBuiltin();
+        case '⋆':
+        case '*': return new StarBuiltin();
+        case '|': return new StileBuiltin();
+        case '∧': return new AndBuiltin();
+        case '∨': return new OrBuiltin();
+        case '⌈': return new CeilingBuiltin();
+        case '⌊': return new FloorBuiltin();
+        case '√': return new RootBuiltin();
+        case '¬': return new NotBuiltin();
+  
+  
+        case '⊢': return new RTackBuiltin();
+        case '⊣': return new LTackBuiltin();
+  
+        case '⥊': return new ShapeBuiltin();
+        case '↑': return new UpArrowBuiltin();
+        case '↓': return new DownArrowBuiltin();
+        case '∾': return new JoinBuiltin();
+        case '≍': return new LaminateBuiltin();
+        case '⍉': return new TransposeBuiltin();
+        
+        case '/': return new SlashBuiltin();
+        case '⊏': return new LBoxBuiltin();
+        case '⊔': return new GroupBuiltin();
+        case '⊑': return new LBoxUBBuiltin();
+        case '⊐': return new RBoxBuiltin();
+        case '⊒': return new RBoxUBBuiltin();
+        case '↕': return new UDBuiltin();
+        case '∊': return new EpsBuiltin();
+        case '⍷': return new FindBuiltin();
+        case '⍋': return new GradeUpBuiltin(sc);
+        case '⍒': return new GradeDownBuiltin(sc);
+        case '≢': return new TallyBuiltin();
+        case '≡': return new MatchBuiltin();
+        
+        
         
         // comparisons
         case '<': return new LTBuiltin();
@@ -636,38 +646,60 @@ public class Exec {
         case '≠': return new NEBuiltin();
         
         // mops
-        case '/': return new ReduceBuiltin();
-        case '\\':return new ScanBuiltin();
+        case '´': return new ReduceBuiltin();
+        case '`': return new ScanBuiltin();
         case '¨': return new EachBuiltin();
-        case '⍨': return new SelfieBuiltin();
-        case '⌾': return new TableBuiltin();
-        case '⌸': return new KeyBuiltin(sc);
-        case '⍁': return new ObliqueBuiltin();
-        case '⍩':
-        case 'ᐵ': return new EachLeft();
-        case 'ᑈ': return new EachRight();
+        case '˜': return new SelfieBuiltin();
+        case '⌜': return new TableBuiltin();
+        case '⁼': return new InvBuiltin();
+        case '˘': return new CellBuiltin();
+        // case '⌸': return new KeyBuiltin(sc);
+        // case '⍁': return new ObliqueBuiltin();
+        // case '⍩':
+        // case 'ᐵ': return new EachLeft();
+        // case 'ᑈ': return new EachRight();
         
         // dops
-        case '∘': return new JotBuiltin();
-        case '⍛': return new JotUBBuiltin();
-        case '.': return new DotBuiltin();
-        case '⍣': return new RepeatBuiltin(sc);
-        case '⍡': return new CRepeatBuiltin(sc);
-        case '⍤': return new JotDiaeresisBuiltin();
-        case '⍥': return new OverBuiltin();
-        case '⍢': return new DualBuiltin();
-        case '@': return new AtBuiltin(sc);
-        case '⍫': return new ObverseBuiltin();
+        // case '∘': return new JotBuiltin();
+        // case '⍛': return new JotUBBuiltin();
+        // case '.': return new DotBuiltin();
+        // case '⍡': return new CRepeatBuiltin(sc);
+        case '○': return new OverBuiltin();
+        case '∘': return new AtopBuiltin();
+        case '⊸': return new BeforeBuiltin();
+        case '⟜': return new AfterBuiltin();
+        case '⌾': return new UnderBuiltin();
+        case '⍟': return new RepeatBuiltin();
+        case '⚇': return new DepthBuiltin();
+        // case '@': return new AtBuiltin(sc);
+        // case '⍫': return new ObverseBuiltin();
         
         
         case '⍬': return new DoubleArr(DoubleArr.EMPTY);
-        case '⎕': return new Quad(sc);
-        case '⍞': return new QuoteQuad();
-        case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
-        case '⍵':     o = sc.get("⍵"); if(o == null) throw new SyntaxError("No ⍵ found", t); return o;
-        case '∇':     o = sc.get("∇"); if(o == null) throw new SyntaxError("No ∇ found", t); return o;
-        case '⍶':     o = sc.get("⍶"); if(o == null) throw new SyntaxError("No ⍶ found", t); return o;
-        case '⍹':     o = sc.get("⍹"); if(o == null) throw new SyntaxError("No ⍹ found", t); return o;
+        case '•': return new Quad(sc);
+        // case '⍞': return new QuoteQuad();
+        // case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
+        // case '⍵':     o = sc.get("⍵"); if(o == null) throw new SyntaxError("No ⍵ found", t); return o;
+        // case '∇':     o = sc.get("∇"); if(o == null) throw new SyntaxError("No ∇ found", t); return o;
+        // case '⍶':     o = sc.get("⍶"); if(o == null) throw new SyntaxError("No ⍶ found", t); return o;
+        // case '⍹':     o = sc.get("⍹"); if(o == null) throw new SyntaxError("No ⍹ found", t); return o;
+        
+        // case 'ℝ': // the lone double-struck..
+        case 55349: // double-struck surrogate pair
+          Obj o;
+          System.out.println("HI");
+          switch (t1.op) { // +TODO clean up
+            case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
+            case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o;
+            case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
+            case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o;
+            case "𝕗": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
+            case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o;
+            case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
+            case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o;
+            // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
+          }
+          /* fallthrough! */
         default: throw new NYIError("no built-in " + ((OpTok) t).op + " defined in exec", t);
       }
     }

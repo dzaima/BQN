@@ -5,6 +5,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.MinusBuiltin;
 
 public class ReverseBuiltin extends Builtin implements DimMFn, DimDFn {
   @Override public String repr() {

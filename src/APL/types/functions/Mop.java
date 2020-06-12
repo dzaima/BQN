@@ -72,4 +72,8 @@ public abstract class Mop extends Callable {
   @Override public boolean equals(Obj o) {
     return this == o;
   }
+  
+  public Fun asFun() {
+    throw new Error("can't do");
+  }
 }

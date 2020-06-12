@@ -20,7 +20,7 @@ public class ReplicateBuiltin extends Builtin {
     return replicate(a, w, this);
   }
   
-  public static Value replicate(Value a, Value w, Callable blame) {
+  public static Value replicate(Value a, Value w, Callable blame) { // +TODO move to SlashBuiltin
     if (a.rank == 0) {
       if (w.rank > 1) throw new RankError("⌿: rank of ⍵ should be ≤1 if ⍺ is a scalar", blame);
       int sz = a.asInt();

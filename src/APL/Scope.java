@@ -6,7 +6,7 @@ import APL.tokenizer.types.BasicLines;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
-import APL.types.functions.builtins.dops.OverBuiltin;
+import APL.types.functions.builtins.dops.*;
 import APL.types.functions.builtins.fns.*;
 
 import java.io.*;
@@ -23,7 +23,7 @@ public class Scope {
   private Num nIO;
   public Random rnd;
   public Scope() {
-    IO = 1;
+    IO = 0;
     nIO = Num.ONE;
     rnd = new Random();
   }
@@ -773,26 +773,26 @@ public class Scope {
         // if (w instanceof Num) return new BigValue(Double.doubleToLongBits(w.asDouble()), false);
         // return new Num(Double.longBitsToDouble(((BigValue) w).i.longValue()));
         if (t==3) {
-          if (f==1) return OverBuiltin.on(this, new Fun() {
+          if (f==1) return DepthBuiltin.on(this, new Fun() {
             public String repr() { return ""; }
             public Value call(Value w) {
               return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, w, DR.this)).longValue()));
             }
           }, 1, w);
-          if (f==5) return OverBuiltin.on(this, new Fun() {
+          if (f==5) return DepthBuiltin.on(this, new Fun() {
             public String repr() { return ""; }
             public Value call(Value w) {
               return new Num(Double.longBitsToDouble(((BigValue) w).longValue()));
             }
           }, 0, w);
         } else {
-          if (t==1) return OverBuiltin.on(this, new Fun() {
+          if (t==1) return DepthBuiltin.on(this, new Fun() {
             public String repr() { return ""; }
             public Value call(Value w) {
               return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(w.asDouble()))}, new int[]{64});
             }
           }, 0, w);
-          if (t==5) return OverBuiltin.on(this, new Fun() {
+          if (t==5) return DepthBuiltin.on(this, new Fun() {
             public String repr() { return ""; }
             public Value call(Value w) {
               return new BigValue(Double.doubleToRawLongBits(w.asDouble()));

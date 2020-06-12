@@ -37,7 +37,7 @@ public abstract class APLError extends RuntimeException {
     else for (Mg g : l) println(List.of(g));
   }
   
-  public void println(List<Mg> gs) {
+  public void println(List<Mg> gs) { // +TODO proper formatting for surrogate pairs
     if (gs.size() == 0) return;
     
     String raw = gs.get(0).raw;

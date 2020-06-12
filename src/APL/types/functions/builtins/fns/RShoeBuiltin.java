@@ -3,8 +3,9 @@ package APL.types.functions.builtins.fns;
 import APL.*;
 import APL.errors.*;
 import APL.types.*;
+import APL.types.functions.Builtin;
 
-public class RShoeBuiltin extends Fun {
+public class RShoeBuiltin extends Builtin {
   @Override public String repr() {
     return "⊃";
   }

@@ -107,14 +107,14 @@ public class RhoBuiltin extends Builtin {
       Value c = a.get(i);
       if (!(c instanceof Num)) { // a⍬b ⍴ w - must use all items
         if (w.rank == 0 && v.first() instanceof Primitive) return v.first();
-        if (v.ia != w.ia) throw new DomainError("⍢⍴ expected equal amount of output & output items", this);
+        if (v.ia != w.ia) throw new DomainError("⌾⍴ expected equal amount of output & output items", this);
         return v.ofShape(w.shape);
       }
     }
     int[] sh = a.asIntVec();
     int am = Arr.prod(sh);
-    if (am > w.ia) throw new DomainError("⍢("+ Main.formatAPL(sh)+"⍴) applied on array with less items than "+am, this);
-    if (!Arrays.equals(sh, v.shape)) throw new DomainError("⍢⍴ expected equal amount of output & output items", this);
+    if (am > w.ia) throw new DomainError("⌾("+ Main.formatAPL(sh)+"⍴) applied on array with less items than "+am, this);
+    if (!Arrays.equals(sh, v.shape)) throw new DomainError("⌾⍴ expected equal amount of output & output items", this);
     Value[] vs = new Value[w.ia];
     System.arraycopy(v.values(), 0, vs, 0, am);
     System.arraycopy(w.values(), am, vs, am, vs.length-am);
@@ -125,7 +125,7 @@ public class RhoBuiltin extends Builtin {
   //   Value v = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
   //   int[] sh = v.asIntVec();
   //   
-  //   if (Arr.prod(sh) != w.ia) throw new DomainError("⍢⍴ expected equal amount of output & output items", this);
+  //   if (Arr.prod(sh) != w.ia) throw new DomainError("⌾⍴ expected equal amount of output & output items", this);
   //   return w.ofShape(sh);
   // }
 }

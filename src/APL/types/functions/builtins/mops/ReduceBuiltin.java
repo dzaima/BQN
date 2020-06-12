@@ -7,22 +7,23 @@ import APL.types.arrs.*;
 import APL.types.dimensions.DimMMop;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.*;
+import APL.types.functions.builtins.fns2.*;
 
 public class ReduceBuiltin extends Mop implements DimMMop {
   @Override public String repr() {
-    return "/";
+    return "´";
   }
   
   
   
   @Override
   public Value call(Obj f, Value w, int dim) {
-    if (!(f instanceof Fun)) throw new SyntaxError("/ is only reduce. To use as replicate, use ⌿", f);
+    isFn(f);
     return ngnReduce(w, dim, (Fun)f);
   }
   
   public Value call(Obj f, Value w, DerivedMop derv) {
-    if (!(f instanceof Fun)) throw new SyntaxError("/ is only reduce. To use as replicate, use ⌿", f);
+    isFn(f);
     Fun ff = (Fun) f;
     if (w.rank >= 2) {
       return ngnReduce(w, w.rank-1, ff);
@@ -45,7 +46,7 @@ public class ReduceBuiltin extends Mop implements DimMMop {
         return new Num(p);
       }
     }
-    if (f instanceof CatBuiltin) {
+    if (f instanceof OldCatBuiltin) {
       if (w.ia > 0) {
         special: {
           Value first = w.first();

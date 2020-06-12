@@ -82,7 +82,7 @@ dyadic ops
 ⍡  cumulative repeat
 ⍥  over (←→ {(⍹⍺) ⍶ ⍹⍵} )
 ⍤  atop (←→ {⍺⍺ ⍺ ⍵⍵ ⍵} )
-⍢  under (←→ {⍺←{_←⍺⍺⋄⍵}⋄(⍹⍣¯1) (⍹⍺) ⍶ ⍹⍵}; also structural inverse )
+⌾  under (←→ {⍺←{_←⍺⍺⋄⍵}⋄(⍹⍣¯1) (⍹⍺) ⍶ ⍹⍵}; also structural inverse )
 ⍫  obverse - define inverse: ⍶ - regular function, ⍹ - inverse
 @  at; right op = indices or function giving boolean array, left op = replacement array or function
 ⍁  for each diagonal

@@ -8,8 +8,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class Tokenizer {
-  private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_∆".toCharArray();
-  private static final String ops = "⍺⍳⍴⍵!%*+,-./<=>?@\\^|~⍬⊢⊣⌷¨⍨⌿⍀≤≥≠∨∧÷×∊↑↓○⌈⌊∇∘⊂⊃∩∪⊥⊤⍱⍲⍒⍋⍉⌽⊖⍟⌹⍕⍎⍫⍪≡≢⍷→⎕⍞⍣⍶⍸⍹⌸⌺⍇⍢⍤⍁⍂⊆⊇⊙⌾⌻⌼⍃⍄⍅⍆⍈⍊⍌⍍⍏⍐⍑⍓⍔⍖⍗⍘⍚⍛⍜⍠⍡⍥⍦⍧⍩⍭⍮⍯⍰√‽⊗ϼ∍⋾…ᑈᐵ"; // stolen from https://bitbucket.org/zacharyjtaylor/rad/src/master/RAD_document.txt?fileviewer=file-view-default
+  private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
+  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ";
+  private static final String surrogateOps = "𝕨𝕩𝔽𝔾𝕎𝕏𝕗𝕘𝕊";
   private static boolean validNameStart(char c) {
     for (char l : validNames) if (l == c) return true;
     return false;
@@ -72,7 +73,7 @@ public class Tokenizer {
     return tokenize(raw, false);
   }
   
-  public static BasicLines tokenize(String raw, boolean pointless) { // pointless means unevaled things get tokens; mainly for syntax highlighting
+  @SuppressWarnings("StringConcatenationInLoop") public static BasicLines tokenize(String raw, boolean pointless) { // pointless means unevaled things get tokens; mainly for syntax highlighting
     int li = 0;
     int len = raw.length();
     
@@ -140,11 +141,11 @@ public class Tokenizer {
           tokens = lines.get(lines.size() - 1);
           tokens.add(r);
           i++;
-        } else if (validNameStart(c) || c == '⎕' && validNameStart(next)) {
+        } else if (validNameStart(c) || c == '•' && validNameStart(next)) {
           i++;
           while (i < len && validNameMid(raw.charAt(i))) i++;
           var name = raw.substring(li, i);
-          if (c == '⎕') name = name.toUpperCase();
+          if (c == '•') name = name.toUpperCase();
           tokens.add(new NameTok(raw, li, i, name));
         } else if (c=='¯' && next=='∞') {
           i+= 2;
@@ -201,10 +202,18 @@ public class Tokenizer {
             } else tokens.add(new NumTok(raw, li, i, f));
           } else tokens.add(new NumTok(raw, li, i, f));
         } else if (ops.contains(cS)) {
-          tokens.add(new OpTok(raw, i, i + 1, cS));
+          tokens.add(new OpTok(raw, i, i+1, cS));
           i++;
+        } else if (c == 55349) { // low surrogate pair of double-struck chars
+          if (i+1==len) throw new SyntaxError("expression ended with low surrogate \\uD835");
+          if (surrogateOps.indexOf(raw.charAt(i+1)) == -1) {
+            String hex = Integer.toHexString(raw.charAt(i+1)).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
+            throw new SyntaxError("unknown token `\uD835" + raw.charAt(i+1) + "` (\\uD835\\u"+hex+")");
+          }
+          tokens.add(new OpTok(raw, i, i+2, raw.substring(i, i+2)));
+          i+= 2;
         } else if (c == '←') {
-          tokens.add(new SetTok(raw, i, i + 1));
+          tokens.add(new SetTok(raw, i, i+1));
           i++;
         } else if (c == '`') {
           if (tokens.annoyingBacktickPos != null) throw new SyntaxError("` after `");
@@ -212,9 +221,9 @@ public class Tokenizer {
           i++;
         } else if (c == ':') {
           if (next == ':') {
-            tokens.add(new DColonTok(raw, i, i + 2));
+            tokens.add(new DColonTok(raw, i, i+2));
             i++;
-          } else tokens.add(new ColonTok(raw, i, i + 1));
+          } else tokens.add(new ColonTok(raw, i, i+1));
           i++;
         } else if (c == '\'') {
           StringBuilder str = new StringBuilder();
@@ -275,7 +284,7 @@ public class Tokenizer {
         } else if (c == '\n' || c == '⋄' || c == '\r' || c == ';') {
           if (c=='⋄' && pointless) tokens.add(new DiamondTok(raw, i));
           if (c=='⋄' || c=='\n') expr.hasDmd = true;
-          if (c == ';') tokens.add(new SemiTok(raw, i, i + 1));
+          if (c == ';') tokens.add(new SemiTok(raw, i, i+1));
           
           if (tokens.size() > 0) {
             lines.add(new Line(raw, li));
@@ -289,13 +298,9 @@ public class Tokenizer {
           tokens.add(new ScopeTok(raw, i, i+1));
           i++;
         } else if (c == ' ' || c == '\t') {i++;} else {
-          if (pointless) tokens.add(new ErrTok(raw, i, i + 1));
+          if (pointless) tokens.add(new ErrTok(raw, i, i+1));
           else {
-            String hex = Integer.toHexString(c);
-            
-            while(hex.length() < 4)
-              //noinspection StringConcatenationInLoop \\ shut UUuuppp
-              hex = "0"+hex;
+            String hex = Integer.toHexString(c).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
             throw new SyntaxError("unknown token `" + c + "` (\\u"+hex+")");
           }
           i++;

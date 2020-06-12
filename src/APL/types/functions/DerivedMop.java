@@ -35,7 +35,7 @@ public class DerivedMop extends Fun {
   }
   
   @Override public String repr() {
-    return op instanceof TableBuiltin? "∘."+aa.toString() : aa.toString()+op.repr();
+    return aa.toString()+op.repr();
   }
   
   public Value under(Obj o, Value w) {

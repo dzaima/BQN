@@ -21,4 +21,8 @@ public abstract class Settable extends Obj {
     if (v == null) return this;
     return v;
   }
+  
+  public Fun asFun() {
+    return get().asFun();
+  }
 }

@@ -8,13 +8,13 @@ import APL.types.functions.*;
 
 public class ScanBuiltin extends Mop {
   @Override public String repr() {
-    return "\\";
+    return "`";
   }
   
   public Value call(Obj aa, Value w, DerivedMop derv) {
     Fun aaf = isFn(aa);
     // TODO ranks
-    if (w.rank != 1) throw new NYIError("\\: unimplemented for rank≠1 ("+Main.formatAPL(w.shape)+" ≡ ⍴⍵)");
+    if (w.rank != 1) throw new NYIError("`: unimplemented for rank≠1 ("+Main.formatAPL(w.shape)+" ≡ ⍴⍵)");
     if (w.ia == 0) return w;
     Value c = w.get(0);
     Value[] res = new Value[w.ia];
@@ -30,8 +30,8 @@ public class ScanBuiltin extends Mop {
     Fun aaf = isFn(aa);
     int n = a.asInt();
     int len = w.ia;
-    if (n < 0) throw new DomainError("\\: ⍺ should be non-negative (was "+n+")", this);
-    if (w.rank > 1) throw new RankError("\\: rank of ⍵ should be less than 2 (was "+w.rank+")", this);
+    if (n < 0) throw new DomainError("`: ⍺ should be non-negative (was "+n+")", this);
+    if (w.rank > 1) throw new RankError("`: rank of ⍵ should be less than 2 (was "+w.rank+")", this);
     
     if (w.quickDoubleArr()) {
       Value[] res = new Value[len-n+1];

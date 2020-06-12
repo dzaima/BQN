@@ -585,4 +585,8 @@ public abstract class Fun extends Callable {
   @Override public boolean equals(Obj o) {
     return this == o;
   }
+  
+  public Fun asFun() {
+    return this;
+  }
 }
