@@ -65,15 +65,16 @@ public abstract class Mop extends Callable {
     return (Fun) o;
   }
   
+  
+  public Fun asFun() {
+    throw new Error("can't do");
+  }
+  
   // functions are equal per-object basis
   @Override public int hashCode() {
     return actualHashCode();
   }
   @Override public boolean equals(Obj o) {
     return this == o;
-  }
-  
-  public Fun asFun() {
-    throw new Error("can't do");
   }
 }

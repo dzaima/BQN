@@ -344,8 +344,8 @@ public class Scope {
     @Override
     public Value call(Value w) {
       String name = w.asString();
-      if (!(get(name) instanceof Value)) return Num.MINUS_ONE;
-      Value v = (Value) get(name);
+      if (!(Scope.this.get(name) instanceof Value)) return Num.MINUS_ONE;
+      Value v = (Value) Scope.this.get(name);
       Value optimized = v.squeeze();
       if (v == optimized) return Num.ZERO;
       update(name, optimized);
@@ -553,7 +553,7 @@ public class Scope {
     }
     
     @Override public Value call(Value w) {
-      Obj obj = get(w.asString());
+      Obj obj = Scope.this.get(w.asString());
       if (obj == null) return Num.ZERO;
       if (obj instanceof Value) return Num.NUMS[2];
       if (obj instanceof Fun  ) return Num.NUMS[3];

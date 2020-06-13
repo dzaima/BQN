@@ -566,6 +566,9 @@ public abstract class Fun extends Callable {
     }
   }
   
+  
+  
+  
   @Override
   public Type type() {
     return Type.fn;
@@ -578,15 +581,15 @@ public abstract class Fun extends Callable {
     return repr();
   }
   
+  public Fun asFun() {
+    return this;
+  }
+  
   // functions are equal per-object basis
   @Override public int hashCode() {
     return actualHashCode();
   }
   @Override public boolean equals(Obj o) {
     return this == o;
-  }
-  
-  public Fun asFun() {
-    return this;
   }
 }
