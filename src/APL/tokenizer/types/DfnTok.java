@@ -5,8 +5,7 @@ import java.util.List;
 public class DfnTok extends TokArr<LineTok> {
   
   public DfnTok(String line, int spos, int epos, List<LineTok> tokens) {
-    super(line, spos, tokens);
-    end(epos);
+    super(line, spos, tokens); end(epos);
   }
   
   @Override public String toRepr() {

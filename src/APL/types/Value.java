@@ -252,7 +252,8 @@ public abstract class Value extends Obj implements Iterable<Value> {
     return this;
   }
   
-  public Fun asFun() {
+  
+  public /*open*/ Fun asFun() {
     return new Fun() {
       public String repr() {
         return Value.this.toString();

@@ -64,6 +64,4 @@ public abstract class Obj implements Tokenable {
   public Token getToken() {
     return token;
   }
-  
-  public abstract Fun asFun(); // +TODO remove
 }

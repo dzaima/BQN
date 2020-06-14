@@ -1,6 +1,6 @@
 package APL.tokenizer;
 
-import APL.errors.SyntaxError;
+import APL.errors.*;
 import APL.tokenizer.types.*;
 import APL.types.BigValue;
 
@@ -140,8 +140,8 @@ public class Tokenizer {
           for (Line ta : closed.a) lineTokens.add(ta.tok());
           Token r;
           switch (c) {
-            case ')':
-              r = new ParenTok(raw, closed.pos, i+1, lineTokens, closed.hasDmd);
+            case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
+              r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0), closed.hasDmd);
               break;
             case '}':
               r = new DfnTok(raw, closed.pos, i+1, lineTokens);
@@ -341,8 +341,8 @@ public class Tokenizer {
         for (Line ta : closed.a) lineTokens.add(ta.tok());
         Token r;
         switch (closed.b) {
-          case ')':
-            r = new ParenTok(raw, closed.pos, len, lineTokens, closed.hasDmd);
+          case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
+            r = new ParenTok(raw, closed.pos, len, lineTokens.get(0), closed.hasDmd);
             break;
           case '}':
             r = new DfnTok(raw, closed.pos, len, lineTokens);

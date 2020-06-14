@@ -612,13 +612,13 @@ public class Exec {
           Obj o;
           switch (t1.op) { // +TODO clean up
             case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
-            case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o.asFun();
+            case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return Main.san(o).asFun();
             case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
-            case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o.asFun();
+            case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return Main.san(o).asFun();
             case "𝕗": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
-            case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o.asFun();
+            case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return Main.san(o).asFun();
             case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
-            case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o.asFun();
+            case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return Main.san(o).asFun();
             // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
           }
           /* fallthrough! */
@@ -632,39 +632,41 @@ public class Exec {
     if (t instanceof NameTok) return sc.getVar(((NameTok) t).name);
     if (t instanceof LineTok) return Main.exec((LineTok) t, sc);
     if (t instanceof ParenTok) {
-      List<LineTok> ts = ((ParenTok) t).tokens;
-      int size = ts.size();
-      if (size == 0) return new StrMap();
-      LineTok fst = ts.get(0);
-      if (size==1 && fst.colonPos()==-1) {
-        if (((ParenTok) t).hasDmd) return new Shape1Arr(Main.exec(ts.get(0), sc));
-        return Main.exec(ts.get(0), sc);
-      }
-      if (fst.tokens != null && fst.colonPos() != -1) { // map constants
-        Scope nsc = new Scope(sc);
-        StrMap res = new StrMap(nsc);
-        for (LineTok ct : ts) {
-          Token name = ct.tokens.get(0);
-          if (ct.colonPos() ==-1) throw new SyntaxError("expected a colon in expression", ct.tokens.get(0));
-          if (ct.colonPos() != 1) throw new SyntaxError("expected : to be the 2nd token in parenthesis", ct.tokens.get(ct.colonPos()));
-          String key;
-          if (name instanceof NameTok) key = ((NameTok) name).name;
-          else if (name instanceof StrTok) key = ((StrTok) name).parsed;
-          else if (name instanceof ChrTok) key = ((ChrTok) name).parsed;
-          else throw new SyntaxError("expected a key name, got " + Main.explain(name), name);
-          List<Token> tokens = ct.tokens.subList(2, ct.tokens.size());
-          
-          Value val = Main.exec(LineTok.inherit(tokens), nsc);
-          res.setStr(key, val);
-        }
-        return res;
-      } else { // array +TODO
-        Value[] vs = new Value[size];
-        for (int i = 0; i < ts.size(); i++) {
-          vs[i] = Main.exec(ts.get(i), sc);
-        }
-        return Arr.create(vs);
-      }
+      return Main.exec(((ParenTok) t).ln, sc);
+      
+      // List<LineTok> ts = ((ParenTok) t).tokens;
+      // int size = ts.size();
+      // if (size == 0) return new StrMap();
+      // LineTok fst = ts.get(0);
+      // if (size==1 && fst.colonPos()==-1) {
+      //   if (((ParenTok) t).hasDmd) return new Shape1Arr(Main.exec(ts.get(0), sc));
+      //   return Main.exec(ts.get(0), sc);
+      // }
+      // if (fst.tokens != null && fst.colonPos() != -1) { // map constants
+      //   Scope nsc = new Scope(sc);
+      //   StrMap res = new StrMap(nsc);
+      //   for (LineTok ct : ts) {
+      //     Token name = ct.tokens.get(0);
+      //     if (ct.colonPos() ==-1) throw new SyntaxError("expected a colon in expression", ct.tokens.get(0));
+      //     if (ct.colonPos() != 1) throw new SyntaxError("expected : to be the 2nd token in parenthesis", ct.tokens.get(ct.colonPos()));
+      //     String key;
+      //     if (name instanceof NameTok) key = ((NameTok) name).name;
+      //     else if (name instanceof StrTok) key = ((StrTok) name).parsed;
+      //     else if (name instanceof ChrTok) key = ((ChrTok) name).parsed;
+      //     else throw new SyntaxError("expected a key name, got " + Main.explain(name), name);
+      //     List<Token> tokens = ct.tokens.subList(2, ct.tokens.size());
+      //    
+      //     Value val = Main.exec(LineTok.inherit(tokens), nsc);
+      //     res.setStr(key, val);
+      //   }
+      //   return res;
+      // } else { // array +TODO
+      //   Value[] vs = new Value[size];
+      //   for (int i = 0; i < ts.size(); i++) {
+      //     vs[i] = Main.exec(ts.get(i), sc);
+      //   }
+      //   return Arr.create(vs);
+      // }
     }
     if (t instanceof StrandTok) {
       List<Token> tks = ((StrandTok) t).tokens;
