@@ -141,7 +141,7 @@ public class Tokenizer {
           Token r;
           switch (c) {
             case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
-              r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0), closed.hasDmd);
+              r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0));
               break;
             case '}':
               r = new DfnTok(raw, closed.pos, i+1, lineTokens);
@@ -342,7 +342,7 @@ public class Tokenizer {
         Token r;
         switch (closed.b) {
           case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
-            r = new ParenTok(raw, closed.pos, len, lineTokens.get(0), closed.hasDmd);
+            r = new ParenTok(raw, closed.pos, len, lineTokens.get(0));
             break;
           case '}':
             r = new DfnTok(raw, closed.pos, len, lineTokens);

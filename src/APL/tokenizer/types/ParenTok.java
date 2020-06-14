@@ -4,12 +4,10 @@ import APL.tokenizer.Token;
 
 public class ParenTok extends Token {
   public final LineTok ln;
-  public final boolean hasDmd;
   
-  public ParenTok(String line, int spos, int epos, LineTok ln, boolean hasDmd) {
+  public ParenTok(String line, int spos, int epos, LineTok ln) {
     super(line, spos); end(epos);
     this.ln = ln;
-    this.hasDmd = hasDmd;
   }
   
   @Override public String toRepr() {
