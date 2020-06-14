@@ -130,7 +130,7 @@ public class DoubleArr extends Arr {
   
   public Arr reverseOn(int dim) {
     if (rank == 0) {
-      if (dim != 0) throw new DomainError("rotating a scalar with a non-⎕IO axis", this);
+      if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis", this);
       return this;
     }
     if (dim < 0) dim+= rank;

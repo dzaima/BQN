@@ -55,7 +55,7 @@ public class UDBuiltin extends Builtin {
       int ia = Arr.prod(shape);
       Value[] arr = new Value[ia];
       int i = 0;
-      for (int[] c : new Indexer(shape, 0)) {
+      for (int[] c : new Indexer(shape)) {
         arr[i] = Main.toAPL(c);
         i++;
       }

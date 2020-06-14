@@ -40,7 +40,6 @@ bigints:
 ⌽[dim] takes dim reversed
 
 ⎕-s:
-  ⎕IO      : index origin; 0 or 1
   ⎕VI      : vector indexing. changes behavior if ⍳vec, ⊇, etc.
   ⎕MILLIS  : time since starting
   ⎕TIME    : time `⍎⍵` repeated ⍺ times (def = 1) in nanoseconds

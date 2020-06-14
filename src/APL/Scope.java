@@ -19,18 +19,12 @@ public class Scope {
   public final HashMap<String, Value> vars = new HashMap<>();
   private Scope parent = null;
   public boolean alphaDefined;
-  public int IO;
-  private Num nIO;
   public Random rnd;
   public Scope() {
-    IO = 0;
-    nIO = Num.ONE;
     rnd = new Random();
   }
   public Scope(Scope p) {
     parent = p;
-    IO = p.IO;
-    nIO = p.nIO;
     rnd = p.rnd;
   }
   private Scope owner(String name) {
@@ -48,11 +42,7 @@ public class Scope {
     if (name.charAt(0) == '⎕') {
       switch (name) {
         case "⎕IO":
-          int tIO = val.asInt();
-          if (tIO != 0 && tIO != 1) throw new DomainError("⎕IO should be 0 or 1", val);
-          IO = tIO;
-          nIO = IO==0? Num.ZERO : Num.ONE;
-          break;
+          throw new DomainError("Cannot set ⎕IO");
         case "⎕BOXSIMPLE":
           Main.enclosePrimitives = val.asInt() == 1;
           break;
@@ -100,7 +90,7 @@ public class Scope {
         case "⎕DR": return new DR();
         case "⎕UCS": return new UCS(this);
         case "⎕HASH": return new Hasher();
-        case "⎕IO": return nIO;
+        case "⎕IO": return Num.ZERO;
         case "⎕VI": return Main.vind? Num.ONE : Num.ZERO;
         case "⎕BOXSIMPLE": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
         case "⎕CLASS": return new ClassGetter();
@@ -145,13 +135,13 @@ public class Scope {
   
   public double rand(double d) {
     return rnd.nextDouble()*d;
-  } // with ⎕IO←0
+  }
   public long randLong() {
     return rnd.nextLong();
-  } // with ⎕IO←0
+  }
   public int rand(int n) {
     return rnd.nextInt(n);
-  } // with ⎕IO←0
+  }
   
   static class GCLog extends Builtin {
     @Override public String repr() {

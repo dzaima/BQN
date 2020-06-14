@@ -14,7 +14,7 @@ public class DervDimMop extends Mop {
     this.f = f;
     if (dim == null) this.dim = 0;
     else if (dim < 0) this.dim = dim;
-    else this.dim = dim - sc.IO;
+    else this.dim = dim;
     this.token = f.token;
     
   }

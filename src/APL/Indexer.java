@@ -25,14 +25,14 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       c[i] = offsets[i];
     }
   }
-  public Indexer(int[] sh, int IO) {
+  public Indexer(int[] sh) {
     shape = sh;
     rank = sh.length;
     c = new int[sh.length];
     this.offsets = new int[sh.length];
     for (int i = 0; i < sh.length; i++) {
       ia*= sh[i];
-      offsets[i] = IO;
+      // offsets[i] = 0; \\ default
       c[i] = offsets[i];
     }
   }
@@ -81,32 +81,32 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     return res;
   }
   
-  public static int fromShape(int[] shape, int[] pos, int IO) {
+  public static int fromShape(int[] shape, int[] pos) {
     int x = 0;
     for (int i = 0; i < shape.length; i++) {
-      x+= pos[i] - IO;
+      x+= pos[i];
       if (i != shape.length-1) x*= shape[i+1];
     }
     return x;
   }
-  public static int fromShapeChk(int[] sh, int[] pos, Callable blame) { // IO≡0
+  public static int fromShapeChk(int[] sh, int[] pos, Callable blame) {
     if (sh.length != pos.length) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
     int x = 0;
     for (int i = 0; i < sh.length; i++) {
       x+= pos[i];
-      if (pos[i]<0 || pos[i]>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+"+⎕IO)", blame);
+      if (pos[i]<0 || pos[i]>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
     }
     return x;
   }
-  public static int fromShapeChk(int[] sh, Value pos, int IO, Callable blame) {
+  public static int fromShapeChk(int[] sh, Value pos, Callable blame) {
     if (pos.rank > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+ Main.formatAPL(pos.shape)+")", blame);
     if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
     int x = 0;
     double[] ds = pos.asDoubleArr();
     for (int i = 0; i < sh.length; i++) {
       int c = (int) ds[i];
-      c-= IO;
+      c-= 0;
       x+= c;
       if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
@@ -125,8 +125,8 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   
   // checks for rank & bound errors
   // ⎕VI←1 and sh.length≡1 allows for a shortcut of items (1 2 3 ←→ ⊂1 2 3)
-  public static PosSh poss(Value v, int[] ish, int IO, Callable blame) {
-    // if (v instanceof Primitive) return new PosSh(new int[]{v.asInt()-IO}, Rank0Arr.SHAPE);
+  public static PosSh poss(Value v, int[] ish, Callable blame) {
+    // if (v instanceof Primitive) return new PosSh(new int[]{v.asInt()}, Rank0Arr.SHAPE);
     if (Main.vind) { // ⎕VI←1
       boolean deep = false;
       int[] rsh = null;
@@ -143,7 +143,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       if (v.rank > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
       if (!(!deep && ish.length==1) && ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
       if (!deep) { // either the rank==1 case or a single position
-        int[] res = intsNoIO(v, IO);
+        int[] res = v.asIntArr();
         if (ish.length == 1) return new PosSh(res, new int[]{res.length});
         return new PosSh(new int[]{fromShapeChk(ish, res, blame)}, Rank0Arr.SHAPE);
       }
@@ -152,16 +152,16 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       for (int i = 0; i < v.ia; i++) {
         Value c = v.get(i);
         if (c instanceof Primitive) {
-          int n = c.asInt()-IO;
-          if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+(i+IO)+"] ≡ "+c+")", blame);
+          int n = c.asInt();
+          if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
           for (int j = 0; j < res.length; j++) res[j]+= n;
         } else {
           double[] ns = c.asDoubleArr();
           for (int j = 0; j < ns.length; j++) {
             int n = Num.toInt(ns[j]);
-            n-= IO;
+            n-= 0;
             res[j]+= n;
-            if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+(i+IO)+"] ≡ "+n+")", blame);
+            if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+n+")", blame);
           }
         }
         if (i != v.ia-1) {
@@ -172,24 +172,17 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     } else { // ⎕VI←0
       int[] rsh = v.shape;
       if (v.quickDoubleArr()) {
-        int[] res = intsNoIO(v, IO);
+        int[] res = v.asIntArr();
         if (v.ia == 0) return new PosSh(EmptyArr.NOINTS, rsh);
         if (ish.length != 1) throw new RankError(blame+": indexing at rank 1 (indexing by scalars in shape "+Main.formatAPL(ish)+" array)", blame);
-        for (int c : res) if (c<0 || c>=ish[0]) throw new LengthError(blame+": indexing out-of bounds (shape ≡ "+rsh[0]+"; pos ≡ " + (c+IO) + ")", blame);
+        for (int c : res) if (c<0 || c>=ish[0]) throw new LengthError(blame+": indexing out-of bounds (shape ≡ "+rsh[0]+"; pos ≡ " + c + ")", blame);
         return new PosSh(res, rsh);
       }
       
       int[] res = new int[v.ia];
-      for (int i = 0; i < v.ia; i++) res[i] = fromShapeChk(ish, v.get(i), IO, blame);
+      for (int i = 0; i < v.ia; i++) res[i] = fromShapeChk(ish, v.get(i), blame);
       return new PosSh(res, rsh);
     }
-  }
-  
-  static int[] intsNoIO(Value v, int IO) {
-    if (IO==0) return v.asIntArr();
-    int[] res = v.asIntArrClone();
-    for (int i = 0; i < res.length; i++) res[i]--;
-    return res;
   }
   
   public Iterator<int[]> iterator() {

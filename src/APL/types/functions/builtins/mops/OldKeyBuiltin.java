@@ -29,7 +29,7 @@ public class OldKeyBuiltin extends Mop {
       return ((APLMap) f).getRaw(w);
     }
     if (f instanceof Fun) {
-      int i = sc.IO;
+      int i = 0;
       var vals = new HashMap<Value, ArrayList<Value>>();
       var order = new ArrayList<Value>();
       for (Value v : w) {

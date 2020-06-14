@@ -14,18 +14,14 @@ public class RandBuiltin extends Builtin {
     return "?";
   }
   
-  public RandBuiltin(Scope sc) {
-    super(sc);
-  }
-  
   private final NumMV nf = new NumMV() {
     @Override public Value call(Num v) {
       if (v.num == 0) return new Num(sc.rand(1d));
-      else return Num.of(sc.rand(v.asInt()) + sc.IO);
+      else return Num.of(sc.rand(v.asInt()));
     }
     @Override public void call(double[] res, double[] a) {
       for (int i = 0; i < res.length; i++) {
-        res[i] = a[i]==0? sc.rand(1d) : Math.floor(sc.rand(a[i])) + sc.IO;
+        res[i] = a[i]==0? sc.rand(1d) : Math.floor(sc.rand(a[i]));
       }
     }
     @Override public Value call(BigValue w) {
@@ -34,12 +30,12 @@ public class RandBuiltin extends Builtin {
       do {
         n = new BigInteger(w.i.bitLength(), sc.rnd);
       } while (n.compareTo(w.i) >= 0);
-      return new BigValue(sc.IO==0? n : n.add(BigInteger.ONE));
+      return new BigValue(n);
     }
   };
   
   public Value call(Value w) {
-    if (sc.IO==0 && w instanceof SingleItemArr) {
+    if (w instanceof SingleItemArr) {
       Value f = w.first();
       if (f instanceof Num && ((Num) f).num==2) {
         long[] ls = new long[BitArr.sizeof(w.ia)];
@@ -53,12 +49,11 @@ public class RandBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    int IO = sc.IO;
     ArrayList<Integer> vs = new ArrayList<>(w.ia);
     int wi = w.asInt();
     int ai = a.asInt();
     for (int i = 0; i < wi; i++) {
-      vs.add(i+IO);
+      vs.add(i);
     }
     Collections.shuffle(vs, sc.rnd);
     double[] res = new double[ai];

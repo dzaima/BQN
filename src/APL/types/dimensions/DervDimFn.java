@@ -5,7 +5,6 @@ import APL.errors.*;
 import APL.types.*;
 
 public class DervDimFn extends Fun {
-  private final int IO;
   private final Fun f;
   private final int[] raw;
   private final int[] dims;
@@ -18,14 +17,12 @@ public class DervDimFn extends Fun {
     super(sc);
     this.f = f;
     this.raw = raw;
-    this.IO = sc.IO;
     if (raw == null) dims = new int[]{0};
     else {
       dims = new int[raw.length];
       for (int i = 0; i < raw.length; i++) {
         int c = raw[i];
-        if (c==0 && IO==1) throw new DomainError("bracket axis cannot contain 0 with ⎕IO←1", this);
-        dims[i] = c<0? c : c-IO;
+        dims[i] = c;
       }
     }
     this.token = f.token;
@@ -38,7 +35,7 @@ public class DervDimFn extends Fun {
     for (int i = 0; i < dims.length; i++) {
       int c = dims[i];
       int ax = c < 0? c + rank : c;
-      if (used[ax]) throw new DomainError("function axis specified axis "+(ax+IO)+" twice", this);
+      if (used[ax]) throw new DomainError("function axis specified axis "+ax+" twice", this);
       else used[ax] = true;
       res[i] = ax;
     }

@@ -21,6 +21,6 @@ public class SquadBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    return w.at(a.asIntVec(), sc.IO);
+    return w.at(a.asIntVec());
   }
 }

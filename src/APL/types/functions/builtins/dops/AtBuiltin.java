@@ -16,10 +16,10 @@ public class AtBuiltin extends Dop {
   }
   
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    return at(aa, ww, w, sc.IO, this);
+    return at(aa, ww, w, this);
   }
   
-  public static Value at(Obj aa, Obj ww, Value w, int IO, Callable blame) {
+  public static Value at(Obj aa, Obj ww, Value w, Callable blame) {
     int ia = w.ia;
     if (ww instanceof Fun) {
       Value vba = ((Fun) ww).call(w);
@@ -56,7 +56,7 @@ public class AtBuiltin extends Dop {
     } else {
       Value wwa = (Value) ww;
   
-      Indexer.PosSh poss = Indexer.poss(wwa, w.shape, IO, blame);
+      Indexer.PosSh poss = Indexer.poss(wwa, w.shape, blame);
       Value repl;
       if (aa instanceof Fun) {
         Fun aaf = ((Fun) aa);

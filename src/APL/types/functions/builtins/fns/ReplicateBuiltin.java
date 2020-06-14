@@ -225,6 +225,6 @@ public class ReplicateBuiltin extends Builtin {
     return AtBuiltin.at(v, new Fun() { // lazy version
       public String repr() { return "{⌿.⍺}"; }
       public Value call(Value w) { return a; }
-    }, w, -1234, this);
+    }, w, this);
   }
 }

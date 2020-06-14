@@ -133,19 +133,6 @@ public abstract class Value extends Obj implements Iterable<Value> {
     return new ValueIterator();
   }
   
-  public Value ind(double[][] ind, int id, int IO) {
-    if (ind.length != rank) throw new RankError("array rank was "+rank+", tried to get item at rank "+ind.length, this);
-    int x = 0;
-    for (int i = 0; i < rank; i++) {
-      double c = ind[i][id];
-      if (c < IO) throw new DomainError("Tried to access item at position " + c, this);
-      if (c >= shape[i]+IO) throw new DomainError("Tried to access item at position " + c + " while max was " + shape[i], this);
-      x+= c-IO;
-      if (i != rank-1) x*= shape[i+1];
-    }
-    return get(x);
-  }
-  
   class ValueIterator implements Iterator<Value> {
     int c = 0;
     @Override
@@ -159,13 +146,13 @@ public abstract class Value extends Obj implements Iterable<Value> {
     }
   }
   
-  public Value at(int[] pos, int IO) {
+  public Value at(int[] pos) {
     if (pos.length != rank) throw new RankError("array rank was "+rank+", tried to get item at rank "+pos.length, this);
     int x = 0;
     for (int i = 0; i < rank; i++) {
-      if (pos[i] < IO) throw new DomainError("Tried to access item at position "+pos[i], this);
-      if (pos[i] >= shape[i]+IO) throw new DomainError("Tried to access item at position "+pos[i]+" while max was "+(shape[i]+IO-1), this);
-      x+= pos[i]-IO;
+      if (pos[i] < 0) throw new DomainError("Tried to access item at position "+pos[i], this);
+      if (pos[i] >= shape[i]) throw new DomainError("Tried to access item at position "+pos[i]+" while max was "+(shape[i]-1), this);
+      x+= pos[i];
       if (i != rank-1) x*= shape[i+1];
     }
     return get(x);

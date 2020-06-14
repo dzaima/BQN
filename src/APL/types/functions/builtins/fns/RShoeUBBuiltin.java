@@ -15,10 +15,10 @@ public class RShoeUBBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    return on(a, w, sc.IO, this);
+    return on(a, w, this);
   }
   
-  public static Value on(Value a, Value w, int IO, Callable blame) { // +TODO remove usage of, moved to ⊏
+  public static Value on(Value a, Value w, Callable blame) { // +TODO remove usage of, moved to ⊏
     if (w instanceof APLMap) {
       Value[] res = new Value[a.ia];
       APLMap map = (APLMap) w;
@@ -29,12 +29,12 @@ public class RShoeUBBuiltin extends Builtin {
       return Arr.create(res, a.shape);
     }
     if (a instanceof Primitive && w.rank==1) {
-      Value r = w.get((int) a.asDouble() - IO);
+      Value r = w.get(a.asInt());
       if (r instanceof Primitive) return r;
       else return new Rank0Arr(r);
     }
     
-    return on(Indexer.poss(a, w.shape, IO, blame), w);
+    return on(Indexer.poss(a, w.shape, blame), w);
   }
   
   public static Value on(Indexer.PosSh poss, Value w) { // +TODO ↑
@@ -59,7 +59,7 @@ public class RShoeUBBuiltin extends Builtin {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     Value[] vs = w.valuesCopy();
     for (int i = 0; i < a.ia; i++) {
-      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec(), sc.IO)] = v.get(i);
+      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
     }
     return Arr.createL(vs, w.shape);
   }

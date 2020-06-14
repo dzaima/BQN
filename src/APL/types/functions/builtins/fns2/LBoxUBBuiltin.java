@@ -38,7 +38,7 @@ public class LBoxUBBuiltin extends Builtin {
       else return new Rank0Arr(r);
     }
     
-    return on(Indexer.poss(a, w.shape, 0, blame), w);
+    return on(Indexer.poss(a, w.shape, blame), w);
   }
   
   public static Value on(Indexer.PosSh poss, Value w) {
@@ -64,7 +64,7 @@ public class LBoxUBBuiltin extends Builtin {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     Value[] vs = w.valuesCopy();
     for (int i = 0; i < a.ia; i++) {
-      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec(), sc.IO)] = v.get(i);
+      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
     }
     return Arr.createL(vs, w.shape);
   }

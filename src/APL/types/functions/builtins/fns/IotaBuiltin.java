@@ -19,17 +19,15 @@ public class IotaBuiltin extends Builtin {
   }
   
   public Value call(Value w) {
-    int IO = sc.IO;
     if (w instanceof Primitive) {
       if (w instanceof Num) {
         double[] res = new double[w.asInt()];
-        if (IO == 0) for (int i = 0; i < res.length; i++) res[i] = i;
-        else for (int i = 0; i < res.length; i++) res[i] = i + 1;
+        for (int i = 0; i < res.length; i++) res[i] = i;
         return new DoubleArr(res);
       } else if (w instanceof BigValue) {
         Value[] res = new Value[w.asInt()];
         for (int i = 0; i < res.length; i++) {
-          res[i] = new BigValue(i+IO);
+          res[i] = new BigValue(i);
         }
         return new HArr(res);
       }
@@ -45,7 +43,7 @@ public class IotaBuiltin extends Builtin {
         double[] ds = new double[prod];
         int len = shape[i];
         int csz = 0;
-        double val = IO;
+        double val = 0;
         for (int k = 0; k < len; k++) {
           for (int l = 0; l < blockSize; l++) ds[csz++] = val;
           val++;
@@ -64,7 +62,7 @@ public class IotaBuiltin extends Builtin {
       int ia = Arr.prod(shape);
       Value[] arr = new Value[ia];
       int i = 0;
-      for (int[] c : new Indexer(shape, IO)) {
+      for (int[] c : new Indexer(shape)) {
         arr[i] = Main.toAPL(c);
         i++;
       }
@@ -73,10 +71,10 @@ public class IotaBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    return on(a, w, sc.IO, this);
+    return on(a, w, this);
   }
   
-  public static Value on(Value a, Value w, int IO, Callable blame) {
+  public static Value on(Value a, Value w, Callable blame) {
     if (w.rank > 1) throw new RankError("⍳: ⍵ had rank > 1", blame, w);
     if (a.rank > 1) throw new RankError("⍳: ⍺ had rank > 1", blame, a);
     if (w.ia > 20 && a.ia > 20) {
@@ -88,10 +86,9 @@ public class IotaBuiltin extends Builtin {
       }
       double[] res = new double[w.ia];
       ctr = 0;
-      double notfound = IO + a.ia;
       for (Value v : w) {
         Integer f = map.get(v);
-        res[ctr] = f==null? notfound : f + IO;
+        res[ctr] = f==null? a.ia : f;
         ctr++;
       }
       // w won't be a scalar
@@ -105,7 +102,7 @@ public class IotaBuiltin extends Builtin {
         if (av.equals(wv)) break;
         j++;
       }
-      res[i++] = j+IO;
+      res[i++] = j;
     }
     if (w instanceof Primitive) return new Num(res[0]);
     if (w.rank == 0) return new Num(res[0]);

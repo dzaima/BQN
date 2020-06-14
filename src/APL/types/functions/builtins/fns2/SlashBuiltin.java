@@ -17,7 +17,6 @@ public class SlashBuiltin extends Builtin {
   
   
   public Value call(Value w) {
-    int IO = 0; // +TODO opt
     int sum = (int)w.sum();
     if (w.rank == 1) {
       if (sum<0) {
@@ -29,7 +28,7 @@ public class SlashBuiltin extends Builtin {
       if (w instanceof BitArr) {
         BitArr.BR r = ((BitArr) w).read();
         for (int i = 0; i < w.ia; i++) {
-          if (r.read()) sub[p++] = i + IO;
+          if (r.read()) sub[p++] = i;
         }
       } else {
         var da = w.asDoubleArr();
@@ -37,7 +36,7 @@ public class SlashBuiltin extends Builtin {
           int v = (int) da[i];
           if (v < 0) throw new DomainError("/: ⍵ contained "+v, this, w);
           for (int j = 0; j < v; j++) {
-            sub[p++] = i + IO;
+            sub[p++] = i;
           }
         }
       }
@@ -47,7 +46,7 @@ public class SlashBuiltin extends Builtin {
       if (Main.vind) { // ⎕VI←1
         double[][] res = new double[w.rank][sum];
         int ri = 0;
-        Indexer idx = new Indexer(w.shape, IO);
+        Indexer idx = new Indexer(w.shape);
         int rank = res.length;
         for (int i = 0; i < w.ia; i++) {
           int[] p = idx.next();
@@ -65,7 +64,7 @@ public class SlashBuiltin extends Builtin {
       } else { // ⎕VI←0
         Value[] res = new Value[sum];
         int ri = 0;
-        Indexer idx = new Indexer(w.shape, IO);
+        Indexer idx = new Indexer(w.shape);
         for (int i = 0; i < w.ia; i++) {
           int[] p = idx.next();
           int n = Num.toInt(wd[idx.pos()]);
@@ -79,17 +78,16 @@ public class SlashBuiltin extends Builtin {
     }
   }
   public Value callInv(Value w) {
-    int IO = 0; // +TODO opt
     int[] sh = fn.call(w).asIntVec();
     int ia = 1;
     for (int i = 0; i < sh.length; i++) {
-      sh[i]+=1-IO;
+      sh[i]+= 1;
       ia *= sh[i];
     }
     double[] arr = new double[ia];
     for (Value v : w) {
       int[] c = v.asIntVec();
-      arr[Indexer.fromShape(sh, c, IO)]++;
+      arr[Indexer.fromShape(sh, c)]++;
     }
     return new DoubleArr(arr, sh);
   }

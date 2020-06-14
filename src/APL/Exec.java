@@ -141,7 +141,7 @@ public class Exec {
           if (Main.debug) printlvl("n[]");
           var a = firstVal();
           var w = (Brackets) popS();
-          addS(RShoeUBBuiltin.on(w.val, a, sc.IO, w));
+          addS(RShoeUBBuiltin.on(w.val, a, w));
           continue;
         }
       }
@@ -514,7 +514,7 @@ public class Exec {
         case '⌿': return new ReplicateBuiltin();
         case '⍀': return new ExpandBuiltin();
         case '⍧': return new LShoeStileBuiltin();
-        case '%': return new MergeBuiltin(sc);
+        case '%': return new MergeBuiltin();
         
         
         
@@ -553,8 +553,8 @@ public class Exec {
         case '↕': return new UDBuiltin();
         case '∊': return new EpsBuiltin();
         case '⍷': return new FindBuiltin();
-        case '⍋': return new GradeUpBuiltin(sc);
-        case '⍒': return new GradeDownBuiltin(sc);
+        case '⍋': return new GradeUpBuiltin();
+        case '⍒': return new GradeDownBuiltin();
         case '≢': return new TallyBuiltin();
         case '≡': return new MatchBuiltin();
         

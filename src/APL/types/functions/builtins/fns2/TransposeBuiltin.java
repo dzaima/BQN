@@ -34,12 +34,12 @@ public class TransposeBuiltin extends Builtin {
         }
       } else {
         int ci = 0;
-        for (int[] c : new Indexer(w.shape, 0)) {
+        for (int[] c : new Indexer(w.shape)) {
           int[] nc = new int[w.rank];
           for (int i = 0; i < w.rank; i++) {
             nc[i] = c[w.rank - i - 1];
           }
-          res[Indexer.fromShape(sh, nc, 0)] = dw[ci++];
+          res[Indexer.fromShape(sh, nc)] = dw[ci++];
         }
       }
       return new DoubleArr(res, sh);
@@ -49,12 +49,12 @@ public class TransposeBuiltin extends Builtin {
     for (int i = 0; i < w.rank; i++) {
       ns[i] = w.shape[w.rank - i - 1];
     }
-    for (int[] c : new Indexer(w.shape, 0)) {
+    for (int[] c : new Indexer(w.shape)) {
       int[] nc = new int[w.rank];
       for (int i = 0; i < w.rank; i++) {
         nc[i] = c[w.rank - i - 1];
       }
-      arr[Indexer.fromShape(ns, nc, 0)] = w.simpleAt(c);
+      arr[Indexer.fromShape(ns, nc)] = w.simpleAt(c);
     }
     return Arr.create(arr, ns);
   }

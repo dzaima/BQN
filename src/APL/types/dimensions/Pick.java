@@ -9,7 +9,6 @@ public class Pick extends Settable {
   private final Variable var;
   private final Value val;
   private final Value idx;
-  private final int IO;
   private final Brackets obj;
   
   public Pick(Variable var, Brackets where, Scope sc) {
@@ -18,16 +17,15 @@ public class Pick extends Settable {
     this.val = var.get();
     this.idx = where.val;
     this.obj = where;
-    this.IO = sc.IO;
   }
   
   @Override
   public void set(Value v, Callable blame) {
-    var.update(AtBuiltin.at(v, idx, val, IO, blame));
+    var.update(AtBuiltin.at(v, idx, val, blame));
   }
   
   public Value get() {
-    return RShoeUBBuiltin.on(idx, val, IO, obj);
+    return RShoeUBBuiltin.on(idx, val, obj);
   }
   
   public Obj getOrThis() {

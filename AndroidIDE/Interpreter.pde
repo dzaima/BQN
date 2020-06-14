@@ -76,7 +76,7 @@ class AppMap extends SimpleMap {
   Obj getv(String k) {
     String s = k.toLowerCase();
     if (s.matches("t\\d+")) {
-      int i = Integer.parseInt(s.substring(1)) - dzaimaSC.IO;
+      int i = Integer.parseInt(s.substring(1));
       if (i < topbar.tabs.size()) return topbar.tabs.get(i);
     }
     switch (s) {

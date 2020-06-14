@@ -28,12 +28,12 @@ public class RShoeBuiltin extends Builtin {
     if (a instanceof Num) {
       if (w.rank != 1) throw new RankError("array rank was "+w.rank+", tried to get item at rank 0", this, w);
       if (w.ia == 0) throw new LengthError("⊃ on array with 0 elements", this, w);
-      int p = a.asInt() - sc.IO;
+      int p = a.asInt();
       if (p >= w.ia) throw new DomainError("Tried to access item at position "+a+" while shape was "+ Main.formatAPL(w.shape), this);
       return w.get(p);
     }
     for (Value v : a) {
-      w = w.at(v.asIntVec(), sc.IO);
+      w = w.at(v.asIntVec());
     }
     return w;
   }
@@ -48,7 +48,7 @@ public class RShoeBuiltin extends Builtin {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     if (a instanceof Primitive) {
       Value[] vs = w.valuesCopy();
-      vs[a.asInt() - sc.IO] = v;
+      vs[a.asInt()] = v;
       return Arr.createL(vs, w.shape);
     } else {
       Value[] vs = w.valuesCopy();
@@ -58,7 +58,7 @@ public class RShoeBuiltin extends Builtin {
     }
   }
   private void replace(Value[] vs, Value w, int[] d, int i) {
-    int c = d[i]-sc.IO;
+    int c = d[i];
     if (i+1 == d.length) vs[c] = w;
     else {
       Value cv = vs[c];

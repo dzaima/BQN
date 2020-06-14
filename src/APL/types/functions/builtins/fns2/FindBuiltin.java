@@ -47,14 +47,14 @@ public class FindBuiltin extends Builtin {
         }
       }
     } else {
-      Indexer ind = new Indexer(Indexer.add(Indexer.sub(w.shape, a.shape), 1), 0);
+      Indexer ind = new Indexer(Indexer.add(Indexer.sub(w.shape, a.shape), 1));
       w: for (int[] inW : ind) {
-        for (int[] inA : new Indexer(a.shape, 0)) {
+        for (int[] inA : new Indexer(a.shape)) {
           Value vA = a.simpleAt(inA);
           Value vW = w.simpleAt(Indexer.add(inA, inW));
           if (!vA.equals(vW)) continue w;
         }
-        bc.set(Indexer.fromShape(w.shape, inW, 0));
+        bc.set(Indexer.fromShape(w.shape, inW));
       }
     }
     return bc.finish();

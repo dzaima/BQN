@@ -95,7 +95,7 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
     int i = 0;
     for (Value v : vals) {
       Value proto = v.prototype();
-      for (int[] c : new Indexer(def, 0)) {
+      for (int[] c : new Indexer(def)) {
         res[i++] = v.at(c, proto);
       }
     }
@@ -142,8 +142,8 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
     int rank = sh.length;
     assert rank==off.length && rank==w.rank;
     for (int i = 0; i < rank; i++) {
-      if (off[i] < 0) throw new DomainError(blame+": requesting item before first"+(rank>1? " at axis "+i+"+⎕IO" : ""), blame);
-      if (off[i]+sh[i] > w.shape[i]) throw new DomainError(blame+": requesting item after end"+(rank>1? " at axis "+i+"+⎕IO" : ""), blame);
+      if (off[i] < 0) throw new DomainError(blame+": requesting item before first"+(rank>1? " at axis "+i : ""), blame);
+      if (off[i]+sh[i] > w.shape[i]) throw new DomainError(blame+": requesting item after end"+(rank>1? " at axis "+i : ""), blame);
     }
     if (rank == 1) {
       int s = off[0];
@@ -183,7 +183,7 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
       String s = ((ChrArr) w).s;
       int i = 0;
       for (int[] index : new Indexer(sh, off)) {
-        arr[i] = s.charAt(Indexer.fromShape(w.shape, index, 0));
+        arr[i] = s.charAt(Indexer.fromShape(w.shape, index));
         i++;
       }
       return new ChrArr(arr, sh);
@@ -193,7 +193,7 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
       double[] wd = w.asDoubleArr();
       int i = 0;
       for (int[] index : new Indexer(sh, off)) {
-        arr[i] = wd[Indexer.fromShape(w.shape, index, 0)];
+        arr[i] = wd[Indexer.fromShape(w.shape, index)];
         i++;
       }
       return new DoubleArr(arr, sh);
@@ -201,7 +201,7 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
     Value[] arr = new Value[ia];
     int i = 0;
     for (int[] index : new Indexer(sh, off)) {
-      arr[i] = w.at(index, 0);
+      arr[i] = w.at(index);
       i++;
     }
     return Arr.create(arr, sh);
@@ -231,7 +231,7 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
     }
     Value[] r = new Value[origW.ia];
     int[] s = origW.shape;
-    Indexer idx = new Indexer(s, 0);
+    Indexer idx = new Indexer(s);
     int[] tmp = new int[e.length];
     for (int[] i : idx) {
       Value c;
