@@ -10,7 +10,7 @@ public class RepeatBuiltin extends Dop {
     return "⍟";
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     if (ww instanceof Fun) {
       Fun g = (Fun) ww;
@@ -35,7 +35,7 @@ public class RepeatBuiltin extends Dop {
     }
   }
   
-  public Value callInv(Obj aa, Obj ww, Value w) {
+  public Value callInv(Value aa, Value ww, Value w) {
     Fun aaf = isFn(aa, '⍶');
     if (ww instanceof Fun) throw new DomainError("(f⍣g)A cannot be inverted", this);
     
@@ -50,7 +50,7 @@ public class RepeatBuiltin extends Dop {
     return w;
   }
   
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     if (ww instanceof Fun) {
       Fun g = (Fun) ww;
@@ -76,7 +76,7 @@ public class RepeatBuiltin extends Dop {
     }
   }
   
-  public Value callInvW(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶');
     if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
     int am = ((Num) ww).asInt();
@@ -89,7 +89,7 @@ public class RepeatBuiltin extends Dop {
     }
     return w;
   }
-  public Value callInvA(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvA(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶');
     if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
     int am = ((Num) ww).asInt();
@@ -99,7 +99,7 @@ public class RepeatBuiltin extends Dop {
     throw new DomainError("f⍣N: ⍺-inverting is only possible when N∊¯1 1", this, ww);
   }
   
-  public Value under(Obj aa, Obj ww, Obj o, Value w, DerivedDop derv) {
+  public Value under(Value aa, Value ww, Obj o, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
     int n = ((Value) ww).asInt();

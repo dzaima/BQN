@@ -16,7 +16,7 @@ import java.util.*;
 
 
 public class Scope {
-  public final HashMap<String, Obj> vars = new HashMap<>();
+  public final HashMap<String, Value> vars = new HashMap<>();
   private Scope parent = null;
   public boolean alphaDefined;
   public int IO;
@@ -39,12 +39,12 @@ public class Scope {
     else return parent.owner(name);
   }
   
-  public void update(String name, Obj val) { // sets wherever var already exists
+  public void update(String name, Value val) { // sets wherever var already exists
     Scope sc = owner(name);
     if (sc == null) sc = this;
     sc.set(name, val);
   }
-  public void set(String name, Obj val) { // sets in current scope
+  public void set(String name, Value val) { // sets in current scope
     if (name.charAt(0) == '⎕') {
       switch (name) {
         case "⎕IO":
@@ -76,7 +76,7 @@ public class Scope {
       }
     } else vars.put(name, val);
   }
-  public Obj get(String name) {
+  public Value get(String name) {
     if (name.startsWith("⎕")) {
       switch (name) {
         case "⎕MILLIS": return new Num(System.currentTimeMillis() - Main.startingMillis);
@@ -122,7 +122,7 @@ public class Scope {
           return new Optimizer(this);
       }
     }
-    Obj f = vars.get(name);
+    Value f = vars.get(name);
     if (f == null) {
       if (parent == null) return null;
       else return parent.get(name);
@@ -344,8 +344,7 @@ public class Scope {
     @Override
     public Value call(Value w) {
       String name = w.asString();
-      if (!(Scope.this.get(name) instanceof Value)) return Num.MINUS_ONE;
-      Value v = (Value) Scope.this.get(name);
+      Value v = Scope.this.get(name);
       Value optimized = v.squeeze();
       if (v == optimized) return Num.ZERO;
       update(name, optimized);
@@ -371,11 +370,6 @@ public class Scope {
     }
     
     public Value call(Value w) {
-      Obj o = callObj(w);
-      if (o instanceof Value) return (Value) o;
-      throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-    }
-    public Obj callObj(Value w) {
       String path = w.asString();
       return Main.exec(Main.readFile(path), sc);
     }
@@ -397,7 +391,7 @@ public class Scope {
     }
     
     String get(APLMap m, String key, String def) {
-      Value got = (Value) m.getRaw(key);
+      Value got = m.getRaw(key);
       if (got != Null.NULL) return got.asString();
       return def;
     }
@@ -419,7 +413,7 @@ public class Scope {
           if (eo != Null.NULL) {
             APLMap e = (APLMap) eo;
             for (Value k : e.allKeys()) {
-              Value v = (Value) e.getRaw(k);
+              Value v = e.getRaw(k);
               conn.setRequestProperty(k.asString(), v.asString());
             }
           }
@@ -478,18 +472,17 @@ public class Scope {
       APLMap m = (APLMap) a;
       
       File dir = null;
-      Obj diro = m.getRaw("dir");
-      if (diro != Null.NULL) dir = new File(((Value) diro).asString());
+      Value diro = m.getRaw("dir");
+      if (diro != Null.NULL) dir = new File(diro.asString());
       
       byte[] inp = null;
-      Obj inpo = m.getRaw("inp");
+      Value inpo = m.getRaw("inp");
       if (inpo != Null.NULL) {
-        Value inpv = (Value) inpo;
-        if (inpv.ia > 0) {
-          if (inpv.first() instanceof Char) inp = inpv.asString().getBytes(StandardCharsets.UTF_8);
+        if (inpo.ia > 0) {
+          if (inpo.first() instanceof Char) inp = inpo.asString().getBytes(StandardCharsets.UTF_8);
           else {
-            inp = new byte[inpv.ia];
-            double[] ds = inpv.asDoubleArr();
+            inp = new byte[inpo.ia];
+            double[] ds = inpo.asDoubleArr();
             for (int i = 0; i < ds.length; i++) inp[i] = (byte) ds[i];
           }
         }
@@ -555,10 +548,10 @@ public class Scope {
     @Override public Value call(Value w) {
       Obj obj = Scope.this.get(w.asString());
       if (obj == null) return Num.ZERO;
-      if (obj instanceof Value) return Num.NUMS[2];
       if (obj instanceof Fun  ) return Num.NUMS[3];
       if (obj instanceof Dop  ) return Num.NUMS[4];
       if (obj instanceof Mop  ) return Num.NUMS[5];
+      if (obj instanceof Value) return Num.NUMS[2];
       return Num.NUMS[9];
     }
   }
@@ -598,7 +591,7 @@ public class Scope {
     }
     
     static final HashMap<String, Pr> pfRes = new HashMap<>();
-    static Obj results() {
+    static Value results() {
       Value[] arr = new Value[pfRes.size()*4+4];
       arr[0] = new ChrArr("expr");
       arr[1] = new ChrArr("calls");
@@ -621,12 +614,6 @@ public class Scope {
     @Override public Value call(Value w) {
       return call(w, w);
     }
-    public Value call(Value a, Value w) {
-      Obj o = callObj(a, w);
-      if (o instanceof Value) return (Value) o;
-      throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-    }
-    
     private static Pr get(Value a, Value w) {
       String s = w.asString();
       String k = a.asString();
@@ -635,12 +622,12 @@ public class Scope {
       p.am++;
       return p;
     }
-    
-    public Obj callObj(Value a, Value w) {
+  
+    public Value call(Value a, Value w) {
       Pr p = get(a, w);
       BasicLines t = p.tok;
       long sns = System.nanoTime();
-      Obj res = Main.execLines(t, sc);
+      Value res = Main.execLines(t, sc);
       long ens = System.nanoTime();
       p.ms+= (ens-sns)/1000000d;
       return res;
@@ -663,7 +650,7 @@ public class Scope {
         return p;
       }
       
-      public Value call(Obj f, Value w, DerivedMop derv) {
+      public Value call(Value f, Value w, DerivedMop derv) {
         Pr p = get(f);
         
         long sns = System.nanoTime();
@@ -673,7 +660,7 @@ public class Scope {
         return r;
       }
       
-      public Value call(Obj f, Value a, Value w, DerivedMop derv) {
+      public Value call(Value f, Value a, Value w, DerivedMop derv) {
         Pr p = get(f);
         
         long sns = System.nanoTime();
@@ -742,7 +729,6 @@ public class Scope {
        3=100| - 64-bit float
        4=100| - map
        5=100| - bigint
-       6=100| - `fn
        9=100| - null
       
       0=÷∘100 - primitive
@@ -756,7 +742,6 @@ public class Scope {
       if (w instanceof DoubleArr) return Num.of(103);
       if (w instanceof    APLMap) return Num.of(  4);
       if (w instanceof  BigValue) return Num.of(  5);
-      if (w instanceof    ArrFun) return Num.of(  8);
       if (w instanceof      Null) return Num.of(  9);
       if (w instanceof       Arr) return Num.of(100);
       if (w instanceof Primitive) return Num.of(  0);

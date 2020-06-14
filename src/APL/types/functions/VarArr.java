@@ -33,7 +33,7 @@ public class VarArr extends Settable {
     return Type.array;
   }
   
-  @Override public void set(Obj v, Callable blame) {
+  @Override public void set(Value v, Callable blame) {
     set(v, false);
   }
   
@@ -88,7 +88,7 @@ public class VarArr extends Settable {
     return new VarArr(vs);
   }
   
-  public void set(Obj w, boolean update) {
+  public void set(Value w, boolean update) {
     if (w instanceof Arr) {
       Arr ow = (Arr) w;
       if (ow.rank != 1) throw new LengthError("← scatter rank ≠1", ow);

@@ -3,9 +3,9 @@ package APL.types.functions;
 import APL.types.*;
 
 public class DerivedDop extends Fun {
-  private final Obj aa, ww;
+  private final Value aa, ww;
   private final Dop op;
-  DerivedDop(Obj aa, Obj ww, Dop op) {
+  DerivedDop(Value aa, Value ww, Dop op) {
     this.aa = aa;
     this.ww = ww;
     this.op = op;
@@ -17,12 +17,6 @@ public class DerivedDop extends Fun {
   }
   public Value call(Value a, Value w) {
     return op.call(aa, ww, a, w, this);
-  }
-  public Obj callObj(Value w) {
-    return op.callObj(aa, ww, w, this);
-  }
-  public Obj callObj(Value a, Value w) {
-    return op.callObj(aa, ww, a, w, this);
   }
   public Value callInv(Value w) {
     return op.callInv(aa, ww, w);

@@ -8,11 +8,11 @@ public class BeforeBuiltin extends Dop {
     return "⊸";
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     return call(aa, ww, w, w, derv);
   }
   
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     return ww.asFun().call(aa.asFun().call(a), w);
   }
   

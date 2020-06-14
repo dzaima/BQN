@@ -9,7 +9,7 @@ public class EachRight extends Mop {
     return "ᑈ";
   }
   
-  public Value call(Obj f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value a, Value w, DerivedMop derv) {
     Fun ff = isFn(f);
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
@@ -18,7 +18,7 @@ public class EachRight extends Mop {
     return Arr.createL(n, w.shape);
   }
   
-  public Value underW(Obj aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underW(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
     return EachBuiltin.underW(isFn(aa), o, new Rank0Arr(a), w, this);
   }
 }

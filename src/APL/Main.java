@@ -264,7 +264,7 @@ public class Main {
     }
   }
   
-  public static Obj exec(String s, Scope sc) {
+  public static Value exec(String s, Scope sc) {
     BasicLines t = Tokenizer.tokenize(s);
     printdbg(t);
     return execLines(t, sc);
@@ -293,30 +293,20 @@ public class Main {
   enum EType {
     all
   }
-  public static Obj exec(LineTok s, Scope sc) {
+  public static Value exec(LineTok s, Scope sc) {
     return new Exec(s, sc).exec();
   }
   
-  
-  
-  public static Obj oexec(LineTok s, Scope sc) {
-    Obj val = Main.exec(s, sc);
-    if (val instanceof VarArr) val = ((VarArr) val).get();
-    if (val instanceof Settable) val = ((Settable) val).get();
-    return val;
-  }
-  
-  public static Value vexec(LineTok s, Scope sc) {
-    Obj val = Main.exec(s, sc);
-    if (val instanceof VarArr) val = ((VarArr) val).get();
-    if (val instanceof Settable) val = ((Settable) val).get();
-    if (val instanceof Value) return (Value) val;
-    throw new SyntaxError("expected array, got " + val.humanType(true), s);
+  public static Value san(Obj o) {
+    if (o instanceof Value   ) return (Value) o;
+    if (o instanceof VarArr  ) return ((VarArr  ) o).get();
+    if (o instanceof Settable) return ((Settable) o).get();
+    throw new DomainError("Cannot convert "+o.humanType(true)+" to array", o);
   }
   
   
-  public static Obj execLines(TokArr<LineTok> lines, Scope sc) {
-    Obj res = null;
+  public static Value execLines(TokArr<LineTok> lines, Scope sc) {
+    Value res = null;
     HashMap<EType, LineTok> eGuards = new HashMap<>();
     try {
       for (LineTok ln : lines.tokens) {
@@ -352,7 +342,6 @@ public class Main {
           if (endAfter) return res;
         }
       }
-      if (res instanceof Settable) return ((Settable) res).get();
     } catch (Throwable e) {
       for (Map.Entry<EType, LineTok> entry : eGuards.entrySet()) {
         EType t = entry.getKey();
@@ -400,7 +389,7 @@ public class Main {
   
   private static Value norm(Obj o) {
     if (o instanceof VarArr) return ((VarArr) o).get();
-    if (o instanceof Settable) return (Value) ((Settable) o).get();
+    if (o instanceof Settable) return ((Settable) o).get();
     if (!(o instanceof Value)) throw new DomainError("Trying to use "+o.humanType(true)+" as array", o);
     return (Value) o;
   }

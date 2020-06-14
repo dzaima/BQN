@@ -22,7 +22,7 @@ public class ReduceBuiltin extends Mop implements DimMMop {
     return ngnReduce(w, dim, (Fun)f);
   }
   
-  public Value call(Obj f, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, DerivedMop derv) {
     isFn(f);
     Fun ff = (Fun) f;
     if (w.rank >= 2) {
@@ -125,7 +125,7 @@ public class ReduceBuiltin extends Mop implements DimMMop {
     return last.squeeze();
   }
   
-  public Value call(Obj f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value a, Value w, DerivedMop derv) {
     Fun ff = isFn(f);
     if (w.rank != 1) throw new NYIError("A f/ B with 2≤⍴⍴B hasn't been implemented", this, w);
     int n = a.asInt();

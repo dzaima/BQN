@@ -3,14 +3,14 @@ package APL.types;
 import APL.errors.SyntaxError;
 
 public abstract class SimpleMap extends APLMap {
-  @Override public Obj getRaw(Value k) {
+  @Override public Value getRaw(Value k) {
     return getv(k.asString());
   }
   
-  public abstract Obj getv(String s);
+  public abstract Value getv(String s);
   public abstract void setv(String s, Obj v);
   
-  @Override public void set(Value k, Obj v) {
+  @Override public void set(Value k, Value v) {
     setv(k.asString(), v);
   }
   

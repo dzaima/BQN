@@ -6,7 +6,7 @@ import APL.types.arrs.HArr;
 import java.util.*;
 
 public class StrMap extends APLMap {
-  public final HashMap<String, Obj> vals;
+  public final HashMap<String, Value> vals;
   // public final Scope sc;
   
   public StrMap(Scope sc) {
@@ -14,7 +14,7 @@ public class StrMap extends APLMap {
     // this.sc = sc;
   }
   
-  public StrMap(HashMap<String, Obj> vals) {
+  public StrMap(HashMap<String, Value> vals) {
     this.vals = vals;
   }
   
@@ -30,23 +30,23 @@ public class StrMap extends APLMap {
   
   
   @Override
-  public Obj getRaw(Value k) {
+  public Value getRaw(Value k) {
     return getRaw(k.asString());
   }
   @Override
-  public Obj getRaw(String k) {
-    Obj v = vals.get(k);
+  public Value getRaw(String k) {
+    Value v = vals.get(k);
     if (v == null) return Null.NULL;
     return v;
   }
   
   @Override
-  public void set(Value k, Obj v) {
+  public void set(Value k, Value v) {
     if (v == Null.NULL) vals.remove(k.asString());
     else vals.put(k.asString(), v);
   }
   
-  public void setStr(String k, Obj v) {
+  public void setStr(String k, Value v) {
     if (v == Null.NULL) vals.remove(k);
     else vals.put(k, v);
   }
@@ -72,10 +72,8 @@ public class StrMap extends APLMap {
     ArrayList<Value> ks = new ArrayList<>();
     ArrayList<Value> vs = new ArrayList<>();
     vals.forEach((k, v) -> {
-      if (v instanceof Value) {
-        ks.add(Main.toAPL(k));
-        vs.add((Value) v);
-      }
+      ks.add(Main.toAPL(k));
+      vs.add(v);
     });
     return new HArr(new Value[]{
       HArr.create(ks),

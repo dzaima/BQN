@@ -13,7 +13,7 @@ public class ObliqueBuiltin extends Mop {
   
   
   
-  public Value call(Obj f, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, DerivedMop derv) {
     if (w.rank != 2) throw new DomainError("⍁: ⍵ must be a rank 2 array", this, w);
     Fun ff = isFn(f);
     int[] sz = w.shape;

@@ -8,10 +8,10 @@ public class OverBuiltin extends Dop {
     return "○";
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     return aa.asFun().call(ww.asFun().call(w));
   }
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun wwf = ww.asFun();
     return aa.asFun().call(wwf.call(a), wwf.call(w));
   }

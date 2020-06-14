@@ -22,11 +22,11 @@ public class Pick extends Settable {
   }
   
   @Override
-  public void set(Obj v, Callable blame) {
+  public void set(Value v, Callable blame) {
     var.update(AtBuiltin.at(v, idx, val, IO, blame));
   }
   
-  public Obj get() {
+  public Value get() {
     return RShoeUBBuiltin.on(idx, val, IO, obj);
   }
   

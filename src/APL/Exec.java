@@ -38,7 +38,7 @@ public class Exec {
     Main.printdbg(args);
   }
   private Stack<Token> left;
-  public Obj exec() {
+  public Value exec() {
     if (tokens.size() > 0) Main.faulty = tokens.get(0);
     else Main.faulty = allToken;
     if (sc.alphaDefined && tokens.size() >= 2 && tokens.get(0) instanceof OpTok && ((OpTok) tokens.get(0)).op.equals("𝕨") && tokens.get(1) instanceof SetTok) {
@@ -90,7 +90,7 @@ public class Exec {
       // oh well that failed
       throw new SyntaxError("couldn't join everything up into a single expression", pollL());
     }
-    return pollS();
+    return Main.san(pollS());
   }
   private void update(boolean end) {
     if (llSize == 1 && pollS() == null) return;
@@ -102,7 +102,7 @@ public class Exec {
         var f = lastFun();
         var a = lastVal();
         Main.faulty = f;
-        var res = f.callObj(a, w);
+        var res = f.call(a, w);
         if (res == null && (left.size() > 0 || llSize > 0)) throw new SyntaxError("trying to use result of function which returned nothing", a);
         if (res != null) addE(res);
         else return;
@@ -150,7 +150,7 @@ public class Exec {
         var w = lastVal();
         var f = lastFun();
         Main.faulty = f;
-        var res = f.callObj(w);
+        var res = f.call(w);
         if (res == null && (left.size() > 0 || llSize > 0)) throw new SyntaxError("trying to use result of function which returned nothing", f);
         if (res != null) addE(res);
         else return;
@@ -162,7 +162,7 @@ public class Exec {
       }
       if (is(new String[]{"D!|V←[#NFMD]","#←[#NFMDV]","D!|D←D","D!|M←M","D!|F←F","D!|N←N"}, end, false)) { // "D!|.←." to allow changing type
         if (Main.debug) printlvl("N←.");
-        var w = lastObj();
+        var w = lastVal();
         var s = (AbstractSet) popE(); // ←
         var a = popE(); // variable
         Main.faulty = s;
@@ -194,27 +194,17 @@ public class Exec {
       }
       if (is("!D|[FN]M", end, true)) {
         if (Main.debug) printlvl("FM");
-        var f = firstObj();
+        var f = firstVal();
         var o = firstMop();
         addFirst(o.derive(f));
         continue;
       }
       if (is("!D|[FNV]D[FNV]", end, true)) {
         if (Main.debug) printlvl("FDF");
-        var aa = popB(); // done.removeFirst();
+        var aa = Main.san(popB()); // done.removeFirst();
         var  o = firstDop(); // (Dop) done.removeFirst();
-        var ww = popB();
-        var aau = aa;
-        var wwu = ww;
-        if (aau instanceof Settable) aau = ((Settable) aau).getOrThis();
-        if (wwu instanceof Settable) wwu = ((Settable) wwu).getOrThis();
-        if (aau instanceof VarArr) aau = ((VarArr) aau).get();
-        if (wwu instanceof VarArr) wwu = ((VarArr) wwu).get();
-        if (o instanceof DotBuiltin && aau instanceof APLMap && ww instanceof Variable) {
-          addB(((APLMap) aau).get(Main.toAPL(((Variable) ww).name)));
-        } else {
-          addB(o.derive(aau, wwu));
-        }
+        var ww = Main.san(popB());
+        addB(o.derive(aa, ww));
         continue;
       }
       if (is("D!|[FN]FF", end, false)) {
@@ -245,8 +235,7 @@ public class Exec {
       if (Main.debug) printlvl("g h");
       var h = lastFun();
       var g = lastObj();
-      if (g instanceof Fun || g instanceof Value) addE(new Atop(g, h));
-      else throw new SyntaxError("creating an atop with "+g.humanType(true), g);
+      addE(new Atop(g, h));
     }
   }
   
@@ -651,7 +640,7 @@ public class Exec {
       if (size == 0) return new StrMap();
       LineTok fst = ts.get(0);
       if (size==1 && fst.colonPos()==-1) {
-        if (((ParenTok) t).hasDmd) return new Shape1Arr(Main.vexec(ts.get(0), sc));
+        if (((ParenTok) t).hasDmd) return new Shape1Arr(Main.exec(ts.get(0), sc));
         return Main.exec(ts.get(0), sc);
       }
       if (fst.tokens != null && fst.colonPos() != -1) { // map constants
@@ -668,29 +657,16 @@ public class Exec {
           else throw new SyntaxError("expected a key name, got " + Main.explain(name), name);
           List<Token> tokens = ct.tokens.subList(2, ct.tokens.size());
           
-          Obj val = Main.oexec(LineTok.inherit(tokens), nsc);
+          Value val = Main.exec(LineTok.inherit(tokens), nsc);
           res.setStr(key, val);
         }
         return res;
-      } else { // array
-        Obj fo = Main.oexec(fst, sc);
-        if (fo instanceof Value) { // value array
-          Value[] vs = new Value[size];
-          for (int i = 0; i < ts.size(); i++) {
-            Obj o = Main.oexec(ts.get(i), sc);
-            if (!(o instanceof Value)) throw new DomainError("⋄-array contained " + o.humanType(true), o);
-            vs[i] = (Value) o;
-          }
-          return Arr.create(vs);
-        } else if (fo instanceof Fun) { // function array
-          Obj[] os = new Obj[size];
-          for (int i = 0; i < ts.size(); i++) {
-            Obj o = Main.oexec(ts.get(i), sc);
-            if (!(o instanceof Fun)) throw new DomainError("function array contained " + o.humanType(true), o);
-            os[i] = o;
-          }
-          return new FunArr(os);
-        } else throw new DomainError("⋄-array contained " + fo.humanType(true), fo);
+      } else { // array +TODO
+        Value[] vs = new Value[size];
+        for (int i = 0; i < ts.size(); i++) {
+          vs[i] = Main.exec(ts.get(i), sc);
+        }
+        return Arr.create(vs);
       }
     }
     if (t instanceof StrandTok) {
@@ -703,7 +679,6 @@ public class Exec {
     }
     if (t instanceof DfnTok) return UserDefined.of((DfnTok) t, sc);
     if (t instanceof BracketTok) return Brackets.of((BracketTok) t, sc);
-    if (t instanceof BacktickTok) return new ArrFun((BacktickTok) t, sc);
     if (t instanceof BigTok) return ((BigTok) t).val;
     if (t instanceof ScopeTok) return new StrMap(sc);
     throw new NYIError("Unknown type: " + Main.explain(t), t);

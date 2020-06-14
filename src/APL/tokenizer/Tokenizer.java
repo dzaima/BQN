@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Tokenizer {
   private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
-  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ";
+  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎";
   private static final String surrogateOps = "𝕨𝕩𝔽𝔾𝕎𝕏𝕗𝕘𝕊";
   private static boolean validNameStart(char c) {
     for (char l : validNames) if (l == c) return true;
@@ -22,7 +22,6 @@ public class Tokenizer {
     final ArrayList<Token> ts;
     final String line;
     final int pos;
-    Integer annoyingBacktickPos;
     
     Line(String line, int pos, ArrayList<Token> ts) {
       this.ts = ts;
@@ -39,16 +38,10 @@ public class Tokenizer {
     }
     
     public void add(Token r) {
-      if (annoyingBacktickPos != null) {
-        ts.add(new BacktickTok(line, annoyingBacktickPos, r.epos, r));
-        annoyingBacktickPos = null;
-      } else {
-        ts.add(r);
-      }
+      ts.add(r);
     }
     
     LineTok tok() { // also handles strands because why not
-      if (annoyingBacktickPos != null) throw new SyntaxError("Nothing after backtick");
       int epos = size() == 0? pos : ts.get(size()-1).epos;
       ArrayList<Token> pts = new ArrayList<>();
       
@@ -99,7 +92,7 @@ public class Tokenizer {
     int li = 0;
     int len = raw.length();
   
-    ArrayList<Block> levels = new ArrayList<Block>();
+    ArrayList<Block> levels = new ArrayList<>();
     levels.add(new Block(new ArrayList<>(), '⋄', 0));
     levels.get(0).a.add(new Line(raw, 0, new ArrayList<>()));
     
@@ -236,10 +229,6 @@ public class Tokenizer {
           i+= 2;
         } else if (c == '←') {
           tokens.add(new SetTok(raw, i, i+1));
-          i++;
-        } else if (c == '`') {
-          if (tokens.annoyingBacktickPos != null) throw new SyntaxError("` after `");
-          tokens.annoyingBacktickPos = i;
           i++;
         } else if (c == '‿') {
           tokens.add(new StranderTok(raw, i, i+1));

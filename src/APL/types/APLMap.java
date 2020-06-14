@@ -9,16 +9,16 @@ public abstract class APLMap extends Primitive {
     return new MapPointer(this, k);
   }
   
-  public abstract Obj getRaw(Value k);
+  public abstract Value getRaw(Value k);
   
-  public Obj getRaw(String k) {
+  public Value getRaw(String k) {
     return getRaw(Main.toAPL(k));
   }
   public MapPointer get(String k) {
     return get(Main.toAPL(k));
   }
   
-  abstract public void set(Value k, Obj v);
+  abstract public void set(Value k, Value v);
   abstract public Arr allValues();
   abstract public Arr allKeys();
   abstract public Arr kvPair();
@@ -35,7 +35,7 @@ public abstract class APLMap extends Primitive {
     }
     
     @Override
-    public void set(Obj v, Callable blame) {
+    public void set(Value v, Callable blame) {
       map.set(k, v);
     }
     

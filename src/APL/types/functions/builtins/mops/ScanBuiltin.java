@@ -11,7 +11,7 @@ public class ScanBuiltin extends Mop {
     return "`";
   }
   
-  public Value call(Obj aa, Value w, DerivedMop derv) {
+  public Value call(Value aa, Value w, DerivedMop derv) {
     Fun aaf = isFn(aa);
     // TODO ranks
     if (w.rank != 1) throw new NYIError("`: unimplemented for rank≠1 ("+Main.formatAPL(w.shape)+" ≡ ⍴⍵)");
@@ -26,7 +26,7 @@ public class ScanBuiltin extends Mop {
     return Arr.create(res);
   }
   
-  public Value call(Obj aa, Value a, Value w, DerivedMop derv) {
+  public Value call(Value aa, Value a, Value w, DerivedMop derv) {
     Fun aaf = isFn(aa);
     int n = a.asInt();
     int len = w.ia;

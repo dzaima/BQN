@@ -17,23 +17,18 @@ public class OldKeyBuiltin extends Mop {
     super(sc);
   }
   
-  public Value call(Obj f, Value w, DerivedMop derv) {
-    Obj o = callObj(f, w, derv);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Obj aa, Value w, DerivedMop derv) {
-    if (aa instanceof APLMap) {
+  public Value call(Value f, Value w, DerivedMop derv) {
+    if (f instanceof APLMap) {
       if (w.rank > 1) {
         Value[] arr = new Value[w.ia];
         for (int i = 0; i < w.ia; i++) {
-          arr[i] = (Value) ((APLMap) aa).getRaw(w.get(i));
+          arr[i] = (Value) ((APLMap) f).getRaw(w.get(i));
         }
         return Arr.create(arr, w.shape);
       }
-      return ((APLMap) aa).getRaw(w);
+      return ((APLMap) f).getRaw(w);
     }
-    if (aa instanceof Fun) {
+    if (f instanceof Fun) {
       int i = sc.IO;
       var vals = new HashMap<Value, ArrayList<Value>>();
       var order = new ArrayList<Value>();
@@ -51,14 +46,14 @@ public class OldKeyBuiltin extends Mop {
       var res = new Value[order.size()];
       i = 0;
       for (Value c : order) {
-        res[i++] = ((Fun)aa).call(c, Arr.create(vals.get(c)));
+        res[i++] = ((Fun)f).call(c, Arr.create(vals.get(c)));
       }
       return new HArr(res);
     }
-    throw new DomainError("⌸: ⍶ must be a function or a map, was "+aa.humanType(true), derv, aa);
+    throw new DomainError("⌸: ⍶ must be a function or a map, was "+f.humanType(true), derv, f);
   }
   
-  public Value call(Obj aa, Value a, Value w, DerivedMop derv) {
+  public Value call(Value aa, Value a, Value w, DerivedMop derv) {
     if (aa instanceof APLMap) {
       ((APLMap)aa).set(a, w);
       return w;

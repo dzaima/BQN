@@ -14,7 +14,7 @@ public class SetBuiltin extends AbstractSet {
   
   
   
-  public Obj callObj(Obj a, Obj w, boolean update) {
+  public Value callObj(Obj a, Value w, boolean update) {
     if (!(a instanceof Settable)) throw new SyntaxError(a + " isn't settable", a);
     Settable as = (Settable) a;
     if (update) {
@@ -28,7 +28,7 @@ public class SetBuiltin extends AbstractSet {
   }
   
   public Obj callObj(Fun f, Obj a, Value w) {
-    callObj(a, f.call((Value) ((Settable) a).get(), w), true);
+    callObj(a, f.call(((Settable) a).get(), w), true);
     return w;
   }
 }

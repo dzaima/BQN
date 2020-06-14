@@ -24,12 +24,6 @@ public abstract class Fun extends Callable {
   public Value call(Value a, Value w) {
     throw new IncorrectArgsError("function "+toString()+" called dyadically", this, a);
   }
-  public Obj callObj(Value w) { // if overridden, call(w) must be overridden too!
-    return call(w);
-  }
-  public Obj callObj(Value a, Value w) { // if overridden, call(a, w) must be overridden too!
-    return call(a, w);
-  }
   
   public Value callInv(Value w) {
     throw new DomainError(this+" doesn't support monadic inverting", this, w);

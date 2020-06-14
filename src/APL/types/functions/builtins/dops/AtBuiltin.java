@@ -1,13 +1,10 @@
 package APL.types.functions.builtins.dops;
 
 import APL.*;
-import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.RShoeUBBuiltin;
-
-import java.util.Arrays;
 
 public class AtBuiltin extends Dop {
   @Override public String repr() {
@@ -18,7 +15,7 @@ public class AtBuiltin extends Dop {
     super(sc);
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     return at(aa, ww, w, sc.IO, this);
   }
   

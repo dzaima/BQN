@@ -10,7 +10,7 @@ public class JotBuiltin extends Dop {
   }
   
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     if (ww instanceof Fun) {
       if (aa instanceof Fun) {
         return ((Fun)aa).call(((Fun)ww).call(w));
@@ -22,7 +22,7 @@ public class JotBuiltin extends Dop {
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
-  public Value callInv(Obj aa, Obj ww, Value w) {
+  public Value callInv(Value aa, Value ww, Value w) {
     if (ww instanceof Fun) {
       if (aa instanceof Fun) {
         return ((Fun)ww).callInv(((Fun)aa).callInv(w));
@@ -34,7 +34,7 @@ public class JotBuiltin extends Dop {
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     if (!(aa instanceof Fun)) {
       throw new SyntaxError("operands of dyadically applied ∘ must be functions, but ⍶ is "+aa.humanType(true), this, aa);
     }
@@ -44,17 +44,17 @@ public class JotBuiltin extends Dop {
     return ((Fun)aa).call(a, ((Fun)ww).call(w));
   }
   
-  public Value callInvW(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return wwf.callInv(aaf.callInvW(a, w));
   }
   
-  public Value callInvA(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvA(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return aaf.callInvA(a, wwf.call(w));
   }
   
-  public Value under(Obj aa, Obj ww, Obj o, Value w, DerivedDop derv) {
+  public Value under(Value aa, Value ww, Obj o, Value w, DerivedDop derv) {
     if (ww instanceof Fun) {
       Fun wwf = (Fun) ww;
       if (aa instanceof Fun) {

@@ -18,39 +18,34 @@ public abstract class Mop extends Callable {
     return Type.mop;
   }
   
-  public DerivedMop derive(Obj aa) {
+  public DerivedMop derive(Value aa) {
     return new DerivedMop(aa, this);
   }
-  public Value call(Obj f, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, DerivedMop derv) {
     throw new IncorrectArgsError(repr()+" can't be called monadically", derv, w);
   }
-  public Value call(Obj f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value a, Value w, DerivedMop derv) {
     throw new IncorrectArgsError(repr()+" can't be called dyadically", derv, a);
   }
-  public Obj callObj(Obj f, Value w, DerivedMop derv) { // if overridden, call(f, w, derv) must be overridden too!
-    return call(f, w, derv);
-  }
-  public Obj callObj(Obj f, Value a, Value w, DerivedMop derv) { // if overridden, call(f, a, w, derv) must be overridden too!
-    return call(f, a, w, derv);
-  }
-  public Value callInv(Obj f, Value w) {
+  
+  public Value callInv(Value f, Value w) {
     throw new DomainError(this+" doesn't support monadic inverting", this, w);
   }
-  public Value callInvW(Obj f, Value a, Value w) {
+  public Value callInvW(Value f, Value a, Value w) {
     throw new DomainError(this+" doesn't support dyadic inverting of ⍵", this, w);
   }
-  public Value callInvA(Obj f, Value a, Value w) {
+  public Value callInvA(Value f, Value a, Value w) {
     throw new DomainError(this+" doesn't support dyadic inverting of ⍺", this, w);
   }
-  public Value under(Obj aa, Obj o, Value w, DerivedMop derv) {
+  public Value under(Value aa, Obj o, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, derv)) : (Value) o;
     return callInv(aa, v);
   }
-  public Value underW(Obj aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underW(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : (Value) o;
     return callInvW(aa, a, v);
   }
-  public Value underA(Obj aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underA(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : (Value) o;
     return callInvA(aa, v, w);
   }

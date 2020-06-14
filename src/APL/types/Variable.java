@@ -14,16 +14,16 @@ public class Variable extends Settable {
     this.name = name;
   }
   
-  public Obj get() {
+  public Value get() {
     if (v == null) throw new ValueError("trying to get value of non-existing variable "+name, this);
     return v;
   }
   
   @Override
-  public void set(Obj v, Callable blame) {
+  public void set(Value v, Callable blame) {
     sc.set(name, v);
   }
-  public void update(Obj v) {
+  public void update(Value v) {
     sc.update(name, v);
   }
   

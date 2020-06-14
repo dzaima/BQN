@@ -8,12 +8,12 @@ public class QuoteQuad extends Settable {
     super(null);
   }
   
-  public void set(Obj v, Callable blame) {
+  public void set(Value v, Callable blame) {
     Main.print(v.toString());
   }
   
   @Override
-  public Obj get() {
+  public Value get() {
     return Main.toAPL(Main.console.nextLine());
   }
   public Type type() {

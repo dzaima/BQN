@@ -9,25 +9,25 @@ public class ObverseBuiltin extends Dop {
   }
   
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     return aaf.call(w);
   }
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     return aaf.call(a, w);
   }
   
-  public Value callInv(Obj aa, Obj ww, Value w) {
+  public Value callInv(Value aa, Value ww, Value w) {
     Fun wwf = isFn(ww, '⍹');
     return wwf.call(w);
   }
-  public Value callInvW(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun wwf = isFn(ww, '⍹');
     return wwf.call(a, w);
   }
   
-  public Value callInvA(Obj aa, Obj ww, Value a, Value w) { // fall-back to ⍶
+  public Value callInvA(Value aa, Value ww, Value a, Value w) { // fall-back to ⍶
     Fun aaf = isFn(aa, '⍶');
     return aaf.callInvA(a, w);
   }

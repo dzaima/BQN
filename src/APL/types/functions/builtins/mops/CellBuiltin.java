@@ -10,7 +10,7 @@ public class CellBuiltin extends Mop {
     return "˘";
   }
   
-  public Value call(Obj f, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, DerivedMop derv) {
     Fun ff = f.asFun();
     if (w.rank == 0) throw new RankError(f+"˘: executed on a rank 0 array", this, w);
     int am = w.shape[0];

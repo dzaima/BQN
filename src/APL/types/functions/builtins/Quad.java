@@ -10,12 +10,12 @@ public class Quad extends Settable {
     this.sc = sc;
   }
   
-  public void set(Obj v, Callable blame) {
+  public void set(Value v, Callable blame) {
     Main.println((Main.debug? "[log] " : "")+v);
   }
   
   @Override
-  public Obj get() {
+  public Value get() {
     return Main.exec(Main.console.nextLine(), sc);
   }
   public Type type() {

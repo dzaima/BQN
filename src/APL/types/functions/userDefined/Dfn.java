@@ -13,37 +13,21 @@ public class Dfn extends Fun {
     code = t;
   }
   public Value call(Value w) {
-    Obj o = callObj(w);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Value w) {
     Main.printdbg("dfn call", w);
     Scope nsc = new Scope(sc);
-    nsc.set("𝕨", new Variable(nsc, "𝕨"));
+    nsc.set("𝕨", null); // +TODO was new Variable(nsc, "𝕨")
     nsc.set("𝕩", w);
     nsc.set("∇", this);
-    var res = Main.execLines(code, nsc);
-    if (res instanceof VarArr) return ((VarArr)res).get();
-    if (res instanceof Settable) return ((Settable)res).get();
-    return res;
+    return Main.execLines(code, nsc);
   }
   public Value call(Value a, Value w) {
-    Obj o = callObj(a, w);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Value a, Value w) {
     Main.printdbg("dfn call", a, w);
     Scope nsc = new Scope(sc);
     nsc.set("𝕨", a);
     nsc.set("𝕩", w);
     nsc.set("∇", this);
     nsc.alphaDefined = true;
-    var res = Main.execLines(code, nsc);
-    if (res instanceof VarArr) return ((VarArr)res).get();
-    if (res instanceof Settable) return ((Settable)res).get();
-    return res;
+    return Main.execLines(code, nsc);
   }
   public String repr() {
     return code.toRepr();

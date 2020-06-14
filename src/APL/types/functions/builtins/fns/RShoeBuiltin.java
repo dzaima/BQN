@@ -21,11 +21,6 @@ public class RShoeBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    Obj o = callObj(a, w);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Value a, Value w) {
     if (w instanceof APLMap) {
       APLMap map = (APLMap) w;
       return map.getRaw(a);

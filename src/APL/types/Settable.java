@@ -4,16 +4,16 @@ import APL.Type;
 import APL.errors.ValueError;
 
 public abstract class Settable extends Obj {
-  final Obj v;
-  protected Settable(Obj v) {
+  final Value v;
+  protected Settable(Value v) {
     this.v = v;
   }
   @Override
   public Type type() {
     return v == null? Type.var : v.type();
   }
-  public abstract void set(Obj v, Callable blame);
-  public Obj get() {
+  public abstract void set(Value v, Callable blame);
+  public Value get() {
     if (v == null) throw new ValueError("trying to get value of non-existing settable", this);
     return v;
   }

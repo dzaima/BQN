@@ -4,9 +4,9 @@ import APL.types.*;
 import APL.types.functions.builtins.mops.TableBuiltin;
 
 public class DerivedMop extends Fun {
-  private final Obj aa;
+  private final Value aa;
   private final Mop op;
-  DerivedMop(Obj aa, Mop op) {
+  DerivedMop(Value aa, Mop op) {
     this.aa = aa;
     this.op = op;
     token = op.token;
@@ -17,12 +17,6 @@ public class DerivedMop extends Fun {
   }
   public Value call(Value a, Value w) {
     return op.call(aa, a, w, this);
-  }
-  public Obj callObj(Value w) {
-    return op.callObj(aa, w, this);
-  }
-  public Obj callObj(Value a, Value w) {
-    return op.callObj(aa, a, w, this);
   }
   public Value callInv(Value w) {
     return op.callInv(aa, w);

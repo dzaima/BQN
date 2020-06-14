@@ -110,7 +110,6 @@ static class SyntaxHighlight {
     if (t instanceof StrTok) set(t, th.str);
     if (t instanceof ChrTok) set(t, th.str);
     
-    if (t instanceof BacktickTok) walk(((BacktickTok) t).value(), dlvl);
     if (t instanceof CommentTok) set(t, th.com);
     if (t instanceof ColonTok || t instanceof DColonTok) set(t, dfncol);
     if (t instanceof DiamondTok) set(t, th.dmd);

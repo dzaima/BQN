@@ -8,10 +8,10 @@ public class AtopBuiltin extends Dop {
     return "∘";
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     return aa.asFun().call(ww.asFun().call(w));
   }
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     return aa.asFun().call(ww.asFun().call(a, w));
   }
   

@@ -12,24 +12,24 @@ public class UnderBuiltin extends Dop {
   
   
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Fun wwf = isFn(ww, '⍹');
     return wwf.under(aa, w);
   }
-  public Value callInv(Obj aa, Obj ww, Value w) {
+  public Value callInv(Value aa, Value ww, Value w) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return wwf.under(InvertBuiltin.invertM(aaf), w);
   }
   
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return wwf.under(new BindA(wwf.call(a), aaf), w);
   }
-  public Value callInvW(Obj aa, Obj ww, Value a, Value w) {
+  public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return wwf.under(new BindA(wwf.call(a), InvertBuiltin.invertW(aaf)), w);
   }
-  public Value callInvA(Obj aa, Obj ww, Value a, Value w) { // structural inverse is not possible; fall back to computational inverse
+  public Value callInvA(Value aa, Value ww, Value a, Value w) { // structural inverse is not possible; fall back to computational inverse
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     Value a1 = wwf.call(a);
     Value w1 = wwf.call(w);

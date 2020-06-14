@@ -10,7 +10,7 @@ public class DepthBuiltin extends Dop {
     return "⚇";
   }
   
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶'); Fun wwf = isFn(ww, '⍹');
     return aaf.call(wwf.call(a), wwf.call(w));
   }

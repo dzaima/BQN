@@ -1,7 +1,6 @@
 package APL.types.functions.userDefined;
 
 import APL.*;
-import APL.errors.DomainError;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 import APL.types.functions.*;
@@ -20,31 +19,18 @@ public class Ddop extends Dop {
     code = t;
   }
   
-  public Value call(Obj aa, Obj ww, Value w, DerivedDop derv) {
-    Obj o = callObj(aa, ww, w, derv);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Obj aa, Obj ww, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", w);
     Scope nsc = new Scope(sc);
     nsc.set("𝕗", aa);
     nsc.set("𝕘", ww);
-    nsc.set("𝕨", new Variable(nsc, "𝕨"));
+    nsc.set("𝕨", null); // +TODO was new Variable(nsc, "𝕨")
     nsc.set("𝕩", w);
     nsc.set("∇", derv);
-    var res = Main.execLines(code, nsc);
-    if (res instanceof VarArr) return ((VarArr)res).get();
-    if (res instanceof Settable) return ((Settable)res).get();
-    return res;
+    return Main.execLines(code, nsc);
   }
   
-  public Value call(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
-    Obj o = callObj(aa, ww, a, w, derv);
-    if (o instanceof Value) return (Value) o;
-    throw new DomainError("Was expected to give array, got "+o.humanType(true), this);
-  }
-  public Obj callObj(Obj aa, Obj ww, Value a, Value w, DerivedDop derv) {
+  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", a, w);
     Scope nsc = new Scope(sc);
     nsc.set("𝕗", aa);
@@ -53,9 +39,6 @@ public class Ddop extends Dop {
     nsc.set("𝕩", w);
     nsc.set("∇", derv);
     nsc.alphaDefined = true;
-    var res = Main.execLines(code, nsc);
-    if (res instanceof VarArr) return ((VarArr)res).get();
-    if (res instanceof Settable) return ((Settable)res).get();
-    return res;
+    return Main.execLines(code, nsc);
   }
 }

@@ -40,13 +40,13 @@ public class Brackets extends Callable {
       Value[] lns = new Value[t.tokens.size()];
       for (int i = 0; i < t.tokens.size(); i++) {
         LineTok tk = t.tokens.get(i);
-        lns[i] = Main.vexec(tk, sc);
+        lns[i] = Main.exec(tk, sc);
       }
       return OldUpArrowBuiltin.merge(lns, new int[]{lns.length}, t);
     } else {
       if (t.tokens.size() == 0) return new Brackets(null);
       assert t.tokens.size() == 1; // t.array is true if size>1
-      Value res = Main.vexec(t.tokens.get(0), sc);
+      Value res = Main.exec(t.tokens.get(0), sc);
       return new Brackets(res);
     }
   }
