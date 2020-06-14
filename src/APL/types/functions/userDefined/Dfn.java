@@ -1,10 +1,8 @@
 package APL.types.functions.userDefined;
 
 import APL.*;
-import APL.errors.DomainError;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
-import APL.types.functions.VarArr;
 
 public class Dfn extends Fun {
   public final DfnTok code;

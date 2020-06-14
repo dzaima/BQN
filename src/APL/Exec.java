@@ -243,7 +243,6 @@ public class Exec {
     var r = popE();
     if (r instanceof Settable) r = ((Settable) r).get();
     if (r instanceof Value) return (Value) r;
-    if (r instanceof VarArr) return ((VarArr) r).get();
     throw new SyntaxError("Expected value, got "+r, r);
   }
   
@@ -258,7 +257,6 @@ public class Exec {
     var r = popB();
     if (r instanceof Settable) r = ((Settable) r).get();
     if (r instanceof Value) return (Value) r;
-    if (r instanceof VarArr) return ((VarArr) r).get();
     throw new SyntaxError("Expected value, got "+r, r);
   }
   private Dop firstDop() {
@@ -271,7 +269,6 @@ public class Exec {
   private Obj lastObj() {
     var r = popE();
     if (r instanceof Settable) r = ((Settable) r).get();
-    if (r instanceof VarArr) return ((VarArr) r).get();
     return r;
   }
   private Obj firstObj() {

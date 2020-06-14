@@ -6,8 +6,6 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
-import java.util.Arrays;
-
 
 public class LTBuiltin extends Builtin {
   @Override public String repr() {

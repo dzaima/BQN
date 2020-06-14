@@ -16,37 +16,35 @@ public class EachBuiltin extends Mop {
   
   
   public Value call(Value f, Value w, DerivedMop derv) {
-    if (w.scalar()) return f instanceof Fun? ((Fun)f).call(w.first()) : (Value) f;
-    if (f instanceof Fun) {
-      Value[] n = new Value[w.ia];
-      for (int i = 0; i < n.length; i++) {
-        n[i] = ((Fun) f).call(w.get(i)).squeeze();
-      }
-      return Arr.create(n, w.shape);
-    } else {
-      return new SingleItemArr((Value) f, w.shape);
+    if (w.scalar()) return f.asFun().call(w);
+    Fun ff = f.asFun();
+    Value[] n = new Value[w.ia];
+    for (int i = 0; i < n.length; i++) {
+      n[i] = ff.call(w.get(i));
     }
+    return Arr.create(n, w.shape);
   }
   public Value call(Value f, Value a, Value w, DerivedMop derv) {
+    Fun ff = f.asFun();
     if (w.scalar()) {
-      if (a.scalar()) return ((Fun)f).call(a, w);
+      if (a.scalar()) return ff.call(a, w);
       Value[] n = new Value[a.ia];
       for (int i = 0; i < n.length; i++) {
-        n[i] = ((Fun)f).call(a.get(i), w.first()).squeeze();
+        n[i] = ff.call(a.get(i), w.first());
       }
       return Arr.create(n, a.shape);
     }
     if (a.scalar()) {
       Value[] n = new Value[w.ia];
       for (int i = 0; i < n.length; i++) {
-        n[i] = ((Fun)f).call(a.first(), w.get(i)).squeeze();
+        n[i] = ff.call(a.first(), w.get(i));
       }
       return Arr.create(n, w.shape);
     }
     if (!Arrays.equals(a.shape, w.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = ((Fun)f).call(a.get(i), w.get(i)).squeeze();
+      n[i] = ff.call(a.get(i), w.get(i));
     }
     return Arr.create(n, w.shape);
   }

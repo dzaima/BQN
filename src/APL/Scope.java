@@ -48,25 +48,25 @@ public class Scope {
     if (name.charAt(0) == '⎕') {
       switch (name) {
         case "⎕IO":
-          int tIO = ((Value) val).asInt();
+          int tIO = val.asInt();
           if (tIO != 0 && tIO != 1) throw new DomainError("⎕IO should be 0 or 1", val);
           IO = tIO;
           nIO = IO==0? Num.ZERO : Num.ONE;
           break;
         case "⎕BOXSIMPLE":
-          Main.enclosePrimitives = ((Value) val).asInt() == 1;
+          Main.enclosePrimitives = val.asInt() == 1;
           break;
         case "⎕VI":
           Main.vind = Main.bool(val);
           break;
         case "⎕RL":
-          rnd = new Random(((Value) val).asInt());
+          rnd = new Random(val.asInt());
           break;
         case "⎕PP":
           if (val instanceof Primitive) {
-            Num.setPrecision(((Value) val).asInt());
+            Num.setPrecision(val.asInt());
           } else {
-            int[] args = ((Value) val).asIntVec();
+            int[] args = val.asIntVec();
             if (args.length == 3) Num.setPrecision(args[0], args[1], args[2]);
             else throw new DomainError("⎕PP expected either a scalar number or array of 3 integers as ⍵", val);
           }

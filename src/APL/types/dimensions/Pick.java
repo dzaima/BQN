@@ -15,7 +15,7 @@ public class Pick extends Settable {
   public Pick(Variable var, Brackets where, Scope sc) {
     super(null);
     this.var = var;
-    this.val = (Value) var.get();
+    this.val = var.get();
     this.idx = where.val;
     this.obj = where;
     this.IO = sc.IO;

@@ -24,7 +24,7 @@ public class RShoeUBBuiltin extends Builtin {
       APLMap map = (APLMap) w;
       Value[] vs = a.values();
       for (int i = 0; i < a.ia; i++) {
-        res[i] = (Value) map.getRaw(vs[i].asString());
+        res[i] = map.getRaw(vs[i].asString());
       }
       return Arr.create(res, a.shape);
     }
@@ -40,7 +40,7 @@ public class RShoeUBBuiltin extends Builtin {
   public static Value on(Indexer.PosSh poss, Value w) { // +TODO ↑
     if (w.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
-      double[] wd = w.asDoubleArr();;
+      double[] wd = w.asDoubleArr();
       int[] idxs = poss.vals;
       for (int i = 0; i < idxs.length; i++) {
         res[i] = wd[idxs[i]];

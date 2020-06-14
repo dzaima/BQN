@@ -32,7 +32,7 @@ public class CRepeatBuiltin extends Dop {
       }
       return Arr.create(res);
     } else {
-      int n = ((Value) ww).asInt();
+      int n = ww.asInt();
       Value[] res = new Value[n];
       Value curr = w;
       for (int i = 0; i < n; i++) {

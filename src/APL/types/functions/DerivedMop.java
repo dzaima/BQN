@@ -1,7 +1,6 @@
 package APL.types.functions;
 
 import APL.types.*;
-import APL.types.functions.builtins.mops.TableBuiltin;
 
 public class DerivedMop extends Fun {
   private final Value aa;

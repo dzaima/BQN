@@ -15,10 +15,10 @@ public class JotBuiltin extends Dop {
       if (aa instanceof Fun) {
         return ((Fun)aa).call(((Fun)ww).call(w));
       } else {
-        return ((Fun)ww).call((Value)aa, w);
+        return ((Fun)ww).call(aa, w);
       }
     } else {
-      if (aa instanceof Fun) return ((Fun) aa).call(w, (Value) ww);
+      if (aa instanceof Fun) return ((Fun) aa).call(w, ww);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
@@ -27,10 +27,10 @@ public class JotBuiltin extends Dop {
       if (aa instanceof Fun) {
         return ((Fun)ww).callInv(((Fun)aa).callInv(w));
       } else {
-        return ((Fun)ww).callInvW((Value)aa, w);
+        return ((Fun)ww).callInvW(aa, w);
       }
     } else {
-      if (aa instanceof Fun) return ((Fun) aa).callInvA(w, (Value) ww);
+      if (aa instanceof Fun) return ((Fun) aa).callInvA(w, ww);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
@@ -65,11 +65,11 @@ public class JotBuiltin extends Dop {
           }
         }, w);
       } else {
-        return wwf.underW(o, (Value) aa, w);
+        return wwf.underW(o, aa, w);
       }
     } else {
       if (aa instanceof Fun) {
-        return ((Fun) aa).underA(o, w, (Value) ww);
+        return ((Fun) aa).underA(o, w, ww);
       } else {
         throw new SyntaxError("arr∘arr makes no sense", this);
       }

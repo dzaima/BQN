@@ -23,7 +23,7 @@ public class RepeatBuiltin extends Dop {
       }
       return curr;
     } else {
-      int am = ((Num) ww).asInt();
+      int am = ww.asInt();
       if (am < 0) {
         for (int i = 0; i < -am; i++) {
           w = aaf.callInv(w);
@@ -39,7 +39,7 @@ public class RepeatBuiltin extends Dop {
     Fun aaf = isFn(aa, '⍶');
     if (ww instanceof Fun) throw new DomainError("(f⍣g)A cannot be inverted", this);
     
-    int am = ((Num) ww).asInt();
+    int am = ww.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
         w = aaf.call(w);
@@ -64,7 +64,7 @@ public class RepeatBuiltin extends Dop {
       return curr;
     } else {
       if (!(ww instanceof Num)) throw new SyntaxError("⍣: ⍹ must be either a function or scalar number");
-      int am = ((Num) ww).asInt();
+      int am = ww.asInt();
       if (am < 0) {
         for (int i = 0; i < -am; i++) {
           w = aaf.callInvW(a, w);
@@ -78,8 +78,7 @@ public class RepeatBuiltin extends Dop {
   
   public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶');
-    if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
-    int am = ((Num) ww).asInt();
+    int am = ww.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
         w = aaf.call(a, w);
@@ -91,8 +90,7 @@ public class RepeatBuiltin extends Dop {
   }
   public Value callInvA(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶');
-    if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
-    int am = ((Num) ww).asInt();
+    int am = ww.asInt();
     if (am== 1) return aaf.callInvA(a, w);
     if (am==-1) return aaf.callInvA(w, a);
     
@@ -101,8 +99,7 @@ public class RepeatBuiltin extends Dop {
   
   public Value under(Value aa, Value ww, Obj o, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
-    if (!(ww instanceof Value)) throw new DomainError("⍣: expected ⍹ to be a number, got "+ww.humanType(true), this, ww);
-    int n = ((Value) ww).asInt();
+    int n = ww.asInt();
     return repeat(aaf, n, o, w);
   }
   public Value repeat(Fun aa, int n, Obj o, Value w) { // todo don't do recursion?

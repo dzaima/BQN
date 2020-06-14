@@ -22,7 +22,7 @@ public class OldKeyBuiltin extends Mop {
       if (w.rank > 1) {
         Value[] arr = new Value[w.ia];
         for (int i = 0; i < w.ia; i++) {
-          arr[i] = (Value) ((APLMap) f).getRaw(w.get(i));
+          arr[i] = ((APLMap) f).getRaw(w.get(i));
         }
         return Arr.create(arr, w.shape);
       }
