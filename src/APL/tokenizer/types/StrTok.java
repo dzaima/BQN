@@ -11,7 +11,8 @@ public class StrTok extends Token {
   public StrTok(String line, int spos, int epos, String str) {
     super(line, spos, epos);
     parsed = str;
-    this.val = Main.toAPL(str);
+    val = Main.toAPL(str);
+    val.token = this;
   }
   
   @Override public String toRepr() {

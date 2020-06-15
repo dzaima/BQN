@@ -19,7 +19,7 @@ public class Main {
   public static boolean vind = false; // vector indexing
   public static boolean noBoxing = false;
   public static boolean quotestrings = false;
-  public static boolean enclosePrimitives = false;
+  public static boolean enclosePrimitives = true;
   public static boolean colorful = true;
   static final ChrArr alphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   static final ChrArr lowercaseAlphabet = toAPL("abcdefghijklmnopqrstuvwxyz");

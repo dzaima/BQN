@@ -39,20 +39,20 @@ public class Scope {
     sc.set(name, val);
   }
   public void set(String name, Value val) { // sets in current scope
-    if (name.charAt(0) == '⎕') {
+    if (name.charAt(0) == '•') {
       switch (name) {
-        case "⎕IO":
-          throw new DomainError("Cannot set ⎕IO");
-        case "⎕BOXSIMPLE":
+        case "•IO":
+          throw new DomainError("Cannot set •IO");
+        case "•BOXSIMPLE":
           Main.enclosePrimitives = val.asInt() == 1;
           break;
-        case "⎕VI":
+        case "•VI":
           Main.vind = Main.bool(val);
           break;
-        case "⎕RL":
+        case "•RL":
           rnd = new Random(val.asInt());
           break;
-        case "⎕PP":
+        case "•PP":
           if (val instanceof Primitive) {
             Num.setPrecision(val.asInt());
           } else {
@@ -67,40 +67,40 @@ public class Scope {
     } else vars.put(name, val);
   }
   public Value get(String name) {
-    if (name.startsWith("⎕")) {
+    if (name.startsWith("•")) {
       switch (name) {
-        case "⎕MILLIS": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "⎕TIME": return new Timer(this, true);
-        case "⎕HTIME": return new Timer(this, false);
-        case "⎕EX": return new Ex(this);
-        case "⎕LNS": return new Lns();
-        case "⎕SH": return new Shell();
-        case "⎕NC": return new NC();
-        case "⎕A": return Main.alphabet;
-        case "⎕AV": return Main.toAPL(Main.CODEPAGE);
-        case "⎕D": return Main.digits;
-        case "⎕L":
-        case "⎕LA": return Main.lowercaseAlphabet;
-        case "⎕ERASE": return new Eraser(this);
-        case "⎕GC": System.gc(); return Num.ONE;
-        case "⎕GCLOG": return new GCLog();
-        case "⎕NULL": return Null.NULL;
-        case "⎕MAP": case "⎕NS": return new MapGen();
-        case "⎕DL": return new Delay(this);
-        case "⎕DR": return new DR();
-        case "⎕UCS": return new UCS(this);
-        case "⎕HASH": return new Hasher();
-        case "⎕IO": return Num.ZERO;
-        case "⎕VI": return Main.vind? Num.ONE : Num.ZERO;
-        case "⎕BOXSIMPLE": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
-        case "⎕CLASS": return new ClassGetter();
-        case "⎕PP": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
-        case "⎕PFX": return new Profiler(this);
-        case "⎕PFO": return new Profiler.ProfilerOp(this);
-        case "⎕PFR": return Profiler.results();
-        case "⎕STDIN": return new Stdin();
-        case "⎕BIG": return new Big();
-        case "⎕U": return new Builtin() {
+        case "•MILLIS": return new Num(System.currentTimeMillis() - Main.startingMillis);
+        case "•TIME": return new Timer(this, true);
+        case "•HTIME": return new Timer(this, false);
+        case "•EX": return new Ex(this);
+        case "•LNS": return new Lns();
+        case "•SH": return new Shell();
+        case "•NC": return new NC();
+        case "•A": return Main.alphabet;
+        case "•AV": return Main.toAPL(Main.CODEPAGE);
+        case "•D": return Main.digits;
+        case "•L":
+        case "•LA": return Main.lowercaseAlphabet;
+        case "•ERASE": return new Eraser(this);
+        case "•GC": System.gc(); return Num.ONE;
+        case "•GCLOG": return new GCLog();
+        case "•NULL": return Null.NULL;
+        case "•MAP": case "⎕NS": return new MapGen();
+        case "•DL": return new Delay(this);
+        case "•DR": return new DR();
+        case "•UCS": return new UCS(this);
+        case "•HASH": return new Hasher();
+        case "•IO": return Num.ZERO;
+        case "•VI": return Main.vind? Num.ONE : Num.ZERO;
+        case "•BOXSIMPLE": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
+        case "•CLASS": return new ClassGetter();
+        case "•PP": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
+        case "•PFX": return new Profiler(this);
+        case "•PFO": return new Profiler.ProfilerOp(this);
+        case "•PFR": return Profiler.results();
+        case "•STDIN": return new Stdin();
+        case "•BIG": return new Big();
+        case "•U": return new Builtin() {
           @Override public String repr() { return "⎕U"; }
   
           @Override public Value call(Value w) {
@@ -108,7 +108,7 @@ public class Scope {
             return null;
           }
         };
-        case "⎕OPT": case "⎕OPTIMIZE":
+        case "•OPT": case "⎕OPTIMIZE":
           return new Optimizer(this);
       }
     }

@@ -1,19 +1,18 @@
 package APL.tokenizer.types;
 
-import APL.Main;
+import APL.errors.SyntaxError;
 import APL.tokenizer.Token;
 import APL.types.*;
 
 public class ChrTok extends Token {
   public final Value val;
-  public final String parsed;
   
   public ChrTok(String line, int spos, int epos, String str) {
     super(line, spos, epos);
-    parsed = str;
-    
-    if (str.length() == 1) val = Char.of(str.charAt(0));
-    else val = Main.toAPL(str);
+  
+    if (str.length() != 1) throw new SyntaxError("single-quote chars must be length 1", this);
+    val = Char.of(str.charAt(0));
+    val.token = this;
   }
   
   @Override public String toRepr() {
