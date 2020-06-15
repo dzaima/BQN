@@ -227,6 +227,12 @@ public class Main {
           lastError.printStackTrace();
         }
         break;
+      case "E":
+        println(Comp.comp(Tokenizer.tokenize(rest)).exec(sc).toString());
+        break;
+      case "B":
+        println(Comp.comp(Tokenizer.tokenize(rest)).fmt());
+        break;
       default:
         throw new SyntaxError("Undefined user command");
     }

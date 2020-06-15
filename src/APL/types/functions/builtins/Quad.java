@@ -4,10 +4,8 @@ import APL.*;
 import APL.types.*;
 
 public class Quad extends Settable {
-  private final Scope sc;
-  public Quad(Scope sc) {
+  public Quad() {
     super(null);
-    this.sc = sc;
   }
   
   public void set(Value v, Callable blame) {
@@ -16,7 +14,7 @@ public class Quad extends Settable {
   
   @Override
   public Value get() {
-    return Main.exec(Main.console.nextLine(), sc);
+    return Main.toAPL(Main.console.nextLine());
   }
   public Type type() {
     return Type.gettable;

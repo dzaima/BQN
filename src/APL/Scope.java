@@ -198,19 +198,21 @@ public class Scope {
       String test = w.asString();
       
       BasicLines testTokenized = Tokenizer.tokenize(test);
+      Comp testCompiled = Comp.comp(testTokenized);
       
       if (separate) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          Main.execLines(testTokenized, sc);
+          // Main.execLines(testTokenized, sc);
+          testCompiled.exec(sc);  
           long end = System.nanoTime();
           r[i] = end-start;
         }
         return new DoubleArr(r);
       } else {
         long start = System.nanoTime();
-        for (int i = 0; i < n; i++) Main.execLines(testTokenized, sc);
+        for (int i = 0; i < n; i++) testCompiled.exec(sc); // Main.execLines(testTokenized, sc);
         long end = System.nanoTime();
         if (raw) {
           return new Num((end-start)/n);
