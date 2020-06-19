@@ -37,9 +37,29 @@ public class Comp extends Obj {
   public static final byte SPEC = -1; // special
   public static final byte   EVBT = 0; // ⍎ needs special attention
   
+  static class Stk {
+    Obj[] vals = new Obj[4];
+    int sz = 0;
+    void push(Obj o) {
+      if (sz==vals.length) dbl();
+      vals[sz++] = o;
+    }
+    Obj pop() {
+      Obj val = vals[--sz];
+      vals[sz] = null;
+      return val;
+    }
+    Obj peek() {
+      return vals[sz-1];
+    }
+  
+    private void dbl() {
+      vals = Arrays.copyOf(vals, vals.length<<1);
+    }
+  }
   
   public Value exec(Scope sc) {
-    Stack<Obj> s = new Stack<>();
+    Stk s = new Stk();
     int i = 0;
     while (i!=bc.length) {
       int pi = i;
@@ -171,8 +191,10 @@ public class Comp extends Obj {
     f - function
     d - dop
     m - mop
+    
     ← - new var
     ↩ - upd var
+    
     _ - empty
     
    */
@@ -196,7 +218,7 @@ public class Comp extends Obj {
   public static Comp comp(LineTok ln) {
     // return example();
     Mut mut = new Mut();
-    Res r = compP(mut, ln);
+    Res r = compP(mut, ln, false);
     byte[] bcr = new byte[r.bc.size()];
     for (int i = 0; i < r.bc.size(); i++) bcr[i] = r.bc.get(i);
     return new Comp(bcr, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]));
@@ -206,7 +228,7 @@ public class Comp extends Obj {
     Mut mut = new Mut();
     ArrayList<Byte> bc = new ArrayList<>();
     for (LineTok ln : lns.tokens) {
-      bc.addAll(compP(mut, ln).bc);
+      bc.addAll(compP(mut, ln, false).bc);
     }
     byte[] bcr = new byte[bc.size()];
     for (int i = 0; i < bc.size(); i++) bcr[i] = bc.get(i);
@@ -339,6 +361,8 @@ public class Comp extends Obj {
   private static class Res {
     private final char t;
     private final ArrayList<Byte> bc;
+    private boolean m;
+  
     public Res(char t, ArrayList<Byte> bs) {
       this.t = t;
       this.bc = bs;
@@ -363,11 +387,10 @@ public class Comp extends Obj {
   
   private static final ArrayList<Byte> EMPTY = new ArrayList<>();
   
-  
   // @interface CheckReturnValue{}@CheckReturnValue
-  public static Res compP(Mut m, Token tk) {
+  public static Res compP(Mut m, Token tk, boolean mut) {
     if (tk instanceof ParenTok) {
-      return compP(m, ((ParenTok) tk).ln);
+      return compP(m, ((ParenTok) tk).ln, mut);
     }
     if (tk instanceof NumTok) {
       Res r = new Res('a');
@@ -387,15 +410,16 @@ public class Comp extends Obj {
     if (tk instanceof LineTok) {
       List<Token> ts = ((LineTok) tk).tokens;
       if (ts.size() == 0) return new Res('_', EMPTY);
+      if (ts.size() == 1) return compP(m, ts.get(0), mut);
       int i = ts.size()-1;
   
       LinkedList<Res> tps = new LinkedList<>();
-      Res c0 = compP(m, ts.get(i--));
+      Res c0 = compP(m, ts.get(i--), false);
       tps.addFirst(c0);
       final boolean train = c0.t =='f';
       
       while (i>=0) {
-        Res c = compP(m, ts.get(i));
+        Res c = compP(m, ts.get(i), false);
         tps.addFirst(c);
         if (DBGCOMP) System.out.println(tps);
         collect(tps, train, i==0);
@@ -438,13 +462,19 @@ public class Comp extends Obj {
       String name = ((NameTok) tk).name;
       Res r = new Res(varType(name));
       m.pushVar(r, name);
+      r.m = mut;
       return r;
     }
     if (tk instanceof StrandTok) {
       List<Token> tks = ((StrandTok) tk).tokens;
       Res r = new Res('a');
-      for (Token c : tks) r.add(compP(m, c));
+      for (Token c : tks) {
+        Res cr = compP(m, c, mut);
+        mut|= cr.m;
+        r.add(cr);
+      }
       r.bc.add(ARRO);
+      r.m = mut;
       int sz = tks.size();
       if (sz > 255) throw new NYIError("array constants with >255 items", tk);
       r.bc.add((byte) sz);
