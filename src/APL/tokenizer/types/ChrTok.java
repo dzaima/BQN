@@ -13,6 +13,7 @@ public class ChrTok extends Token {
     if (str.length() != 1) throw new SyntaxError("single-quote chars must be length 1", this);
     val = Char.of(str.charAt(0));
     val.token = this;
+    type = 'a';
   }
   
   @Override public String toRepr() {

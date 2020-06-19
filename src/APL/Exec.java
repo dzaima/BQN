@@ -627,7 +627,7 @@ public class Exec {
       if (((OpTok) t).op.charAt(0)=='•') return new Quad();
       return builtin((OpTok) t, sc);
     }
-    if (t instanceof NumTok) return ((NumTok) t).num;
+    if (t instanceof NumTok) return ((NumTok) t).val;
     if (t instanceof ChrTok) return ((ChrTok) t).val;
     if (t instanceof StrTok) return ((StrTok) t).val;
     if (t instanceof SetTok) return SetBuiltin.inst;

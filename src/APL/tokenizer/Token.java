@@ -3,6 +3,7 @@ package APL.tokenizer;
 import APL.types.Tokenable;
 
 public abstract class Token implements Tokenable {
+  public char type; // \0 by default
   public final String raw;
   public final int spos; // incl
   public       int epos; // excl
@@ -35,5 +36,9 @@ public abstract class Token implements Tokenable {
   
   public String source() {
     return raw.substring(spos, epos);
+  }
+  
+  public String toString() {
+    return toRepr()+"→"+type;
   }
 }
