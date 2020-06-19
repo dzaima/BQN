@@ -1,6 +1,7 @@
 package APL.types;
 
 import APL.Main;
+import APL.errors.*;
 import APL.types.arrs.SingleItemArr;
 
 public abstract class APLMap extends Primitive {
@@ -34,12 +35,13 @@ public abstract class APLMap extends Primitive {
       this.k = k;
     }
     
-    @Override
-    public void set(Value v, Callable blame) {
+    public void set(Value v, boolean update, Callable blame) {
+      boolean prev = map.getRaw(k) != Null.NULL;
+      if (prev && !update) throw new SyntaxError("←: Cannot reassign map key '"+k+"'");
+      if (!prev && update) throw new SyntaxError("↩: Cannot assign to new key '"+k+"'");
       map.set(k, v);
     }
-    
-    @Override
+  
     public String toString() {
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;
       return v == null? "map@"+k : v.toString();

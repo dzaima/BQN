@@ -37,8 +37,4 @@ public abstract class Token implements Tokenable {
   public String source() {
     return raw.substring(spos, epos);
   }
-  
-  public String toString() {
-    return toRepr()+"→"+type;
-  }
 }

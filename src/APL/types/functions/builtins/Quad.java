@@ -8,7 +8,7 @@ public class Quad extends Settable {
     super(null);
   }
   
-  public void set(Value v, Callable blame) {
+  public void set(Value v, boolean update, Callable blame) { // don't care about updating
     Main.println((Main.debug? "[log] " : "")+v);
   }
   

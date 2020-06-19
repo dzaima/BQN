@@ -8,7 +8,7 @@ public class QuoteQuad extends Settable {
     super(null);
   }
   
-  public void set(Value v, Callable blame) {
+  public void set(Value v, boolean update, Callable blame) {
     Main.print(v.toString());
   }
   

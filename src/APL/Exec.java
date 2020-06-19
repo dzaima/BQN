@@ -166,7 +166,7 @@ public class Exec {
         var s = (AbstractSet) popE(); // ←
         var a = popE(); // variable
         Main.faulty = s;
-        var res = s.callObj(a, w, false);
+        var res = s.call(a, w, false);
         addE(res);
         continue;
       }
@@ -188,7 +188,7 @@ public class Exec {
         var f = lastFun();
         Obj a = popE(); // variable
         Main.faulty = f;
-        Obj res = s.callObj(f, a, w);
+        Obj res = s.call(a, w, false);
         if (res != null) addE(res);
         continue;
       }
@@ -273,7 +273,7 @@ public class Exec {
   }
   private Obj firstObj() {
     var r = popB();
-    if (r instanceof VarArr) return ((VarArr) r).get();
+    if (r instanceof MutArr) return ((MutArr) r).get();
     if (r instanceof Settable) return ((Settable) r).get();
     return r;
   }
@@ -676,7 +676,7 @@ public class Exec {
       for (Token tk : tks) {
         parts.add(valueOf(tk));
       }
-      return VarArr.of(parts);
+      return MutArr.of(parts);
     }
     if (t instanceof DfnTok) return UserDefined.of((DfnTok) t, sc);
     if (t instanceof BracketTok) return Brackets.of((BracketTok) t, sc);

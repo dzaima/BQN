@@ -2,10 +2,10 @@ package APL.tokenizer.types;
 
 import APL.tokenizer.Token;
 
-public class SetTok extends Token {
-  public SetTok(String line, int spos, int epos) {
+public class ModTok extends Token {
+  public ModTok(String line, int spos, int epos) {
     super(line, spos, epos);
-    type = '←';
+    type = '↩';
   }
   
   @Override public String toRepr() {

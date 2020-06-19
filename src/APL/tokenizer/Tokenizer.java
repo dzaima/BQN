@@ -230,6 +230,9 @@ public class Tokenizer {
         } else if (c == '←') {
           tokens.add(new SetTok(raw, i, i+1));
           i++;
+        } else if (c == '↩') {
+          tokens.add(new ModTok(raw, i, i+1));
+          i++;
         } else if (c == '‿') {
           tokens.add(new StranderTok(raw, i, i+1));
           i++;

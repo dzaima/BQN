@@ -8,10 +8,10 @@ import APL.types.functions.builtins.SetBuiltin;
 
 import java.util.*;
 
-public class VarArr extends Settable {
+public class MutArr extends Settable { // old version of SettableArr
   public final ArrayList<Obj> arr;
   public final int ia;
-  public VarArr(ArrayList<Obj> arr) {
+  public MutArr(ArrayList<Obj> arr) {
     super(null);
     ia = arr.size();
     if (arr.size() > 0) this.token = arr.get(0).token;
@@ -23,7 +23,7 @@ public class VarArr extends Settable {
     Value[] res = new Value[arr.size()];
     for (int i = 0; i < ia; i++) {
       Obj c = arr.get(i);
-      res[i] = c instanceof VarArr? ((VarArr) c).get() : (Value) (c instanceof Value? c : ((Settable) c).get());
+      res[i] = c instanceof MutArr? ((MutArr) c).get() : (Value) (c instanceof Value? c : ((Settable) c).get());
     }
     return Arr.create(res);
   }
@@ -33,15 +33,13 @@ public class VarArr extends Settable {
     return Type.array;
   }
   
-  @Override public void set(Value v, Callable blame) {
-    set(v, false);
-  }
   
   @Override
   public String toString() {
     if (Main.debug) return "vararr:"+arr;
     return get().toString();
   }
+  
   
   public static Obj of(ArrayList<Obj> vs) {
     int sz = vs.size();
@@ -85,20 +83,19 @@ public class VarArr extends Settable {
       }
       if (s != null) return new ChrArr(s);
     }
-    return new VarArr(vs);
+    return new MutArr(vs);
   }
   
-  public void set(Value w, boolean update) {
-    if (w instanceof Arr) {
-      Arr ow = (Arr) w;
-      if (ow.rank != 1) throw new LengthError("← scatter rank ≠1", ow);
-      if (ow.ia != this.ia) throw new LengthError("← scatter argument lengths not equal", ow);
-      for (int i = 0; i < this.ia; i++) {
-        SetBuiltin.inst.callObj(this.arr.get(i), ow.get(i), update);
+  public void set(Value w, boolean update, Callable blame) {
+    if (w.rank == 0) {
+      for (int i = 0; i < ia; i++) {
+        SetBuiltin.set(arr.get(i), w, update);
       }
     } else {
-      for (int i = 0; i < this.ia; i++) {
-        SetBuiltin.inst.callObj(this.arr.get(i), w, update);
+      if (w.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", w);
+      if (w.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", w);
+      for (int i = 0; i < ia; i++) {
+        SetBuiltin.set(arr.get(i), w.get(i), update);
       }
     }
   }

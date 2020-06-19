@@ -1,6 +1,7 @@
 package APL.types.dimensions;
 
 import APL.Scope;
+import APL.errors.SyntaxError;
 import APL.types.*;
 import APL.types.functions.builtins.dops.AtBuiltin;
 import APL.types.functions.builtins.fns.RShoeUBBuiltin;
@@ -19,9 +20,9 @@ public class Pick extends Settable {
     this.obj = where;
   }
   
-  @Override
-  public void set(Value v, Callable blame) {
-    var.update(AtBuiltin.at(v, idx, val, blame));
+  public void set(Value v, boolean update, Callable blame) {
+    if (update) throw new SyntaxError("←: Must use ↩ to set indexed elements");
+    var.set(AtBuiltin.at(v, idx, val, blame), false, blame);
   }
   
   public Value get() {

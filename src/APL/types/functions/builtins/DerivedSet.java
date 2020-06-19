@@ -12,8 +12,8 @@ public class DerivedSet extends AbstractSet {
     this.f = f;
   }
   
-  @Override public Value callObj(Obj a, Value w, boolean update) {
-    s.callObj(a, f.call(((Settable) a).get(), w), update);
+  @Override public Value call(Obj a, Value w, boolean update) {
+    s.call(a, f.call(((Settable) a).get(), w), update);
     return w;
   }
   

@@ -24,19 +24,24 @@ public class Comp extends Obj {
     this.strs = strs;
   }
   
-  public static final byte PUSH = 0; // 1O; 2
-  public static final byte VARO = 1; // 1S; x/𝕨/𝕏
-  public static final byte ARRO = 2; // 1B; 1‿2‿3 / ⟨1⋄2⋄3⟩; compilers job to extend past 255 (or maybe another op?)
-  public static final byte FN1C = 3; // monadic call
-  public static final byte FN2C = 4; // dyadic call
-  public static final byte OP1D = 5; // derive modifier
-  public static final byte OP2D = 6; // derive composition
-  public static final byte TR2D = 7; // derive 2-train aka atop
-  public static final byte TR3D = 8; // derive 3-train aka fork
+  public static final byte PUSH =  0; // 1O; 2
+  public static final byte VARO =  1; // 1S; x/𝕨/𝕏
+  public static final byte VARM =  2; // 1S; mutable x/𝕨/𝕏
+  public static final byte ARRO =  3; // 1B; 1‿2‿3 / ⟨1⋄2⋄3⟩; compilers job to extend past 255 (or maybe another op?)
+  public static final byte ARRM =  4; // 1B; mutable x‿y‿z / ⟨x⋄y⋄z)
+  public static final byte FN1C =  5; // monadic call
+  public static final byte FN2C =  6; // dyadic call
+  public static final byte OP1D =  7; // derive modifier
+  public static final byte OP2D =  8; // derive composition
+  public static final byte TR2D =  9; // derive 2-train aka atop
+  public static final byte TR3D = 10; // derive 3-train aka fork
+  public static final byte SETN = 11; // set new; _  ←_;
+  public static final byte SETU = 12; // set upd; _  ↩_;
+  public static final byte SETM = 13; // set mod; _ F↩_;
   // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
-  public static final byte   EVBT = 0; // ⍎ needs special attention
+  public static final byte   EVAL = 0; // ⍎ needs special attention
   
   static class Stk {
     Obj[] vals = new Obj[4];
@@ -66,14 +71,38 @@ public class Comp extends Obj {
       int pi = i;
       i++;
       switch (mutbc[pi]) {
-        case PUSH:
-          s.push(objs[mutbc[i++]&0xff]);
+        case PUSH: {
+          s.push(objs[mutbc[i++] & 0xff]);
           break;
-        case VARO:
+        }
+        case VARO: {
           Value got = sc.get(strs[mutbc[i++] & 0xff]);
-          if (got == null) throw new ValueError("Unknown variable "+strs[mutbc[i-1] & 0xff]);
+          if (got == null) throw new ValueError("Unknown variable " + strs[mutbc[i - 1] & 0xff]);
           s.push(got);
           break;
+        }
+        case VARM: {
+          s.push(new Variable(sc, strs[mutbc[i++] & 0xff]));
+          break;
+        }
+        case ARRO: {
+          int am = mutbc[i++]&0xff;
+          Value[] vs = new Value[am];
+          for (int j = 0; j < am; j++) {
+            vs[am-j-1] = (Value) s.pop();
+          }
+          s.push(Arr.create(vs));
+          break;
+        }
+        case ARRM: {
+          int am = mutbc[i++]&0xff;
+          Settable[] vs = new Settable[am];
+          for (int j = 0; j < am; j++) {
+            vs[am-j-1] = (Settable) s.pop();
+          }
+          s.push(new SettableArr(vs));
+          break;
+        }
         case FN1C: {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
@@ -85,15 +114,6 @@ public class Comp extends Obj {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
           s.push(f.asFun().call(a, w));
-          break;
-        }
-        case ARRO: {
-          int am = mutbc[i++]&0xff;
-          Value[] vs = new Value[am];
-          for (int j = 0; j < am; j++) {
-            vs[am-j-1] = (Value) s.pop(); // +TODO better alg
-          }
-          s.push(Arr.create(vs));
           break;
         }
         case OP1D: {
@@ -126,9 +146,31 @@ public class Comp extends Obj {
           s.push(d);
           break;
         }
+        case SETN: {
+          Settable k = (Settable) s.pop();
+          Value    v = (Value   ) s.pop();
+          k.set(v, false, null);
+          s.push(v);
+          break;
+        }
+        case SETU: {
+          Settable k = (Settable) s.pop();
+          Value    v = (Value   ) s.pop();
+          k.set(v, true, null);
+          s.push(v);
+          break;
+        }
+        case SETM: {
+          Settable k = (Settable) s.pop();
+          Value    f = (Value   ) s.pop();
+          Value    v = (Value   ) s.pop();
+          k.set(f.asFun().call(k.get(), v), true, null);
+          s.push(v);
+          break;
+        }
         case SPEC: {
           switch(mutbc[i++]) {
-            case EVBT:
+            case EVAL:
               s.push(new EvalBuiltin(sc));
               break;
             default:
@@ -149,23 +191,38 @@ public class Comp extends Obj {
       while (i != mutbc.length) {
         int pi = i;
         i++;
+        String cs = "";
         switch (mutbc[pi]) {
-          case PUSH: b.append(" PUSH ").append(safeObj(mutbc[i++])); break;
-          case VARO: b.append(" VARO ").append(safeStr(mutbc[i++])); break;
-          case ARRO: b.append(" ARRO ").append(mutbc[i++]&0xff); break;
-          case FN1C: b.append(" FN1C"); break;
-          case FN2C: b.append(" FN2C"); break;
-          case OP1D: b.append(" OP1D"); break;
-          case OP2D: b.append(" OP2D"); break;
-          case TR2D: b.append(" TR2D"); break;
-          case TR3D: b.append(" TR3D"); break;
-          case SPEC: b.append(" SPEC ").append(mutbc[i++]&0xff); break;
-          default  : b.append(" unknown ").append(mutbc[i++]&0xff);
+          case PUSH: cs = " PUSH " + safeObj(mutbc[i++]); break;
+          case VARO: cs = " VARO " + safeStr(mutbc[i++]); break;
+          case VARM: cs = " VARM " + safeStr(mutbc[i++]); break;
+          case ARRO: cs = " ARRO " + (mutbc[i++]&0xff); break;
+          case ARRM: cs = " ARRM " + (mutbc[i++]&0xff); break;
+          case FN1C: cs = " FN1C"; break;
+          case FN2C: cs = " FN2C"; break;
+          case OP1D: cs = " OP1D"; break;
+          case OP2D: cs = " OP2D"; break;
+          case TR2D: cs = " TR2D"; break;
+          case TR3D: cs = " TR3D"; break;
+          case SETN: cs = " SETN"; break;
+          case SETU: cs = " SETU"; break;
+          case SETM: cs = " SETM"; break;
+          case SPEC: cs = " SPEC "+(mutbc[i++]&0xff); break;
+          default  : cs = " unknown ";
         }
+        b.append(' ');
+        for (int j = pi; j < i; j++) {
+          int c = mutbc[j]&0xff;
+          b.append(Integer.toHexString(c/16));
+          b.append(Integer.toHexString(c%16));
+          b.append(' ');
+        }
+        b.append("   ".repeat(2 - (i-pi)));
+        b.append(cs);
         b.append('\n');
       }
     } catch (Throwable t) {
-      b.append("#ERR#");
+      b.append("#ERR#\n");
     }
     if (objs.length > 0) {
       b.append("objs:\n");
@@ -181,13 +238,13 @@ public class Comp extends Obj {
   
   private String safeObj(byte i) {
     int l = i&0xff;
-    if (l>=objs.length) return i+": INVALID";
-    return i+": "+objs[l];
+    if (l>=objs.length) return "INVALID";
+    return "!"+objs[l];
   }
   private String safeStr(byte i) {
     int l = i&0xff;
-    if (l>=strs.length) return i+": INVALID";
-    return i+": "+strs[l];
+    if (l>=strs.length) return "INVALID";
+    return "\""+strs[l]+"\"";
   }
   
   
@@ -207,16 +264,21 @@ public class Comp extends Obj {
   static class Mut {
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
-    
-    public byte[] pushVar(String s) {
-      byte[] res = {PUSH, (byte) strs.size()};
-      strs.add(s);
-      return res;
-    }
   
     public byte[] push(Value o) {
       byte[] res = {PUSH, (byte) objs.size()};
       objs.add(o);
+      return res;
+    }
+    
+    public byte[] varo(String s) {
+      byte[] res = {VARO, (byte) strs.size()};
+      strs.add(s);
+      return res;
+    }
+    public byte[] varm(String s) {
+      byte[] res = {VARM, (byte) strs.size()};
+      strs.add(s);
       return res;
     }
   }
@@ -240,7 +302,7 @@ public class Comp extends Obj {
     return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]));
   }
   
-  private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // [] only for !; O=[af] in non-!
+  private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[af] in non-!
     if (tps.size() > 4) return false;
     int pi = pt.length()-1;
     int ti = tps.size()-1;
@@ -263,6 +325,12 @@ public class Comp extends Obj {
           }
         } else if (c=='O') {
           if (t!='f' && t!='a') return false;
+        } else if (c == ']') {
+          boolean any = false;
+          do { pi--;
+            if (t == pt.charAt(pi)) any = true;
+          } while(pt.charAt(pi) != '['); pi--;
+          if (!any) return false;
         } else {
           if (t != c) return false;
         }
@@ -348,7 +416,7 @@ public class Comp extends Obj {
           ));
           continue;
         }
-        if (isE(tps, "←|ff", last)) {
+        if (isE(tps, "[←↩]|ff", last)) {
           if (DBGCOMP) System.out.println("match F F");
           tps.addLast(new Res('f',
             tps.removeLast().comp(m, false),
@@ -378,10 +446,11 @@ public class Comp extends Obj {
           continue;
         }
       }
-      { // all
+      // all
+      {
         int i = tps.get(0).type=='d'? 1 : last?0 : 1;
         if (isS(tps, "Om", i)) {
-          if (DBGCOMP) System.out.println("O m");
+          if (DBGCOMP) System.out.println("match F m");
           tps.add(i, new Res('f',
             tps.remove(i+1).comp(m, false),
             tps.remove(i  ).comp(m, false),
@@ -390,7 +459,7 @@ public class Comp extends Obj {
           continue;
         }
         if (isS(tps, "OdO", i)) {
-          if (DBGCOMP) System.out.println("O d O");
+          if (DBGCOMP) System.out.println("match F d G");
           tps.add(i, new Res('f',
             tps.remove(i+2).comp(m, false),
             tps.remove(i+1).comp(m, false),
@@ -400,12 +469,44 @@ public class Comp extends Obj {
           continue;
         }
       }
+      
+      if (isE(tps, "a←a", false)) {
+        if (DBGCOMP) System.out.println("a←a");
+        tps.addLast(new Res('a',
+          tps.removeLast().comp(m, false),
+          tps.removeLast().comp(m, false), // empty
+          tps.removeLast().comp(m, true),
+          new byte[]{SETN}
+        ));
+        continue;
+      }
+      if (isE(tps, "a↩a", false)) {
+        if (DBGCOMP) System.out.println("a↩a");
+        tps.addLast(new Res('a',
+          tps.removeLast().comp(m, false),
+          tps.removeLast().comp(m, false), // empty
+          tps.removeLast().comp(m, true),
+          new byte[]{SETU}
+        ));
+        continue;
+      }
+      if (isE(tps, "af↩a", false)) {
+        if (DBGCOMP) System.out.println("af↩a");
+        tps.addLast(new Res('a',
+          tps.removeLast().comp(m, false),
+          tps.removeLast().comp(m, false),
+          tps.removeLast().comp(m, false), // empty
+          tps.removeLast().comp(m, true),
+          new byte[]{SETM}
+        ));
+        continue;
+      }
       break;
     }
   }
   
   public static char typeof(Token t) {
-    if (t.type != 0) return t.type; // handles NumTok, StrTok, ChrTok & re-evaluations
+    if (t.type != 0) return t.type; // handles NumTok, StrTok, ChrTok, SetTok, ModTok & re-evaluations
     
     if (t instanceof ParenTok) {
       return t.type = typeof(((ParenTok) t).ln);
@@ -436,13 +537,13 @@ public class Comp extends Obj {
       if (tps.length == 0) throw new SyntaxError("line with no tokens", t);
       for (int i = 0; i < tks.size(); i++) tps[i] = typeof(tks.get(i));
       char last = tps[tps.length-1];
+      if (tps.length == 1) return t.type = last;
       if (last == 'a') return t.type = 'a';
       if (last == 'f') return t.type = 'f';
-      if (last == 'd') { // i hope this and the 'm' case are correct..
-        if (tps.length==1) return t.type = 'd';
-        throw new SyntaxError("dop can't be the last token of a line", tks.get(tks.size()-1));
-      }
-      if (last == 'm') return t.type = tps.length==1? 'm' : 'f';
+      
+      // i hope these are correct..
+      if (last == 'd') throw new SyntaxError("dop can't be the last token of a line", tks.get(tks.size() - 1));
+      if (last == 'm') return t.type = 'f';
     }
     throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName());
   }
@@ -451,8 +552,31 @@ public class Comp extends Obj {
   @interface CheckReturnValue{}@CheckReturnValue
   public static byte[] compP(Mut m, Token tk, boolean mut) { // assumes tk has been typechecked
     assert tk.type != 0;
+    if (mut) {
+      if (tk instanceof NameTok) {
+        return m.varm(((NameTok) tk).name);
+      }
+      if (tk instanceof StrandTok) {
+        List<Token> tks = ((StrandTok) tk).tokens;
+        int sz = tks.size();
+        byte[][] bcs = new byte[sz+1][];
+        for (int i = 0; i < tks.size(); i++) {
+          bcs[i] = compP(m, tks.get(i), true);
+        }
+        if (sz > 255) throw new NYIError("array constants with >255 items", tk);
+        bcs[bcs.length-1] = new byte[]{ARRM, (byte) sz};
+        return cat(bcs);
+      }
+      if (tk instanceof ParenTok) {
+        return compP(m, ((ParenTok) tk).ln, true);
+      }
+      if (tk instanceof LineTok) {
+        if (((LineTok) tk).tokens.size() == 1) return compP(m, ((LineTok) tk).tokens.get(0), true);
+      }
+      throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
+    }
     if (tk instanceof ParenTok) {
-      return compP(m, ((ParenTok) tk).ln, mut);
+      return compP(m, ((ParenTok) tk).ln, false);
     }
     if (tk instanceof NumTok) {
       return m.push(((NumTok) tk).val);
@@ -480,11 +604,12 @@ public class Comp extends Obj {
         Res c = new Res(ts.get(i));
         tps.addFirst(c);
         // if (DBGCOMP) System.out.println(tps);
-        collect(tps, m, train, i==0);
+        collect(tps, m, train, false);
         i--;
       }
+      collect(tps, m, train, true);
       // if (DBGCOMP) System.out.println(tps);
-      if (tps.size()!=1) throw new SyntaxError("couldn't join everything to a single expression");
+      if (tps.size()!=1) throw new SyntaxError("couldn't join everything to a single expression", tps.get(tps.size()-1).tk);
       assert tps.get(0).type == tk.type;
       return tps.get(0).comp(m, false);
     }
@@ -497,15 +622,14 @@ public class Comp extends Obj {
       switch (s) {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩":
         case "𝕎": case "𝔾": case "𝔽": case "𝕏":
-          return m.pushVar(s);
+          return m.varo(s);
         case "⍎": // +TODO handle better
-          return new byte[]{SPEC, EVBT};
+          return new byte[]{SPEC, EVAL};
         default: throw new ImplementationError("Undefined unknown built-in "+s, op);
       }
     }
     if (tk instanceof NameTok) {
-      String name = ((NameTok) tk).name;
-      return m.pushVar(name);
+      return m.varo(((NameTok) tk).name);
     }
     if (tk instanceof StrandTok) {
       List<Token> tks = ((StrandTok) tk).tokens;
@@ -517,6 +641,9 @@ public class Comp extends Obj {
       if (sz > 255) throw new NYIError("array constants with >255 items", tk);
       bs[bs.length-1] = new byte[]{ARRO, (byte) sz};
       return cat(bs);
+    }
+    if (tk instanceof SetTok || tk instanceof ModTok) {
+      return NOBYTES;
     }
     throw new ImplementationError("can't compile "+tk.getClass());
   }

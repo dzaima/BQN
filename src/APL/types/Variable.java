@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.*;
-import APL.errors.ValueError;
+import APL.errors.*;
 
 public class Variable extends Settable {
   
@@ -15,16 +15,17 @@ public class Variable extends Settable {
   }
   
   public Value get() {
-    if (v == null) throw new ValueError("trying to get value of non-existing variable "+name, this);
+    if (v == null) throw new ValueError("trying to get value of non-existing variable '"+name+"'", this);
     return v;
   }
   
-  @Override
-  public void set(Value v, Callable blame) {
-    sc.set(name, v);
-  }
-  public void update(Value v) {
-    sc.update(name, v);
+  public void set(Value v, boolean update, Callable blame) {
+    if (update) {
+      sc.update(name, v);
+    } else {
+      if (sc.vars.containsKey(name)) throw new SyntaxError("←: Cannot reassign '"+name+"'", blame);
+      sc.set(name, v);
+    }
   }
   
   @Override

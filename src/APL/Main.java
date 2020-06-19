@@ -5,7 +5,7 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.VarArr;
+import APL.types.functions.MutArr;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -305,7 +305,7 @@ public class Main {
   
   public static Value san(Obj o) {
     if (o instanceof Value   ) return (Value) o;
-    if (o instanceof VarArr  ) return ((VarArr  ) o).get();
+    if (o instanceof MutArr) return ((MutArr) o).get();
     if (o instanceof Settable) return ((Settable) o).get();
     throw new DomainError("Cannot convert "+o.humanType(true)+" to array", o);
   }
@@ -394,7 +394,7 @@ public class Main {
   }
   
   private static Value norm(Obj o) {
-    if (o instanceof VarArr) return ((VarArr) o).get();
+    if (o instanceof MutArr) return ((MutArr) o).get();
     if (o instanceof Settable) return ((Settable) o).get();
     if (!(o instanceof Value)) throw new DomainError("Trying to use "+o.humanType(true)+" as array", o);
     return (Value) o;

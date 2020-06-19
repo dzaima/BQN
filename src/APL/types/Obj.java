@@ -27,13 +27,14 @@ public abstract class Obj implements Tokenable {
     if (this instanceof Fun     )return article? "a function"   : "function";
     if (this instanceof Null    )return article? "javanull"     : "javanull";
     if (this instanceof Brackets)return article? "brackets"     : "brackets";
-    if (this instanceof VarArr  )return article? "a vararr"     : "vararr";
+    if (this instanceof MutArr  )return article? "a vararr"     : "vararr";
     if (this instanceof Variable)return article? "a variable"   : "variable";
     if (this instanceof Pick    )return article? "an array item": "array item";
     if (this instanceof Mop     )return article? "monadic operator" : "a monadic operator";
     if (this instanceof Dop     )return article? "dyadic operator" : "a dyadic operator";
-    if (this instanceof APLMap.MapPointer)return article? "a map item": "map item";
     if (this instanceof BigValue)return article? "a biginteger" : "biginteger";
+    if (this instanceof SettableArr)return article? "a vararr"     : "vararr";
+    if (this instanceof APLMap.MapPointer)return article? "a map item": "map item";
     return "some type that dzaima hasn't named in Obj.humanType ಠ_ಠ (class = "+getClass()+")";
   }
   

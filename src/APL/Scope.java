@@ -35,7 +35,7 @@ public class Scope {
   
   public void update(String name, Value val) { // sets wherever var already exists
     Scope sc = owner(name);
-    if (sc == null) sc = this;
+    if (sc == null) throw new SyntaxError("No variable '"+name+"' to update", val);
     sc.set(name, val);
   }
   public void set(String name, Value val) { // sets in current scope

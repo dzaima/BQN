@@ -12,9 +12,9 @@ public abstract class Settable extends Obj {
   public Type type() {
     return v == null? Type.var : v.type();
   }
-  public abstract void set(Value v, Callable blame);
+  public abstract void set(Value v, boolean update, Callable blame);
   public Value get() {
-    if (v == null) throw new ValueError("trying to get value of non-existing settable", this);
+    if (v == null) throw new ValueError("trying to get non-existing value", this);
     return v;
   }
   public Obj getOrThis() {
