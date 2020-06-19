@@ -6,7 +6,7 @@ import APL.tokenizer.types.BasicLines;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
-import APL.types.functions.builtins.dops.*;
+import APL.types.functions.builtins.dops.DepthBuiltin;
 import APL.types.functions.builtins.fns.*;
 
 import java.io.*;

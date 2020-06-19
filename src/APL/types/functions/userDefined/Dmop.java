@@ -2,7 +2,7 @@ package APL.types.functions.userDefined;
 
 import APL.*;
 import APL.tokenizer.types.DfnTok;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 
 

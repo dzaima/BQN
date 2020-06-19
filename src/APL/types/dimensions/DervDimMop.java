@@ -2,7 +2,7 @@ package APL.types.dimensions;
 
 import APL.Scope;
 import APL.errors.SyntaxError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 
 public class DervDimMop extends Mop {

@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.Scope;
-import APL.types.arrs.*;
+import APL.types.arrs.SingleItemArr;
 
 public abstract class Callable extends Primitive {
   final public Scope sc;

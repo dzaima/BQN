@@ -3,10 +3,9 @@ package APL.types.functions;
 import APL.*;
 import APL.errors.LengthError;
 import APL.types.*;
-import APL.types.arrs.*;
 import APL.types.functions.builtins.SetBuiltin;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class SettableArr extends Settable {
   public final Settable[] arr;

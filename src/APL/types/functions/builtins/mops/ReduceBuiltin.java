@@ -6,7 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.DimMMop;
 import APL.types.functions.*;
-import APL.types.functions.builtins.fns.*;
+import APL.types.functions.builtins.fns.OldCatBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
 public class ReduceBuiltin extends Mop implements DimMMop {

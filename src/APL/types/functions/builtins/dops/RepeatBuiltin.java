@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.dops;
 
-import APL.*;
+import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.functions.*;

@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.Main;
-import APL.errors.*;
+import APL.errors.SyntaxError;
 import APL.types.arrs.SingleItemArr;
 
 public abstract class APLMap extends Primitive {

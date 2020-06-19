@@ -6,7 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.builtins.SetBuiltin;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class MutArr extends Settable { // old version of SettableArr
   public final ArrayList<Obj> arr;

@@ -3,7 +3,7 @@ package APL.types.functions.builtins.mops;
 import APL.Main;
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.Rank0Arr;
 import APL.types.functions.*;
 
 import java.util.Arrays;

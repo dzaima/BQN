@@ -2,7 +2,7 @@ package APL.types.functions.builtins.fns2;
 
 import APL.errors.*;
 import APL.types.Value;
-import APL.types.arrs.*;
+import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
 
 import java.util.*;

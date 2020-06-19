@@ -4,7 +4,7 @@ import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.DoubleArr;
 import APL.types.dimensions.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.AbstractSet;

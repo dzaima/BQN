@@ -1,6 +1,6 @@
 package APL.tokenizer;
 
-import APL.errors.*;
+import APL.errors.SyntaxError;
 import APL.tokenizer.types.*;
 import APL.types.BigValue;
 
