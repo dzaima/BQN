@@ -124,10 +124,10 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   }
   
   // checks for rank & bound errors
-  // ⎕VI←1 and sh.length≡1 allows for a shortcut of items (1 2 3 ←→ ⊂1 2 3)
+  // •VI←1 and sh.length≡1 allows for a shortcut of items (1 2 3 ←→ ⊂1 2 3)
   public static PosSh poss(Value v, int[] ish, Callable blame) {
     // if (v instanceof Primitive) return new PosSh(new int[]{v.asInt()}, Rank0Arr.SHAPE);
-    if (Main.vind) { // ⎕VI←1
+    if (Main.vind) { // •VI←1
       boolean deep = false;
       int[] rsh = null;
       if (!(v instanceof DoubleArr || v instanceof ChrArr || v instanceof BitArr)) {
@@ -169,7 +169,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
         }
       }
       return new PosSh(res, rsh);
-    } else { // ⎕VI←0
+    } else { // •VI←0
       int[] rsh = v.shape;
       if (v.quickDoubleArr()) {
         int[] res = v.asIntArr();

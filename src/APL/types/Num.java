@@ -33,7 +33,7 @@ public class Num extends Primitive {
       return d<0? "¯∞" : "∞";
     }
     int exp = (fa[pp+4]-'0')*10  +   fa[pp+5]-'0'; // exponent
-    /* ⎕pp←4:
+    /* •pp←4:
        4.0000e+03
        0123456789
      ∆ 43210123456
@@ -68,7 +68,7 @@ public class Num extends Primitive {
     
     
     // generic standard notation
-    /* ⎕pp←4:
+    /* •pp←4:
        _31416e+00
        01234567890
      ∆ 432101234567
@@ -118,7 +118,7 @@ public class Num extends Primitive {
   }
   public static void setPrecision(int p, int s, int e) {
     pp = Math.min(p, 20);
-    if (s<-90 | e>90) throw new DomainError("⎕PP standard notation range too big");
+    if (s<-90 | e>90) throw new DomainError("•PP standard notation range too big");
     sEr = s;
     eEr = e;
   }

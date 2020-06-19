@@ -25,7 +25,7 @@ public class UDBuiltin extends Builtin {
         return new HArr(res);
       }
     }
-    if (Main.vind) { // ⎕VI←1
+    if (Main.vind) { // •VI←1
       if (w.rank != 1) throw new DomainError("↕: ⍵ must be a vector ("+ Main.formatAPL(w.shape)+" ≡ ⍴⍵)", this, w);
       int dim = w.ia;
       int[] shape = w.asIntVec();
@@ -50,7 +50,7 @@ public class UDBuiltin extends Builtin {
         blockSize*= shape[i];
       }
       return new HArr(res);
-    } else { // ⎕VI←0
+    } else { // •VI←0
       int[] shape = w.asIntVec();
       int ia = Arr.prod(shape);
       Value[] arr = new Value[ia];

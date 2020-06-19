@@ -56,7 +56,7 @@ public class Main {
                   println("-b     : disable boxing");
                   println("-c     : disable colorful printing");
                   println("-q     : enable quoting strings");
-                  println("⎕A←B   : set quad A to B");
+                  println("•A←B   : set •A to B");
                   println("-D file: run the file as SBCS");
                   println("-E a b : encode the file A in the SBCS, save as B");
                   println("If given no arguments, an implicit -r will be added");
@@ -72,8 +72,8 @@ public class Main {
                     String name = args[++i];
                     exec(readFile(name), global);
                     break;
-                  case '⎕':
-                    throw new DomainError("⎕ settings must be a separate argument");
+                  case '•':
+                    throw new DomainError("• settings must be a separate argument");
                   case 'e':
                     String code = args[++i];
                     exec(code, global);
@@ -144,7 +144,7 @@ public class Main {
                 }
               }
             }
-          } else if (p.charAt(0)=='⎕') {
+          } else if (p.charAt(0)=='•') {
             int si = p.indexOf('←');
             if (si == -1) throw new DomainError("argument `"+p+"` didn't contain a `←`");
             String qk = p.substring(0, si);

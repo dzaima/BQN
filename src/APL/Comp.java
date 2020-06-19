@@ -6,8 +6,6 @@ import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.EvalBuiltin;
-import APL.types.functions.builtins.fns2.*;
-import APL.types.functions.builtins.mops.ReduceBuiltin;
 import APL.types.functions.trains.*;
 
 import java.util.*;
@@ -191,7 +189,7 @@ public class Comp extends Obj {
       while (i != mutbc.length) {
         int pi = i;
         i++;
-        String cs = "";
+        String cs;
         switch (mutbc[pi]) {
           case PUSH: cs = " PUSH " + safeObj(mutbc[i++]); break;
           case VARO: cs = " VARO " + safeStr(mutbc[i++]); break;
@@ -208,7 +206,7 @@ public class Comp extends Obj {
           case SETU: cs = " SETU"; break;
           case SETM: cs = " SETM"; break;
           case SPEC: cs = " SPEC "+(mutbc[i++]&0xff); break;
-          default  : cs = " unknown ";
+          default  : cs = " unknown";
         }
         b.append(' ');
         for (int j = pi; j < i; j++) {
@@ -371,10 +369,6 @@ public class Comp extends Obj {
       type = tk.type;
     }
     
-    public Res(char type, byte[] bc) {
-      this.type = type;
-      this.bc = bc;
-    }
     public Res(char type, byte[]... bcs) {
       this.type = type;
       this.bc = cat(bcs);
@@ -635,7 +629,7 @@ public class Comp extends Obj {
       List<Token> tks = ((StrandTok) tk).tokens;
       byte[][] bs = new byte[tks.size()+1][];
       for (int i = 0; i < tks.size(); i++) {
-        bs[i] = compP(m, tks.get(i), mut);
+        bs[i] = compP(m, tks.get(i), false);
       }
       int sz = tks.size();
       if (sz > 255) throw new NYIError("array constants with >255 items", tk);
@@ -650,37 +644,13 @@ public class Comp extends Obj {
   
   public static char varType(String name) {
     char s = name.charAt(0);
+    if (s=='•') s = name.charAt(1);
     if (s=='_') {
       char e = name.charAt(name.charAt(name.length()-1));
       return e=='_'? 'd' : 'm';
     }
     if (s>='A' && s<='Z') return 'f';
     return 'a';
-  }
-  
-  private static Comp example() {
-    Value[] os = new Value[4];
-    os[0] = new Num(5);
-    os[1] = new DivBuiltin();
-    os[2] = new PlusBuiltin();
-    os[3] = new ReduceBuiltin();
-    byte[] bcs = {
-      PUSH, 0, // 5
-      PUSH, 1, // ÷ 5
-      FN1C,    // .2
-      PUSH, 0, // .2 5
-      PUSH, 0, // .2 5 5
-      ARRO, 3, // ⟨.2,5,5⟩
-  
-      PUSH, 3, // ⟨.2,5,5⟩ /
-      PUSH, 2, // ⟨.2,5,5⟩ / +
-      OP1D,    // ⟨.2,5,5⟩ +/
-      FN1C,    // +/⟨.2,5,5⟩ ≡ 10.2
-  
-      PUSH, 2,
-      ARRO, 2,
-    };
-    return new Comp(bcs, os, new String[0]);
   }
   
   

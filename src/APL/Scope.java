@@ -58,7 +58,7 @@ public class Scope {
           } else {
             int[] args = val.asIntVec();
             if (args.length == 3) Num.setPrecision(args[0], args[1], args[2]);
-            else throw new DomainError("⎕PP expected either a scalar number or array of 3 integers as ⍵", val);
+            else throw new DomainError("•PP expected either a scalar number or array of 3 integers as ⍵", val);
           }
           break;
         default:
@@ -85,7 +85,7 @@ public class Scope {
         case "•GC": System.gc(); return Num.ONE;
         case "•GCLOG": return new GCLog();
         case "•NULL": return Null.NULL;
-        case "•MAP": case "⎕NS": return new MapGen();
+        case "•MAP": case "•NS": return new MapGen();
         case "•DL": return new Delay(this);
         case "•DR": return new DR();
         case "•UCS": return new UCS(this);
@@ -101,14 +101,14 @@ public class Scope {
         case "•STDIN": return new Stdin();
         case "•BIG": return new Big();
         case "•U": return new Builtin() {
-          @Override public String repr() { return "⎕U"; }
+          @Override public String repr() { return "•U"; }
   
           @Override public Value call(Value w) {
             Main.ucmd(Scope.this, w.asString());
             return null;
           }
         };
-        case "•OPT": case "⎕OPTIMIZE":
+        case "•OPT": case "•OPTIMIZE":
           return new Optimizer(this);
       }
     }
@@ -145,7 +145,7 @@ public class Scope {
   
   static class GCLog extends Builtin {
     @Override public String repr() {
-      return "⎕GCLOG";
+      return "•GCLOG";
     }
     
     @Override
@@ -164,7 +164,7 @@ public class Scope {
         Main.println(msg+" was GCed");
       }
       public String toString() {
-        return "⎕GCLOG["+msg+"]";
+        return "•GCLOG["+msg+"]";
       }
       
       @Override
@@ -178,7 +178,7 @@ public class Scope {
   static class Timer extends Builtin {
     final boolean raw;
     @Override public String repr() {
-      return "⎕TIME";
+      return "•TIME";
     }
     Timer(Scope sc, boolean raw) {
       super(sc);
@@ -229,7 +229,7 @@ public class Scope {
   }
   static class Eraser extends Builtin {
     @Override public String repr() {
-      return "⎕ERASE";
+      return "•ERASE";
     }
     Eraser(Scope sc) {
       super(sc);
@@ -242,7 +242,7 @@ public class Scope {
   }
   static class Delay extends Builtin {
     @Override public String repr() {
-      return "⎕DL";
+      return "•DL";
     }
     Delay(Scope sc) {
       super(sc);
@@ -260,7 +260,7 @@ public class Scope {
   }
   static class UCS extends Builtin {
     @Override public String repr() {
-      return "⎕UCS";
+      return "•UCS";
     }
     UCS(Scope sc) {
       super(sc);
@@ -285,7 +285,7 @@ public class Scope {
   
   private static class MapGen extends Builtin {
     @Override public String repr() {
-      return "⎕MAP";
+      return "•MAP";
     }
     
     @Override
@@ -307,7 +307,7 @@ public class Scope {
       }
       var map = new StrMap();
       for (Value v : w) {
-        if (v.rank != 1 || v.ia != 2) throw new RankError("⎕map: input pairs should be 2-item vectors", this, v);
+        if (v.rank != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
         map.set(v.get(0), v.get(1));
       }
       return map;
@@ -328,7 +328,7 @@ public class Scope {
   
   private class Optimizer extends Builtin {
     @Override public String repr() {
-      return "⎕OPT";
+      return "•OPT";
     }
     Optimizer(Scope sc) {
       super(sc);
@@ -345,7 +345,7 @@ public class Scope {
   }
   private static class ClassGetter extends Builtin {
     @Override public String repr() {
-      return "⎕CLASS";
+      return "•CLASS";
     }
     @Override
     public Value call(Value w) {
@@ -355,7 +355,7 @@ public class Scope {
   
   private static class Ex extends Builtin {
     @Override public String repr() {
-      return "⎕EX";
+      return "•EX";
     }
     Ex(Scope sc) {
       super(sc);
@@ -368,7 +368,7 @@ public class Scope {
   }
   private static class Lns extends Builtin {
     @Override public String repr() {
-      return "⎕LNS";
+      return "•LNS";
     }
     
     @Override
@@ -451,7 +451,7 @@ public class Scope {
   
   private static class Shell extends Fun {
     @Override public String repr() {
-      return "⎕SH";
+      return "•SH";
     }
     
     @Override
@@ -534,7 +534,7 @@ public class Scope {
   
   private class NC extends Fun {
     @Override public String repr() {
-      return "⎕NC";
+      return "•NC";
     }
     
     @Override public Value call(Value w) {
@@ -551,7 +551,7 @@ public class Scope {
   
   private static class Hasher extends Builtin {
     @Override public String repr() {
-      return "⎕HASH";
+      return "•HASH";
     }
     @Override public Value call(Value w) {
       return Num.of(w.hashCode());
@@ -559,7 +559,7 @@ public class Scope {
   }
   private static class Stdin extends Builtin {
     @Override public String repr() {
-      return "⎕STDIN";
+      return "•STDIN";
     }
     @Override public Value call(Value w) {
       if (w instanceof Num) {
@@ -573,7 +573,7 @@ public class Scope {
         while (Main.console.hasNext()) res.add(Main.toAPL(Main.console.nextLine()));
         return new HArr(res);
       }
-      throw new DomainError("⎕STDIN needs either ⍬ or a number as ⍵", this);
+      throw new DomainError("•STDIN needs either ⍬ or a number as ⍵", this);
     }
   }
   
@@ -601,7 +601,7 @@ public class Scope {
     }
     
     @Override public String repr() {
-      return "⎕PFX";
+      return "•PFX";
     }
     @Override public Value call(Value w) {
       return call(w, w);
@@ -663,7 +663,7 @@ public class Scope {
       }
       
       public String repr() {
-        return "⎕PFO";
+        return "•PFO";
       }
     }
   }
@@ -709,7 +709,7 @@ public class Scope {
       return HArr.create(va, w.shape);
     }
     @Override public String repr() {
-      return "⎕BIG";
+      return "•BIG";
     }
   }
   
@@ -741,7 +741,7 @@ public class Scope {
     }
     public Value call(Value a, Value w) {
       int[] is = a.asIntVec();
-      if (is.length != 2) throw new DomainError("⎕DR expected ⍺ to have 2 items", this);
+      if (is.length != 2) throw new DomainError("•DR expected ⍺ to have 2 items", this);
       int f = is[0];
       int t = is[1];
       if ((f==1 || f==3 || f==5)
@@ -777,13 +777,13 @@ public class Scope {
           }, 0, w);
         }
       }
-      throw new NYIError(a+"⎕DR not implemented", this);
+      throw new NYIError(a+"•DR not implemented", this);
     }
     public Value callInvW(Value a, Value w) {
       return call(ReverseBuiltin.on(a), w);
     }
     public String repr() {
-      return "⎕DR";
+      return "•DR";
     }
   }
   

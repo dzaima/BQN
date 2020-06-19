@@ -44,7 +44,7 @@ public class IotaUBBuiltin extends Builtin {
       return new DoubleArr(sub);
     } else {
       double[] wd = w.asDoubleArr();
-      if (Main.vind) { // ⎕VI←1
+      if (Main.vind) { // •VI←1
         double[][] res = new double[w.rank][sum];
         int ri = 0;
         Indexer idx = new Indexer(w.shape);
@@ -62,7 +62,7 @@ public class IotaUBBuiltin extends Builtin {
         Value[] resv = new Value[rank];
         for (int i = 0; i < rank; i++) resv[i] = new DoubleArr(res[i]);
         return new HArr(resv);
-      } else { // ⎕VI←0
+      } else { // •VI←0
         Value[] res = new Value[sum];
         int ri = 0;
         Indexer idx = new Indexer(w.shape);

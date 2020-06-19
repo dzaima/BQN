@@ -9,7 +9,7 @@ public class Null extends Primitive {
   
   @Override
   public String toString() {
-    return "⎕NULL";
+    return "•NULL";
   }
   
   @Override
