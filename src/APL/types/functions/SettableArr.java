@@ -38,16 +38,10 @@ public class SettableArr extends Settable {
   
   
   public void set(Value w, boolean update, Callable blame) {
-    if (w.rank == 0) {
-      for (int i = 0; i < ia; i++) {
-        SetBuiltin.set(arr[i], w, update);
-      }
-    } else {
-      if (w.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", w);
-      if (w.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", w);
-      for (int i = 0; i < ia; i++) {
-        SetBuiltin.set(arr[i], w.get(i), update);
-      }
+    if (w.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", w);
+    if (w.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", w);
+    for (int i = 0; i < ia; i++) {
+      SetBuiltin.set(arr[i], w.get(i), update);
     }
   }
 }

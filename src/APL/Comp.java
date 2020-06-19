@@ -5,21 +5,25 @@ import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.functions.*;
+import APL.types.functions.builtins.Quad;
 import APL.types.functions.builtins.fns.EvalBuiltin;
 import APL.types.functions.trains.*;
+import APL.types.functions.userDefined.UserDefined;
 
 import java.util.*;
 
-public class Comp extends Obj {
+public class Comp {
   private static final byte[] NOBYTES = new byte[0];
   private final byte[] mutbc;
   private final Value[] objs;
   private final String[] strs;
+  private final DfnTok[] dfns;
   
-  Comp(byte[] bc, Value[] objs, String[] strs) {
+  Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns) {
     this.mutbc = bc;
     this.objs = objs;
     this.strs = strs;
+    this.dfns = dfns;
   }
   
   public static final byte PUSH =  0; // 1O; 2
@@ -36,10 +40,15 @@ public class Comp extends Obj {
   public static final byte SETN = 11; // set new; _  ←_;
   public static final byte SETU = 12; // set upd; _  ↩_;
   public static final byte SETM = 13; // set mod; _ F↩_;
+  public static final byte POPS = 14; // pop object from stack
+  public static final byte DFND = 15; // 1D; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
-  public static final byte   EVAL = 0; // ⍎ needs special attention
+  public static final byte   EVAL = 0; // ⍎
+  public static final byte   STDIN = 1; // •
+  public static final byte   STDOUT = 2; // •←
+  
   
   static class Stk {
     Obj[] vals = new Obj[4];
@@ -166,10 +175,25 @@ public class Comp extends Obj {
           s.push(v);
           break;
         }
+        case POPS: {
+          s.pop();
+          break;
+        }
+        case DFND: {
+          DfnTok dfn = dfns[mutbc[i++] & 0xff];
+          s.push(UserDefined.of(dfn, sc));
+          break;
+        }
         case SPEC: {
           switch(mutbc[i++]) {
             case EVAL:
               s.push(new EvalBuiltin(sc));
+              break;
+            case STDOUT:
+              s.push(new Quad());
+              break;
+            case STDIN:
+              s.push(new Quad().get());
               break;
             default:
               throw new InternalError("Unknown special "+ mutbc[i-1]);
@@ -205,14 +229,17 @@ public class Comp extends Obj {
           case SETN: cs = " SETN"; break;
           case SETU: cs = " SETU"; break;
           case SETM: cs = " SETM"; break;
+          case POPS: cs = " POPS"; break;
+          case DFND: cs = " DFND " + (mutbc[i++]&0xff); break;
+          
           case SPEC: cs = " SPEC "+(mutbc[i++]&0xff); break;
           default  : cs = " unknown";
         }
         b.append(' ');
         for (int j = pi; j < i; j++) {
           int c = mutbc[j]&0xff;
-          b.append(Integer.toHexString(c/16));
-          b.append(Integer.toHexString(c%16));
+          b.append(Integer.toHexString(c/16).toUpperCase());
+          b.append(Integer.toHexString(c%16).toUpperCase());
           b.append(' ');
         }
         b.append("   ".repeat(2 - (i-pi)));
@@ -230,6 +257,14 @@ public class Comp extends Obj {
       b.append("strs:\n");
       for (int j = 0; j < strs.length; j++) b.append(' ').append(j).append(": ").append(strs[j]).append('\n');
     }
+    if (dfns.length > 0) {
+      b.append("dfns:\n");
+      for (int j = 0; j < dfns.length; j++) {
+        DfnTok dfn = dfns[j];
+        b.append(' ').append(j).append(":\n  type ").append(dfn.type).append(" \n  ");
+        b.append(dfn.comp.fmt().replace("\n", "\n  "));
+      }
+    }
     b.deleteCharAt(b.length()-1);
     return b.toString();
   }
@@ -238,6 +273,11 @@ public class Comp extends Obj {
     int l = i&0xff;
     if (l>=objs.length) return "INVALID";
     return "!"+objs[l];
+  }
+  private String safeDfn(byte i) {
+    int l = i&0xff;
+    if (l>=dfns.length) return "INVALID";
+    return "!"+dfns[l];
   }
   private String safeStr(byte i) {
     int l = i&0xff;
@@ -259,13 +299,21 @@ public class Comp extends Obj {
     
    */
   
+  
+  
   static class Mut {
     ArrayList<Value> objs = new ArrayList<>();
+    ArrayList<DfnTok> dfns = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
   
     public byte[] push(Value o) {
       byte[] res = {PUSH, (byte) objs.size()};
       objs.add(o);
+      return res;
+    }
+    public byte[] push(DfnTok o) {
+      byte[] res = {DFND, (byte) dfns.size()};
+      dfns.add(o);
       return res;
     }
     
@@ -281,12 +329,25 @@ public class Comp extends Obj {
     }
   }
   
+  
+  public static Comp comp(DfnTok t) {
+    Mut mut = new Mut();
+    List<LineTok> lns = t.tokens;
+    byte[][] bcs = new byte[lns.size()][];
+    for (int i = 0; i < lns.size(); i++) {
+      LineTok ln = lns.get(i);
+      typeof(ln);
+      bcs[i*2] = compP(mut, ln, false);
+    }
+    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
+  }
+  
   public static Comp comp(LineTok ln) {
     // return example();
     typeof(ln);
     Mut mut = new Mut();
     byte[] bc = compP(mut, ln, false);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]));
+    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
   }
   
   public static Comp comp(BasicLines lns) {
@@ -297,7 +358,7 @@ public class Comp extends Obj {
       typeof(ln);
       bcs[i] = compP(mut, ln, false);
     }
-    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]));
+    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
   }
   
   private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[af] in non-!
@@ -515,10 +576,9 @@ public class Comp extends Obj {
       if (b==null) {
         String s = op.op;
         switch (s) {
-          case "𝕨": case "𝕘": case "𝕗": case "𝕩":
+          case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "•":
             return t.type = 'a';
-          case "𝕎": case "𝔾": case "𝔽": case "𝕏":
-          case "⍎":
+          case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "⍎":
             return t.type = 'f';
           default: throw new ImplementationError("Undefined unknown built-in "+s, op);
         }
@@ -567,6 +627,7 @@ public class Comp extends Obj {
       if (tk instanceof LineTok) {
         if (((LineTok) tk).tokens.size() == 1) return compP(m, ((LineTok) tk).tokens.get(0), true);
       }
+      if (tk instanceof OpTok && ((OpTok) tk).op.equals("•")) return new byte[]{SPEC, STDOUT};
       throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
     }
     if (tk instanceof ParenTok) {
@@ -617,8 +678,8 @@ public class Comp extends Obj {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩":
         case "𝕎": case "𝔾": case "𝔽": case "𝕏":
           return m.varo(s);
-        case "⍎": // +TODO handle better
-          return new byte[]{SPEC, EVAL};
+        case "⍎": return new byte[]{SPEC, EVAL };
+        case "•": return new byte[]{SPEC, STDIN};
         default: throw new ImplementationError("Undefined unknown built-in "+s, op);
       }
     }
@@ -638,6 +699,9 @@ public class Comp extends Obj {
     }
     if (tk instanceof SetTok || tk instanceof ModTok) {
       return NOBYTES;
+    }
+    if (tk instanceof DfnTok) {
+      return m.push((DfnTok) tk);
     }
     throw new ImplementationError("can't compile "+tk.getClass());
   }

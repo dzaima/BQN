@@ -593,8 +593,8 @@ public class Exec {
       case '⚇': return new DepthBuiltin();
       // case '@': return new AtBuiltin(sc);
       // case '⍫': return new ObverseBuiltin();
-    
-    
+      case '•': assert sc==null; return null;
+  
       case '⍬': return new DoubleArr(DoubleArr.EMPTY);
       // case '⍞': return new QuoteQuad();
       // case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
@@ -609,16 +609,17 @@ public class Exec {
         Value o;
         switch (t.op) { // +TODO clean up
           case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
-          case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return Main.san(o).asFun();
+          case "𝕎": o = sc.get("𝕎"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o;
           case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
-          case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return Main.san(o).asFun();
+          case "𝕏": o = sc.get("𝕏"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o;
           case "𝕗": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
-          case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return Main.san(o).asFun();
+          case "𝔽": o = sc.get("𝔽"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o;
           case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
-          case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return Main.san(o).asFun();
+          case "𝔾": o = sc.get("𝔾"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o;
           // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
         }
         /* fallthrough! */
+  
       default: throw new ImplementationError("no built-in " + t.op + " defined in exec", t);
     }
   }

@@ -37,8 +37,8 @@ public abstract class APLMap extends Primitive {
     
     public void set(Value v, boolean update, Callable blame) {
       boolean prev = map.getRaw(k) != Null.NULL;
-      if (prev && !update) throw new SyntaxError("←: Cannot reassign map key '"+k+"'");
-      if (!prev && update) throw new SyntaxError("↩: Cannot assign to new key '"+k+"'");
+      if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame, k);
+      if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame, k);
       map.set(k, v);
     }
   

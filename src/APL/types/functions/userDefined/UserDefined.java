@@ -7,27 +7,12 @@ import APL.types.Obj;
 
 public class UserDefined {
   public static Obj of(DfnTok ts, Scope sc) {
-    Type type = funType(ts, true);
+    char type = DfnTok.funType(ts, true);
     switch (type) {
-      case fn : return new Dfn(ts, sc);
-      case mop: return new Dmop(ts, sc);
-      case dop: return new Ddop(ts, sc);
+      case 'f': return new Dfn(ts, sc);
+      case 'm': return new Dmop(ts, sc);
+      case 'd': return new Ddop(ts, sc);
       default : throw new IllegalStateException();
     }
-  }
-  private static Type funType(TokArr<?> i, boolean first) {
-    Type type = Type.fn;
-    if (!(i instanceof DfnTok) || first) for (Token t : i.tokens) {
-      if (t instanceof OpTok) {
-        String op = ((OpTok) t).op;
-        if (op.equals("𝕗") || op.equals("𝔽")) type = Type.mop;
-        else if (op.equals("𝕘") || op.equals("𝔾")) return Type.dop;
-      } else if (t instanceof TokArr<?>) {
-        Type n = funType((TokArr<?>) t, false);
-        if (n == Type.mop) type = Type.mop;
-        else if (n.equals(Type.dop)) return Type.dop;
-      }
-    }
-    return type;
   }
 }
