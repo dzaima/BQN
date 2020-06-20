@@ -1,7 +1,6 @@
 package APL.types.functions.builtins.dops;
 
-import APL.Main;
-import APL.errors.*;
+import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.*;
 
@@ -11,28 +10,16 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun aaf = isFn(aa, '⍶');
-    if (ww instanceof Fun) {
-      Fun g = (Fun) ww;
-      Value prev = w;
-      Value curr = aaf.call(w);
-      while (!Main.bool(g.call(prev, curr))) {
-        Value next = aaf.call(curr);
-        prev = curr;
-        curr = next;
+    Fun aaf = aa.asFun();
+    int am = ww.asFun().call(w).asInt();
+    if (am < 0) {
+      for (int i = 0; i < -am; i++) {
+        w = aaf.callInv(w);
       }
-      return curr;
-    } else {
-      int am = ww.asInt();
-      if (am < 0) {
-        for (int i = 0; i < -am; i++) {
-          w = aaf.callInv(w);
-        }
-      } else for (int i = 0; i < am; i++) {
-        w = aaf.call(w);
-      }
-      return w;
+    } else for (int i = 0; i < am; i++) {
+      w = aaf.call(w);
     }
+    return w;
   }
   
   public Value callInv(Value aa, Value ww, Value w) {
@@ -51,29 +38,16 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    Fun aaf = isFn(aa, '⍶');
-    if (ww instanceof Fun) {
-      Fun g = (Fun) ww;
-      Value prev = w;
-      Value curr = aaf.call(a, w);
-      while (!Main.bool(g.call(prev, curr))) {
-        Value next = aaf.call(a, curr);
-        prev = curr;
-        curr = next;
+    Fun aaf = aa.asFun();
+    int am = ww.asFun().call(a, w).asInt();
+    if (am < 0) {
+      for (int i = 0; i < -am; i++) {
+        w = aaf.callInvW(a, w);
       }
-      return curr;
-    } else {
-      if (!(ww instanceof Num)) throw new SyntaxError("⍣: ⍹ must be either a function or scalar number");
-      int am = ww.asInt();
-      if (am < 0) {
-        for (int i = 0; i < -am; i++) {
-          w = aaf.callInvW(a, w);
-        }
-      } else for (int i = 0; i < am; i++) {
-        w = aaf.call(a, w);
-      }
-      return w;
+    } else for (int i = 0; i < am; i++) {
+      w = aaf.call(a, w);
     }
+    return w;
   }
   
   public Value callInvW(Value aa, Value ww, Value a, Value w) {
