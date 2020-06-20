@@ -780,9 +780,4 @@ public class Comp {
     if (s>='A' && s<='Z') return 'f';
     return 'a';
   }
-  
-  
-  public Type type() { // +TODO?
-    return Type.cmp;
-  }
 }

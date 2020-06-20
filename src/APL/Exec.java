@@ -607,7 +607,7 @@ public class Exec {
       case 55349: // double-struck surrogate pair
         if (sc == null) return null;
         Value o;
-        switch (t.op) { // +TODO clean up
+        switch (t.op) {
           case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
           case "𝕎": o = sc.get("𝕎"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o;
           case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
@@ -616,7 +616,7 @@ public class Exec {
           case "𝔽": o = sc.get("𝔽"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o;
           case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
           case "𝔾": o = sc.get("𝔾"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o;
-          // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
+          // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o;
         }
         /* fallthrough! */
         
@@ -663,7 +663,7 @@ public class Exec {
       //     res.setStr(key, val);
       //   }
       //   return res;
-      // } else { // array +TODO
+      // } else { // array
       //   Value[] vs = new Value[size];
       //   for (int i = 0; i < ts.size(); i++) {
       //     vs[i] = Main.exec(ts.get(i), sc);

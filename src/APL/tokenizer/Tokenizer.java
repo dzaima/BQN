@@ -71,7 +71,6 @@ public class Tokenizer {
   static class Block { // temp storage of multiple lines
     final ArrayList<Line> a;
     final char b;
-    boolean hasDmd = false;
     private final int pos;
     
     Block(ArrayList<Line> a, char b, int pos) {
@@ -147,7 +146,7 @@ public class Tokenizer {
               r = new DfnTok(raw, closed.pos, i+1, lineTokens);
               break;
             case ']':
-              r = new BracketTok(raw, closed.pos, i+1, lineTokens, closed.hasDmd);
+              r = new BracketTok(raw, closed.pos, i+1, lineTokens);
               break;
             default:
               throw new Error("this should really not happen "+c);
@@ -299,7 +298,6 @@ public class Tokenizer {
           tokens.add(new StrTok(raw, li, i, str.toString()));
         } else if (c=='\n' || c=='⋄' || c=='\r' || c==';' || c==',') {
           if ((c=='⋄' || c==',') && pointless) tokens.add(new DiamondTok(raw, i));
-          if ((c=='⋄' || c==',') || c=='\n') expr.hasDmd = true; // +TODO remove hasDmd
           if (c == ';') tokens.add(new SemiTok(raw, i, i+1));
           
           if (tokens.size() > 0) {
@@ -353,7 +351,7 @@ public class Tokenizer {
             r = new DfnTok(raw, closed.pos, len, lineTokens);
             break;
           case ']':
-            r = new BracketTok(raw, closed.pos, len, lineTokens, closed.hasDmd);
+            r = new BracketTok(raw, closed.pos, len, lineTokens);
             break;
           default:
             throw new Error("this should really not happen "+closed.b);

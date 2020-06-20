@@ -5,13 +5,11 @@ import APL.errors.DomainError;
 import java.util.List;
 
 public class BracketTok extends TokArr<LineTok> {
-  public final boolean array;
   
-  public BracketTok(String line, int spos, int epos, List<LineTok> tokens, boolean hasDmd) {
+  public BracketTok(String line, int spos, int epos, List<LineTok> tokens) {
     super(line, spos, tokens);
-    array = tokens.size()>=2 || hasDmd;
     end(epos);
-    if (tokens.size()==0 && hasDmd) throw new DomainError("[⋄] is not valid syntax", this);
+    if (tokens.size()==0) throw new DomainError("[⋄] is not valid syntax", this);
   }
   
   @Override public String toRepr() {
