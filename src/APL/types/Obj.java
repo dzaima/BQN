@@ -33,6 +33,7 @@ public abstract class Obj implements Tokenable {
     if (this instanceof Mop     )return article? "monadic operator" : "a monadic operator";
     if (this instanceof Dop     )return article? "dyadic operator" : "a dyadic operator";
     if (this instanceof BigValue)return article? "a biginteger" : "biginteger";
+    if (this instanceof Nothing )return article? "nothing"      : "nothing";
     if (this instanceof SettableArr)return article? "a vararr"     : "vararr";
     if (this instanceof APLMap.MapPointer)return article? "a map item": "map item";
     return "some type that dzaima hasn't named in Obj.humanType ಠ_ಠ (class = "+getClass()+")";

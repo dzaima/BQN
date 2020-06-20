@@ -2,7 +2,7 @@ package APL.types.functions.userDefined;
 
 import APL.*;
 import APL.tokenizer.types.DfnTok;
-import APL.types.Value;
+import APL.types.*;
 import APL.types.functions.*;
 
 
@@ -19,7 +19,7 @@ public class Dmop extends Mop {
     Main.printdbg("dmop call", w);
     Scope nsc = new Scope(sc);
     nsc.set("𝕗", f); nsc.set("𝔽", f.asFun());
-    nsc.set("𝕨", null); nsc.set("𝕎", null); // +TODO was new Variable(nsc, "𝕨")
+    nsc.set("𝕨", Nothing.inst); nsc.set("𝕎", Nothing.inst);
     nsc.set("𝕩", w); nsc.set("𝕏", f.asFun());
     nsc.set("∇", derv);
     return code.comp.exec(nsc);

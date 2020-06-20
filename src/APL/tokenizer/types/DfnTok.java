@@ -13,18 +13,22 @@ public class DfnTok extends TokArr<LineTok> {
     type = funType(this, true);
     comp = Comp.comp(this);
   }
-  public static char funType(TokArr<?> i, boolean first) {
+  public static char funType(Token t, boolean first) {
     char type = 'f';
-    if (!(i instanceof DfnTok) || first) for (Token t : i.tokens) {
-      if (t instanceof OpTok) {
-        String op = ((OpTok) t).op;
-        if (op.equals("𝕗") || op.equals("𝔽")) type = 'm';
-        else if (op.equals("𝕘") || op.equals("𝔾")) return 'd';
-      } else if (t instanceof TokArr<?>) {
-        char n = funType((TokArr<?>) t, false);
+    if (t instanceof TokArr<?>) {
+      if (first || !(t instanceof DfnTok)) for (Token c : ((TokArr<?>) t).tokens) {
+        char n = funType(c, false);
         if (n == 'm') type = 'm';
         else if (n == 'd') return 'd';
       }
+    } else if (t instanceof OpTok) {
+      String op = ((OpTok) t).op;
+      if (op.equals("𝕗") || op.equals("𝔽")) type = 'm';
+      else if (op.equals("𝕘") || op.equals("𝔾")) return 'd';
+    } else if (t instanceof ParenTok) {
+      char n = funType(((ParenTok) t).ln, false);
+      if (n == 'm') type = 'm';
+      else if (n == 'd') return 'd';
     }
     return type;
   }

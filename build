@@ -1,9 +1,9 @@
 #!/bin/bash
-rm -f APL.jar
-rm -rf src/build/APL
+rm -f BQN.jar
+rm -rf src/build/BQN
 cd src
 mkdir -p build
 javac -Xmaxerrs 1000 -d ./build $(find APL -name '*.java')
 cd build
-jar cvfe APL.jar APL.Main * > /dev/null
-mv APL.jar ../../APL.jar
+jar cvfe BQN.jar APL.Main * > /dev/null
+mv BQN.jar ../../BQN.jar

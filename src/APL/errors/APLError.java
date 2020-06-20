@@ -37,7 +37,7 @@ public abstract class APLError extends RuntimeException {
     else for (Mg g : l) println(List.of(g));
   }
   
-  public void println(List<Mg> gs) { // +TODO proper formatting for surrogate pairs
+  public void println(List<Mg> gs) {
     if (gs.size() == 0) return;
     
     String raw = gs.get(0).raw;
@@ -49,10 +49,11 @@ public abstract class APLError extends RuntimeException {
     String ln = gs.get(0).raw.substring(lns, lne);
     Main.println(ln);
     char[] str = new char[ln.length()];
-    for (int i = 0; i < str.length; i++) {
+    for (int i = 0, j = 0; i < str.length; j++) {
       char c = ' ';
       for (Mg g : gs) if (i>=g.spos && i<g.epos) c = g.c;
-      str[i] = c;
+      str[j] = c;
+      i+= Character.isHighSurrogate(ln.charAt(i))? 2 : 1;
     }
     Main.println(new String(str));
   }

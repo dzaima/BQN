@@ -1,14 +1,12 @@
 package APL.types.functions.userDefined;
 
-import APL.*;
-import APL.tokenizer.Token;
-import APL.tokenizer.types.*;
+import APL.Scope;
+import APL.tokenizer.types.DfnTok;
 import APL.types.Obj;
 
 public class UserDefined {
   public static Obj of(DfnTok ts, Scope sc) {
-    char type = DfnTok.funType(ts, true);
-    switch (type) {
+    switch (ts.type) {
       case 'f': return new Dfn(ts, sc);
       case 'm': return new Dmop(ts, sc);
       case 'd': return new Ddop(ts, sc);

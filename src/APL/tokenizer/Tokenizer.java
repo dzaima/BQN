@@ -298,9 +298,9 @@ public class Tokenizer {
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
-        } else if (c == '\n' || c == '⋄' || c == '\r' || c == ';') {
-          if (c=='⋄' && pointless) tokens.add(new DiamondTok(raw, i));
-          if (c=='⋄' || c=='\n') expr.hasDmd = true;
+        } else if (c=='\n' || c=='⋄' || c=='\r' || c==';' || c==',') {
+          if ((c=='⋄' || c==',') && pointless) tokens.add(new DiamondTok(raw, i));
+          if ((c=='⋄' || c==',') || c=='\n') expr.hasDmd = true; // +TODO remove hasDmd
           if (c == ';') tokens.add(new SemiTok(raw, i, i+1));
           
           if (tokens.size() > 0) {
@@ -313,6 +313,9 @@ public class Tokenizer {
           if (pointless) tokens.add(new CommentTok(raw, li, i));
         } else if (c == '#') {
           tokens.add(new ScopeTok(raw, i, i+1));
+          i++;
+        } else if (c == '·') {
+          tokens.add(new NothingTok(raw, i, i+1));
           i++;
         } else if (c == ' ' || c == '\t') {i++;} else {
           if (pointless) tokens.add(new ErrTok(raw, i, i+1));

@@ -6,7 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
-public class NotBuiltin extends Builtin { // +TODO modified definition
+public class NotBuiltin extends Builtin { // +TODO modified definition, along with ∨∧
   public String repr() {
     return "¬";
   }

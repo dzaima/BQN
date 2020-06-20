@@ -10,7 +10,7 @@ import APL.types.functions.MutArr;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Scanner;
 
 @SuppressWarnings("WeakerAccess") // for use as a library
 public class Main {
@@ -174,8 +174,10 @@ public class Main {
             if (")OFF".equals(cr) || ")EXIT".equals(cr) || ")STOP".equals(cr)) break /* REPL */;
             ucmd(global, cr.substring(1));
           } else {
-            Obj r = exec(cr, global);
-            if (r!=null) println(r.toString());
+            Comp comp = Comp.comp(Tokenizer.tokenize(cr));
+            byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
+            Obj r = comp.exec(global);
+            if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) println(r.toString());
           }
         } catch (APLError e) {
           lastError = e;
@@ -227,10 +229,7 @@ public class Main {
           lastError.printStackTrace();
         }
         break;
-      case "E":
-        println(Comp.comp(Tokenizer.tokenize(rest)).exec(sc).toString());
-        break;
-      case "B":
+      case "BC":
         println(Comp.comp(Tokenizer.tokenize(rest)).fmt());
         break;
       default:
@@ -250,7 +249,7 @@ public class Main {
     if (ia.length == 0) return "⍬";
     StringBuilder r = new StringBuilder(Num.formatInt(ia[0]));
     for (int i = 1; i < ia.length; i++) {
-      r.append(" ");
+      r.append("‿");
       r.append(Num.formatInt(ia[i]));
     }
     return r.toString();
@@ -300,7 +299,7 @@ public class Main {
     all
   }
   public static Value exec(LineTok s, Scope sc) {
-    return new Exec(s, sc).exec();
+    return Comp.comp(s).exec(sc);
   }
   
   public static Value san(Obj o) {
@@ -312,50 +311,7 @@ public class Main {
   
   
   public static Value execLines(TokArr<LineTok> lines, Scope sc) {
-    Value res = null;
-    HashMap<EType, LineTok> eGuards = new HashMap<>();
-    try {
-      for (LineTok ln : lines.tokens) {
-        List<Token> tokens = ln.tokens;
-        int guardPos = ln.colonPos();
-        int eguardPos = ln.eguardPos();
-        if (guardPos != -1 && eguardPos != -1) throw new SyntaxError("both : and :: found in line");
-        boolean endAfter = tokens.size() > 1 && tokens.get(0) instanceof SetTok;
-        if (endAfter) tokens = tokens.subList(1, tokens.size());
-        else if (guardPos != -1) {
-          if (guardPos == tokens.size()-1) throw new SyntaxError("Guard without success expression");
-          if (tokens.get(guardPos+1) instanceof SetTok) endAfter = true;
-        } else if (eguardPos != -1) {
-          if (eguardPos == tokens.size()-1) throw new SyntaxError("Error guard without success expression");
-        }
-        if (guardPos != -1) {
-          var guard = LineTok.inherit(tokens.subList(0, guardPos));
-          if (bool(norm(exec(guard, sc)))) {
-            var expr = LineTok.inherit(tokens.subList(guardPos+(endAfter? 2 : 1), tokens.size()));
-            res = exec(expr, sc);
-            if (endAfter) return res;
-          }
-        } else if (eguardPos != -1) {
-          var guard = LineTok.inherit(tokens.subList(0, eguardPos));
-          Value r = norm(exec(guard, sc));
-          EType t;
-          if (r.equals(Num.ZERO)) t = EType.all;
-          else throw new DomainError("guard "+r+" not supported", guard);
-          var expr = LineTok.inherit(tokens.subList(eguardPos+(endAfter? 2 : 1), tokens.size()));
-          eGuards.put(t, expr);
-        } else {
-          res = exec(endAfter? LineTok.inherit(tokens) : ln, sc);
-          if (endAfter) return res;
-        }
-      }
-    } catch (Throwable e) {
-      for (Map.Entry<EType, LineTok> entry : eGuards.entrySet()) {
-        EType t = entry.getKey();
-        if (t == EType.all) return norm(exec(entry.getValue(), sc));
-      }
-      throw e;
-    }
-    return res;
+    return Comp.comp(lines).exec(sc);
   }
   public static boolean bool(double d) {
     if (d == 1) return true;

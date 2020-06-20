@@ -14,13 +14,13 @@ import java.util.*;
 
 public class Comp {
   private static final byte[] NOBYTES = new byte[0];
-  private final byte[] mutbc;
+  public final byte[] bc;
   private final Value[] objs;
   private final String[] strs;
   private final DfnTok[] dfns;
   
   Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns) {
-    this.mutbc = bc;
+    this.bc = bc;
     this.objs = objs;
     this.strs = strs;
     this.dfns = dfns;
@@ -42,6 +42,8 @@ public class Comp {
   public static final byte SETM = 13; // set mod; _ F↩_;
   public static final byte POPS = 14; // pop object from stack
   public static final byte DFND = 15; // 1D; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
+  public static final byte FN1O = 16; // optional monadic call
+  public static final byte FN2O = 17; // optional dyadic call
   // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
@@ -74,26 +76,26 @@ public class Comp {
   public Value exec(Scope sc) {
     Stk s = new Stk();
     int i = 0;
-    while (i!= mutbc.length) {
+    while (i!= bc.length) {
       int pi = i;
       i++;
-      switch (mutbc[pi]) {
+      switch (bc[pi]) {
         case PUSH: {
-          s.push(objs[mutbc[i++] & 0xff]);
+          s.push(objs[bc[i++] & 0xff]);
           break;
         }
         case VARO: {
-          Value got = sc.get(strs[mutbc[i++] & 0xff]);
-          if (got == null) throw new ValueError("Unknown variable " + strs[mutbc[i - 1] & 0xff]);
+          Value got = sc.get(strs[bc[i++] & 0xff]);
+          if (got == null) throw new ValueError("Unknown variable " + strs[bc[i - 1] & 0xff]);
           s.push(got);
           break;
         }
         case VARM: {
-          s.push(new Variable(sc, strs[mutbc[i++] & 0xff]));
+          s.push(new Variable(sc, strs[bc[i++] & 0xff]));
           break;
         }
         case ARRO: {
-          int am = mutbc[i++]&0xff;
+          int am = bc[i++]&0xff;
           Value[] vs = new Value[am];
           for (int j = 0; j < am; j++) {
             vs[am-j-1] = (Value) s.pop();
@@ -102,7 +104,7 @@ public class Comp {
           break;
         }
         case ARRM: {
-          int am = mutbc[i++]&0xff;
+          int am = bc[i++]&0xff;
           Settable[] vs = new Settable[am];
           for (int j = 0; j < am; j++) {
             vs[am-j-1] = (Settable) s.pop();
@@ -121,6 +123,22 @@ public class Comp {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
           s.push(f.asFun().call(a, w));
+          break;
+        }
+        case FN1O: {
+          Value f = (Value) s.pop();
+          Value w = (Value) s.pop();
+          if (w instanceof Nothing) s.push(w);
+          else s.push(f.asFun().call(w));
+          break;
+        }
+        case FN2O: {
+          Value a = (Value) s.pop();
+          Value f = (Value) s.pop();
+          Value w = (Value) s.pop();
+          if (w instanceof Nothing) s.push(w);
+          else if (a instanceof Nothing) s.push(f.asFun().call(w));
+          else s.push(f.asFun().call(a, w));
           break;
         }
         case OP1D: {
@@ -180,12 +198,12 @@ public class Comp {
           break;
         }
         case DFND: {
-          DfnTok dfn = dfns[mutbc[i++] & 0xff];
+          DfnTok dfn = dfns[bc[i++] & 0xff];
           s.push(UserDefined.of(dfn, sc));
           break;
         }
         case SPEC: {
-          switch(mutbc[i++]) {
+          switch(bc[i++]) {
             case EVAL:
               s.push(new EvalBuiltin(sc));
               break;
@@ -196,11 +214,11 @@ public class Comp {
               s.push(new Quad().get());
               break;
             default:
-              throw new InternalError("Unknown special "+ mutbc[i-1]);
+              throw new InternalError("Unknown special "+ bc[i-1]);
           }
           break;
         }
-        default: throw new InternalError("Unknown bytecode "+ mutbc[pi]);
+        default: throw new InternalError("Unknown bytecode "+ bc[pi]);
       }
     }
     return Main.san(s.peek()); // +todo just cast?
@@ -210,16 +228,16 @@ public class Comp {
     StringBuilder b = new StringBuilder("code:\n");
     int i = 0;
     try {
-      while (i != mutbc.length) {
+      while (i != bc.length) {
         int pi = i;
         i++;
         String cs;
-        switch (mutbc[pi]) {
-          case PUSH: cs = " PUSH " + safeObj(mutbc[i++]); break;
-          case VARO: cs = " VARO " + safeStr(mutbc[i++]); break;
-          case VARM: cs = " VARM " + safeStr(mutbc[i++]); break;
-          case ARRO: cs = " ARRO " + (mutbc[i++]&0xff); break;
-          case ARRM: cs = " ARRM " + (mutbc[i++]&0xff); break;
+        switch (bc[pi]) {
+          case PUSH: cs = " PUSH " + safeObj(bc[i++]); break;
+          case VARO: cs = " VARO " + safeStr(bc[i++]); break;
+          case VARM: cs = " VARM " + safeStr(bc[i++]); break;
+          case ARRO: cs = " ARRO " + (bc[i++]&0xff); break;
+          case ARRM: cs = " ARRM " + (bc[i++]&0xff); break;
           case FN1C: cs = " FN1C"; break;
           case FN2C: cs = " FN2C"; break;
           case OP1D: cs = " OP1D"; break;
@@ -230,19 +248,21 @@ public class Comp {
           case SETU: cs = " SETU"; break;
           case SETM: cs = " SETM"; break;
           case POPS: cs = " POPS"; break;
-          case DFND: cs = " DFND " + (mutbc[i++]&0xff); break;
+          case DFND: cs = " DFND " + (bc[i++]&0xff); break;
+          case FN1O: cs = " FN1O"; break;
+          case FN2O: cs = " FN2O"; break;
           
-          case SPEC: cs = " SPEC "+(mutbc[i++]&0xff); break;
+          case SPEC: cs = " SPEC "+(bc[i++]&0xff); break;
           default  : cs = " unknown";
         }
         b.append(' ');
         for (int j = pi; j < i; j++) {
-          int c = mutbc[j]&0xff;
+          int c = bc[j]&0xff;
           b.append(Integer.toHexString(c/16).toUpperCase());
           b.append(Integer.toHexString(c%16).toUpperCase());
           b.append(' ');
         }
-        b.append("   ".repeat(2 - (i-pi)));
+        b.append(Main.repeat("   ", 2 - (i-pi)));
         b.append(cs);
         b.append('\n');
       }
@@ -287,7 +307,8 @@ public class Comp {
   
   
   /* types:
-    a - array +TODO possibly-· type
+    a - array
+    A - array or ·
     f - function
     d - dop
     m - mop
@@ -350,7 +371,7 @@ public class Comp {
     return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
   }
   
-  public static Comp comp(BasicLines lns) {
+  public static Comp comp(TokArr<LineTok> lns) {
     Mut mut = new Mut();
     byte[][] bcs = new byte[lns.tokens.size()][];
     for (int i = 0; i < lns.tokens.size(); i++) {
@@ -361,7 +382,7 @@ public class Comp {
     return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
   }
   
-  private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[af] in non-!
+  private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a
     if (tps.size() > 4) return false;
     int pi = pt.length()-1;
     int ti = tps.size()-1;
@@ -374,6 +395,7 @@ public class Comp {
       } else {
         if (ti==-1) return qex;
         char t = tps.get(ti--).type;
+        if (t=='A') t = 'a';
         if (c=='!') {
           if (pt.charAt(pi) == ']') {
             do { pi--;
@@ -397,7 +419,7 @@ public class Comp {
     }
     return true;
   }
-  private static boolean isS(LinkedList<Res> tps, String pt, int off) { // O=[af] in non-!
+  private static boolean isS(LinkedList<Res> tps, String pt, int off) { // O=[aAf] in non-!
     int pi = 0;
     int ti = off;
     int tsz = tps.size();
@@ -407,7 +429,7 @@ public class Comp {
         if (ti==tsz) return false;
         char t = tps.get(ti++).type;
         if (c=='O') {
-          if (t!='f' && t!='a') return false;
+          if (t!='f' && t!='a' && t!='A') return false;
         } else {
           if (c == '!') {
             if (t == pt.charAt(pi++)) return false;
@@ -434,7 +456,7 @@ public class Comp {
       this.type = type;
       this.bc = cat(bcs);
     }
-    
+  
     byte[] comp(Mut m, boolean mut) {
       if (bc != null) return bc;
       return compP(m, tk, mut);
@@ -456,13 +478,18 @@ public class Comp {
     return bc;
   }
   
-  public static boolean DBGCOMP = false;
+  private static int lvl = 0;
+  private static void printlvl(String s) {
+    System.out.println(Main.repeat(" ", (Math.max(0, lvl*2 - 2))) + s);
+  }
   public static void collect(LinkedList<Res> tps, Mut m, boolean train, boolean last) {
-    while (tps.size() > 1) {
-      if (DBGCOMP) System.out.println(tps);
+    if (Main.debug) lvl++;
+    while (true) {
+      if (Main.debug) printlvl(tps.toString());
+      if (tps.size() <= 1) break;
       if (train) { // trains only
         if (isE(tps, "d!|Off", last)) {
-          if (DBGCOMP) System.out.println("match F F F");
+          if (Main.debug) printlvl("match F F F");
           tps.addLast(new Res('f',
             tps.removeLast().comp(m, false),
             tps.removeLast().comp(m, false),
@@ -472,7 +499,7 @@ public class Comp {
           continue;
         }
         if (isE(tps, "[←↩]|ff", last)) {
-          if (DBGCOMP) System.out.println("match F F");
+          if (Main.debug) printlvl("match F F");
           tps.addLast(new Res('f',
             tps.removeLast().comp(m, false),
             tps.removeLast().comp(m, false),
@@ -480,32 +507,37 @@ public class Comp {
           ));
           continue;
         }
-      } else { // regular expressions only
+      } else { // value expressions
         if (isE(tps, "d!|afa", last)) {
-          if (DBGCOMP) System.out.println("match a F a");
-          tps.addLast(new Res('a',
-            tps.removeLast().comp(m, false),
-            tps.removeLast().comp(m, false),
-            tps.removeLast().comp(m, false),
-            new byte[]{FN2C}
+          if (Main.debug) printlvl("match a F a");
+          Res x = tps.removeLast();
+          Res f = tps.removeLast();
+          Res w = tps.removeLast();
+          tps.addLast(new Res(x.type,
+            x.comp(m, false),
+            f.comp(m, false),
+            w.comp(m, false),
+            new byte[]{x.type=='A' | w.type=='A'? FN2O : FN2C}
           ));
           continue;
         }
         if (isE(tps, "[da]!|fa", last)) {
-          if (DBGCOMP) System.out.println("match F a");
-          tps.addLast(new Res('a',
-            tps.removeLast().comp(m, false),
-            tps.removeLast().comp(m, false),
-            new byte[]{FN1C}
+          if (Main.debug) printlvl("match F a");
+          Res x = tps.removeLast();
+          Res f = tps.removeLast();
+          tps.addLast(new Res(x.type,
+            x.comp(m, false),
+            f.comp(m, false),
+            new byte[]{x.type=='A'? FN1O : FN1C}
           ));
           continue;
         }
       }
       // all
       {
-        int i = tps.get(0).type=='d'? 1 : last?0 : 1;
+        int i = tps.get(0).type=='d' || !last? 1 : 0;
         if (isS(tps, "Om", i)) {
-          if (DBGCOMP) System.out.println("match F m");
+          if (Main.debug) printlvl("match O m");
           tps.add(i, new Res('f',
             tps.remove(i+1).comp(m, false),
             tps.remove(i  ).comp(m, false),
@@ -514,7 +546,7 @@ public class Comp {
           continue;
         }
         if (isS(tps, "OdO", i)) {
-          if (DBGCOMP) System.out.println("match F d G");
+          if (Main.debug) printlvl("match O d O "+i);
           tps.add(i, new Res('f',
             tps.remove(i+2).comp(m, false),
             tps.remove(i+1).comp(m, false),
@@ -524,29 +556,8 @@ public class Comp {
           continue;
         }
       }
-      
-      if (isE(tps, "a←a", false)) {
-        if (DBGCOMP) System.out.println("a←a");
-        tps.addLast(new Res('a',
-          tps.removeLast().comp(m, false),
-          tps.removeLast().comp(m, false), // empty
-          tps.removeLast().comp(m, true),
-          new byte[]{SETN}
-        ));
-        continue;
-      }
-      if (isE(tps, "a↩a", false)) {
-        if (DBGCOMP) System.out.println("a↩a");
-        tps.addLast(new Res('a',
-          tps.removeLast().comp(m, false),
-          tps.removeLast().comp(m, false), // empty
-          tps.removeLast().comp(m, true),
-          new byte[]{SETU}
-        ));
-        continue;
-      }
       if (isE(tps, "af↩a", false)) {
-        if (DBGCOMP) System.out.println("af↩a");
+        if (Main.debug) printlvl("af↩a");
         tps.addLast(new Res('a',
           tps.removeLast().comp(m, false),
           tps.removeLast().comp(m, false),
@@ -556,8 +567,27 @@ public class Comp {
         ));
         continue;
       }
+      if (tps.size() >= 3) {
+        char a = tps.get(tps.size()-2).type;
+        if (a=='←' || a=='↩') {
+          char k = tps.get(tps.size()-3).type;
+          char v = tps.get(tps.size()-1).type;
+          if (v=='A') v = 'a'; // +TODO add a non-nothing check
+          if (k==v) {
+            if (Main.debug) printlvl(k+" "+a+" "+v);
+            tps.addLast(new Res(v,
+              tps.removeLast().comp(m, false),
+              tps.removeLast().comp(m, false), // empty
+              tps.removeLast().comp(m, true),
+              new byte[]{a=='←'? SETN : SETU}
+            ));
+            continue;
+          } else throw new SyntaxError(a+": Cannot assign with different types", tps.get(tps.size()-2).tk);
+        }
+      }
       break;
     }
+    if (Main.debug) lvl--;
   }
   
   public static char typeof(Token t) {
@@ -576,9 +606,11 @@ public class Comp {
       if (b==null) {
         String s = op.op;
         switch (s) {
-          case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "•":
+          case "𝕨":
+            return t.type = 'A';
+          case "𝕘": case "𝕗": case "𝕩": case "•":
             return t.type = 'a';
-          case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "⍎":
+          case "𝔾": case "𝔽": case "𝕏": case "⍎": case "𝕎":
             return t.type = 'f';
           default: throw new ImplementationError("Undefined unknown built-in "+s, op);
         }
@@ -592,11 +624,15 @@ public class Comp {
       for (int i = 0; i < tks.size(); i++) tps[i] = typeof(tks.get(i));
       char last = tps[tps.length-1];
       if (tps.length == 1) return t.type = last;
-      if (last == 'a') return t.type = 'a';
+      char prev = tps[tps.length-2];
+      if (last=='a' || last=='A') { // +TODO this is _probably_ not right
+        if (prev == 'd') return t.type = 'f';
+        else return t.type = last;
+      }
       if (last == 'f') return t.type = 'f';
       
       // i hope these are correct..
-      if (last == 'd') throw new SyntaxError("dop can't be the last token of a line", tks.get(tks.size() - 1));
+      if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘})
       if (last == 'm') return t.type = 'f';
     }
     throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName());
@@ -658,14 +694,12 @@ public class Comp {
       while (i>=0) {
         Res c = new Res(ts.get(i));
         tps.addFirst(c);
-        // if (DBGCOMP) System.out.println(tps);
         collect(tps, m, train, false);
         i--;
       }
       collect(tps, m, train, true);
-      // if (DBGCOMP) System.out.println(tps);
       if (tps.size()!=1) throw new SyntaxError("couldn't join everything to a single expression", tps.get(tps.size()-1).tk);
-      assert tps.get(0).type == tk.type;
+      assert tps.get(0).type == tk.type : tps.get(0).type + "≠" + tk.type;
       return tps.get(0).comp(m, false);
     }
     if (tk instanceof OpTok) {
@@ -703,6 +737,9 @@ public class Comp {
     if (tk instanceof DfnTok) {
       return m.push((DfnTok) tk);
     }
+    if (tk instanceof NothingTok) {
+      return m.push(((NothingTok) tk).val);
+    }
     throw new ImplementationError("can't compile "+tk.getClass());
   }
   
@@ -710,7 +747,7 @@ public class Comp {
     char s = name.charAt(0);
     if (s=='•') s = name.charAt(1);
     if (s=='_') {
-      char e = name.charAt(name.charAt(name.length()-1));
+      char e = name.charAt(name.length()-1);
       return e=='_'? 'd' : 'm';
     }
     if (s>='A' && s<='Z') return 'f';

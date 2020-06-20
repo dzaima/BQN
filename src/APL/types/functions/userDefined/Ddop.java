@@ -2,7 +2,7 @@ package APL.types.functions.userDefined;
 
 import APL.*;
 import APL.tokenizer.types.DfnTok;
-import APL.types.Value;
+import APL.types.*;
 import APL.types.functions.*;
 
 
@@ -20,7 +20,7 @@ public class Ddop extends Dop {
     Scope nsc = new Scope(sc);
     nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
     nsc.set("𝕘", ww); nsc.set("𝔾", ww.asFun());
-    nsc.set("𝕨", null); nsc.set("𝕎", null); // +TODO was new Variable(nsc, "𝕨")
+    nsc.set("𝕨", Nothing.inst); nsc.set("𝕎", Nothing.inst);
     nsc.set("𝕩", w); nsc.set("𝕏", w.asFun());
     nsc.set("𝕩", w);
     nsc.set("∇", derv);
