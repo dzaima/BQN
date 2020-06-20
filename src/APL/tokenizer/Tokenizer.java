@@ -103,7 +103,7 @@ public class Tokenizer {
         char c = raw.charAt(i);
         char next = i+1 < len? raw.charAt(i + 1) : ' ';
         String cS = String.valueOf(c);
-        if (c == '(' || c == '{' || c == '[') {
+        if (c == '(' || c == '{' || c == '[' || c == '⟨') {
           char match;
           switch (c) {
             case '(':
@@ -115,6 +115,9 @@ public class Tokenizer {
             case '[':
               match = ']';
               break;
+            case '⟨':
+              match = '⟩';
+              break;
             default:
               throw new Error("this should really not happen");
           }
@@ -123,7 +126,7 @@ public class Tokenizer {
           lines.add(new Line(raw, i));
           
           i++;
-        } else if (c == ')' || c == '}' || c == ']') {
+        } else if (c == ')' || c == '}' || c == ']' || c == '⟩') {
           Block closed = levels.remove(levels.size() - 1);
           if (c != closed.b) {
             if (pointless) {
@@ -147,6 +150,9 @@ public class Tokenizer {
               break;
             case ']':
               r = new BracketTok(raw, closed.pos, i+1, lineTokens);
+              break;
+            case '⟩':
+              r = new ArrayTok(raw, closed.pos, i+1, lineTokens);
               break;
             default:
               throw new Error("this should really not happen "+c);

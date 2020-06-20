@@ -625,6 +625,9 @@ public class Comp {
     } else if (t instanceof StrandTok) {
       for (Token c : ((StrandTok) t).tokens) typeof(c);
       return t.type = 'a';
+    } else if (t instanceof ArrayTok) {
+      for (Token c : ((ArrayTok) t).tokens) typeof(c);
+      return t.type = 'a';
     } else if (t instanceof NameTok) {
       return t.type = varType(((NameTok) t).name);
     } else if (t instanceof OpTok) {
@@ -749,6 +752,17 @@ public class Comp {
     }
     if (tk instanceof StrandTok) {
       List<Token> tks = ((StrandTok) tk).tokens;
+      byte[][] bs = new byte[tks.size()+1][];
+      for (int i = 0; i < tks.size(); i++) {
+        bs[i] = compP(m, tks.get(i), false);
+      }
+      int sz = tks.size();
+      if (sz > 255) throw new NYIError("array constants with >255 items", tk);
+      bs[bs.length-1] = new byte[]{ARRO, (byte) sz};
+      return cat(bs);
+    }
+    if (tk instanceof ArrayTok) {
+      List<LineTok> tks = ((ArrayTok) tk).tokens;
       byte[][] bs = new byte[tks.size()+1][];
       for (int i = 0; i < tks.size(); i++) {
         bs[i] = compP(m, tks.get(i), false);
