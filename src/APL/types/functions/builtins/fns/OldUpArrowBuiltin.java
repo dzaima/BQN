@@ -6,6 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.GTBuiltin;
 
 public class OldUpArrowBuiltin extends Builtin implements DimDFn {
   @Override public String repr() {
@@ -16,91 +17,10 @@ public class OldUpArrowBuiltin extends Builtin implements DimDFn {
     if (w instanceof Arr) {
       if (w instanceof DoubleArr || w instanceof ChrArr || w instanceof BitArr) return w;
       Value[] subs = w.values();
-      return merge(subs, w.shape, this);
+      return GTBuiltin.merge(subs, w.shape, this);
     } else return w;
   }
   
-  public static Value merge(Value[] vals, int[] sh, Tokenable blame) { // +TODO move?
-    if (vals.length == 0) return EmptyArr.SHAPE0N;
-  
-    Value first = vals[0];
-    int[] def = new int[first.rank];
-    System.arraycopy(first.shape, 0, def, 0, def.length);
-    boolean allNums = true;
-    boolean eqShapes = true;
-    for (Value v : vals) {
-      if (v.rank != def.length) {
-        String msg = blame + ": expected equal ranks of items (shapes " + Main.formatAPL(first.shape) + " vs " + Main.formatAPL(v.shape) + ")";
-        if (blame instanceof Callable) throw new RankError(msg, (Callable) blame, v);
-        else throw new RankError(msg, v);
-      }
-      for (int i = 0; i < def.length; i++) {
-        if (v.shape[i] > def[i]) {
-          def[i] = v.shape[i];
-          eqShapes = false;
-        }
-      }
-      if (!v.quickDoubleArr()) {
-        allNums = false;
-      }
-    }
-    int subIA = Arr.prod(def);
-    int totalIA = subIA * Arr.prod(sh);
-    int[] resShape = new int[def.length + sh.length];
-    System.arraycopy(sh, 0, resShape, 0, sh.length);
-    System.arraycopy(def, 0, resShape, sh.length, def.length);
-  
-    if (eqShapes) {
-      if (allNums) {
-        double[] res = new double[totalIA];
-      
-        int i = 0;
-        for (Value v : vals) {
-          double[] da = v.asDoubleArr();
-          System.arraycopy(da, 0, res, i, da.length);
-          i+= subIA;
-        }
-        return new DoubleArr(res, resShape);
-      }
-      Value[] res = new Value[totalIA];
-    
-      int i = 0;
-      for (Value v : vals) {
-        Value[] va = v.values();
-        System.arraycopy(va, 0, res, i, va.length);
-        i+= subIA;
-      }
-      return Arr.create(res, resShape);
-    }
-  
-    if (allNums) {
-      double[] res = new double[totalIA];
-    
-      int i = 0;
-      for (Value v : vals) {
-        double[] c = v.asDoubleArr();
-        int k = 0;
-        for (int j : new SimpleIndexer(def, v.shape)) {
-          res[i+j] = c[k++];
-        }
-        // automatic zero padding
-        i+= subIA;
-      }
-    
-      return new DoubleArr(res, resShape);
-    }
-  
-  
-    Value[] res = new Value[totalIA];
-    int i = 0;
-    for (Value v : vals) {
-      Value proto = v.prototype();
-      for (int[] c : new Indexer(def)) {
-        res[i++] = v.at(c, proto);
-      }
-    }
-    return Arr.create(res, resShape);
-  }
   
   
   

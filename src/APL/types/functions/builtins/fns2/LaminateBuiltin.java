@@ -11,7 +11,7 @@ public class LaminateBuiltin extends Builtin {
   
   private static final int[] MSH = new int[]{2};
   public Value call(Value a, Value w) {
-    return OldUpArrowBuiltin.merge(new Value[]{a, w}, MSH, this);
+    return GTBuiltin.merge(new Value[]{a, w}, MSH, this);
   }
   
   public Value call(Value w) {

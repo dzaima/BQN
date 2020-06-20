@@ -6,6 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.GTBuiltin;
 
 import java.util.Arrays;
 
@@ -98,6 +99,6 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
         if (!Arrays.equals(vs[i].shape, sh)) throw new LengthError("⌾↓: undoing expected arrays of equal shapes ("+Main.formatAPL(sh)+" ≢ "+Main.formatAPL(vs[i].shape)+")", this, o);
       }
     }
-    return OldUpArrowBuiltin.merge(vs, v.shape, this);
+    return GTBuiltin.merge(vs, v.shape, this);
   }
 }

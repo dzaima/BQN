@@ -5,6 +5,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
+import APL.types.functions.builtins.fns2.GTBuiltin;
 
 public class ObliqueBuiltin extends Mop {
   @Override public String repr() {
@@ -72,6 +73,6 @@ public class ObliqueBuiltin extends Mop {
       }
     }
     
-    return OldUpArrowBuiltin.merge(res, new int[]{res.length}, this);
+    return GTBuiltin.merge(res, new int[]{res.length}, this);
   }
 }

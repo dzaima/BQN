@@ -4,6 +4,7 @@ import APL.*;
 import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
+import APL.types.functions.builtins.fns2.GTBuiltin;
 
 public class Brackets extends Callable {
   
@@ -42,7 +43,7 @@ public class Brackets extends Callable {
         LineTok tk = t.tokens.get(i);
         lns[i] = Main.exec(tk, sc);
       }
-      return OldUpArrowBuiltin.merge(lns, new int[]{lns.length}, t);
+      return GTBuiltin.merge(lns, new int[]{lns.length}, t);
     } else {
       if (t.tokens.size() == 0) return new Brackets(null);
       assert t.tokens.size() == 1; // t.array is true if size>1

@@ -4,6 +4,7 @@ import APL.errors.RankError;
 import APL.types.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
+import APL.types.functions.builtins.fns2.GTBuiltin;
 
 public class CellBuiltin extends Mop {
   public String repr() {
@@ -24,6 +25,6 @@ public class CellBuiltin extends Mop {
       System.arraycopy(wv, i*csz, c, 0, csz);
       res[i] = ff.call(Arr.create(c, csh));
     }
-    return OldUpArrowBuiltin.merge(res, new int[]{am}, this);
+    return GTBuiltin.merge(res, new int[]{am}, this);
   }
 }
