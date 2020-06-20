@@ -13,7 +13,6 @@ import APL.types.functions.userDefined.UserDefined;
 import java.util.*;
 
 public class Comp {
-  private static final byte[] NOBYTES = new byte[0];
   public final byte[] bc;
   private final Value[] objs;
   private final String[] strs;
@@ -44,6 +43,8 @@ public class Comp {
   public static final byte DFND = 15; // 1D; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   public static final byte FN1O = 16; // optional monadic call
   public static final byte FN2O = 17; // optional dyadic call
+  public static final byte CHKV = 18; // error if ToS is ·
+  public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
@@ -144,7 +145,7 @@ public class Comp {
         case OP1D: {
           Value f = (Value) s.pop();
           Mop   o = (Mop  ) s.pop();
-          DerivedMop d = o.derive(f); d.token = o.token;
+          Fun d = o.derive(f); d.token = o.token;
           s.push(d);
           break;
         }
@@ -152,7 +153,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Dop   o = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          DerivedDop d = o.derive(f, g); d.token = o.token;
+          Fun d = o.derive(f, g); d.token = o.token;
           s.push(d);
           break;
         }
@@ -168,6 +169,14 @@ public class Comp {
           Value g = (Value) s.pop();
           Value h = (Value) s.pop();
           Fork d = new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
+          s.push(d);
+          break;
+        }
+        case TR3O: {
+          Value f = (Value) s.pop();
+          Value g = (Value) s.pop();
+          Value h = (Value) s.pop();
+          Obj d = f instanceof Nothing? new Atop(g, h.asFun()) : new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
           s.push(d);
           break;
         }
@@ -200,6 +209,11 @@ public class Comp {
         case DFND: {
           DfnTok dfn = dfns[bc[i++] & 0xff];
           s.push(UserDefined.of(dfn, sc));
+          break;
+        }
+        case CHKV: {
+          Obj v = s.peek();
+          if (v instanceof Nothing) throw new SyntaxError("Didn't expect · here", v);
           break;
         }
         case SPEC: {
@@ -251,6 +265,8 @@ public class Comp {
           case DFND: cs = " DFND " + (bc[i++]&0xff); break;
           case FN1O: cs = " FN1O"; break;
           case FN2O: cs = " FN2O"; break;
+          case CHKV: cs = " CHKV"; break;
+          case TR3O: cs = " TR3O"; break;
           
           case SPEC: cs = " SPEC "+(bc[i++]&0xff); break;
           default  : cs = " unknown";
@@ -283,6 +299,7 @@ public class Comp {
         DfnTok dfn = dfns[j];
         b.append(' ').append(j).append(":\n  type ").append(dfn.type).append(" \n  ");
         b.append(dfn.comp.fmt().replace("\n", "\n  "));
+        b.append('\n');
       }
     }
     b.deleteCharAt(b.length()-1);
@@ -478,6 +495,10 @@ public class Comp {
     return bc;
   }
   
+  private static final byte[] NOBYTES = new byte[0];
+  private static final byte[] CHKVBC = new byte[]{CHKV};
+  
+  
   private static int lvl = 0;
   private static void printlvl(String s) {
     System.out.println(Main.repeat(" ", (Math.max(0, lvl*2 - 2))) + s);
@@ -490,11 +511,12 @@ public class Comp {
       if (train) { // trains only
         if (isE(tps, "d!|Off", last)) {
           if (Main.debug) printlvl("match F F F");
+          Res f;
           tps.addLast(new Res('f',
-            tps.removeLast().comp(m, false),
-            tps.removeLast().comp(m, false),
-            tps.removeLast().comp(m, false),
-            new byte[]{TR3D}
+            (  tps.removeLast()).comp(m, false),
+            (  tps.removeLast()).comp(m, false),
+            (f=tps.removeLast()).comp(m, false),
+            new byte[]{f.type=='A'? TR3O : TR3D}
           ));
           continue;
         }
@@ -538,19 +560,24 @@ public class Comp {
         int i = tps.get(0).type=='d' || !last? 1 : 0;
         if (isS(tps, "Om", i)) {
           if (Main.debug) printlvl("match O m");
+          Res f;
           tps.add(i, new Res('f',
-            tps.remove(i+1).comp(m, false),
-            tps.remove(i  ).comp(m, false),
+            (  tps.remove(i+1)).comp(m, false),
+            (f=tps.remove(i  )).comp(m, false),
+            f.type=='A'? CHKVBC : NOBYTES,
             new byte[]{OP1D}
           ));
           continue;
         }
         if (isS(tps, "OdO", i)) {
           if (Main.debug) printlvl("match O d O "+i);
+          Res f, g;
           tps.add(i, new Res('f',
-            tps.remove(i+2).comp(m, false),
-            tps.remove(i+1).comp(m, false),
-            tps.remove(i  ).comp(m, false),
+            (f=tps.remove(i+2)).comp(m, false),
+            f.type=='A'? CHKVBC : NOBYTES,
+            (  tps.remove(i+1)).comp(m, false),
+            (g=tps.remove(i  )).comp(m, false),
+            g.type=='A'? CHKVBC : NOBYTES,
             new byte[]{OP2D}
           ));
           continue;

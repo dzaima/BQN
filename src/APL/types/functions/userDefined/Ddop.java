@@ -15,6 +15,15 @@ public class Ddop extends Dop {
     code = t;
   }
   
+  public Fun derive(Value aa, Value ww) {
+    if (!code.immediate) return super.derive(aa, ww);
+    Main.printdbg("ddop immediate call", aa, ww);
+    Scope nsc = new Scope(sc);
+    nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
+    nsc.set("𝕘", ww); nsc.set("𝔾", ww.asFun());
+    return code.comp.exec(nsc).asFun();
+  }
+  
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", w);
     Scope nsc = new Scope(sc);

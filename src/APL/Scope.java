@@ -69,35 +69,35 @@ public class Scope {
   public Value get(String name) {
     if (name.startsWith("•")) {
       switch (name) {
-        case "•MILLIS": return new Num(System.currentTimeMillis() - Main.startingMillis);
+        case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
         case "•TIME": return new Timer(this, true);
         case "•HTIME": return new Timer(this, false);
         case "•EX": return new Ex(this);
         case "•LNS": return new Lns();
         case "•SH": return new Shell();
         case "•NC": return new NC();
-        case "•A": return Main.alphabet;
-        case "•AV": return Main.toAPL(Main.CODEPAGE);
-        case "•D": return Main.digits;
-        case "•L":
-        case "•LA": return Main.lowercaseAlphabet;
+        case "•a": return Main.uAlphabet;
+        case "•av": return Main.toAPL(Main.CODEPAGE);
+        case "•d": return Main.digits;
+        case "•l":
+        case "•la": return Main.lAlphabet;
         case "•ERASE": return new Eraser(this);
-        case "•GC": System.gc(); return Num.ONE;
+        case "•gc": System.gc(); return Num.ONE;
         case "•GCLOG": return new GCLog();
-        case "•NULL": return Null.NULL;
+        case "•null": return Null.NULL;
         case "•MAP": case "•NS": return new MapGen();
         case "•DL": return new Delay(this);
         case "•DR": return new DR();
         case "•UCS": return new UCS(this);
         case "•HASH": return new Hasher();
-        case "•IO": return Num.ZERO;
-        case "•VI": return Main.vind? Num.ONE : Num.ZERO;
+        case "•io": return Num.ZERO;
+        case "•vi": return Main.vind? Num.ONE : Num.ZERO;
         case "•BOXSIMPLE": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
         case "•CLASS": return new ClassGetter();
-        case "•PP": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
+        case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•PFX": return new Profiler(this);
         case "•PFO": return new Profiler.ProfilerOp(this);
-        case "•PFR": return Profiler.results();
+        case "•pfr": return Profiler.results();
         case "•STDIN": return new Stdin();
         case "•BIG": return new Big();
         case "•U": return new Builtin() {

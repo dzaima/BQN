@@ -15,6 +15,14 @@ public class Dmop extends Mop {
     code = t;
   }
   
+  public Fun derive(Value aa) {
+    if (!code.immediate) return super.derive(aa);
+    Main.printdbg("dmop immediate call", aa);
+    Scope nsc = new Scope(sc);
+    nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
+    return code.comp.exec(nsc).asFun();
+  }
+  
   public Value call(Value f, Value w, DerivedMop derv) {
     Main.printdbg("dmop call", w);
     Scope nsc = new Scope(sc);

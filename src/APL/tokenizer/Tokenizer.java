@@ -160,7 +160,6 @@ public class Tokenizer {
           i++;
           while (i < len && validNameMid(raw.charAt(i))) i++;
           var name = raw.substring(li, i);
-          if (c == '•') name = name.toUpperCase();
           tokens.add(new NameTok(raw, li, i, name));
         } else if (c=='¯' && next=='∞') {
           i+= 2;

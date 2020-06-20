@@ -21,8 +21,8 @@ public class Main {
   public static boolean quotestrings = false;
   public static boolean enclosePrimitives = true;
   public static boolean colorful = true;
-  static final ChrArr alphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  static final ChrArr lowercaseAlphabet = toAPL("abcdefghijklmnopqrstuvwxyz");
+  static final ChrArr uAlphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  static final ChrArr lAlphabet = toAPL("abcdefghijklmnopqrstuvwxyz");
   public static final ChrArr digits = toAPL("0123456789");
   static int printlvl = 0;
   static final long startingMillis = System.currentTimeMillis();

@@ -18,7 +18,7 @@ public abstract class Dop extends Callable {
     return Type.dop;
   }
   
-  public DerivedDop derive(Value aa, Value ww) {
+  public Fun derive(Value aa, Value ww) {
     return new DerivedDop(aa, ww, this);
   }
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {

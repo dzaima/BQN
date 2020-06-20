@@ -7,30 +7,32 @@ import java.util.List;
 
 public class DfnTok extends TokArr<LineTok> {
   public final Comp comp;
+  public boolean immediate;
   
   public DfnTok(String line, int spos, int epos, List<LineTok> tokens) {
     super(line, spos, tokens); end(epos);
-    type = funType(this, true);
+    type = 'f';
+    immediate = true;
+    funType(this, this, true);
     comp = Comp.comp(this);
   }
-  public static char funType(Token t, boolean first) {
-    char type = 'f';
+  public static void funType(Token t, DfnTok dt, boolean first) {
     if (t instanceof TokArr<?>) {
-      if (first || !(t instanceof DfnTok)) for (Token c : ((TokArr<?>) t).tokens) {
-        char n = funType(c, false);
-        if (n == 'm') type = 'm';
-        else if (n == 'd') return 'd';
+      if (first || !(t instanceof DfnTok)) {
+        for (Token c : ((TokArr<?>) t).tokens) funType(c, dt, false);
       }
     } else if (t instanceof OpTok) {
       String op = ((OpTok) t).op;
-      if (op.equals("𝕗") || op.equals("𝔽")) type = 'm';
-      else if (op.equals("𝕘") || op.equals("𝔾")) return 'd';
+      if (dt.type != 'd') {
+        if (op.equals("𝕗") || op.equals("𝔽")) dt.type = 'm';
+        else if (op.equals("𝕘") || op.equals("𝔾")) dt.type = 'd';
+      }
+      if (dt.immediate) {
+        if (op.equals("𝕨") || op.equals("𝕎") || op.equals("𝕩") || op.equals("𝕏")) dt.immediate = false;
+      }
     } else if (t instanceof ParenTok) {
-      char n = funType(((ParenTok) t).ln, false);
-      if (n == 'm') type = 'm';
-      else if (n == 'd') return 'd';
+      funType(((ParenTok) t).ln, dt, false);
     }
-    return type;
   }
   
   @Override public String toRepr() {
