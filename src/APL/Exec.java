@@ -484,8 +484,8 @@ public class Exec {
       // case '⍟': return new LogBuiltin()
       // case '⍲': return new NandBuiltin(sc);
       // case '⍱': return new NorBuiltin(sc);
-      case '⊥': return new UTackBuiltin();
-      case '⊤': return new DTackBuiltin();
+      // case '⊥': return new UTackBuiltin();
+      // case '⊤': return new DTackBuiltin();
       // case '○': return new TrigBuiltin();
       // case '!': return new ExclBuiltin();
     
@@ -504,18 +504,18 @@ public class Exec {
       // case '⊖': return new FlipBuiltin();
       // case '⌽': return new ReverseBuiltin();
     
-      case '…': return new EllipsisBuiltin();
-      case '⍮': return new SemiUBBuiltin();
-      case '⍕': return new FormatBuiltin();
+      // case '…': return new EllipsisBuiltin();
+      // case '⍮': return new SemiUBBuiltin();
+      // case '⍕': return new FormatBuiltin();
       case '⍎': return sc==null? null : new EvalBuiltin(sc);
-      case '⌿': return new ReplicateBuiltin();
-      case '⍀': return new ExpandBuiltin();
-      case '⍧': return new LShoeStileBuiltin();
-      case '%': return new MergeBuiltin();
-    
-    
-    
-    
+      // case '⌿': return new ReplicateBuiltin();
+      // case '⍀': return new ExpandBuiltin();
+      // case '⍧': return new LShoeStileBuiltin();
+      // case '%': return new MergeBuiltin();
+      
+      
+      
+      
       case '+': return new PlusBuiltin();
       case '-': return new MinusBuiltin();
       case '×': return new MulBuiltin();
@@ -529,18 +529,18 @@ public class Exec {
       case '⌊': return new FloorBuiltin();
       case '√': return new RootBuiltin();
       case '¬': return new NotBuiltin();
-    
-    
+      
+      
       case '⊢': return new RTackBuiltin();
       case '⊣': return new LTackBuiltin();
-    
+      
       case '⥊': return new ShapeBuiltin();
       case '↑': return new UpArrowBuiltin();
       case '↓': return new DownArrowBuiltin();
       case '∾': return new JoinBuiltin();
       case '≍': return new LaminateBuiltin();
       case '⍉': return new TransposeBuiltin();
-    
+      
       case '/': return new SlashBuiltin();
       case '⊏': return new LBoxBuiltin();
       case '⊔': return new GroupBuiltin();
@@ -554,9 +554,9 @@ public class Exec {
       case '⍒': return new GradeDownBuiltin();
       case '≢': return new TallyBuiltin();
       case '≡': return new MatchBuiltin();
-    
-    
-    
+      
+      
+      
       // comparisons
       case '<': return new LTBuiltin();
       case '≤': return new LEBuiltin();
@@ -564,7 +564,7 @@ public class Exec {
       case '≥': return new GEBuiltin();
       case '>': return new GTBuiltin();
       case '≠': return new NEBuiltin();
-    
+      
       // mops
       case '´': return new ReduceBuiltin();
       case '`': return new ScanBuiltin();
@@ -578,7 +578,7 @@ public class Exec {
       // case '⍩':
       // case 'ᐵ': return new EachLeft();
       // case 'ᑈ': return new EachRight();
-    
+      
       // dops
       // case '∘': return new JotBuiltin();
       // case '⍛': return new JotUBBuiltin();
@@ -594,7 +594,7 @@ public class Exec {
       // case '@': return new AtBuiltin(sc);
       // case '⍫': return new ObverseBuiltin();
       case '•': assert sc==null; return null;
-  
+      
       case '⍬': return new DoubleArr(DoubleArr.EMPTY);
       // case '⍞': return new QuoteQuad();
       // case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
@@ -602,7 +602,7 @@ public class Exec {
       // case '∇':     o = sc.get("∇"); if(o == null) throw new SyntaxError("No ∇ found", t); return o;
       // case '⍶':     o = sc.get("⍶"); if(o == null) throw new SyntaxError("No ⍶ found", t); return o;
       // case '⍹':     o = sc.get("⍹"); if(o == null) throw new SyntaxError("No ⍹ found", t); return o;
-    
+      
       // case 'ℝ': // the lone double-struck..
       case 55349: // double-struck surrogate pair
         if (sc == null) return null;
@@ -619,7 +619,7 @@ public class Exec {
           // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o; // +TODO recursion
         }
         /* fallthrough! */
-  
+        
       default: throw new ImplementationError("no built-in " + t.op + " defined in exec", t);
     }
   }
