@@ -6,6 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.UpArrowBuiltin;
 
 import java.util.Arrays;
 
@@ -140,6 +141,6 @@ public class OldCatBuiltin extends Builtin implements DimDFn {
       if (a.ia+1 != v.ia) throw new DomainError("original ⍵ was of rank ⍬, which is not satisfiable", this);
       return v.get(v.ia-1);
     }
-    return OldUpArrowBuiltin.on(new int[]{v.ia-a.ia}, new int[]{a.ia}, v, this);
+    return UpArrowBuiltin.on(new int[]{v.ia-a.ia}, new int[]{a.ia}, v, this);
   }
 }

@@ -5,7 +5,6 @@ import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
 
 public class DownArrowBuiltin extends Builtin {
   public String repr() {
@@ -48,6 +47,16 @@ public class DownArrowBuiltin extends Builtin {
       sh[i] = w.shape[i] - Math.abs(am);
       if (am > 0) off[i] = am;
     }
-    return OldUpArrowBuiltin.on(sh, off, w, this);
+    return UpArrowBuiltin.on(sh, off, w, this);
+  }
+  
+  public Value underW(Obj o, Value a, Value w) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    int[] ls = a.asIntVec();
+    int[] sh = w.shape;
+    for (int i = 0; i < ls.length; i++) {
+      ls[i] = ls[i]>0? ls[i]-sh[i] : ls[i]+sh[i];
+    }
+    return UpArrowBuiltin.undo(ls, v, w, this);
   }
 }

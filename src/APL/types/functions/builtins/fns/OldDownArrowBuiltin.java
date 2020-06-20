@@ -6,7 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns2.GTBuiltin;
+import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
@@ -62,7 +62,7 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
       sh[i] = w.shape[i] - Math.abs(am);
       if (am > 0) off[i] = am;
     }
-    return OldUpArrowBuiltin.on(sh, off, w, this);
+    return UpArrowBuiltin.on(sh, off, w, this);
   }
   
   public Value call(Value a, Value w, DervDimFn dims) {
@@ -77,7 +77,7 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
       sh[ax] = w.shape[ax] - Math.abs(am);
       if (am > 0) off[ax] = am;
     }
-    return OldUpArrowBuiltin.on(sh, off, w, this);
+    return UpArrowBuiltin.on(sh, off, w, this);
   }
   
   public Value underW(Obj o, Value a, Value w) {
@@ -87,7 +87,7 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
     for (int i = 0; i < ls.length; i++) {
       ls[i] = ls[i]>0? ls[i]-sh[i] : ls[i]+sh[i];
     }
-    return OldUpArrowBuiltin.undo(ls, v, w, this);
+    return UpArrowBuiltin.undo(ls, v, w, this);
   }
   
   public Value under(Obj o, Value w) {
