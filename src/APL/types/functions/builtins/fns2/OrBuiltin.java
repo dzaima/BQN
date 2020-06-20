@@ -26,16 +26,16 @@ public class OrBuiltin extends Builtin {
   
   private static final D_NNeN DNF = new D_NNeN() {
     public double on(double a, double w) {
-      return Num.gcd2(a, w);
+      return a+w - a*w;
     }
     public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = Num.gcd2(a, w[i]);
+      for (int i = 0; i < w.length; i++) res[i] = a+w[i] - a*w[i];
     }
     public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = Num.gcd2(a[i], w);
+      for (int i = 0; i < a.length; i++) res[i] = a[i]+w - a[i]*w;
     }
     public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = Num.gcd2(a[i], w[i]);
+      for (int i = 0; i < a.length; i++) res[i] = a[i]+w[i] - a[i]*w[i];
     }
     public Value call(BigValue a, BigValue w) {
       return new BigValue(a.i.gcd(w.i));

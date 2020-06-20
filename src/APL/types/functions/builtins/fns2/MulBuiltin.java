@@ -3,6 +3,7 @@ package APL.types.functions.builtins.fns2;
 import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
+import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
 
 import java.math.BigInteger;
@@ -51,8 +52,23 @@ public class MulBuiltin extends Builtin {
       return new BigValue(a.i.multiply(w.i));
     }
   };
+  public static final D_BB DBF = new D_BB() {
+    public Value call(boolean a, BitArr w) {
+      if (a) return w;
+      return BitArr.fill(w, false);
+    }
+    public Value call(BitArr a, boolean w) {
+      if (w) return a;
+      return BitArr.fill(a, false);
+    }
+    public Value call(BitArr a, BitArr w) {
+      BitArr.BC bc = new BitArr.BC(a.shape);
+      for (int i = 0; i < a.arr.length; i++) bc.arr[i] = a.arr[i] & w.arr[i];
+      return bc.finish();
+    }
+  };
   public Value call(Value a, Value w) {
-    return numD(DNF, a, w);
+    return bitD(DNF, DBF, a, w);
   }
   
   public Value callInvW(Value a, Value w) {

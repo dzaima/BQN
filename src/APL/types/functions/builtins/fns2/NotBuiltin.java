@@ -1,12 +1,11 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
-public class NotBuiltin extends Builtin { // +TODO modified definition, along with ∨∧
+public class NotBuiltin extends Builtin {
   public String repr() {
     return "¬";
   }
@@ -30,31 +29,22 @@ public class NotBuiltin extends Builtin { // +TODO modified definition, along wi
       
       if (w.quickDoubleArr()) {
         // for (int i = 0; i < w.length; i++) if (w[i] == 0) res[i>>6]|= 1L << (i&63);
-        BitArr.BA a = new BitArr.BA(w.shape);
-        for (double v : w.asDoubleArr()) a.add(v == 0);
-        return a.finish();
+        double[] ds = w.asDoubleArr();
+        double[] res = new double[w.ia];
+        for (int i = 0; i < ds.length; i++) {
+          double v = ds[i];
+          res[i] = 1 - v;
+        }
+        return new DoubleArr(res, w.shape);
       }
       
       Arr o = (Arr) w;
-      if (o.ia>0 && o.get(0) instanceof Num) {
-        BitArr.BA a = new BitArr.BA(w.ia); // it's probably worth going all-in on creating a bitarr
-        for (int i = 0; i < o.ia; i++) {
-          Value v = o.get(i);
-          if (v instanceof Num) a.add(!Main.bool(v));
-          else {
-            a = null;
-            break;
-          }
-        }
-        if (a != null) return a.finish();
-        // could make it reuse the progress made, but ¯\_(ツ)_/¯
-      }
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
         arr[i] = rec(o.get(i));
       }
       return new HArr(arr, o.shape);
-    } else if (w instanceof Num) return Main.bool(w)? Num.ZERO : Num.ONE;
+    } else if (w instanceof Num) return Num.of(1-((Num) w).num);
     else throw new DomainError("Expected boolean, got "+w.humanType(false), this, w);
   }
   
