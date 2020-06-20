@@ -5,6 +5,7 @@ import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns.RShoeUBBuiltin;
+import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
 public class AtBuiltin extends Dop {
   @Override public String repr() {
@@ -60,7 +61,7 @@ public class AtBuiltin extends Dop {
       Value repl;
       if (aa instanceof Fun) {
         Fun aaf = ((Fun) aa);
-        Value arg = RShoeUBBuiltin.on(poss, w);
+        Value arg = LBoxUBBuiltin.on(poss, w);
         repl = aaf.call(arg);
       } else {
         repl = (Value) aa;

@@ -5,6 +5,7 @@ import APL.errors.SyntaxError;
 import APL.types.*;
 import APL.types.functions.builtins.dops.AtBuiltin;
 import APL.types.functions.builtins.fns.RShoeUBBuiltin;
+import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
 public class Pick extends Settable {
   private final Variable var;
@@ -26,7 +27,7 @@ public class Pick extends Settable {
   }
   
   public Value get() {
-    return RShoeUBBuiltin.on(idx, val, obj);
+    return LBoxUBBuiltin.on(idx, val, obj);
   }
   
   public Obj getOrThis() {

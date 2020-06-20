@@ -141,7 +141,7 @@ public class Exec {
           if (Main.debug) printlvl("n[]");
           var a = firstVal();
           var w = (Brackets) popS();
-          addS(RShoeUBBuiltin.on(w.val, a, w));
+          addS(LBoxUBBuiltin.on(w.val, a, w));
           continue;
         }
       }

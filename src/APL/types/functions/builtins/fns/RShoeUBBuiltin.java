@@ -4,6 +4,7 @@ import APL.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
 public class RShoeUBBuiltin extends Builtin {
   @Override public String repr() {
@@ -15,44 +16,7 @@ public class RShoeUBBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    return on(a, w, this);
-  }
-  
-  public static Value on(Value a, Value w, Callable blame) { // +TODO remove usage of, moved to ⊏
-    if (w instanceof APLMap) {
-      Value[] res = new Value[a.ia];
-      APLMap map = (APLMap) w;
-      Value[] vs = a.values();
-      for (int i = 0; i < a.ia; i++) {
-        res[i] = map.getRaw(vs[i].asString());
-      }
-      return Arr.create(res, a.shape);
-    }
-    if (a instanceof Primitive && w.rank==1) {
-      Value r = w.get(a.asInt());
-      if (r instanceof Primitive) return r;
-      else return new Rank0Arr(r);
-    }
-    
-    return on(Indexer.poss(a, w.shape, blame), w);
-  }
-  
-  public static Value on(Indexer.PosSh poss, Value w) { // +TODO ↑
-    if (w.quickDoubleArr()) {
-      double[] res = new double[Arr.prod(poss.sh)];
-      double[] wd = w.asDoubleArr();
-      int[] idxs = poss.vals;
-      for (int i = 0; i < idxs.length; i++) {
-        res[i] = wd[idxs[i]];
-      }
-      return DoubleArr.safe(res, poss.sh);
-    }
-    Value[] res = new Value[Arr.prod(poss.sh)];
-    int[] idxs = poss.vals;
-    for (int i = 0; i < idxs.length; i++) {
-      res[i] = w.get(idxs[i]);
-    }
-    return Arr.create(res, poss.sh);
+    return LBoxUBBuiltin.on(a, w, this);
   }
   
   public Value underW(Obj o, Value a, Value w) {
