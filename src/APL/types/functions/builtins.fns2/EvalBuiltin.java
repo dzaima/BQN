@@ -1,4 +1,4 @@
-package APL.types.functions.builtins.fns;
+package APL.types.functions.builtins.fns2;
 
 import APL.*;
 import APL.types.Value;

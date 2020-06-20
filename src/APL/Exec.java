@@ -10,7 +10,6 @@ import APL.types.functions.*;
 import APL.types.functions.builtins.AbstractSet;
 import APL.types.functions.builtins.*;
 import APL.types.functions.builtins.dops.*;
-import APL.types.functions.builtins.fns.*;
 import APL.types.functions.builtins.fns2.*;
 import APL.types.functions.builtins.mops.*;
 import APL.types.functions.trains.*;
