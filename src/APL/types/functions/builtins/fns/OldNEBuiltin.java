@@ -3,6 +3,7 @@ package APL.types.functions.builtins.fns;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.NotBuiltin;
 
 
 public class OldNEBuiltin extends Builtin {
@@ -31,11 +32,11 @@ public class OldNEBuiltin extends Builtin {
   };
   private static final D_BB DBF = new D_BB() {
     @Override public Value call(boolean a, BitArr w) {
-      if (a) return TildeBuiltin.call(w);
+      if (a) return NotBuiltin.call(w);
       return w;
     }
     @Override public Value call(BitArr a, boolean w) {
-      if (w) return TildeBuiltin.call(a);
+      if (w) return NotBuiltin.call(a);
       return a;
     }
     @Override public Value call(BitArr a, BitArr w) {

@@ -2,7 +2,6 @@ package APL.types.functions.builtins.fns2;
 
 import APL.types.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns.LogBuiltin;
 
 public class RootBuiltin extends Builtin {
   @Override public String repr() {

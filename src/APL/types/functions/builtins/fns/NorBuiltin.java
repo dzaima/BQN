@@ -4,6 +4,7 @@ import APL.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.NotBuiltin;
 
 public class NorBuiltin extends Builtin {
   @Override public String repr() {
@@ -32,11 +33,11 @@ public class NorBuiltin extends Builtin {
   private static final D_BB DBF = new D_BB() {
     @Override public Value call(boolean a, BitArr w) {
       if (a) return BitArr.fill(w, false);
-      return TildeBuiltin.call(w);
+      return NotBuiltin.call(w);
     }
     @Override public Value call(BitArr a, boolean w) {
       if (w) return BitArr.fill(a, false);
-      return TildeBuiltin.call(a);
+      return NotBuiltin.call(a);
     }
     @Override public Value call(BitArr a, BitArr w) {
       BitArr.BC bc = new BitArr.BC(a.shape);

@@ -2,7 +2,6 @@ package APL.types.functions.builtins.fns2;
 
 import APL.types.Value;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
 
 public class LaminateBuiltin extends Builtin {
   public String repr() {

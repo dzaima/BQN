@@ -6,7 +6,6 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.dimensions.DimMMop;
 import APL.types.functions.*;
-import APL.types.functions.builtins.fns.OldCatBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
 public class ReduceBuiltin extends Mop implements DimMMop {
@@ -46,7 +45,7 @@ public class ReduceBuiltin extends Mop implements DimMMop {
         return new Num(p);
       }
     }
-    if (f instanceof OldCatBuiltin) {
+    if (f instanceof JoinBuiltin) { // +TODO check if this is still correct
       if (w.ia > 0) {
         special: {
           Value first = w.first();

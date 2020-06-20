@@ -501,7 +501,7 @@ public class Exec {
       // case '?': return new RandBuiltin(sc);
       // case '⍪': return new CommaBarBuiltin();
       // case '⊖': return new FlipBuiltin();
-      // case '⌽': return new ReverseBuiltin();
+      case '⌽': return new ReverseBuiltin();
     
       // case '…': return new EllipsisBuiltin();
       // case '⍮': return new SemiUBBuiltin();

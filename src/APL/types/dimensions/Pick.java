@@ -4,7 +4,6 @@ import APL.Scope;
 import APL.errors.SyntaxError;
 import APL.types.*;
 import APL.types.functions.builtins.dops.AtBuiltin;
-import APL.types.functions.builtins.fns.RShoeUBBuiltin;
 import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
 public class Pick extends Settable {

@@ -57,14 +57,6 @@ public class TildeBuiltin extends Builtin {
     else throw new DomainError("Expected boolean, got "+w.humanType(false), this, w);
   }
   
-  public static BitArr call(BitArr w) {
-    BitArr.BC bc = BitArr.create(w.shape);
-    for (int i = 0; i < bc.arr.length; i++) {
-      bc.arr[i] = ~w.arr[i];
-    }
-    return bc.finish();
-  }
-  
   public Value call(Value a, Value w) {
     int ia = 0;
     boolean[] leave = new boolean[a.ia];

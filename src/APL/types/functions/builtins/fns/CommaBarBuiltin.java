@@ -3,6 +3,7 @@ package APL.types.functions.builtins.fns;
 import APL.types.Value;
 import APL.types.arrs.EmptyArr;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.fns2.JoinBuiltin;
 
 public class CommaBarBuiltin extends Builtin {
   @Override public String repr() {
@@ -19,6 +20,6 @@ public class CommaBarBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    return OldCatBuiltin.cat(a, w, 0, this);
+    return JoinBuiltin.cat(a, w, 0, this);
   }
 }

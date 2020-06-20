@@ -5,7 +5,6 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns.*;
 
 public class UpArrowBuiltin extends Builtin {
   
@@ -133,8 +132,8 @@ public class UpArrowBuiltin extends Builtin {
   public static Value undo(int[] e, Value w, Value origW, Callable blame) {
     if (e.length==1 && w.rank==1) {
       int am = e[0];
-      if (am > 0) return OldCatBuiltin.cat(w, on(new int[]{origW.ia-am}, e, origW, blame), 0, blame);
-      else return OldCatBuiltin.cat(on(new int[]{origW.ia+am}, new int[]{0}, origW, blame), w, 0, blame);
+      if (am > 0) return JoinBuiltin.cat(w, on(new int[]{origW.ia-am}, e, origW, blame), 0, blame);
+      else return JoinBuiltin.cat(on(new int[]{origW.ia+am}, new int[]{0}, origW, blame), w, 0, blame);
     }
     chk: {
       fail: if (w.rank == e.length) {

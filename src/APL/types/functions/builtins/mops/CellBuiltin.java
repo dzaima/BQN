@@ -3,7 +3,6 @@ package APL.types.functions.builtins.mops;
 import APL.errors.RankError;
 import APL.types.*;
 import APL.types.functions.*;
-import APL.types.functions.builtins.fns.OldUpArrowBuiltin;
 import APL.types.functions.builtins.fns2.GTBuiltin;
 
 public class CellBuiltin extends Mop {
