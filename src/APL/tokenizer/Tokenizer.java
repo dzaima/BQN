@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Tokenizer {
   private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
-  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎";
+  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶";
   private static final String surrogateOps = "𝕨𝕩𝔽𝔾𝕎𝕏𝕗𝕘𝕊";
   private static boolean validNameStart(char c) {
     for (char l : validNames) if (l == c) return true;
@@ -42,7 +42,8 @@ public class Tokenizer {
     }
     
     LineTok tok() { // also handles strands because why not
-      int epos = size() == 0? pos : ts.get(size()-1).epos;
+      int spos = size()==0? pos : ts.get(0).spos;
+      int epos = size()==0? pos : ts.get(size()-1).epos;
       ArrayList<Token> pts = new ArrayList<>();
       
       ArrayList<Token> cstr = new ArrayList<>();
@@ -65,7 +66,7 @@ public class Tokenizer {
         }
       }
   
-      return new LineTok(line, pos, epos, pts);
+      return new LineTok(line, spos, epos, pts);
     }
   }
   static class Block { // temp storage of multiple lines

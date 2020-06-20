@@ -4,7 +4,6 @@ import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
 import APL.types.*;
-import APL.types.arrs.DoubleArr;
 import APL.types.dimensions.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.AbstractSet;
@@ -590,11 +589,13 @@ public class Exec {
       case '⌾': return new UnderBuiltin();
       case '⍟': return new RepeatBuiltin();
       case '⚇': return new DepthBuiltin();
+      case '⊘': return new AmbivalentBuiltin();
+      case '◶': return new CondBuiltin();
       // case '@': return new AtBuiltin(sc);
       // case '⍫': return new ObverseBuiltin();
       case '•': assert sc==null; return null;
       
-      case '⍬': return new DoubleArr(DoubleArr.EMPTY);
+      // case '⍬': return new DoubleArr(DoubleArr.EMPTY);
       // case '⍞': return new QuoteQuad();
       // case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
       // case '⍵':     o = sc.get("⍵"); if(o == null) throw new SyntaxError("No ⍵ found", t); return o;

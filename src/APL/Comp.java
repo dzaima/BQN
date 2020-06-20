@@ -375,7 +375,7 @@ public class Comp {
     for (int i = 0; i < lns.size(); i++) {
       LineTok ln = lns.get(i);
       typeof(ln);
-      bcs[i*2] = compP(mut, ln, false);
+      bcs[i] = compP(mut, ln, false);
     }
     return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
   }
@@ -480,7 +480,7 @@ public class Comp {
     }
   
     public String toString() {
-      return type+"";
+      return tk==null? type+"" : tk.source();
     }
   }
   
@@ -499,12 +499,10 @@ public class Comp {
   private static final byte[] CHKVBC = new byte[]{CHKV};
   
   
-  private static int lvl = 0;
   private static void printlvl(String s) {
-    System.out.println(Main.repeat(" ", (Math.max(0, lvl*2 - 2))) + s);
+    System.out.println(Main.repeat(" ", Main.printlvl*2) + s);
   }
   public static void collect(LinkedList<Res> tps, Mut m, boolean train, boolean last) {
-    if (Main.debug) lvl++;
     while (true) {
       if (Main.debug) printlvl(tps.toString());
       if (tps.size() <= 1) break;
@@ -599,11 +597,13 @@ public class Comp {
         if (a=='←' || a=='↩') {
           char k = tps.get(tps.size()-3).type;
           char v = tps.get(tps.size()-1).type;
-          if (v=='A') v = 'a'; // +TODO add a non-nothing check
+          char ov = v;
+          if (v=='A') v = 'a';
           if (k==v) {
             if (Main.debug) printlvl(k+" "+a+" "+v);
-            tps.addLast(new Res(v,
+            tps.addLast(new Res(ov, // result is not v because typeof is stupid; +TODO
               tps.removeLast().comp(m, false),
+              ov=='A'? CHKVBC : NOBYTES,
               tps.removeLast().comp(m, false), // empty
               tps.removeLast().comp(m, true),
               new byte[]{a=='←'? SETN : SETU}
@@ -614,7 +614,6 @@ public class Comp {
       }
       break;
     }
-    if (Main.debug) lvl--;
   }
   
   public static char typeof(Token t) {
@@ -655,21 +654,27 @@ public class Comp {
       char last = tps[tps.length-1];
       if (tps.length == 1) return t.type = last;
       char prev = tps[tps.length-2];
-      if (last=='a' || last=='A') { // +TODO this is _probably_ not right
+      
+      // i hope these guesses are correct..
+      if (last=='a' || last=='A') {
         if (prev == 'd') return t.type = 'f';
         else return t.type = last;
       }
       if (last == 'f') return t.type = 'f';
       
-      // i hope these are correct..
       if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘})
-      if (last == 'm') return t.type = 'f';
+      if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
+        for (char tp : tps) {
+          if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
+        }
+        return t.type = 'm';
+      }
     }
     throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName());
   }
   
   
-  @interface CheckReturnValue{}@CheckReturnValue
+  // @interface CheckReturnValue{}@CheckReturnValue
   public static byte[] compP(Mut m, Token tk, boolean mut) { // assumes tk has been typechecked
     assert tk.type != 0;
     if (mut) {
@@ -711,15 +716,20 @@ public class Comp {
     if (tk instanceof LineTok) {
       List<Token> ts = ((LineTok) tk).tokens;
       if (ts.size() == 0) return NOBYTES;
-      if (ts.size() == 1) { return compP(m, ts.get(0), mut); }
+      if (ts.size() == 1) { return compP(m, ts.get(0), false); }
       int i = ts.size()-1;
   
       LinkedList<Res> tps = new LinkedList<>();
       Res t0 = new Res(ts.get(i));
       tps.addFirst(t0);
-      final boolean train = t0.type=='f';
+      final boolean train = t0.type!='a' && t0.type!='A';
       i--;
       
+      
+      if (Main.debug) {
+        printlvl("parsing "+tk.source());
+        Main.printlvl++;
+      }
       
       while (i>=0) {
         Res c = new Res(ts.get(i));
@@ -728,6 +738,8 @@ public class Comp {
         i--;
       }
       collect(tps, m, train, true);
+      if (Main.debug) Main.printlvl--;
+      
       if (tps.size()!=1) throw new SyntaxError("couldn't join everything to a single expression", tps.get(tps.size()-1).tk);
       assert tps.get(0).type == tk.type : tps.get(0).type + "≠" + tk.type;
       return tps.get(0).comp(m, false);
@@ -752,22 +764,28 @@ public class Comp {
       return m.varo(((NameTok) tk).name);
     }
     if (tk instanceof StrandTok) {
+      if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<Token> tks = ((StrandTok) tk).tokens;
       byte[][] bs = new byte[tks.size()+1][];
       for (int i = 0; i < tks.size(); i++) {
         bs[i] = compP(m, tks.get(i), false);
       }
+      if (Main.debug) Main.printlvl--;
+      
       int sz = tks.size();
       if (sz > 255) throw new NYIError("array constants with >255 items", tk);
       bs[bs.length-1] = new byte[]{ARRO, (byte) sz};
       return cat(bs);
     }
     if (tk instanceof ArrayTok) {
+      if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<LineTok> tks = ((ArrayTok) tk).tokens;
       byte[][] bs = new byte[tks.size()+1][];
       for (int i = 0; i < tks.size(); i++) {
         bs[i] = compP(m, tks.get(i), false);
       }
+      if (Main.debug) Main.printlvl--;
+      
       int sz = tks.size();
       if (sz > 255) throw new NYIError("array constants with >255 items", tk);
       bs[bs.length-1] = new byte[]{ARRO, (byte) sz};

@@ -64,7 +64,10 @@ public class Scope {
         default:
           throw new DomainError("setting unknown quad "+name);
       }
-    } else vars.put(name, val);
+    } else {
+      if (val == null) vars.remove(name);
+      else vars.put(name, val); // +TODO a separate "remove" call
+    }
   }
   public Value get(String name) {
     if (name.startsWith("•")) {

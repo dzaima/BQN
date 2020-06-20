@@ -167,6 +167,7 @@ public class Main {
       if (!silentREPL) print("> ");
       while (console.hasNext()) {
         faulty = null;
+        if (debug) printlvl = 0;
         try {
           String cr = console.nextLine();
           if (cr.equals("exit")) break;
