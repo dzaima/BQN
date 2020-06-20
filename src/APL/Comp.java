@@ -556,8 +556,8 @@ public class Comp {
         }
       }
       // all
-      {
-        int i = tps.get(0).type=='d' || !last? 1 : 0;
+      if (tps.get(0).type!='d') {
+        int i = !last? 1 : 0; // hopefully this doesn't need to be looping
         if (isS(tps, "Om", i)) {
           if (Main.debug) printlvl("match O m");
           Res f;
@@ -740,8 +740,9 @@ public class Comp {
       String s = op.op;
       switch (s) {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩":
-        case "𝕎": case "𝔾": case "𝔽": case "𝕏":
           return m.varo(s);
+        case "𝕎": case "𝔾": case "𝔽": case "𝕏":
+          return m.varo(new String(new char[]{55349, (char) (s.charAt(1)+26)})); // lowercase
         case "⍎": return new byte[]{SPEC, EVAL };
         case "•": return new byte[]{SPEC, STDIN};
         default: throw new ImplementationError("Undefined unknown built-in "+s, op);
