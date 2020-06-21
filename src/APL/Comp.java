@@ -145,7 +145,7 @@ public class Comp {
         }
         case OP1D: {
           Value f = (Value) s.pop();
-          Mop   o = (Mop  ) s.pop();
+          Mop   o = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
           Fun d = o.derive(f); d.token = o.token;
           s.push(d);
           break;
@@ -642,7 +642,7 @@ public class Comp {
   }
   
   public static char typeof(Token t) {
-    if (t.type != 0) return t.type; // handles NumTok, StrTok, ChrTok, SetTok, ModTok & re-evaluations
+    if (t.type != 0) return t.type; // handles NumTok, StrTok, ChrTok, SetTok, ModTok, NameTok & re-evaluations
     
     if (t instanceof ParenTok) {
       return t.type = typeof(((ParenTok) t).ln);
@@ -652,8 +652,6 @@ public class Comp {
     } else if (t instanceof ArrayTok) {
       for (Token c : ((ArrayTok) t).tokens) typeof(c);
       return t.type = 'a';
-    } else if (t instanceof NameTok) {
-      return t.type = varType(((NameTok) t).name);
     } else if (t instanceof OpTok) {
       OpTok op = (OpTok) t;
       Value b = Exec.builtin(op, null);
@@ -831,16 +829,5 @@ public class Comp {
       return m.push(((NothingTok) tk).val);
     }
     throw new ImplementationError("can't compile "+tk.getClass());
-  }
-  
-  public static char varType(String name) {
-    char s = name.charAt(0);
-    if (s=='•') s = name.charAt(1);
-    if (s=='_') {
-      char e = name.charAt(name.length()-1);
-      return e=='_'? 'd' : 'm';
-    }
-    if (s>='A' && s<='Z') return 'f';
-    return 'a';
   }
 }

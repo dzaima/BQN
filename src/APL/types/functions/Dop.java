@@ -66,7 +66,7 @@ public abstract class Dop extends Callable {
   
   
   public Fun asFun() {
-    throw new Error("can't do");
+    throw new SyntaxError("Cannot interpret a composition as a function");
   }
   
   // functions are equal per-object basis

@@ -62,7 +62,7 @@ public abstract class Mop extends Callable {
   
   
   public Fun asFun() {
-    throw new Error("can't do");
+    throw new SyntaxError("Cannot interpret a modifier as a function");
   }
   
   // functions are equal per-object basis
