@@ -42,7 +42,8 @@ public class Scope {
     if (name.charAt(0) == '•') {
       switch (name) {
         case "•io":
-          throw new DomainError("Cannot set •IO");
+          if (!val.equals(Num.ZERO)) throw new DomainError("Cannot set •io to "+val);
+          break;
         case "•boxsimple":
           Main.enclosePrimitives = val.asInt() == 1;
           break;
@@ -58,7 +59,7 @@ public class Scope {
           } else {
             int[] args = val.asIntVec();
             if (args.length == 3) Num.setPrecision(args[0], args[1], args[2]);
-            else throw new DomainError("•PP expected either a scalar number or array of 3 integers as ⍵", val);
+            else throw new DomainError("•pp expected either a scalar number or array of 3 integers as ⍵", val);
           }
           break;
         default:
@@ -73,37 +74,37 @@ public class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "•TIME": return new Timer(this, true);
-        case "•HTIME": return new Timer(this, false);
-        case "•EX": return new Ex(this);
-        case "•LNS": return new Lns();
-        case "•SH": return new Shell();
-        case "•NC": return new NC();
+        case "•time": return new Timer(this, true);
+        case "•htime": return new Timer(this, false);
+        case "•ex": return new Ex(this);
+        case "•lns": return new Lns();
+        case "•sh": return new Shell();
+        case "•nc": return new NC();
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
         case "•l":
         case "•la": return Main.lAlphabet;
-        case "•ERASE": return new Eraser(this);
+        case "•erase": return new Eraser(this);
         case "•gc": System.gc(); return Num.ONE;
-        case "•GCLOG": return new GCLog();
+        case "•gclog": return new GCLog();
         case "•null": return Null.NULL;
-        case "•MAP": case "•NS": return new MapGen();
-        case "•DL": return new Delay(this);
-        case "•DR": return new DR();
-        case "•UCS": return new UCS(this);
-        case "•HASH": return new Hasher();
+        case "•map": case "•NS": return new MapGen();
+        case "•dl": return new Delay(this);
+        case "•dr": return new DR();
+        case "•ucs": return new UCS(this);
+        case "•hash": return new Hasher();
         case "•io": return Num.ZERO;
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
         case "•boxsimple": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
-        case "•CLASS": return new ClassGetter();
+        case "•class": return new ClassGetter();
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
-        case "•PFX": return new Profiler(this);
-        case "•PFO": return new Profiler.ProfilerOp(this);
+        case "•pfx": return new Profiler(this);
+        case "•pfo": return new Profiler.ProfilerOp(this);
         case "•pfr": return Profiler.results();
-        case "•STDIN": return new Stdin();
-        case "•BIG": return new Big();
-        case "•U": return new Builtin() {
+        case "•stdin": return new Stdin();
+        case "•big": return new Big();
+        case "•u": return new Builtin() {
           @Override public String repr() { return "•U"; }
   
           @Override public Value call(Value w) {
@@ -111,7 +112,7 @@ public class Scope {
             return null;
           }
         };
-        case "•OPT": case "•OPTIMIZE":
+        case "•opt": case "•optimize":
           return new Optimizer(this);
       }
     }

@@ -10,7 +10,9 @@ public class NameTok extends Token {
     super(line, spos, epos);
     this.rawName = rawName;
     this.type = varType(rawName);
-    name = (type=='a' || type=='f'? rawName : type=='d'? rawName.substring(1,rawName.length()-1) : rawName.substring(1)).toLowerCase();
+    String name0 = (rawName.charAt(0)=='•'? rawName.substring(1) : rawName).toLowerCase();
+    String name1 = type=='a' || type=='f'? name0 : type=='d'? name0.substring(1,name0.length()-1) : name0.substring(1);
+    this.name = rawName.charAt(0)=='•'? '•'+name1 : name1;
   }
   public static char varType(String name) {
     char s = name.charAt(0);
