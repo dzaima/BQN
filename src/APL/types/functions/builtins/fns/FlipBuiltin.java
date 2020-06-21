@@ -4,7 +4,7 @@ import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns2.MinusBuiltin;
+import APL.types.functions.builtins.fns2.*;
 
 public class FlipBuiltin extends Builtin implements DimMFn, DimDFn {
   @Override public String repr() {

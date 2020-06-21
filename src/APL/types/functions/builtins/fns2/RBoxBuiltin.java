@@ -46,8 +46,6 @@ public class RBoxBuiltin extends Builtin {
       }
       res[i++] = j;
     }
-    if (w instanceof Primitive) return new Num(res[0]);
-    if (w.rank == 0) return new Num(res[0]);
     return new DoubleArr(res, w.shape);
   }
 }

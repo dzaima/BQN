@@ -24,6 +24,6 @@ public class RShoeUBBuiltin extends Builtin {
     for (int i = 0; i < a.ia; i++) {
       vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
     }
-    return Arr.createL(vs, w.shape);
+    return Arr.create(vs, w.shape);
   }
 }

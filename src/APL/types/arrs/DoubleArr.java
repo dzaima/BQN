@@ -45,11 +45,6 @@ public class DoubleArr extends Arr {
     }
   }
   
-  public static Value safe(double[] vs, int[] sh) {
-    if (sh.length == 0) return new Num(vs[0]);
-    return new DoubleArr(vs, sh);
-  }
-  
   @Override
   public int[] asIntArrClone() {
     int[] r = new int[ia];

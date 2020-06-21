@@ -22,7 +22,7 @@ public class LShoeStileBuiltin extends Builtin {
       res[i] = counts.get(ca);
       i++;
     }
-    return DoubleArr.safe(res, a.shape);
+    return new DoubleArr(res, a.shape);
   }
   
   @Override public Value call(Value w) {

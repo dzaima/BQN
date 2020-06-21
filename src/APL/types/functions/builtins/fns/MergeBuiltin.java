@@ -39,7 +39,7 @@ public class MergeBuiltin extends Builtin {
     for (int i = 0; i < idx.length; i++) {
       vs[i] = w.get((int) idx[i]).get(i);
     }
-    return Arr.createL(vs, a.shape);
+    return Arr.create(vs, a.shape);
   }
   
   @Override public String repr() {

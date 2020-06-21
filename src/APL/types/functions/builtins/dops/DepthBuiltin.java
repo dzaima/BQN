@@ -29,6 +29,6 @@ public class DepthBuiltin extends Dop {
     for (int i = 0; i < res.length; i++) {
       res[i] = on(caller, f, d, w.get(i));
     }
-    return Arr.createL(res, w.shape);
+    return Arr.create(res, w.shape);
   }
 }

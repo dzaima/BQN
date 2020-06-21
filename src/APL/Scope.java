@@ -41,18 +41,18 @@ public class Scope {
   public void set(String name, Value val) { // sets in current scope
     if (name.charAt(0) == '•') {
       switch (name) {
-        case "•IO":
+        case "•io":
           throw new DomainError("Cannot set •IO");
-        case "•BOXSIMPLE":
+        case "•boxsimple":
           Main.enclosePrimitives = val.asInt() == 1;
           break;
-        case "•VI":
+        case "•vi":
           Main.vind = Main.bool(val);
           break;
-        case "•RL":
+        case "•rl":
           rnd = new Random(val.asInt());
           break;
-        case "•PP":
+        case "•pp":
           if (val instanceof Primitive) {
             Num.setPrecision(val.asInt());
           } else {
@@ -95,7 +95,7 @@ public class Scope {
         case "•HASH": return new Hasher();
         case "•io": return Num.ZERO;
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
-        case "•BOXSIMPLE": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
+        case "•boxsimple": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
         case "•CLASS": return new ClassGetter();
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•PFX": return new Profiler(this);

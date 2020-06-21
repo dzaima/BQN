@@ -126,7 +126,7 @@ public class ShapeBuiltin extends Builtin {
     Value[] vs = new Value[w.ia];
     System.arraycopy(v.values(), 0, vs, 0, am);
     System.arraycopy(w.values(), am, vs, am, vs.length-am);
-    return Arr.createL(vs, w.shape);
+    return Arr.create(vs, w.shape);
   }
   
   

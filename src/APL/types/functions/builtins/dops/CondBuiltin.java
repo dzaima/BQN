@@ -16,7 +16,7 @@ public class CondBuiltin extends Dop {
   private Fun get(Value F, Value g) {
     int f = F.asInt();
     if (g.rank != 1) throw new RankError("◶: Expected 𝕘 to be a vector, had rank "+g.rank, this, g);
-    if (f>=g.rank || f<0) throw new LengthError("◶: 𝔽 out of bounds of 𝕘 (𝔽 = "+f+")", this, F);
+    if (f>=g.ia || f<0) throw new LengthError("◶: 𝔽 out of bounds of 𝕘 (𝔽 = "+f+")", this, F);
     return g.get(f).asFun();
   }
   

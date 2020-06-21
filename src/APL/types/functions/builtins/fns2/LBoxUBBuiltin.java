@@ -34,8 +34,7 @@ public class LBoxUBBuiltin extends Builtin {
     }
     if (a instanceof Primitive && w.rank==1) {
       Value r = w.get((int) a.asDouble());
-      if (r instanceof Primitive) return r;
-      else return new Rank0Arr(r);
+      return new Rank0Arr(r);
     }
     
     return on(Indexer.poss(a, w.shape, blame), w);
@@ -49,7 +48,7 @@ public class LBoxUBBuiltin extends Builtin {
       for (int i = 0; i < idxs.length; i++) {
         res[i] = wd[idxs[i]];
       }
-      return DoubleArr.safe(res, poss.sh);
+      return new DoubleArr(res, poss.sh);
     }
     Value[] res = new Value[Arr.prod(poss.sh)];
     int[] idxs = poss.vals;
@@ -66,6 +65,6 @@ public class LBoxUBBuiltin extends Builtin {
     for (int i = 0; i < a.ia; i++) {
       vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
     }
-    return Arr.createL(vs, w.shape);
+    return Arr.create(vs, w.shape);
   }
 }

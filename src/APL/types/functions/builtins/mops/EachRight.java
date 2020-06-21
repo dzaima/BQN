@@ -15,7 +15,7 @@ public class EachRight extends Mop {
     for (int i = 0; i < n.length; i++) {
       n[i] = ff.call(a, w.get(i)).squeeze();
     }
-    return Arr.createL(n, w.shape);
+    return Arr.create(n, w.shape);
   }
   
   public Value underW(Value aa, Obj o, Value a, Value w, DerivedMop derv) {

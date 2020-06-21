@@ -41,7 +41,7 @@ public class RShoeBuiltin extends Builtin {
   public Value under(Obj o, Value w) {
     Value[] vs = w.valuesCopy();
     vs[0] = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
-    return Arr.createL(vs, w.shape);
+    return Arr.create(vs, w.shape);
   }
   
   public Value underW(Obj o, Value a, Value w) {
@@ -49,12 +49,12 @@ public class RShoeBuiltin extends Builtin {
     if (a instanceof Primitive) {
       Value[] vs = w.valuesCopy();
       vs[a.asInt()] = v;
-      return Arr.createL(vs, w.shape);
+      return Arr.create(vs, w.shape);
     } else {
       Value[] vs = w.valuesCopy();
       int[] is = a.asIntVec();
       replace(vs, v, is, 0);
-      return Arr.createL(vs, w.shape);
+      return Arr.create(vs, w.shape);
     }
   }
   private void replace(Value[] vs, Value w, int[] d, int i) {
@@ -64,7 +64,7 @@ public class RShoeBuiltin extends Builtin {
       Value cv = vs[c];
       Value[] vsN = cv.valuesCopy();
       replace(vsN, w, d, i+1);
-      vs[c] = Arr.createL(vsN, cv.shape);
+      vs[c] = Arr.create(vsN, cv.shape);
     }
   }
 }

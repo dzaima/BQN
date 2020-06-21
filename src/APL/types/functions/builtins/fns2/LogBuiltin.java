@@ -3,7 +3,6 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns2.*;
 
 public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *⁼ & √⍨⁼⍨
   @Override public String repr() {

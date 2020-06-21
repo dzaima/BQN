@@ -4,7 +4,6 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns2.DTackBuiltin;
 
 import java.math.BigInteger;
 

@@ -52,7 +52,7 @@ public class AtBuiltin extends Dop {
           else ra[i] = w.get(i);
         }
       }
-      return Arr.createL(ra, w.shape);
+      return Arr.create(ra, w.shape);
     } else {
       Value wwa = (Value) ww;
   
@@ -94,6 +94,6 @@ public class AtBuiltin extends Dop {
       Arr.eqShapes(n.shape, poss.sh, blame);
       for (int i = 0; i < is.length; i++) res[is[i]] = n.get(i);
     }
-    return Arr.createL(res, o.shape);
+    return Arr.create(res, o.shape);
   }
 }
