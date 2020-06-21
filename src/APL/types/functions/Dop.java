@@ -21,6 +21,10 @@ public abstract class Dop extends Callable {
   public Fun derive(Value aa, Value ww) {
     return new DerivedDop(aa, ww, this);
   }
+  public Mop derive(Value g) {
+    return new HalfDerivedDop(g, this);
+  }
+  
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     throw new IncorrectArgsError(repr()+" can't be called monadically", derv, w);
   }

@@ -45,7 +45,8 @@ public class Comp {
   public static final byte FN2O = 17; // optional dyadic call
   public static final byte CHKV = 18; // error if ToS is ·
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
-  // public static final byte ____ = 6;
+  public static final byte OP2H = 20; // derive composition to modifier
+// public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
   public static final byte   EVAL = 0; // ⍎
@@ -154,6 +155,13 @@ public class Comp {
           Dop   o = (Dop  ) s.pop();
           Value g = (Value) s.pop();
           Fun d = o.derive(f, g); d.token = o.token;
+          s.push(d);
+          break;
+        }
+        case OP2H: {
+          Dop   o = (Dop  ) s.pop();
+          Value g = (Value) s.pop();
+          Mop d = o.derive(g); d.token = o.token;
           s.push(d);
           break;
         }
@@ -267,8 +275,9 @@ public class Comp {
           case FN2O: cs = " FN2O"; break;
           case CHKV: cs = " CHKV"; break;
           case TR3O: cs = " TR3O"; break;
+          case OP2H: cs = " OP2H"; break;
           
-          case SPEC: cs = " SPEC "+(bc[i++]&0xff); break;
+          case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
         }
         b.append(' ');
@@ -554,8 +563,9 @@ public class Comp {
         }
       }
       // all
+      
+      int i = last? 0 : 1; // hopefully this doesn't need to be looping
       if (tps.get(0).type!='d') {
-        int i = !last? 1 : 0; // hopefully this doesn't need to be looping
         if (isS(tps, "Om", i)) {
           if (Main.debug) printlvl("match O m");
           Res f;
@@ -581,6 +591,21 @@ public class Comp {
           continue;
         }
       }
+      if (isS(tps, "dO", i)) {
+        char t0 = tps.get(0).type;
+        if (i==0 || t0!='a' && t0!='A' && t0!='f') {
+          if (Main.debug) printlvl("match dO");
+          Res f;
+          tps.add(i, new Res('m',
+            (f=tps.remove(i+1)).comp(m, false),
+            f.type=='A'? CHKVBC : NOBYTES,
+            (  tps.remove(i  )).comp(m, false),
+            new byte[]{OP2H}
+          ));
+          continue;
+        }
+      }
+      
       if (isE(tps, "af↩a", false)) {
         if (Main.debug) printlvl("af↩a");
         tps.addLast(new Res('a',
@@ -656,18 +681,23 @@ public class Comp {
       char prev = tps[tps.length-2];
       
       // i hope these guesses are correct..
-      if (last=='a' || last=='A') {
-        if (prev == 'd') return t.type = 'f';
-        else return t.type = last;
-      }
-      if (last == 'f') return t.type = 'f';
-      
-      if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘})
-      if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
-        for (char tp : tps) {
+      if (prev == 'd') { // ends with d[fa], so equivalent to (last == 'm') below
+        for (int i = 0; i < tps.length-2; i++) { // must not touch the last [fa] though (and while at it, d neither) 
+          char tp = tps[i];
           if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
         }
         return t.type = 'm';
+      } else {
+        if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
+        if (last=='a' || last=='A') return t.type = last; // not as arg of dop/mop
+        if (last == 'f') return t.type = 'f';
+  
+        if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
+          for (char tp : tps) {
+            if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
+          }
+          return t.type = 'm';
+        }
       }
     }
     throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName());
@@ -763,7 +793,7 @@ public class Comp {
     if (tk instanceof NameTok) {
       return m.varo(((NameTok) tk).name);
     }
-    if (tk instanceof StrandTok) {
+    if (tk instanceof StrandTok) { // +TODO (+↓) check for type A
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<Token> tks = ((StrandTok) tk).tokens;
       byte[][] bs = new byte[tks.size()+1][];
