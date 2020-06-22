@@ -17,17 +17,19 @@ public class Comp {
   private final Value[] objs;
   private final String[] strs;
   private final DfnTok[] dfns;
+  private final Token tk;
   
-  Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns) {
+  Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns, Token tk) {
     this.bc = bc;
     this.objs = objs;
     this.strs = strs;
     this.dfns = dfns;
+    this.tk = tk;
   }
   
-  public static final byte PUSH =  0; // 1O; 2
-  public static final byte VARO =  1; // 1S; x/𝕨/𝕏
-  public static final byte VARM =  2; // 1S; mutable x/𝕨/𝕏
+  public static final byte PUSH =  0; // 1B; 2
+  public static final byte VARO =  1; // 1B; x/𝕨/𝕏
+  public static final byte VARM =  2; // 1B; mutable x/𝕨/𝕏
   public static final byte ARRO =  3; // 1B; 1‿2‿3 / ⟨1⋄2⋄3⟩; compilers job to extend past 255 (or maybe another op?)
   public static final byte ARRM =  4; // 1B; mutable x‿y‿z / ⟨x⋄y⋄z)
   public static final byte FN1C =  5; // monadic call
@@ -40,12 +42,15 @@ public class Comp {
   public static final byte SETU = 12; // set upd; _  ↩_;
   public static final byte SETM = 13; // set mod; _ F↩_;
   public static final byte POPS = 14; // pop object from stack
-  public static final byte DFND = 15; // 1D; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
+  public static final byte DFND = 15; // 1B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   public static final byte FN1O = 16; // optional monadic call
   public static final byte FN2O = 17; // optional dyadic call
   public static final byte CHKV = 18; // error if ToS is ·
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   public static final byte OP2H = 20; // derive composition to modifier
+  public static final byte DFND2= 21; // 2B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
+  public static final byte VARO2= 22; // 2B; x/𝕨/𝕏
+  public static final byte VARM2= 23; // 2B; mutable x/𝕨/𝕏
 // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
@@ -75,7 +80,9 @@ public class Comp {
     }
   }
   
+  public static final boolean DBGPROG = true;
   public Value exec(Scope sc) {
+    
     Stk s = new Stk();
     int i = 0;
     while (i!= bc.length) {
@@ -88,12 +95,22 @@ public class Comp {
         }
         case VARO: {
           Value got = sc.get(strs[bc[i++] & 0xff]);
-          if (got == null) throw new ValueError("Unknown variable " + strs[bc[i - 1] & 0xff]);
+          if (got == null) throw new ValueError("Unknown variable \"" + strs[bc[i - 1] & 0xff] + "\"");
+          s.push(got);
+          break;
+        }
+        case VARO2: {
+          Value got = sc.get(strs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]);
+          if (got == null) throw new ValueError("Unknown variable \"" + strs[bc[i - 1] & 0xff] + "\"");
           s.push(got);
           break;
         }
         case VARM: {
           s.push(new Variable(sc, strs[bc[i++] & 0xff]));
+          break;
+        }
+        case VARM2: {
+          s.push(new Variable(sc, strs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]));
           break;
         }
         case ARRO: {
@@ -117,6 +134,7 @@ public class Comp {
         case FN1C: {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          if (DBGPROG) Main.faulty = f;
           s.push(f.asFun().call(w));
           break;
         }
@@ -124,12 +142,14 @@ public class Comp {
           Value a = (Value) s.pop();
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          if (DBGPROG) Main.faulty = f;
           s.push(f.asFun().call(a, w));
           break;
         }
         case FN1O: {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          if (DBGPROG) Main.faulty = f;
           if (w instanceof Nothing) s.push(w);
           else s.push(f.asFun().call(w));
           break;
@@ -138,6 +158,7 @@ public class Comp {
           Value a = (Value) s.pop();
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          if (DBGPROG) Main.faulty = f;
           if (w instanceof Nothing) s.push(w);
           else if (a instanceof Nothing) s.push(f.asFun().call(w));
           else s.push(f.asFun().call(a, w));
@@ -219,6 +240,11 @@ public class Comp {
           s.push(UserDefined.of(dfn, sc));
           break;
         }
+        case DFND2: {
+          DfnTok dfn = dfns[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)];
+          s.push(UserDefined.of(dfn, sc));
+          break;
+        }
         case CHKV: {
           Obj v = s.peek();
           if (v instanceof Nothing) throw new SyntaxError("Didn't expect · here", v);
@@ -276,6 +302,8 @@ public class Comp {
           case CHKV: cs = " CHKV"; break;
           case TR3O: cs = " TR3O"; break;
           case OP2H: cs = " OP2H"; break;
+          case DFND2:cs = " DFND2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
+          case VARO2:cs = " VARO2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
           
           case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
@@ -354,23 +382,45 @@ public class Comp {
     ArrayList<String> strs = new ArrayList<>();
   
     public byte[] push(Value o) {
+      if (objs.size() >= 256) throw new SyntaxError(">256 objects in one unit");
       byte[] res = {PUSH, (byte) objs.size()};
       objs.add(o);
       return res;
     }
     public byte[] push(DfnTok o) {
-      byte[] res = {DFND, (byte) dfns.size()};
+      int sz = dfns.size();
+      if (sz >= 256) {
+        if (sz >= 65536) throw new SyntaxError(">65536 dfns in one unit");
+        byte[] res = {DFND2, (byte) (sz/256), (byte) (sz%256)};
+        dfns.add(o);
+        return res;
+      }
+      byte[] res = {DFND, (byte) sz};
       dfns.add(o);
       return res;
     }
     
     public byte[] varo(String s) {
-      byte[] res = {VARO, (byte) strs.size()};
+      int sz = strs.size();
+      if (sz >= 256) {
+        if (sz >= 65536) throw new SyntaxError(">65536 variables in one unit");
+        byte[] res = {VARO2, (byte) (sz/256), (byte) (sz%256)};
+        strs.add(s);
+        return res;
+      }
+      byte[] res = {VARO, (byte) sz};
       strs.add(s);
       return res;
     }
     public byte[] varm(String s) {
-      byte[] res = {VARM, (byte) strs.size()};
+      int sz = strs.size();
+      if (sz >= 256) {
+        if (sz >= 65536) throw new SyntaxError(">65536 mutable variables in one unit");
+        byte[] res = {VARM2, (byte) (sz/256), (byte) (sz%256)};
+        strs.add(s);
+        return res;
+      }
+      byte[] res = {VARM, (byte) sz};
       strs.add(s);
       return res;
     }
@@ -380,13 +430,18 @@ public class Comp {
   public static Comp comp(DfnTok t) {
     Mut mut = new Mut();
     List<LineTok> lns = t.tokens;
-    byte[][] bcs = new byte[lns.size()][];
+    byte[][] bcs = new byte[lns.size()*2][];
+    int lret = -1;
     for (int i = 0; i < lns.size(); i++) {
       LineTok ln = lns.get(i);
-      typeof(ln);
-      bcs[i] = compP(mut, ln, false);
+      if (typeof(ln) != '_') lret = i;
+      bcs[i*2] = compP(mut, ln, false);
     }
-    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
+    if (lret == -1) throw new SyntaxError("Dfns must return something", t);
+    for (int i = 0; i < lns.size(); i++) {
+      bcs[i*2+1] = lret==i || lns.get(i).type=='_'? NOBYTES : new byte[]{POPS};
+    }
+    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), t);
   }
   
   public static Comp comp(LineTok ln) {
@@ -394,7 +449,7 @@ public class Comp {
     typeof(ln);
     Mut mut = new Mut();
     byte[] bc = compP(mut, ln, false);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
+    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), ln);
   }
   
   public static Comp comp(TokArr<LineTok> lns) {
@@ -405,7 +460,7 @@ public class Comp {
       typeof(ln);
       bcs[i] = compP(mut, ln, false);
     }
-    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]));
+    return new Comp(cat(bcs), mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), lns);
   }
   
   private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a
@@ -624,6 +679,7 @@ public class Comp {
           char v = tps.get(tps.size()-1).type;
           char ov = v;
           if (v=='A') v = 'a';
+          if (k=='A') k = 'a'; // 𝕨↩ is a possibility
           if (k==v) {
             if (Main.debug) printlvl(k+" "+a+" "+v);
             tps.addLast(new Res(ov, // result is not v because typeof is stupid; +TODO
@@ -634,7 +690,7 @@ public class Comp {
               new byte[]{a=='←'? SETN : SETU}
             ));
             continue;
-          } else throw new SyntaxError(a+": Cannot assign with different types", tps.get(tps.size()-2).tk);
+          } else if (v!='a' && k!='f') throw new SyntaxError(a+": Cannot assign with different types", tps.get(tps.size()-2).tk);
         }
       }
       break;
@@ -726,7 +782,15 @@ public class Comp {
       if (tk instanceof LineTok) {
         if (((LineTok) tk).tokens.size() == 1) return compP(m, ((LineTok) tk).tokens.get(0), true);
       }
-      if (tk instanceof OpTok && ((OpTok) tk).op.equals("•")) return new byte[]{SPEC, STDOUT};
+      if (tk instanceof OpTok) {
+        String op = ((OpTok) tk).op;
+        if (op.equals("•")) return new byte[]{SPEC, STDOUT};
+        int aid = "𝕨𝕘𝕗𝕩𝕎𝔾𝔽𝕏".indexOf(op);
+        if (aid != -1) {
+          aid = aid % 8; // not %4 because surrogate pairs
+          return m.varm("𝕨𝕘𝕗𝕩".substring(aid, aid+2));
+        }
+      }
       throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
     }
     if (tk instanceof ParenTok) {
@@ -750,8 +814,8 @@ public class Comp {
       LinkedList<Res> tps = new LinkedList<>();
       Res t0 = new Res(ts.get(i));
       tps.addFirst(t0);
-      final boolean train = t0.type!='a' && t0.type!='A';
       i--;
+      final boolean train = (t0.type!='a' && t0.type!='A')  ||  (ts.size()>=2 && ts.get(i).type=='d');
       
       
       if (Main.debug) {
@@ -768,14 +832,27 @@ public class Comp {
       collect(tps, m, train, true);
       if (Main.debug) Main.printlvl--;
       
-      if (tps.size()!=1) throw new SyntaxError("couldn't join everything to a single expression", tps.get(tps.size()-1).tk);
+      if (tps.size()!=1) {
+        Token t = null;
+        for (int i1 = tps.size()-1; i1 >= 0; i1--) {
+          Res tp = tps.get(i1);
+          if (tp.tk != null) {
+            t = tp.tk;
+            break;
+          }
+        }
+        throw new SyntaxError("couldn't join everything to a single expression", t);
+      }
       assert tps.get(0).type == tk.type : tps.get(0).type + "≠" + tk.type;
       return tps.get(0).comp(m, false);
     }
     if (tk instanceof OpTok) {
       OpTok op = (OpTok) tk;
       Value b = Exec.builtin(op, null);
-      if (b != null) return m.push(b);
+      if (b != null) {
+        b.token = tk;
+        return m.push(b);
+      }
       
       String s = op.op;
       switch (s) {

@@ -267,34 +267,12 @@ public class Tokenizer {
           StringBuilder str = new StringBuilder();
           i++;
           if (i == len) throw new SyntaxError("unfinished string");
-          while (raw.charAt(i) != '"') {
-            if (raw.charAt(i) == '\\') {
-              i++;
-              SyntaxError.must(i < len, "unfinished string");
-              char esc = raw.charAt(i);
-              switch (esc) {
-                case  'n': str.append('\n'); break;
-                case  'r': str.append('\r'); break;
-                case  '"': str.append('\"'); break;
-                case '\'': str.append('\''); break;
-                case '\\': str.append('\\'); break;
-                case  't': str.append('\t'); break;
-                case  'x': {
-                  SyntaxError.must(i+2 < len, "unfinished string");
-                  int num = Integer.parseInt(raw.substring(i+1, i+3), 16);
-                  str.append(Character.toChars(num));
-                  i+= 2;
-                  break;
-                }
-                case  'u': {
-                  SyntaxError.must(i+4 < len, "unfinished string");
-                  int num = Integer.parseInt(raw.substring(i+1, i+5), 16);
-                  str.append(Character.toChars(num));
-                  i+= 4;
-                  break;
-                }
-                default: throw new SyntaxError("invalid escape character "+esc);
-              }
+          while (true) {
+            if (raw.charAt(i) == '"') {
+              if (i+1==len) break;
+              else if (raw.charAt(i+1) != '"') break;
+              str.append('"');
+              i+= 1;
             } else {
               str.append(raw.charAt(i));
             }

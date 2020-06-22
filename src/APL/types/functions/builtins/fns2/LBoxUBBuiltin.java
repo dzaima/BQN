@@ -34,7 +34,7 @@ public class LBoxUBBuiltin extends Builtin {
     }
     if (a instanceof Primitive && w.rank==1) {
       Value r = w.get((int) a.asDouble());
-      return new Rank0Arr(r);
+      return r;
     }
     
     return on(Indexer.poss(a, w.shape, blame), w);

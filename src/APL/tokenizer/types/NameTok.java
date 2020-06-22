@@ -1,5 +1,6 @@
 package APL.tokenizer.types;
 
+import APL.errors.SyntaxError;
 import APL.tokenizer.Token;
 
 public class NameTok extends Token {
@@ -10,6 +11,7 @@ public class NameTok extends Token {
     super(line, spos, epos);
     this.rawName = rawName;
     this.type = varType(rawName);
+    if (line.length() <= 2 && type == 'd') throw new SyntaxError("\""+rawName+"\" is an invalid name", this);
     String name0 = (rawName.charAt(0)=='•'? rawName.substring(1) : rawName).toLowerCase();
     String name1 = type=='a' || type=='f'? name0 : type=='d'? name0.substring(1,name0.length()-1) : name0.substring(1);
     this.name = rawName.charAt(0)=='•'? '•'+name1 : name1;

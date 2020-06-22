@@ -233,6 +233,9 @@ public class Main {
       case "BC":
         println(Comp.comp(Tokenizer.tokenize(rest)).fmt());
         break;
+      case "TYPE":
+        println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
+        break;
       default:
         throw new SyntaxError("Undefined user command");
     }

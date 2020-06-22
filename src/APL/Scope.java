@@ -104,6 +104,13 @@ public class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
+        case "•r": return new Dop() {
+          public String repr() { return "•_R_"; }
+  
+          public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
+            return Main.toAPL(w.asString().replaceAll(aa.asString(), ww.asString()));
+          }
+        };
         case "•u": return new Builtin() {
           @Override public String repr() { return "•U"; }
   
