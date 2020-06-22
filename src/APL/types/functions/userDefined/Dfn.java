@@ -9,7 +9,7 @@ import APL.types.*;
 public class Dfn extends Fun {
   public final DfnTok code;
   
-  Dfn(DfnTok t, Scope sc) {
+  public Dfn(DfnTok t, Scope sc) {
     super(sc);
     code = t;
   }

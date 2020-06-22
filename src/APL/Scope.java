@@ -1,13 +1,14 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.Tokenizer;
-import APL.tokenizer.types.BasicLines;
+import APL.tokenizer.*;
+import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.dops.DepthBuiltin;
 import APL.types.functions.builtins.fns2.*;
+import APL.types.functions.userDefined.*;
 
 import java.io.*;
 import java.net.*;
@@ -118,6 +119,53 @@ public class Scope {
             Main.ucmd(Scope.this, w.asString());
             return null;
           }
+        };
+        case "•comp": return new Builtin(this) {
+          public String repr() {
+            return "•COMP";
+          }
+          
+          public Value call(Value a, Value w) {
+            if (w.ia != 4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, w);
+            char type = ((Char) a).chr;
+            Value bc = w.get(0);
+            Value obj = w.get(1);
+            Value str = w.get(2);
+            Value dfn = w.get(3);
+            
+            byte[] bcp = new byte[bc.ia];
+            for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bc.get(i).asInt();
+            Token[] ref = new Token[bcp.length]; // keep as nulls for now
+            
+            Value[] objp = new Value[obj.ia];
+            for (int i = 0; i < objp.length; i++) objp[i] = obj.get(i);
+            
+            String[] strp = new String[str.ia];
+            for (int i = 0; i < strp.length; i++) strp[i] = str.get(i).asString();
+            
+            DfnTok[] dfnp = new DfnTok[dfn.ia];
+            for (int i = 0; i < dfnp.length; i++) {
+              Value c = dfn.get(i);
+              dfnp[i] = c instanceof Dfn? ((Dfn) c).code : c instanceof Ddop? ((Ddop) c).code : ((Dmop) c).code;
+            }
+            
+            Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
+            if (type == 'f') return new Dfn (new DfnTok(c, 'f'), sc);
+            if (type == 'd') return new Ddop(new DfnTok(c, 'd'), sc);
+            if (type == 'm') return new Dmop(new DfnTok(c, 'm'), sc);
+            throw new DomainError("•COMP: 𝕨 must be one of \"fdm\"");
+          }
+        };
+        case "•bc": return new Fun(this) {
+          public String repr() {
+            return "•BC";
+          }
+          
+          public Value call(Value w) {
+            DfnTok s = w instanceof Dfn? ((Dfn) w).code : w instanceof Ddop? ((Ddop) w).code : ((Dmop) w).code;
+            return Main.toAPL(s.comp.fmt());
+          }
+          
         };
         case "•opt": case "•optimize":
           return new Optimizer(this);

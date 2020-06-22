@@ -3,7 +3,7 @@ package APL.tokenizer.types;
 import APL.Comp;
 import APL.tokenizer.Token;
 
-import java.util.List;
+import java.util.*;
 
 public class DfnTok extends TokArr<LineTok> {
   public final Comp comp;
@@ -16,6 +16,15 @@ public class DfnTok extends TokArr<LineTok> {
     funType(this, this, true);
     comp = Comp.comp(this);
   }
+  
+  public DfnTok(Comp code, char type) {
+    super("•COMP", 0, new ArrayList<>()); end(5);
+    immediate = true;
+    funType(this, this, true);
+    this.type = type;
+    comp = code;
+  }
+  
   public static void funType(Token t, DfnTok dt, boolean first) {
     if (t instanceof TokArr<?>) {
       if (first || !(t instanceof DfnTok)) {

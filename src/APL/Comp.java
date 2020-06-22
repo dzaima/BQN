@@ -20,7 +20,7 @@ public class Comp {
   private final Token[] ref;
   private final Token tk;
   
-  Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns, Token[] ref, Token tk) {
+  public Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns, Token[] ref, Token tk) {
     this.bc = bc;
     this.objs = objs;
     this.strs = strs;

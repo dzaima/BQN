@@ -10,7 +10,7 @@ import APL.types.functions.*;
 public class Ddop extends Dop {
   public final DfnTok code;
   
-  Ddop(DfnTok t, Scope sc) {
+  public Ddop(DfnTok t, Scope sc) {
     super(sc);
     code = t;
   }
