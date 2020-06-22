@@ -34,11 +34,14 @@ public abstract class APLError extends RuntimeException {
     ArrayList<Mg> l = new ArrayList<>();
     if (faulty!=null) Mg.add(l, faulty, '^');
     if (cause !=null) Mg.add(l, cause , '¯');
-    if (l.size() == 2 && l.get(0).eqSrc(l.get(1))) println(l);
-    else for (Mg g : l) println(List.of(g));
   }
   
   public static void println(List<Mg> gs) {
+    if (gs.size() == 2 && gs.get(0).eqSrc(gs.get(1))) printgr(gs);
+    else for (Mg g : gs) printgr(List.of(g));
+  }
+  
+  private static void printgr(List<Mg> gs) {
     if (gs.size() == 0) return;
     
     String raw = gs.get(0).raw;
@@ -64,7 +67,7 @@ public abstract class APLError extends RuntimeException {
     final char c;
     final String raw;
     int lns;
-    int spos, epos; // in the line
+    int spos, epos; // in bounds of the line
   
     public Mg(Token t, char c, String raw, int lns, int spos, int epos) {
       this.t = t;
@@ -93,7 +96,7 @@ public abstract class APLError extends RuntimeException {
     
     boolean eqSrc(Mg g) {
       // noinspection StringEquality \\ we want that
-      return raw==g.raw && lns==g.lns && spos == g.spos;
+      return raw==g.raw && lns==g.lns;
     }
   }
 }

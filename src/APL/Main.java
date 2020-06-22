@@ -242,6 +242,9 @@ public class Main {
       case "BC":
         println(Comp.comp(Tokenizer.tokenize(rest)).fmt());
         break;
+      case "BCE":
+        println(Comp.comp(Tokenizer.tokenize(Comp.comp(Tokenizer.tokenize(rest)).exec(sc).asString())).fmt());
+        break;
       case "TYPE":
         println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
         break;
