@@ -3,8 +3,8 @@ package APL.types.functions;
 import APL.types.*;
 
 public class DerivedMop extends Fun {
-  private final Value aa;
-  private final Mop op;
+  public final Value aa;
+  public final Mop op;
   DerivedMop(Value aa, Mop op) {
     this.aa = aa;
     this.op = op;

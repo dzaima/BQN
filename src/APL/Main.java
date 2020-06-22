@@ -10,7 +10,7 @@ import APL.types.functions.MutArr;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.Scanner;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess") // for use as a library
 public class Main {
@@ -194,7 +194,7 @@ public class Main {
           String pmsg = e.getMessage();
           String msg = e.getClass().getSimpleName();
           if (pmsg != null && pmsg.length()!=0) msg+= ": "+pmsg;
-          new ImplementationError(msg + "; )stack for stacktrace").print();
+          new ImplementationError(msg + "; )jstack for stacktrace").print();
         }
         if (!silentREPL) print("> ");
       }
@@ -225,9 +225,18 @@ public class Main {
       case "CLASS"       : var r = exec(rest, sc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : var e = (Arr)sc.get(rest); sc.set(rest, new HArr(e.values(), e.shape)); break;
       case "ATYPE"       : println(exec(rest, sc).humanType(false)); break;
-      case "STACK":
+      case "JSTACK":
         if (lastError != null) {
           lastError.printStackTrace();
+        }
+        break;
+      case "STACK":
+        if (lastError instanceof APLError) {
+          ArrayList<ArrayList<APLError.Mg>> trace = ((APLError) lastError).trace;
+          for (int i = 0; i < trace.size(); i++) {
+            println((i+1)+":");
+            APLError.println(trace.get(i));
+          }
         }
         break;
       case "BC":

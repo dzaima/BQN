@@ -3,8 +3,8 @@ package APL.types.functions;
 import APL.types.*;
 
 public class DerivedDop extends Fun {
-  private final Value aa, ww;
-  private final Dop op;
+  public final Value aa, ww;
+  public final Dop op;
   DerivedDop(Value aa, Value ww, Dop op) {
     this.aa = aa;
     this.ww = ww;

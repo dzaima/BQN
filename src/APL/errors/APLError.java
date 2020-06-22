@@ -10,6 +10,7 @@ import static APL.Main.*;
 
 public abstract class APLError extends RuntimeException {
   public Tokenable cause;
+  public ArrayList<ArrayList<APLError.Mg>> trace = new ArrayList<>();
   
   protected APLError(String msg) {
     super(msg);
@@ -37,7 +38,7 @@ public abstract class APLError extends RuntimeException {
     else for (Mg g : l) println(List.of(g));
   }
   
-  public void println(List<Mg> gs) {
+  public static void println(List<Mg> gs) {
     if (gs.size() == 0) return;
     
     String raw = gs.get(0).raw;
@@ -58,7 +59,7 @@ public abstract class APLError extends RuntimeException {
     Main.println(new String(str));
   }
   
-  static class Mg {
+  public static class Mg {
     final Token t;
     final char c;
     final String raw;
@@ -74,7 +75,8 @@ public abstract class APLError extends RuntimeException {
       this.epos = epos;
     }
   
-    static void add(ArrayList<Mg> l, Tokenable to, char c) {
+    public static void add(ArrayList<Mg> l, Tokenable to, char c) {
+      if (to == null) return;
       Token t = to.getToken();
       if (t == null) return;
       
@@ -91,7 +93,7 @@ public abstract class APLError extends RuntimeException {
     
     boolean eqSrc(Mg g) {
       // noinspection StringEquality \\ we want that
-      return raw==g.raw && lns==g.lns;
+      return raw==g.raw && lns==g.lns && spos == g.spos;
     }
   }
 }

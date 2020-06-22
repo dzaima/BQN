@@ -82,7 +82,9 @@ public class Comp {
   
   public static final boolean DBGPROG = true;
   public Value exec(Scope sc) {
-    
+  
+    Value last = null;
+    try {
     Stk s = new Stk();
     int i = 0;
     while (i!= bc.length) {
@@ -134,7 +136,7 @@ public class Comp {
         case FN1C: {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
-          if (DBGPROG) Main.faulty = f;
+          if (DBGPROG) { Main.faulty = f; last = f; }
           s.push(f.asFun().call(w));
           break;
         }
@@ -142,14 +144,14 @@ public class Comp {
           Value a = (Value) s.pop();
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
-          if (DBGPROG) Main.faulty = f;
+          if (DBGPROG) { Main.faulty = f; last = f; }
           s.push(f.asFun().call(a, w));
           break;
         }
         case FN1O: {
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
-          if (DBGPROG) Main.faulty = f;
+          if (DBGPROG) { Main.faulty = f; last = f; }
           if (w instanceof Nothing) s.push(w);
           else s.push(f.asFun().call(w));
           break;
@@ -158,7 +160,7 @@ public class Comp {
           Value a = (Value) s.pop();
           Value f = (Value) s.pop();
           Value w = (Value) s.pop();
-          if (DBGPROG) Main.faulty = f;
+          if (DBGPROG) { Main.faulty = f; last = f; }
           if (w instanceof Nothing) s.push(w);
           else if (a instanceof Nothing) s.push(f.asFun().call(w));
           else s.push(f.asFun().call(a, w));
@@ -167,6 +169,7 @@ public class Comp {
         case OP1D: {
           Value f = (Value) s.pop();
           Mop   o = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
+          if (DBGPROG) { Main.faulty = f; last = f; }
           Fun d = o.derive(f); d.token = o.token;
           s.push(d);
           break;
@@ -175,6 +178,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Dop   o = (Dop  ) s.pop();
           Value g = (Value) s.pop();
+          if (DBGPROG) { Main.faulty = o; last = o; }
           Fun d = o.derive(f, g); d.token = o.token;
           s.push(d);
           break;
@@ -182,6 +186,7 @@ public class Comp {
         case OP2H: {
           Dop   o = (Dop  ) s.pop();
           Value g = (Value) s.pop();
+          if (DBGPROG) { Main.faulty = o; last = o; }
           Mop d = o.derive(g); d.token = o.token;
           s.push(d);
           break;
@@ -269,7 +274,21 @@ public class Comp {
         default: throw new InternalError("Unknown bytecode "+ bc[pi]);
       }
     }
+    assert s.peek() instanceof Value;
     return Main.san(s.peek()); // +todo just cast?
+    } catch (APLError e) {
+      ArrayList<APLError.Mg> mgs = new ArrayList<>();
+      APLError.Mg.add(mgs, tk, '¯');
+      if (last != null) {
+        if (last.token == null) {
+          if (last instanceof DerivedDop) last = ((DerivedDop) last).op;
+          else if (last instanceof DerivedMop) last = ((DerivedMop) last).op;
+        }
+        APLError.Mg.add(mgs, last, '^');
+      }
+      e.trace.add(mgs);
+      throw e;
+    }
   }
   
   public String fmt() {

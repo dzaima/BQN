@@ -36,7 +36,7 @@ public class EmptyArr extends Arr {
   
   @Override
   public Value get(int i) {
-    throw new ImplementationError("internal: using get() on empty array; view )stack");
+    throw new ImplementationError("internal: using get() on empty array; view )jstack");
   }
   
   @Override
