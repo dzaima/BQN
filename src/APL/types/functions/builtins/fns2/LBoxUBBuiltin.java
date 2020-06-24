@@ -1,9 +1,13 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.Main;
+import APL.errors.*;
 import APL.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
+
+import java.util.Arrays;
 
 public class LBoxUBBuiltin extends Builtin {
   public String repr() {
@@ -32,14 +36,24 @@ public class LBoxUBBuiltin extends Builtin {
       }
       return Arr.create(res, a.shape);
     }
-    if (a instanceof Primitive && w.rank==1) {
-      Value r = w.get((int) a.asDouble());
-      return r;
+    if (a instanceof Primitive) {
+      return w.get(Indexer.scal(a.asInt(), w.shape, blame));
+    } else {
+      return onArr(a, w, blame);
     }
-    
-    return on(Indexer.poss(a, w.shape, blame), w);
+  }
+
+  static Value onArr(Value a, Value w, Callable blame) {
+    if (a instanceof Primitive) throw new DomainError(blame+": indices must all be vectors when nesting (found "+a+")", blame);
+    if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {
+      Value[] vs = new Value[a.ia];
+      for (int i = 0; i < a.ia; i++) vs[i] = onArr(a.get(i), w, blame);
+      return Arr.create(vs, a.shape);
+    }
+    return w.get(Indexer.vec(a, w.shape, blame));
   }
   
+  // only used by AtBuiltin
   public static Value on(Indexer.PosSh poss, Value w) {
     if (w.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
@@ -62,9 +76,23 @@ public class LBoxUBBuiltin extends Builtin {
   public Value underW(Obj o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     Value[] vs = w.valuesCopy();
-    for (int i = 0; i < a.ia; i++) {
-      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
+    if (a instanceof Primitive) {
+      vs[Indexer.scal(a.asInt(), w.shape, this)] = v;
+    } else {
+      underWSub(v, a, vs, w.shape);
     }
+
     return Arr.create(vs, w.shape);
+  }
+
+  void underWSub(Value v, Value a, Value[] vs, int[] shape) {
+    if (a instanceof Primitive) throw new DomainError(this+": indices must all be vectors when nesting (found "+a+")", this);
+    if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {
+      if (a.rank != v.rank) throw new RankError(this+": shapes of nested indices and values must be equal (ranks "+a.rank+" vs "+v.rank + ")", this);
+      if (!Arrays.equals(a.shape, v.shape)) throw new LengthError(this+": shapes of nested indices and values must be equal ("+ Main.formatAPL(a.shape) + " vs " + Main.formatAPL(v.shape) + ")", this);
+      for (int i = 0; i < a.ia; i++) underWSub(v.get(i), a.get(i), vs, shape);
+    } else {
+      vs[Indexer.vec(a, shape, this)] = v;
+    }
   }
 }
