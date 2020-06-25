@@ -74,7 +74,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   
   public Value underW(Obj o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = (Value) o;
     Value[] vs = w.valuesCopy();
     if (a instanceof Primitive) {
       vs[Indexer.scal(a.asInt(), w.shape, this)] = v;
