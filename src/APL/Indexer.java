@@ -185,6 +185,29 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     }
   }
   
+  // v is an index vector
+  // checks for rank & bound errors and returns a ravel index
+  public static int vec(Value v, int[] ish, Callable blame) {
+    if (ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
+    if (v.rank != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
+    int ind = 0;
+    for (int i = 0; i < v.ia; i++) {
+      Value c = v.get(i);
+      if (!(c instanceof Primitive)) throw new DomainError(blame+": index must consist of integers", blame);
+      int n = c.asInt();
+      if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
+      ind = ish[i]*ind + n;
+    }
+    return ind;
+  }
+
+  // same, with scalar index into vector
+  public static int scal(int n, int[] ish, Callable blame) {
+    if (ish.length!=1) throw new LengthError(blame+": amount of index parts should equal rank (scalar index, shape ≡ "+Main.formatAPL(ish)+")", blame);
+    if (n<0 || n>=ish[0]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+0+"] ≡ "+n+")", blame);
+    return n;
+  }
+  
   public Iterator<int[]> iterator() {
     return this;
   }
