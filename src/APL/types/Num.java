@@ -312,9 +312,6 @@ public class Num extends Primitive {
   public String toString() {
     return format(num);
   }
-  public String oneliner(int[] ignored) {
-    return format(num);
-  }
   
   @Override
   public Value ofShape(int[] sh) {

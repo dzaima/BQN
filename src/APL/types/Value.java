@@ -110,12 +110,8 @@ public abstract class Value extends Obj implements Iterable<Value> {
   public abstract Value prototype(); // what to append to this array
   public abstract Value safePrototype();
   
-  public String oneliner(int[] where) {
-    return toString();
-  }
-  
   public String oneliner() {
-    return oneliner(EmptyArr.NOINTS);
+    return toString();
   }
   
   

@@ -17,8 +17,8 @@ public class Main {
   public static final String CODEPAGE = "\0\0\0\0\0\0\0\0\0\t\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~÷×↑↓⌈⌊≠∊⍺⍴⍵⍳∍⋾⎕⍞⌸⌺⍇⍁⍂⌻⌼⍃⍄⍈⍌⍍⍐⍓⍔⍗⍯⍰⍠⌹⊆⊇⍶⍸⍹⍘⍚⍛⍜⍊≤≥⍮ϼ⍷⍉⌽⊖⊙⌾○∘⍟⊗¨⍨⍡⍥⍩⍣⌾⍤⊂⊃∩∪⊥⊤∆∇⍒⍋⍫⍱⍲∨∧⍬⊣⊢⌷⍕⍎←→⍅⍆⍏⍖⌿⍀⍪≡≢⍦⍧⍭‽⍑∞…√ᑈᐵ¯⍝⋄⌶⍙";
   public static boolean debug = false;
   public static boolean vind = false; // vector indexing
-  public static boolean noBoxing = false;
-  public static boolean quotestrings = false;
+  public static boolean oneline = false;
+  public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
   public static boolean enclosePrimitives = true;
   public static boolean colorful = true;
   static final ChrArr uAlphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -103,7 +103,7 @@ public class Main {
                     quotestrings = true;
                     break;
                   case 'b':
-                    noBoxing = true;
+                    oneline = true;
                     break;
                   case 'c':
                     colorful = false;
@@ -164,10 +164,11 @@ public class Main {
       }
     }
     if (args.length == 0 || REPL) {
-      if (!silentREPL) print("> ");
-      while (console.hasNext()) {
+      while (true) {
         faulty = null;
         if (debug) printlvl = 0;
+        if (!silentREPL) print("   ");
+        if (!console.hasNext()) break;
         try {
           String cr = console.nextLine();
           if (cr.equals("exit")) break;
@@ -177,8 +178,10 @@ public class Main {
           } else {
             Comp comp = Comp.comp(Tokenizer.tokenize(cr));
             byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
-            Obj r = comp.exec(global);
-            if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) println(r.toString());
+            Value r = comp.exec(global);
+            if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
+              println(oneline? r.oneliner() : r.toString());
+            }
           }
         } catch (APLError e) {
           lastError = e;
@@ -196,7 +199,6 @@ public class Main {
           if (pmsg != null && pmsg.length()!=0) msg+= ": "+pmsg;
           new ImplementationError(msg + "; )jstack for stacktrace").print();
         }
-        if (!silentREPL) print("> ");
       }
     }
   }
@@ -218,7 +220,7 @@ public class Main {
         quotestrings = !quotestrings;
         break;
       case "ONELINE":
-        noBoxing = !noBoxing;
+        oneline = !oneline;
         break;
       case "TOKENIZE"    : println(Tokenizer.tokenize(rest).toTree("")); break;
       case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
@@ -262,7 +264,7 @@ public class Main {
     System.out.println(s);
   }
   public static String formatAPL(int[] ia) {
-    if (ia.length == 0) return "⍬";
+    if (ia.length == 0) return "⟨⟩";
     StringBuilder r = new StringBuilder(Num.formatInt(ia[0]));
     for (int i = 1; i < ia.length; i++) {
       r.append("‿");

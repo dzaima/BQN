@@ -47,7 +47,7 @@ public class Char extends Primitive {
     if (Main.quotestrings) return "'"+chr+"'";
     else return String.valueOf(chr);
   }
-  public String oneliner(int[] ignored) {
+  public String oneliner() {
     return "'"+chr+"'";
   }
   

@@ -92,13 +92,10 @@ public class SingleItemArr extends Arr {
     return new SingleItemArr(item, shape);
   }
   
-  @Override
-  public String oneliner(int[] where) {
-    if (where.length == 0) {
-      String r = Main.formatAPL(shape);
-      return r + "⍴" + item.oneliner();
-    }
-    return super.oneliner(where);
+  public String oneliner() {
+    String r = Main.formatAPL(shape) + "⥊";
+    if (!(item instanceof Primitive)) r+= "<";
+    return r + item.oneliner();
   }
   
   @Override public Iterator<Value> iterator() {

@@ -1,8 +1,7 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
+import APL.*;
 import APL.errors.*;
-import APL.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;

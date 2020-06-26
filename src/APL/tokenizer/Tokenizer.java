@@ -248,25 +248,13 @@ public class Tokenizer {
           } else tokens.add(new ColonTok(raw, i, i+1));
           i++;
         } else if (c == '\'') {
-          StringBuilder str = new StringBuilder();
-          i++;
-          if (i >= len) throw new SyntaxError("unfinished string");
-          while (true) {
-            if (raw.charAt(i) == '\'') {
-              if (i+1 < len && raw.charAt(i+1) == '\'') {
-                str.append("'");
-                i++;
-              } else break;
-            } else str.append(raw.charAt(i));
-            i++;
-            if (i >= len) throw new SyntaxError("unfinished string");
-          }
-          i++;
-          tokens.add(new ChrTok(raw, li, i, str.toString()));
+          if (i+2 > len) throw new SyntaxError("unfinished character literal");
+          i+= 3;
+          tokens.add(new ChrTok(raw, li, i, raw.charAt(i-2)+""));
         } else if (c == '"') {
           StringBuilder str = new StringBuilder();
           i++;
-          if (i == len) throw new SyntaxError("unfinished string");
+          if (i == len) throw new SyntaxError("unfinished string literal");
           while (true) {
             if (raw.charAt(i) == '"') {
               if (i+1==len) break;
@@ -277,7 +265,7 @@ public class Tokenizer {
               str.append(raw.charAt(i));
             }
             i++;
-            SyntaxError.must(i < len, "unfinished string");
+            SyntaxError.must(i < len, "unfinished string literal");
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
