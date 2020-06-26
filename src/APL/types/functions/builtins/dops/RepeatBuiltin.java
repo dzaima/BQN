@@ -71,12 +71,12 @@ public class RepeatBuiltin extends Dop {
     throw new DomainError("f⍣N: ⍺-inverting is only possible when N∊¯1 1", this, ww);
   }
   
-  public Value under(Value aa, Value ww, Obj o, Value w, DerivedDop derv) {
+  public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
     Fun aaf = isFn(aa, '⍶');
     int n = ww.asInt();
     return repeat(aaf, n, o, w);
   }
-  public Value repeat(Fun aa, int n, Obj o, Value w) { // todo don't do recursion?
+  public Value repeat(Fun aa, int n, Value o, Value w) { // todo don't do recursion?
     if (n==0) {
       return o instanceof Fun? ((Fun) o).call(w) : (Value) o;
     }

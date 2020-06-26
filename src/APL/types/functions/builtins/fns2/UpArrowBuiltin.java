@@ -124,7 +124,7 @@ public class UpArrowBuiltin extends Builtin {
   
   
   
-  public Value underW(Obj o, Value a, Value w) {
+  public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     return undo(a.asIntVec(), v, w, this);
   }

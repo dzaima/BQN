@@ -36,15 +36,15 @@ public abstract class Fun extends Callable {
   }
   
   
-  public Value under(Obj o, Value w) {
+  public Value under(Value o, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
     return callInv(v);
   }
-  public Value underW(Obj o, Value a, Value w) {
+  public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     return callInvW(a, v);
   }
-  public Value underA(Obj o, Value a, Value w) {
+  public Value underA(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     return callInvA(v, w);
   }

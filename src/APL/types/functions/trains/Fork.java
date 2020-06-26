@@ -50,7 +50,7 @@ public class Fork extends Fun {
     return "("+f+" "+g+" "+h+")";
   }
   
-  public Value under(Obj o, Value w) {
+  public Value under(Value o, Value w) {
     if (!(f instanceof Value)) throw new DomainError("(f g h)A cannot be inverted", this);
     Value fa = (Value) f;
     return h.under(new Fun() { public String repr() { return g.repr(); }

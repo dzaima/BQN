@@ -59,7 +59,7 @@ public class EachBuiltin extends Mop {
     return Arr.create(n, w.shape);
   }
   
-  public Value under(Value aa, Obj o, Value w, DerivedMop derv) {
+  public Value under(Value aa, Value o, Value w, DerivedMop derv) {
     Fun aaf = isFn(aa);
     Value[] res2 = new Value[w.ia];
     rec(aaf, o, w, 0, new Value[w.ia], new Value[1], res2);
@@ -82,7 +82,7 @@ public class EachBuiltin extends Mop {
   }
   
   
-  public Value underW(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
     return underW(isFn(aa), o, a, w, this);
   }
   

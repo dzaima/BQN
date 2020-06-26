@@ -39,7 +39,7 @@ public class Atop extends Fun {
     return h.callInvA(((Fun) g).callInv(a), w);
   }
   
-  public Value under(Obj o, Value w) {
+  public Value under(Value o, Value w) {
     if (g instanceof Fun) {
       Fun gf = (Fun) g;
       return h.under(new Fun() { public String repr() { return gf.repr(); }

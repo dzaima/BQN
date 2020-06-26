@@ -37,15 +37,15 @@ public abstract class Mop extends Callable {
   public Value callInvA(Value f, Value a, Value w) {
     throw new DomainError(this+" doesn't support dyadic inverting of ⍺", this, w);
   }
-  public Value under(Value aa, Obj o, Value w, DerivedMop derv) {
+  public Value under(Value aa, Value o, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, derv)) : (Value) o;
     return callInv(aa, v);
   }
-  public Value underW(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : (Value) o;
     return callInvW(aa, a, v);
   }
-  public Value underA(Value aa, Obj o, Value a, Value w, DerivedMop derv) {
+  public Value underA(Value aa, Value o, Value a, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : (Value) o;
     return callInvA(aa, v, w);
   }

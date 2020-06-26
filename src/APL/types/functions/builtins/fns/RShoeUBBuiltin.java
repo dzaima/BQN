@@ -18,7 +18,7 @@ public class RShoeUBBuiltin extends Builtin {
     return LBoxUBBuiltin.on(a, w, this);
   }
   
-  public Value underW(Obj o, Value a, Value w) {
+  public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     Value[] vs = w.valuesCopy();
     for (int i = 0; i < a.ia; i++) {

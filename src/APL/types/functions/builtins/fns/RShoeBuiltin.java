@@ -38,13 +38,13 @@ public class RShoeBuiltin extends Builtin {
     return w;
   }
   
-  public Value under(Obj o, Value w) {
+  public Value under(Value o, Value w) {
     Value[] vs = w.valuesCopy();
     vs[0] = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
     return Arr.create(vs, w.shape);
   }
   
-  public Value underW(Obj o, Value a, Value w) {
+  public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
     if (a instanceof Primitive) {
       Value[] vs = w.valuesCopy();
