@@ -34,6 +34,7 @@ public abstract class APLError extends RuntimeException {
     ArrayList<Mg> l = new ArrayList<>();
     if (faulty!=null) Mg.add(l, faulty, '^');
     if (cause !=null) Mg.add(l, cause , '¯');
+    println(l);
   }
   
   public static void println(List<Mg> gs) {
