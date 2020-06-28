@@ -19,7 +19,6 @@ import java.util.*;
 public class Scope {
   public final HashMap<String, Value> vars = new HashMap<>();
   private Scope parent = null;
-  public boolean alphaDefined;
   public Random rnd;
   public Scope() {
     rnd = new Random();
@@ -253,17 +252,14 @@ public class Scope {
       boolean separate = false;
       if (options.length >= 2) separate = options[1]==1;
       
-      
       String test = w.asString();
       
-      BasicLines testTokenized = Tokenizer.tokenize(test);
-      Comp testCompiled = Comp.comp(testTokenized);
+      Comp testCompiled = Comp.comp(Tokenizer.tokenize(test));
       
       if (separate) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          // Main.execLines(testTokenized, sc);
           testCompiled.exec(sc);  
           long end = System.nanoTime();
           r[i] = end-start;
@@ -271,7 +267,7 @@ public class Scope {
         return new DoubleArr(r);
       } else {
         long start = System.nanoTime();
-        for (int i = 0; i < n; i++) testCompiled.exec(sc); // Main.execLines(testTokenized, sc);
+        for (int i = 0; i < n; i++) testCompiled.exec(sc);
         long end = System.nanoTime();
         if (raw) {
           return new Num((end-start)/n);

@@ -6,7 +6,7 @@ public class ParenTok extends Token {
   public final LineTok ln;
   
   public ParenTok(String line, int spos, int epos, LineTok ln) {
-    super(line, spos); end(epos);
+    super(line, spos, epos);
     this.ln = ln;
   }
   

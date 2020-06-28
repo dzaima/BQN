@@ -39,10 +39,6 @@ public class Exec {
   public Value exec() {
     if (tokens.size() > 0) Main.faulty = tokens.get(0);
     else Main.faulty = allToken;
-    if (sc.alphaDefined && tokens.size() >= 2 && tokens.get(0) instanceof OpTok && ((OpTok) tokens.get(0)).op.equals("𝕨") && tokens.get(1) instanceof SetTok) {
-      if (Main.debug) printlvl("skipping cuz it's 𝕨←");
-      return null;
-    }
     left = new Stack<>();
     left.addAll(tokens);
     if (Main.debug) {
@@ -608,15 +604,12 @@ public class Exec {
         if (sc == null) return null;
         Value o;
         switch (t.op) {
-          case "𝕨": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
-          case "𝕎": o = sc.get("𝕎"); if (o==null) throw new SyntaxError("No 𝕎 found", t); return o;
-          case "𝕩": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
-          case "𝕏": o = sc.get("𝕏"); if (o==null) throw new SyntaxError("No 𝕏 found", t); return o;
-          case "𝕗": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
-          case "𝔽": o = sc.get("𝔽"); if (o==null) throw new SyntaxError("No 𝔽 found", t); return o;
-          case "𝕘": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
-          case "𝔾": o = sc.get("𝔾"); if (o==null) throw new SyntaxError("No 𝔾 found", t); return o;
-          // case "𝕊": o = sc.get("𝕊"); if (o==null) throw new SyntaxError("No 𝕊 found", t); return o;
+          case "𝕨": case "𝕎": o = sc.get("𝕨"); if (o==null) throw new SyntaxError("No 𝕨 found", t); return o;
+          case "𝕩": case "𝕏": o = sc.get("𝕩"); if (o==null) throw new SyntaxError("No 𝕩 found", t); return o;
+          case "𝕗": case "𝔽": o = sc.get("𝕗"); if (o==null) throw new SyntaxError("No 𝕗 found", t); return o;
+          case "𝕘": case "𝔾": o = sc.get("𝕘"); if (o==null) throw new SyntaxError("No 𝕘 found", t); return o;
+          case "𝕤": case "𝕊": o = sc.get("𝕤"); if (o==null) throw new SyntaxError("No 𝕤 found", t); return o;
+          case "𝕣": case "ℝ": o = sc.get("𝕣"); if (o==null) throw new SyntaxError("No 𝕣 found", t); return o;
         }
         /* fallthrough! */
         

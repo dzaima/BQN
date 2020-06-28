@@ -236,7 +236,7 @@ public class Main {
         if (lastError instanceof APLError) {
           ArrayList<ArrayList<APLError.Mg>> trace = ((APLError) lastError).trace;
           for (int i = 0; i < trace.size(); i++) {
-            println((i+1)+":");
+            println((trace.size()-i) + ":");
             APLError.println(trace.get(i));
           }
         }

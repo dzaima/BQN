@@ -5,12 +5,12 @@ import APL.tokenizer.types.*;
 import APL.types.BigValue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Tokenizer {
   private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
   private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶";
-  private static final String surrogateOps = "𝕨𝕩𝔽𝔾𝕎𝕏𝕗𝕘𝕊";
+  public static final String surrogateOps = "𝕩𝕏𝕨𝕎𝕗𝔽𝕘𝔾𝕤𝕊𝕣ℝ";
   private static boolean validNameStart(char c) {
     for (char l : validNames) if (l == c) return true;
     return false;
@@ -65,8 +65,16 @@ public class Tokenizer {
           pts.add(t1);
         }
       }
-  
-      return new LineTok(line, spos, epos, pts);
+      
+      char end = 0;
+      if (!pts.isEmpty()) {
+        Token l = pts.get(pts.size()-1);
+        if (l instanceof SemiTok || l instanceof ColonTok) {
+          end = l instanceof SemiTok? ';' : ':';
+          pts.remove(pts.size()-1);
+        }
+      }
+      return new LineTok(line, spos, epos, pts, end);
     }
   }
   static class Block { // temp storage of multiple lines
@@ -162,6 +170,10 @@ public class Tokenizer {
           tokens = lines.get(lines.size() - 1);
           tokens.add(r);
           i++;
+        } else if (c=='_' && i+2<len && raw.codePointAt(i+1)=="𝕣".codePointAt(0)) { // +TODO handle more properly, make all 𝕨𝕩𝕎𝕏𝕗𝕘𝔽𝔾𝕤𝕊𝕣ℝ NameToks
+          boolean cmp = i+3<len && raw.charAt(i+3) == '_';
+          i+= cmp? 4 : 3;
+          tokens.add(new NameTok(raw, li, i, cmp? "_𝕣_" : "_𝕣"));
         } else if (validNameStart(c) || c == '•' && validNameStart(next)) {
           i++;
           while (i < len && validNameMid(raw.charAt(i))) i++;
@@ -241,12 +253,6 @@ public class Tokenizer {
         } else if (c == '‿') {
           tokens.add(new StranderTok(raw, i, i+1));
           i++;
-        } else if (c == ':') {
-          if (next == ':') {
-            tokens.add(new DColonTok(raw, i, i+2));
-            i++;
-          } else tokens.add(new ColonTok(raw, i, i+1));
-          i++;
         } else if (c == '\'') {
           if (i+2 > len) throw new SyntaxError("unfinished character literal");
           i+= 3;
@@ -269,9 +275,10 @@ public class Tokenizer {
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
-        } else if (c=='\n' || c=='⋄' || c=='\r' || c==';' || c==',') {
+        } else if (c=='\n' || c=='\r' || c=='⋄' || c==';' || c==':' || c==',') {
           if ((c=='⋄' || c==',') && pointless) tokens.add(new DiamondTok(raw, i));
-          if (c == ';') tokens.add(new SemiTok(raw, i, i+1));
+          if (c==';') tokens.add(new SemiTok(raw, i, i+1));
+          if (c==':') tokens.add(new ColonTok(raw, i, i+1));
           
           if (tokens.size() > 0) {
             lines.add(new Line(raw, li));

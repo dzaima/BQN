@@ -19,33 +19,36 @@ public class Ddop extends Dop {
     if (!code.immediate) return super.derive(aa, ww);
     Main.printdbg("ddop immediate call", aa, ww);
     Scope nsc = new Scope(sc);
-    nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
-    nsc.set("𝕘", ww); nsc.set("𝔾", ww.asFun());
-    return code.comp.exec(nsc).asFun();
+    int s = code.start(nsc, null, aa, ww, null, this);
+    nsc.set("𝕗", aa);
+    nsc.set("𝕘", ww);
+    return code.comp.exec(nsc, s).asFun();
   }
   
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", w);
     Scope nsc = new Scope(sc);
-    nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
-    nsc.set("𝕘", ww); nsc.set("𝔾", ww.asFun());
-    nsc.set("𝕨", Nothing.inst); nsc.set("𝕎", Nothing.inst);
-    nsc.set("𝕩", w); nsc.set("𝕏", w.asFun());
+    int s = code.start(nsc, null, aa, ww, w, this);
+    nsc.set("𝕗", aa);
+    nsc.set("𝕘", ww);
+    nsc.set("𝕨", Nothing.inst);
     nsc.set("𝕩", w);
-    nsc.set("∇", derv);
-    return code.comp.exec(nsc);
+    nsc.set("𝕤", derv);
+    nsc.set("𝕣", this);
+    return code.comp.exec(nsc, s);
   }
   
   public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Main.printdbg("ddop call", a, w);
     Scope nsc = new Scope(sc);
-    nsc.set("𝕗", aa); nsc.set("𝔽", aa.asFun());
-    nsc.set("𝕘", ww); nsc.set("𝔾", ww.asFun());
-    nsc.set("𝕨", a); nsc.set("𝕎", a.asFun());
-    nsc.set("𝕩", w); nsc.set("𝕏", w.asFun());
-    nsc.set("∇", derv);
-    nsc.alphaDefined = true;
-    return code.comp.exec(nsc);
+    int s = code.start(nsc, a, aa, ww, w, this);
+    nsc.set("𝕗", aa);
+    nsc.set("𝕘", ww);
+    nsc.set("𝕨", a);
+    nsc.set("𝕩", w);
+    nsc.set("𝕤", derv);
+    nsc.set("𝕣", this);
+    return code.comp.exec(nsc, s);
   }
   
   public String repr() {

@@ -73,7 +73,7 @@ public abstract class Arr extends Value {
             simple = false;
             break;
           }
-          res.append(v.toString());
+          res.append(v.oneliner());
         } else res.append("NULLPTR");
       }
       if (simple) return res.toString();

@@ -1,7 +1,7 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.Token;
+import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.functions.*;
@@ -53,6 +53,7 @@ public class Comp {
   public static final byte DFND2= 21; // 2B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   public static final byte VARO2= 22; // 2B; x/𝕨/𝕏
   public static final byte VARM2= 23; // 2B; mutable x/𝕨/𝕏
+  public static final byte RETN = 24; // returns, giving ToS
 // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
@@ -83,14 +84,17 @@ public class Comp {
   }
   
   public static final boolean DBGPROG = true;
-  public Value exec(Scope sc) {
+  public Value exec(Scope sc) { 
+    return exec(sc, 0);
+  }
+  public Value exec(Scope sc, int spt) {
   
     Value last = null;
-    int pi = 0;
+    int pi = spt;
     try {
-    int i = 0;
+    int i = spt;
     Stk s = new Stk();
-    while (i != bc.length) {
+    exec: while (i != bc.length) {
       pi = i;
       i++;
       switch (bc[pi]) {
@@ -258,6 +262,9 @@ public class Comp {
           if (v instanceof Nothing) throw new SyntaxError("Didn't expect · here", v);
           break;
         }
+        case RETN: {
+          break exec;
+        }
         case SPEC: {
           switch(bc[i++]) {
             case EVAL:
@@ -342,7 +349,7 @@ public class Comp {
           case DFND2:cs = " DFND2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
           case VARO2:cs = " VARO2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
           case VARM2:cs = " VARM2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
-          
+          case RETN: cs = " RETN"; break;
           case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
         }
@@ -468,23 +475,8 @@ public class Comp {
   }
   
   
-  public static Comp comp(DfnTok t) {
-    Mut mut = new Mut();
-    List<LineTok> lns = t.tokens;
-    int lret = -1;
-    for (int i = 0; i < lns.size(); i++) {
-      LineTok ln = lns.get(i);
-      if (typeof(ln) != '_') lret = i;
-      compP(mut, ln, false);
-    }
-    if (lret == -1) throw new SyntaxError("Dfns must return something", t);
-    byte[] bc = new byte[mut.bc.size()];
-    for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), t);
-  }
   
   public static Comp comp(LineTok ln) {
-    // return example();
     typeof(ln);
     Mut mut = new Mut();
     compP(mut, ln, false);
@@ -503,6 +495,21 @@ public class Comp {
     byte[] bc = new byte[mut.bc.size()];
     for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
     return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), lns);
+  }
+  
+  public static Comp comp(ArrayList<List<LineTok>> parts, int[] offsets) { // offsets is an output
+    Mut mut = new Mut();
+    for (int i = 0; i < parts.size(); i++) {
+      offsets[i] = mut.bc.size();
+      for (LineTok ln : parts.get(i)) {
+        typeof(ln);
+        compP(mut, ln, false);
+      }
+      if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
+    }
+    byte[] bc = new byte[mut.bc.size()];
+    for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
+    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), parts.get(0).get(0));
   }
   
   private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a
@@ -826,9 +833,9 @@ public class Comp {
         switch (s) {
           case "𝕨":
             return t.type = 'A';
-          case "𝕘": case "𝕗": case "𝕩": case "•":
+          case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣": case "•":
             return t.type = 'a';
-          case "𝔾": case "𝔽": case "𝕏": case "⍎": case "𝕎":
+          case "𝔾": case "𝔽": case "𝕏": case "⍎": case "𝕎": case "𝕊": case "ℝ":
             return t.type = 'f';
           default: throw new ImplementationError("Undefined unknown built-in "+s, op);
         }
@@ -899,10 +906,10 @@ public class Comp {
           m.add(tk, SPEC, STDOUT);
           return;
         }
-        int aid = "𝕨𝕘𝕗𝕩𝕎𝔾𝔽𝕏".indexOf(op);
+        int aid = Tokenizer.surrogateOps.indexOf(op);
         if (aid != -1) {
-          aid = aid % 8; // not %4 because surrogate pairs
-          m.varm("𝕨𝕘𝕗𝕩".substring(aid, aid+2));
+          aid = aid/4*4;
+          m.varm(Tokenizer.surrogateOps.substring(aid, aid+2));
           return;
         }
       }
@@ -977,10 +984,10 @@ public class Comp {
       
       String s = op.op;
       switch (s) {
-        case "𝕨": case "𝕘": case "𝕗": case "𝕩":
+        case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣":
           m.varo(s);
           return;
-        case "𝕎": case "𝔾": case "𝔽": case "𝕏":
+        case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊": case "ℝ":
           m.varo(new String(new char[]{55349, (char) (s.charAt(1)+26)})); // lowercase
           return;
         case "⍎": m.add(op, SPEC, EVAL ); return;

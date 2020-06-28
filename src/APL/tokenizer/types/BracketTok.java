@@ -7,8 +7,7 @@ import java.util.List;
 public class BracketTok extends TokArr<LineTok> {
   
   public BracketTok(String line, int spos, int epos, List<LineTok> tokens) {
-    super(line, spos, tokens);
-    end(epos);
+    super(line, spos, epos, tokens);
     if (tokens.size()==0) throw new DomainError("[⋄] is not valid syntax", this);
   }
   

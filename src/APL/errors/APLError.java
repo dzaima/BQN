@@ -90,7 +90,7 @@ public abstract class APLError extends RuntimeException {
   
   
       int spos = t.spos - lns;
-      int epos = (t.epos==Token.EPOS_DEF? spos+1 : t.epos) - lns;
+      int epos = t.epos - lns;
       
       l.add(new Mg(t, c, raw, lns, spos, epos));
     }

@@ -5,8 +5,7 @@ import java.util.List;
 public class ArrayTok extends TokArr<LineTok> {
   
   public ArrayTok(String line, int spos, int epos, List<LineTok> tokens) {
-    super(line, spos, tokens);
-    end(epos);
+    super(line, spos, epos, tokens);
   }
   
   @Override public String toRepr() {

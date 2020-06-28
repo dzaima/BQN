@@ -1,16 +1,11 @@
 package APL.tokenizer.types;
 
-import APL.tokenizer.Token;
 import APL.types.Num;
 
-public class NumTok extends Token {
-  public final Num val;
+public class NumTok extends ConstTok {
   
   public NumTok(String line, int spos, int epos, double d) {
-    super(line, spos, epos);
-    val = new Num(d);
-    val.token = this;
-    type = 'a';
+    super(line, spos, epos, new Num(d));
   }
   
   @Override public String toTree(String p) {
