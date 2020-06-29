@@ -70,7 +70,7 @@ public class Main {
                 switch (c) {
                   case 'f':
                     String name = args[++i];
-                    exec(readFile(name), global);
+                    exec(removeHashBang(readFile(name)), global);
                     break;
                   case '•':
                     throw new DomainError("• settings must be a separate argument");
@@ -285,6 +285,12 @@ public class Main {
       ne.initCause(e);
       throw ne;
     }
+  }
+  static String removeHashBang(String source) {
+    if (source.charAt(0)=='#' && source.charAt(1)=='!') {
+      source = source.substring(source.indexOf('\n')+1);
+    }
+    return source;
   }
   
   public static Value exec(String s, Scope sc) {
