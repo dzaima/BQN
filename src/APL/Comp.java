@@ -53,7 +53,8 @@ public class Comp {
   public static final byte DFND2= 21; // 2B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   public static final byte VARO2= 22; // 2B; x/𝕨/𝕏
   public static final byte VARM2= 23; // 2B; mutable x/𝕨/𝕏
-  public static final byte RETN = 24; // returns, giving ToS
+  public static final byte PUSH2= 24; // 1B; 2
+  public static final byte RETN = 25; // returns, giving ToS
 // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
@@ -100,6 +101,10 @@ public class Comp {
       switch (bc[pi]) {
         case PUSH: {
           s.push(objs[bc[i++] & 0xff]);
+          break;
+        }
+        case PUSH2: {
+          s.push(objs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]);
           break;
         }
         case VARO: {
@@ -286,7 +291,8 @@ public class Comp {
     }
     assert s.peek() instanceof Value;
     return Main.san(s.peek()); // +todo just cast?
-    } catch (APLError e) {
+    } catch (Throwable t) {
+      APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
       ArrayList<APLError.Mg> mgs = new ArrayList<>();
       APLError.Mg.add(mgs, tk, '¯');
       if (last != null) {
@@ -325,9 +331,9 @@ public class Comp {
         i++;
         String cs;
         switch (bc[pi]) {
-          case PUSH: cs = " PUSH " + safeObj(bc[i++]); break;
-          case VARO: cs = " VARO " + safeStr(bc[i++]); break;
-          case VARM: cs = " VARM " + safeStr(bc[i++]); break;
+          case PUSH: cs = " PUSH " + safeObj(bc[i++]&0xff); break;
+          case VARO: cs = " VARO " + safeStr(bc[i++]&0xff); break;
+          case VARM: cs = " VARM " + safeStr(bc[i++]&0xff); break;
           case ARRO: cs = " ARRO " + (bc[i++]&0xff); break;
           case ARRM: cs = " ARRM " + (bc[i++]&0xff); break;
           case FN1C: cs = " FN1C"; break;
@@ -347,8 +353,9 @@ public class Comp {
           case TR3O: cs = " TR3O"; break;
           case OP2H: cs = " OP2H"; break;
           case DFND2:cs = " DFND2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
-          case VARO2:cs = " VARO2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
-          case VARM2:cs = " VARM2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
+          case VARO2:cs = " VARO2 " + safeStr(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
+          case VARM2:cs = " VARM2 " + safeStr(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
+          case PUSH2:cs = " PUSH2 " + safeObj(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
           case RETN: cs = " RETN"; break;
           case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
@@ -388,13 +395,11 @@ public class Comp {
     return b.toString();
   }
   
-  private String safeObj(byte i) {
-    int l = i&0xff;
+  private String safeObj(int l) {
     if (l>=objs.length) return "INVALID";
     return "!"+objs[l];
   }
-  private String safeStr(byte i) {
-    int l = i&0xff;
+  private String safeStr(int l) {
     if (l>=strs.length) return "INVALID";
     return "\""+strs[l]+"\"";
   }
@@ -424,8 +429,13 @@ public class Comp {
     ArrayList<Token> ref = new ArrayList<>();
   
     public void push(Value o) {
-      if (objs.size() >= 256) throw new SyntaxError(">256 objects in one unit");
-      add(o.token, PUSH, (byte) objs.size());
+      int sz = objs.size();
+      if (sz >= 256) {
+        if (sz >= 65536) throw new SyntaxError(">65536 objects in one unit");
+        add(o.token, PUSH2, (byte) (sz/256), (byte) (sz%256));
+      } else {
+        add(o.token, PUSH, (byte) sz);
+      }
       objs.add(o);
     }
     public void push(DfnTok o) {
@@ -886,6 +896,14 @@ public class Comp {
         List<Token> tks = ((StrandTok) tk).tokens;
         int sz = tks.size();
         for (Token c : tks) compP(m, c, true);
+        if (sz > 255) throw new NYIError("array constants with >255 items", tk);
+        m.add(tk, ARRM, (byte) sz);
+        return;
+      }
+      if (tk instanceof ArrayTok) {
+        List<LineTok> tks = ((ArrayTok) tk).tokens;
+        int sz = tks.size();
+        for (LineTok c : tks) compP(m, c, true);
         if (sz > 255) throw new NYIError("array constants with >255 items", tk);
         m.add(tk, ARRM, (byte) sz);
         return;
