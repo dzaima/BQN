@@ -10,7 +10,7 @@ public class ImplementationError extends APLError {
     super(s, fun);
   }
   public ImplementationError(Throwable orig) {
-    super(orig.getMessage());
+    super(orig.toString());
     initCause(orig);
   }
   public ImplementationError(String s, Callable fun, Tokenable cause) {

@@ -29,8 +29,9 @@ public abstract class APLError extends RuntimeException {
   
   public void print() {
     String type = getClass().getSimpleName();
-    if (getMessage().length() == 0) colorprint(type, 246);
-    else colorprint(type + ": " + getMessage(), 246);
+    String msg = getMessage();
+    if (msg != null && msg.length() != 0) colorprint(type + ": " + msg, 246);
+    else colorprint(type, 246);
     ArrayList<Mg> l = new ArrayList<>();
     if (faulty!=null) Mg.add(l, faulty, '^');
     if (cause !=null) Mg.add(l, cause , '¯');
