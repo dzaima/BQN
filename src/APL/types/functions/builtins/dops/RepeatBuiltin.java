@@ -78,7 +78,7 @@ public class RepeatBuiltin extends Dop {
   }
   public Value repeat(Fun aa, int n, Value o, Value w) { // todo don't do recursion?
     if (n==0) {
-      return o instanceof Fun? ((Fun) o).call(w) : (Value) o;
+      return o instanceof Fun? ((Fun) o).call(w) : o;
     }
     
     return repeat(aa, n-1, new Fun() { public String repr() { return aa.repr(); }

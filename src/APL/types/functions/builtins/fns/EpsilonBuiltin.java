@@ -66,7 +66,7 @@ public class EpsilonBuiltin extends Builtin {
   
   
   public Value under(Value o, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
     Value[] vs = v.values();
     Value[] res = new Value[w.ia];
     int e = copyIn(res, vs, w, 0);

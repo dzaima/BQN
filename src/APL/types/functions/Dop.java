@@ -42,15 +42,15 @@ public abstract class Dop extends Callable {
     throw new DomainError(this+" doesn't support dyadic inverting of ⍺", this, w);
   }
   public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, w, derv)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, w, derv)) : o;
     return callInv(aa, ww, v);
   }
   public Value underW(Value aa, Value ww, Value o, Value a, Value w, DerivedDop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, a, w, derv)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, a, w, derv)) : o;
     return callInvW(aa, ww, a, v);
   }
   public Value underA(Value aa, Value ww, Value o, Value a, Value w, DerivedDop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, a, w, derv)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, ww, a, w, derv)) : o;
     return callInvA(aa, ww, v, w);
   }
   

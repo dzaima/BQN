@@ -81,7 +81,7 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
   }
   
   public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     int[] ls = a.asIntVec();
     int[] sh = w.shape;
     for (int i = 0; i < ls.length; i++) {
@@ -91,7 +91,7 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
   }
   
   public Value under(Value o, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
     Value[] vs = v.values();
     if (vs.length > 0) {
       int[] sh = vs[0].shape;

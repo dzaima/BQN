@@ -40,12 +40,12 @@ public class RShoeBuiltin extends Builtin {
   
   public Value under(Value o, Value w) {
     Value[] vs = w.valuesCopy();
-    vs[0] = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
+    vs[0] = o instanceof Fun? ((Fun) o).call(call(w)) : o;
     return Arr.create(vs, w.shape);
   }
   
   public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     if (a instanceof Primitive) {
       Value[] vs = w.valuesCopy();
       vs[a.asInt()] = v;

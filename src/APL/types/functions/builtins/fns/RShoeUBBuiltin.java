@@ -19,7 +19,7 @@ public class RShoeUBBuiltin extends Builtin {
   }
   
   public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     Value[] vs = w.valuesCopy();
     for (int i = 0; i < a.ia; i++) {
       vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);

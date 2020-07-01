@@ -33,13 +33,13 @@ public class OldCatBuiltin extends Builtin implements DimDFn {
   
   
   public Value under(Value o, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
     if (v.ia != w.ia) throw new DomainError("⌾, expected equal amount of output & output items", this);
     return v.ofShape(w.shape);
   }
   
   public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     if (a.rank>1) throw new NYIError(", inverted on rank "+a.rank+" ⍺", this);
     if (v.rank>1) throw new NYIError(", inverted on rank "+v.rank+" ⍵", this);
     for (int i = 0; i < a.ia; i++) {

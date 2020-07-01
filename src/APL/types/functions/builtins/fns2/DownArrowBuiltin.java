@@ -51,7 +51,7 @@ public class DownArrowBuiltin extends Builtin {
   }
   
   public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : (Value) o;
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     int[] ls = a.asIntVec();
     int[] sh = w.shape;
     for (int i = 0; i < ls.length; i++) {
