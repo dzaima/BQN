@@ -254,7 +254,10 @@ public class Tokenizer {
           tokens.add(new StranderTok(raw, i, i+1));
           i++;
         } else if (c == '\'') {
-          if (i+2 > len) throw new SyntaxError("unfinished character literal");
+          if (i+2 >= len) throw new SyntaxError("unfinished character literal");
+          if (raw.charAt(i+2) != '\'') { 
+            throw new SyntaxError("character literal must contain exactly 1"+(Character.isHighSurrogate(raw.charAt(i+1))?" UTF-16":"")+" character");
+          }
           i+= 3;
           tokens.add(new ChrTok(raw, li, i, raw.charAt(i-2)+""));
         } else if (c == '"') {

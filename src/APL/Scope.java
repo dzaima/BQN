@@ -20,12 +20,15 @@ public class Scope {
   public final HashMap<String, Value> vars = new HashMap<>();
   private Scope parent = null;
   public Random rnd;
-  public Scope() {
+  public final Sys sys;
+  public Scope(Sys s) {
     rnd = new Random();
+    sys = s;
   }
   public Scope(Scope p) {
     parent = p;
     rnd = p.rnd;
+    sys = p.sys;
   }
   private Scope owner(String name) {
     if (vars.containsKey(name)) return this;
@@ -87,7 +90,7 @@ public class Scope {
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser(this);
         case "•gc": System.gc(); return Num.ONE;
-        case "•gclog": return new GCLog();
+        case "•gclog": return new GCLog(this);
         case "•null": return Null.NULL;
         case "•map": case "•NS": return new MapGen();
         case "•dl": return new Delay(this);
@@ -115,7 +118,7 @@ public class Scope {
           @Override public String repr() { return "•U"; }
   
           @Override public Value call(Value w) {
-            Main.ucmd(Scope.this, w.asString());
+            sys.ucmd(w.asString());
             return null;
           }
         };
@@ -202,24 +205,30 @@ public class Scope {
   }
   
   static class GCLog extends Builtin {
+  
+    protected GCLog(Scope sc) {
+      super(sc);
+    }
+  
     @Override public String repr() {
       return "•GCLOG";
     }
     
     @Override
     public Value call(Value w) {
-      return new Logger(w.toString());
+      return new Logger(sc, w.toString());
     }
     static class Logger extends Primitive {
+      private final Scope sc;
       final String msg;
-      Logger(String s) {
+      Logger(Scope sc, String s) {
+        this.sc = sc;
         this.msg = s;
       }
       
       @SuppressWarnings("deprecation") // this is this things purpose
-      @Override
       protected void finalize() {
-        Main.println(msg+" was GCed");
+        sc.sys.println(msg+" was GCed");
       }
       public String toString() {
         return "•GCLOG["+msg+"]";
@@ -418,7 +427,7 @@ public class Scope {
     
     public Value call(Value w) {
       String path = w.asString();
-      return Main.exec(Main.readFile(path), sc);
+      return Main.execFile(path, sc);
     }
   }
   private static class Lns extends Builtin {

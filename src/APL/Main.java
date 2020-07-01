@@ -17,7 +17,6 @@ public class Main {
   public static final String CODEPAGE = "\0\0\0\0\0\0\0\0\0\t\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~÷×↑↓⌈⌊≠∊⍺⍴⍵⍳∍⋾⎕⍞⌸⌺⍇⍁⍂⌻⌼⍃⍄⍈⍌⍍⍐⍓⍔⍗⍯⍰⍠⌹⊆⊇⍶⍸⍹⍘⍚⍛⍜⍊≤≥⍮ϼ⍷⍉⌽⊖⊙⌾○∘⍟⊗¨⍨⍡⍥⍩⍣⌾⍤⊂⊃∩∪⊥⊤∆∇⍒⍋⍫⍱⍲∨∧⍬⊣⊢⌷⍕⍎←→⍅⍆⍏⍖⌿⍀⍪≡≢⍦⍧⍭‽⍑∞…√ᑈᐵ¯⍝⋄⌶⍙";
   public static boolean debug = false;
   public static boolean vind = false; // vector indexing
-  public static boolean oneline = false;
   public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
   public static boolean enclosePrimitives = true;
   public static boolean colorful = true;
@@ -32,7 +31,7 @@ public class Main {
   public static void main(String[] args) {
     colorful = System.console() != null && System.getenv().get("TERM") != null;
     console = new Scanner(System.in);
-    Scope global = new Scope();
+    CliSys sys = new CliSys();
     boolean REPL = false;
     boolean silentREPL = false;
     if (args.length > 0) {
@@ -70,24 +69,24 @@ public class Main {
                 switch (c) {
                   case 'f':
                     String name = args[++i];
-                    exec(removeHashBang(readFile(name)), global);
+                    execFile(name, sys.gsc);
                     break;
                   case '•':
                     throw new DomainError("• settings must be a separate argument");
                   case 'e':
                     String code = args[++i];
-                    exec(code, global);
+                    exec(code, sys.gsc);
                     break;
                   case 'p':
                     code = args[++i];
-                    println(exec(code, global).toString());
+                    println(exec(code, sys.gsc).toString());
                     break;
                   case 'i':
                     StringBuilder s = new StringBuilder();
                     while (console.hasNext()) {
                       s.append(console.nextLine()).append('\n');
                     }
-                    exec(s.toString(), global);
+                    exec(s.toString(), sys.gsc);
                     break;
                   case 'r':
                     REPL = true;
@@ -103,7 +102,7 @@ public class Main {
                     quotestrings = true;
                     break;
                   case 'b':
-                    oneline = true;
+                    sys.oneline = true;
                     break;
                   case 'c':
                     colorful = false;
@@ -133,7 +132,7 @@ public class Main {
                       for (byte b : bytes) {
                         res.append(CODEPAGE.charAt(b & 0xff));
                       }
-                      exec(res.toString(), global);
+                      exec(res.toString(), sys.gsc);
                     } catch (IOException e) {
                       e.printStackTrace();
                       throw new DomainError("couldn't read file");
@@ -149,43 +148,31 @@ public class Main {
             if (si == -1) throw new DomainError("argument `"+p+"` didn't contain a `←`");
             String qk = p.substring(0, si);
             String qv = p.substring(si+1);
-            global.set(qk, exec(qv, global));
+            sys.gsc.set(qk, exec(qv, sys.gsc));
           } else {
             throw new DomainError("Unknown command-line argument " + p);
           }
         }
       } catch (APLError e) {
-        e.print();
+        e.print(sys);
         throw e;
       } catch (Throwable e) {
         e.printStackTrace();
-        colorprint(e + ": " + e.getMessage(), 246);
+        sys.colorprint(e + ": " + e.getMessage(), 246);
         throw e;
       }
     }
     if (args.length == 0 || REPL) {
       while (true) {
-        faulty = null;
         if (debug) printlvl = 0;
         if (!silentREPL) print("   ");
         if (!console.hasNext()) break;
         try {
           String cr = console.nextLine();
-          if (cr.equals("exit")) break;
-          if (cr.startsWith(")")) {
-            if (")OFF".equals(cr) || ")EXIT".equals(cr) || ")STOP".equals(cr)) break /* REPL */;
-            ucmd(global, cr.substring(1));
-          } else {
-            Comp comp = Comp.comp(Tokenizer.tokenize(cr));
-            byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
-            Value r = comp.exec(global);
-            if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
-              println(oneline? r.oneliner() : r.toString());
-            }
-          }
+          sys.line(cr);
         } catch (APLError e) {
           lastError = e;
-          e.print();
+          e.print(sys);
         } catch (Throwable e) {
           lastError = e;
           // colorprint(e + ": " + e.getMessage(), 246);
@@ -197,61 +184,29 @@ public class Main {
           String pmsg = e.getMessage();
           String msg = e.getClass().getSimpleName();
           if (pmsg != null && pmsg.length()!=0) msg+= ": "+pmsg;
-          new ImplementationError(msg + "; )jstack for stacktrace").print();
+          new ImplementationError(msg + "; )jstack for stacktrace").print(sys);
         }
       }
     }
   }
   
   
+  static class CliSys extends Sys {
+    public void off(int code) {
+      System.exit(0);
+    }
   
-  public static void ucmd(Scope sc, String cr) {
-    String[] parts = cr.split(" ");
-    String t = parts[0].toUpperCase();
-    String rest = parts.length==1? "" : cr.substring(t.length()+1);
-    switch (t) {
-      case "EX":
-        exec(readFile(parts[1]), sc);
-        break;
-      case "DEBUG":
-        debug = !debug;
-        break;
-      case "QUOTE":
-        quotestrings = !quotestrings;
-        break;
-      case "ONELINE":
-        oneline = !oneline;
-        break;
-      case "TOKENIZE"    : println(Tokenizer.tokenize(rest).toTree("")); break;
-      case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
-      case "CLASS"       : var r = exec(rest, sc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
-      case "UOPT"        : var e = (Arr)sc.get(rest); sc.set(rest, new HArr(e.values(), e.shape)); break;
-      case "ATYPE"       : println(exec(rest, sc).humanType(false)); break;
-      case "JSTACK":
-        if (lastError != null) {
-          lastError.printStackTrace();
-        }
-        break;
-      case "STACK":
-        if (lastError instanceof APLError) {
-          ArrayList<ArrayList<APLError.Mg>> trace = ((APLError) lastError).trace;
-          for (int i = 0; i < trace.size(); i++) {
-            println((trace.size()-i) + ":");
-            APLError.println(trace.get(i));
-          }
-        }
-        break;
-      case "BC":
-        println(Comp.comp(Tokenizer.tokenize(rest)).fmt());
-        break;
-      case "BCE":
-        println(Comp.comp(Tokenizer.tokenize(Comp.comp(Tokenizer.tokenize(rest)).exec(sc).asString())).fmt());
-        break;
-      case "TYPE":
-        println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
-        break;
-      default:
-        throw new SyntaxError("Undefined user command");
+    public String input() {
+      return Main.console.nextLine();
+    }
+  
+    public void println(String s) {
+      System.out.println(s);
+    }
+  
+    public void colorprint(String s, int col) {
+      if (Main.colorful) println("\u001b[38;5;" + col + "m" + s + "\u001b[0m");
+      else println(s);
     }
   }
   
@@ -272,7 +227,7 @@ public class Main {
     }
     return r.toString();
   }
-  static String readFile(String path) {
+  public static String readFile(String path) {
     try {
       byte[] encoded = Files.readAllBytes(Paths.get(path));
       return new String(encoded, StandardCharsets.UTF_8);
@@ -286,7 +241,10 @@ public class Main {
       throw ne;
     }
   }
-  static String removeHashBang(String source) {
+  public static Value execFile(String path, Scope sc) {
+    return exec(removeHashBang(readFile(path)), sc);
+  }
+  private static String removeHashBang(String source) {
     if (source.charAt(0)=='#' && source.charAt(1)=='!') {
       source = source.substring(source.indexOf('\n')+1);
     }
@@ -294,9 +252,16 @@ public class Main {
   }
   
   public static Value exec(String s, Scope sc) {
-    BasicLines t = Tokenizer.tokenize(s);
-    printdbg(t);
-    return execLines(t, sc);
+    return comp(s).exec(sc);
+  }
+  public static Value exec(LineTok ln, Scope sc) {
+    return Comp.comp(ln).exec(sc);
+  }
+  public static Value execLines(TokArr<LineTok> lns, Scope sc) {
+    return Comp.comp(lns).exec(sc);
+  }
+  public static Comp comp(String s) {
+    return Comp.comp(Tokenizer.tokenize(s));
   }
   
   public static void printdbg(Object... args) {
@@ -319,12 +284,6 @@ public class Main {
     return n.num==0 || n.num==1;
   }
   
-  enum EType {
-    all
-  }
-  public static Value exec(LineTok s, Scope sc) {
-    return Comp.comp(s).exec(sc);
-  }
   
   public static Value san(Obj o) {
     if (o instanceof Value   ) return (Value) o;
@@ -334,9 +293,6 @@ public class Main {
   }
   
   
-  public static Value execLines(TokArr<LineTok> lines, Scope sc) {
-    return Comp.comp(lines).exec(sc);
-  }
   public static boolean bool(double d) {
     if (d == 1) return true;
     if (d == 0) return false;
@@ -352,10 +308,6 @@ public class Main {
     throw new DomainError("Expected boolean, got "+v, v);
   }
   
-  public static void colorprint(String s, int col) {
-    if (colorful) println("\u001b[38;5;" + col + "m" + s + "\u001b[0m");
-    else println(s);
-  }
   
   public static DoubleArr toAPL(int[] arr) {
     var da = new double[arr.length];

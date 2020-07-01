@@ -175,7 +175,6 @@ public class SlashBuiltin extends Builtin {
             acb>>= 1;
           }
         }
-        System.out.println("repl");
         return res.finish();
       }
       if (w.quickDoubleArr()) {

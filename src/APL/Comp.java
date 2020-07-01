@@ -276,10 +276,10 @@ public class Comp {
               s.push(new EvalBuiltin(sc));
               break;
             case STDOUT:
-              s.push(new Quad());
+              s.push(new Quad(sc));
               break;
             case STDIN:
-              s.push(new Quad().get());
+              s.push(new Quad(sc).get());
               break;
             default:
               throw new InternalError("Unknown special "+ bc[i-1]);
@@ -317,7 +317,7 @@ public class Comp {
         }
         APLError.Mg.add(mgs, tk, '^');
       }
-      e.trace.add(mgs);
+      e.trace.add(new APLError.Frame(sc, mgs));
       throw e;
     }
   }

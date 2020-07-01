@@ -4,17 +4,20 @@ import APL.*;
 import APL.types.*;
 
 public class Quad extends Settable {
-  public Quad() {
+  private final Scope sc;
+  
+  public Quad(Scope sc) {
     super(null);
+    this.sc = sc;
   }
   
   public void set(Value v, boolean update, Callable blame) { // don't care about updating
-    Main.println((Main.debug? "[log] " : "")+v);
+    sc.sys.println((Main.debug? "[log] " : "")+v);
   }
   
   @Override
   public Value get() {
-    return Main.toAPL(Main.console.nextLine());
+    return Main.toAPL(sc.sys.input());
   }
   public Type type() {
     return Type.gettable;

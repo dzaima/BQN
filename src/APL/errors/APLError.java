@@ -1,6 +1,6 @@
 package APL.errors;
 
-import APL.Main;
+import APL.*;
 import APL.tokenizer.Token;
 import APL.types.*;
 
@@ -10,7 +10,8 @@ import static APL.Main.*;
 
 public abstract class APLError extends RuntimeException {
   public Tokenable cause;
-  public ArrayList<ArrayList<APLError.Mg>> trace = new ArrayList<>();
+  public ArrayList<Frame> trace = new ArrayList<>();
+  
   
   protected APLError(String msg) {
     super(msg);
@@ -27,23 +28,23 @@ public abstract class APLError extends RuntimeException {
   }
   
   
-  public void print() {
+  public void print(Sys s) {
     String type = getClass().getSimpleName();
     String msg = getMessage();
-    if (msg != null && msg.length() != 0) colorprint(type + ": " + msg, 246);
-    else colorprint(type, 246);
+    if (msg != null && msg.length() != 0) s.colorprint(type + ": " + msg, 246);
+    else s.colorprint(type, 246);
     ArrayList<Mg> l = new ArrayList<>();
     if (faulty!=null) Mg.add(l, faulty, '^');
     if (cause !=null) Mg.add(l, cause , '¯');
-    println(l);
+    println(l, s);
   }
   
-  public static void println(List<Mg> gs) {
-    if (gs.size() == 2 && gs.get(0).eqSrc(gs.get(1))) printgr(gs);
-    else for (Mg g : gs) printgr(List.of(g));
+  public static void println(List<Mg> gs, Sys s) {
+    if (gs.size() == 2 && gs.get(0).eqSrc(gs.get(1))) printgr(gs, s);
+    else for (Mg g : gs) printgr(List.of(g), s);
   }
   
-  private static void printgr(List<Mg> gs) {
+  private static void printgr(List<Mg> gs, Sys s) {
     if (gs.size() == 0) return;
     
     String raw = gs.get(0).raw;
@@ -53,7 +54,7 @@ public abstract class APLError extends RuntimeException {
     if (lne == -1) lne = raw.length();
     
     String ln = gs.get(0).raw.substring(lns, lne);
-    Main.println(ln);
+    s.println(ln);
     char[] str = new char[ln.length()];
     for (int i = 0, j = 0; i < str.length; j++) {
       char c = ' ';
@@ -61,7 +62,7 @@ public abstract class APLError extends RuntimeException {
       str[j] = c;
       i+= Character.isHighSurrogate(ln.charAt(i))? 2 : 1;
     }
-    Main.println(new String(str));
+    s.println(new String(str));
   }
   
   public static class Mg {
@@ -99,6 +100,18 @@ public abstract class APLError extends RuntimeException {
     boolean eqSrc(Mg g) {
       // noinspection StringEquality \\ we want that
       return raw==g.raw && lns==g.lns;
+    }
+  }
+  
+  
+  public static class Frame {
+    public final Scope sc;
+    public ArrayList<Mg> msgs;
+    
+    public Frame(Scope sc, ArrayList<Mg> msgs) {
+      
+      this.sc = sc;
+      this.msgs = msgs;
     }
   }
 }

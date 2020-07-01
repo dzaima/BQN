@@ -618,7 +618,7 @@ public class Exec {
   }
   private Obj valueOfRaw(Token t) {
     if (t instanceof OpTok) {
-      if (((OpTok) t).op.charAt(0)=='•') return new Quad();
+      if (((OpTok) t).op.charAt(0)=='•') return new Quad(sc);
       return builtin((OpTok) t, sc);
     }
     if (t instanceof NumTok) return ((NumTok) t).val;
