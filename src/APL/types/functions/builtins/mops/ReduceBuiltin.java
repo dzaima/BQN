@@ -45,71 +45,9 @@ public class ReduceBuiltin extends Mop implements DimMMop {
         return new Num(p);
       }
     }
-    if (f instanceof JoinBuiltin) { // +TODO check if this is still correct
-      if (w.ia > 0) {
-        special: {
-          Value first = w.first();
-          int am = 0;
-          int chki = 0;
-          typed: {
-            if (first instanceof ChrArr || first instanceof Char) {
-              for (Value v : w) {
-                if (v.rank > 1) break special;
-                if (!(v instanceof ChrArr || v instanceof Char)) break typed;
-                am += v.ia;
-                chki++;
-              }
-              char[] cs = new char[am];
-              int ri = 0;
-              for (int i = 0; i < w.ia; i++) {
-                Value v = w.get(i);
-                if (v instanceof Char) cs[ri++] = ((Char) v).chr;
-                else {
-                  String s = ((ChrArr) v).s;
-                  s.getChars(0, s.length(), cs, ri);
-                  ri+= s.length();
-                }
-              }
-              return Main.toAPL(new String(cs));
-              
-              
-            } else if (first.quickDoubleArr()) {
-              for (Value v : w) {
-                if (v.rank > 1) break special;
-                if (!v.quickDoubleArr()) break typed;
-                am+= v.ia;
-                chki++;
-              }
-              double[] ds = new double[am];
-              
-              int ri = 0;
-              for (int i = 0; i < w.ia; i++) {
-                Value v = w.get(i);
-                if (v instanceof Num) ds[ri++] = ((Num) v).num;
-                else if (v.quickDoubleArr()) {
-                  System.arraycopy(v.asDoubleArr(), 0, ds, ri, v.ia);
-                  ri+= v.ia;
-                }
-              }
-              return new DoubleArr(ds);
-            }
-          }
-          
-          for (; chki < w.ia; chki++) {
-            Value v = w.get(chki);
-            if (v.rank > 1) break special;
-            am+= v.ia;
-          }
-          
-          Value[] vs = new Value[am];
-          int ri = 0;
-          for (Value v : w) {
-            System.arraycopy(v.values(), 0, vs, ri, v.ia);
-            ri+= v.ia;
-          }
-          return HArr.create(vs);
-        }
-      }
+    if (f instanceof JoinBuiltin) {
+      Value joined = JoinBuiltin.joinVec(w);
+      if (joined != null) return joined;
     }
     Value[] a = w.values();
     if (a.length == 0) {

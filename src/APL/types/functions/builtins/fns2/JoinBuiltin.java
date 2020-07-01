@@ -15,7 +15,70 @@ public class JoinBuiltin extends Builtin {
   }
   
   public Value call(Value w) {
-    throw new NYIError("TODO monadic ∾", this, w);
+    if (w.rank == 1) {
+      Value joined = JoinBuiltin.joinVec(w);
+      if (joined != null) return joined;
+    }
+    throw new NYIError("monadic ∾ on rank>1", this, w);
+  }
+  
+  public static Value joinVec(Value x) { // returns null if contents weren't rank 1
+    assert x.rank == 1;
+    if (x.ia == 0) return x;
+    Value first = x.first();
+    int am = 0;
+    int chki = 0;
+    typed: {
+      if (first instanceof ChrArr) {
+        for (Value v : x) {
+          if (v.rank != 1) return null;
+          if (!(v instanceof ChrArr)) break typed;
+          am += v.ia;
+          chki++;
+        }
+        char[] cs = new char[am];
+        int ri = 0;
+        for (int i = 0; i < x.ia; i++) {
+          Value v = x.get(i);
+          String s = ((ChrArr) v).s;
+          s.getChars(0, s.length(), cs, ri);
+          ri+= s.length();
+        }
+        return Main.toAPL(new String(cs));
+      
+      
+      } else if (first.quickDoubleArr()) {
+        for (Value v : x) {
+          if (v.rank != 1) return null;
+          if (!v.quickDoubleArr()) break typed;
+          am+= v.ia;
+          chki++;
+        }
+        double[] ds = new double[am];
+      
+        int ri = 0;
+        for (int i = 0; i < x.ia; i++) {
+          Value v = x.get(i);
+          System.arraycopy(v.asDoubleArr(), 0, ds, ri, v.ia);
+          ri+= v.ia;
+        }
+        return new DoubleArr(ds);
+      }
+    }
+  
+    for (; chki < x.ia; chki++) {
+      Value v = x.get(chki);
+      if (v.rank != 1) return null;
+      am+= v.ia;
+    }
+  
+    Value[] vs = new Value[am];
+    int ri = 0;
+    for (Value v : x) {
+      System.arraycopy(v.values(), 0, vs, ri, v.ia);
+      ri+= v.ia;
+    }
+    return Arr.create(vs);
   }
   
   public Value call(Value a, Value w) {
@@ -116,5 +179,23 @@ public class JoinBuiltin extends Builtin {
         System.arraycopy(av, j, rv, i, ad);
       }
     }
+  }
+  
+  public Value under(Value o, Value w) {
+    if (w.rank != 1) throw new NYIError("⌾∾ for rank>1", this, w); // doesn't work 
+    Value joined = call(w);
+    Value v = o instanceof Fun? ((Fun) o).call(joined) : o;
+    Arr.eqShapes(joined.shape, v.shape, this);
+    Value[] res = new Value[w.ia];
+    Value[] vv = v.values();
+    int oi = 0;
+    int ii = 0;
+    for (Value c : w) {
+      Value[] cr = new Value[c.ia];
+      System.arraycopy(vv, ii, cr, 0, cr.length);
+      res[oi] = Arr.create(cr, c.shape);
+      oi++; ii+= cr.length;
+    }
+    return new HArr(res, w.shape);
   }
 }

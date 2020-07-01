@@ -3,7 +3,7 @@ package APL.types.functions.builtins.fns2;
 import APL.*;
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.DoubleArr;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
 import java.util.Arrays;
@@ -17,6 +17,14 @@ public class LBoxUBBuiltin extends Builtin {
   
   public Value call(Value w) {
     return w.first();
+  }
+  
+  public Value under(Value o, Value w) {
+    if (w.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, w);
+    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
+    Value[] vs = w.valuesCopy();
+    vs[0] = v;
+    return HArr.create(vs, w.shape);
   }
   
   
