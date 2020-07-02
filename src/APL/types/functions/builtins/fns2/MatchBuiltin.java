@@ -21,25 +21,11 @@ public class MatchBuiltin extends Builtin {
   public static int full(Value w) {
     if (w instanceof Primitive) return 0;
     if (w instanceof DoubleArr || w instanceof ChrArr || w instanceof BitArr) return 1;
-    boolean first = true;
-    boolean uneven = false;
-    int sub = 0;
+    int depth = 0;
     for (Value v : w) {
-      int cd = full(v);
-      if (cd < 0) {
-        uneven = true;
-        cd = -cd;
-      }
-      if (first) {
-        first = false;
-        sub = cd;
-      } else if (sub != cd) {
-        sub = Math.max(sub, cd);
-        uneven = true;
-      }
+      depth = Math.max(depth, full(v));
     }
-    sub++;
-    return uneven? -sub : sub;
+    return depth + 1;
   }
   
   public Value call(Value w) {
