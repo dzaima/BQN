@@ -39,6 +39,7 @@ public class ReduceBuiltin extends Mop {
       Value joined = JoinBuiltin.joinVec(w);
       if (joined != null) return joined;
     }
+    
     Value[] a = w.values();
     if (a.length == 0) {
       Value id = ff.identity();
@@ -57,6 +58,6 @@ public class ReduceBuiltin extends Mop {
     for (int i = a.length-skip-1; i >= 0; i--) {
       init = ff.call(a[i], init);
     }
-    return init.squeeze();
+    return init;
   }
 }

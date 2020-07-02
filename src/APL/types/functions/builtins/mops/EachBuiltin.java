@@ -27,26 +27,37 @@ public class EachBuiltin extends Mop {
   public Value call(Value f, Value a, Value w, DerivedMop derv) {
     Fun ff = f.asFun();
     if (w.scalar()) {
-      if (a.scalar()) return ff.call(a, w);
+      if (a.scalar()) return new Rank0Arr(ff.call(a.first(), w.first()));
       Value[] n = new Value[a.ia];
-      for (int i = 0; i < n.length; i++) {
-        n[i] = ff.call(a.get(i), w.first());
-      }
+      for (int i = 0; i < n.length; i++) n[i] = ff.call(a.get(i), w.first());
       return Arr.create(n, a.shape);
     }
     if (a.scalar()) {
       Value[] n = new Value[w.ia];
+      for (int i = 0; i < n.length; i++) n[i] = ff.call(a.first(), w.get(i));
+      return Arr.create(n, w.shape);
+    }
+    
+    int mr = Math.min(a.shape.length, w.shape.length);
+    if (!Arrays.equals(a.shape, 0, mr, w.shape, 0, mr)) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
+    
+    if (a.shape.length == w.shape.length) {
+      Value[] n = new Value[w.ia];
       for (int i = 0; i < n.length; i++) {
-        n[i] = ff.call(a.first(), w.get(i));
+        n[i] = ff.call(a.get(i), w.get(i));
       }
       return Arr.create(n, w.shape);
     }
-    if (!Arrays.equals(a.shape, w.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
-    Value[] n = new Value[w.ia];
-    for (int i = 0; i < n.length; i++) {
-      n[i] = ff.call(a.get(i), w.get(i));
-    }
-    return Arr.create(n, w.shape);
+    
+    boolean ae = a.ia < w.ia; // a is expanded
+    int max = Math.max(a.ia, w.ia);
+    int min = Math.min(a.ia, w.ia);
+    int ext = max/min;
+    Value[] n = new Value[max];
+    int r = 0;
+    if (ae) for (int i = 0; i < min; i++) { Value c = a.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(c, w.get(r)); r++; } }
+    else    for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(a.get(r), c); r++; } } 
+    return Arr.create(n, ae? w.shape : a.shape);
   }
   
   public Value callInv(Value f, Value w) {
