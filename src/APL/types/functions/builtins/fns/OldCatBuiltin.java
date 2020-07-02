@@ -3,11 +3,10 @@ package APL.types.functions.builtins.fns;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.fns2.*;
 
-public class OldCatBuiltin extends Builtin implements DimDFn {
+public class OldCatBuiltin extends Builtin {
   @Override public String repr() {
     return ",";
   }
@@ -25,11 +24,11 @@ public class OldCatBuiltin extends Builtin implements DimDFn {
     int dim = Math.max(a.rank, w.rank) - 1;
     return JoinBuiltin.cat(a, w, dim, this);
   }
-  public Value call(Value a, Value w, DervDimFn dims) {
-    int dim = dims.singleDim();
-    if (dim < 0 || dim >= Math.max(a.rank, w.rank)) throw new DomainError("dimension "+dim+" is out of range", this);
-    return JoinBuiltin.cat(a, w, dim, this);
-  }
+  // public Value call(Value a, Value w, DervDimFn dims) {
+  //   int dim = dims.singleDim();
+  //   if (dim < 0 || dim >= Math.max(a.rank, w.rank)) throw new DomainError("dimension "+dim+" is out of range", this);
+  //   return JoinBuiltin.cat(a, w, dim, this);
+  // }
   
   
   public Value under(Value o, Value w) {

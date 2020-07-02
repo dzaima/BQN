@@ -3,18 +3,14 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
 
-public class ReverseBuiltin extends Builtin implements DimMFn, DimDFn {
+public class ReverseBuiltin extends Builtin {
   @Override public String repr() {
     return "⌽";
   }
   
   
-  public Value call(Value w, int dim) {
-    return ((Arr) w).reverseOn(-dim-1);
-  }
   public Value call(Value w) {
     return on(w);
   }
@@ -61,12 +57,6 @@ public class ReverseBuiltin extends Builtin implements DimMFn, DimDFn {
       }
       return Arr.create(res, w.shape);
     }
-  }
-  
-  @Override public Value call(Value a, Value w, DervDimFn dims) {
-    int dim = dims.singleDim(w.rank);
-    if (a instanceof Primitive) return on(a.asInt(), dim, w);
-    throw new DomainError("A⌽[n]B not implemented for non-scalar A", this);
   }
   
   @Override public Value callInvW(Value a, Value w) {

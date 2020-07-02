@@ -4,13 +4,12 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.dimensions.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
-public class OldDownArrowBuiltin extends Builtin implements DimDFn {
+public class OldDownArrowBuiltin extends Builtin {
   @Override public String repr() {
     return "↓";
   }
@@ -65,20 +64,20 @@ public class OldDownArrowBuiltin extends Builtin implements DimDFn {
     return UpArrowBuiltin.on(sh, off, w, this);
   }
   
-  public Value call(Value a, Value w, DervDimFn dims) {
-    int[] axV = a.asIntVec();
-    int[] axK = dims.dims(w.rank);
-    if (axV.length != axK.length) throw new DomainError("↓: expected ⍺ and axis specification to have equal number of items (⍺≡"+Main.formatAPL(axV)+"; axis≡"+dims.format()+")", dims);
-    int[] sh = w.shape.clone();
-    int[] off = new int[sh.length];
-    for (int i = 0; i < axV.length; i++) {
-      int ax = axK[i];
-      int am = axV[i];
-      sh[ax] = w.shape[ax] - Math.abs(am);
-      if (am > 0) off[ax] = am;
-    }
-    return UpArrowBuiltin.on(sh, off, w, this);
-  }
+  // public Value call(Value a, Value w, DervDimFn dims) {
+  //   int[] axV = a.asIntVec();
+  //   int[] axK = dims.dims(w.rank);
+  //   if (axV.length != axK.length) throw new DomainError("↓: expected ⍺ and axis specification to have equal number of items (⍺≡"+Main.formatAPL(axV)+"; axis≡"+dims.format()+")", dims);
+  //   int[] sh = w.shape.clone();
+  //   int[] off = new int[sh.length];
+  //   for (int i = 0; i < axV.length; i++) {
+  //     int ax = axK[i];
+  //     int am = axV[i];
+  //     sh[ax] = w.shape[ax] - Math.abs(am);
+  //     if (am > 0) off[ax] = am;
+  //   }
+  //   return UpArrowBuiltin.on(sh, off, w, this);
+  // }
   
   public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;

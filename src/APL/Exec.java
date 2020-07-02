@@ -103,27 +103,6 @@ public class Exec {
         continue;
       }
       if (llSize >= 2 && FN.r.r.type == '@') {
-        if (is("F@", end, true)) {
-          if (Main.debug) printlvl("F[]");
-          var f = (Fun) firstObj();
-          var w = (Brackets) popS();
-          addS(new DervDimFn(f, w.toInts(), sc));
-          continue;
-        }
-        if (is("M@", end, true)) {
-          if (Main.debug) printlvl("M[]");
-          var f = firstMop();
-          var w = (Brackets) popS();
-          addS(new DervDimMop(f, w.toInt(), sc));
-          continue;
-        }
-        if (is("D@", end, true)) {
-          if (Main.debug) printlvl("D[]");
-          var f = firstDop();
-          var w = (Brackets) popS();
-          addS(new DervDimDop(f, w.toInt(), sc));
-          continue;
-        }
         if (is("v@", end, true)) {
           if (Main.debug) printlvl("v[]");
           var f = firstVar();

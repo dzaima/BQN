@@ -1,24 +1,18 @@
 package APL.types.functions.builtins.mops;
 
 import APL.Main;
-import APL.errors.*;
+import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.arrs.*;
-import APL.types.dimensions.DimMMop;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
-public class ReduceBuiltin extends Mop implements DimMMop {
+public class ReduceBuiltin extends Mop {
   @Override public String repr() {
     return "´";
   }
   
   
   
-  @Override
-  public Value call(Obj f, Value w, int dim) {
-    throw new DomainError("reduce with axis doesn't exist", this);
-  }
   
   public Value call(Value f, Value w, DerivedMop derv) {
     Fun ff = f.asFun();

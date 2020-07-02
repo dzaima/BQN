@@ -54,7 +54,7 @@ public class UpArrowBuiltin extends Builtin {
       } else off[i] = 0;
     }
     if (proto) {
-      throw new DomainError("No overtake yet", this);
+      throw new NYIError("No overtake yet", this);
     }
     return on(sh, off, w, this);
   }
