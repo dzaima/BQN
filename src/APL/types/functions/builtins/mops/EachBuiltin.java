@@ -16,7 +16,7 @@ public class EachBuiltin extends Mop {
   
   
   public Value call(Value f, Value w, DerivedMop derv) {
-    if (w.scalar()) return f.asFun().call(w);
+    if (w.scalar()) return new Rank0Arr(f.asFun().call(w.first()));
     Fun ff = f.asFun();
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
