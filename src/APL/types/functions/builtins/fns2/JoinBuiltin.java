@@ -81,8 +81,33 @@ public class JoinBuiltin extends Builtin {
     return Arr.create(vs);
   }
   
-  public Value call(Value a, Value w) {
-    return cat(a, w, 0, this);
+  public Value call(Value w, Value x) {
+    int a = w.rank, b = x.rank;
+    int c = Math.max(1,Math.max(a,b));
+    if (c-a > 1 || c-b > 1) throw new RankError("∾: argument ranks must differ by 1 or less (were "+a+" and "+b+")", this);
+    
+    int[] sh = new int[c];
+    for (int i = 1; i < c; i++) {
+      int s = x.shape[i+b-c];
+      if (w.shape[i+a-c] != s) throw new LengthError("∾: lengths not matchable ("+new DoubleArr(w.shape)+" vs "+new DoubleArr(x.shape)+")", this);
+      sh[i] = s;
+    }
+    sh[0] = (a==c ? w.shape[0] : 1) + (b==c ? x.shape[0] : 1);
+    
+    if ((w instanceof BitArr || Main.isBool(w))
+      && (x instanceof BitArr || Main.isBool(x))) {
+      return catBit(w, x, sh);
+    }
+    if (w instanceof DoubleArr && x instanceof DoubleArr) {
+      double[] r = new double[w.ia + x.ia];
+      System.arraycopy(w.asDoubleArr(), 0, r, 0, w.ia);
+      System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
+      return new DoubleArr(r, sh);
+    }
+    Value[] r = new Value[w.ia + x.ia];
+    System.arraycopy(w.values(), 0, r, 0, w.ia);
+    System.arraycopy(x.values(), 0, r, w.ia, x.ia);
+    return Arr.create(r, sh);
   }
   
   
@@ -105,29 +130,6 @@ public class JoinBuiltin extends Builtin {
   }
   
   public static Value cat(Value a, Value w, int k, Callable blame) {
-    quick: if (k==0 && a.rank==w.rank && a.rank>0) {
-      int[] sh = new int[a.rank];
-      for (int i = 1; i < a.shape.length; i++) {
-        if (a.shape[i]!=w.shape[i]) break quick; // leave proper checks for proper code
-        sh[i] = a.shape[i];
-      }
-      sh[0] = a.shape[0]+w.shape[0];
-      
-      if ((a instanceof BitArr || Main.isBool(a))
-        && (w instanceof BitArr || Main.isBool(w))) {
-        return catBit(a, w, sh);
-      }
-      if (a instanceof DoubleArr && w instanceof DoubleArr) {
-        double[] r = new double[a.ia + w.ia];
-        System.arraycopy(a.asDoubleArr(), 0, r, 0, a.ia);
-        System.arraycopy(w.asDoubleArr(), 0, r, a.ia, w.ia);
-        return new DoubleArr(r, sh);
-      }
-      Value[] r = new Value[a.ia + w.ia];
-      System.arraycopy(a.values(), 0, r, 0, a.ia);
-      System.arraycopy(w.values(), 0, r, a.ia, w.ia);
-      return Arr.create(r);
-    }
     boolean aScalar = a.scalar(), wScalar = w.scalar();
     if (aScalar && wScalar) return cat(new Shape1Arr(a.first()), w, 0, blame);
     if (!aScalar && !wScalar) {
