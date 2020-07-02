@@ -36,27 +36,45 @@ public class UpArrowBuiltin extends Builtin {
   public Value call(Value a, Value w) {
     int[] gsh = a.asIntVec();
     if (gsh.length == 0) return w;
-    if (gsh.length > w.rank) throw new DomainError("↑: ≢⍺ should be less than ⍴⍴⍵ ("+gsh.length+" = ≢⍺; "+ Main.formatAPL(w.shape)+" ≡ ⍴⍵)", this);
-    int[] sh = new int[w.rank];
+    int rank = Math.max(w.rank, gsh.length);
+    int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
-    System.arraycopy(w.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);
-    int[] off = new int[sh.length];
+    int rem = rank - gsh.length;
+    if (rem > 0) System.arraycopy(w.shape, gsh.length, sh, gsh.length, rem);
+    int diff = rank - w.rank;
+    boolean proto = false;
+    int[] off = new int[rank];
     for (int i = 0; i < gsh.length; i++) {
       int d = gsh[i];
+      int s = i < diff ? 1 : w.shape[i - diff];
+      if (d > s) proto = true;
       if (d < 0) {
         sh[i] = -d;
-        off[i] = w.shape[i]-sh[i];
+        off[i] = s-sh[i];
       } else off[i] = 0;
+    }
+    if (proto) {
+      throw new DomainError("No overtake yet", this);
     }
     return on(sh, off, w, this);
   }
   
   public static Value on(int[] sh, int[] off, Value w, Callable blame) {
     int rank = sh.length;
-    assert rank==off.length && rank==w.rank;
-    for (int i = 0; i < rank; i++) {
-      if (off[i] < 0) throw new DomainError(blame+": requesting item before first"+(rank>1? " at axis "+i : ""), blame);
-      if (off[i]+sh[i] > w.shape[i]) throw new DomainError(blame+": requesting item after end"+(rank>1? " at axis "+i : ""), blame);
+    assert rank==off.length && rank>=w.rank;
+    if (rank > w.rank) {
+      boolean empty = false; // has to be empty or all leading 1s
+      int d = rank - w.rank;
+      for (int i = 0; i < d; i++) {
+        if (sh[i] == 0) { empty = true; break; }
+      }
+      if (empty) {
+        return Arr.create(new Value[0], sh);
+      } else {
+        int[] ssh  = new int[w.rank]; System.arraycopy(sh , d, ssh , 0, w.rank);
+        int[] soff = new int[w.rank]; System.arraycopy(off, d, soff, 0, w.rank);
+        return on(ssh, soff, w, blame).ofShape(sh);
+      }
     }
     if (rank == 1) {
       int s = off[0];

@@ -37,15 +37,19 @@ public class DownArrowBuiltin extends Builtin {
   public Value call(Value a, Value w) {
     int[] gsh = a.asIntVec();
     if (gsh.length == 0) return w;
-    if (gsh.length > w.rank) throw new DomainError("↓: ≢⍺ should be less than ⍴⍴⍵ ("+gsh.length+" = ≢⍺; "+ Main.formatAPL(w.shape)+" ≡ ⍴⍵)", this);
-    int[] sh = new int[w.rank];
+    int rank = Math.max(w.rank, gsh.length);
+    int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
-    System.arraycopy(w.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);
+    int rem = rank - gsh.length;
+    if (rem > 0) System.arraycopy(w.shape, gsh.length, sh, gsh.length, rem);
+    int diff = rank - w.rank;
     int[] off = new int[sh.length];
     for (int i = 0; i < gsh.length; i++) {
       int am = gsh[i];
-      sh[i] = w.shape[i] - Math.abs(am);
-      if (am > 0) off[i] = am;
+      int s = i < diff ? 1 : w.shape[i - diff];
+      sh[i] = s - Math.abs(am);
+      if (sh[i] < 0) sh[i] = 0;
+      else if (am > 0) off[i] = am;
     }
     return UpArrowBuiltin.on(sh, off, w, this);
   }
