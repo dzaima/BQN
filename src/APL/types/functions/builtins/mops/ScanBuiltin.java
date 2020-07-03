@@ -12,18 +12,16 @@ public class ScanBuiltin extends Mop {
   }
   
   public Value call(Value aa, Value w, DerivedMop derv) {
-    Fun aaf = isFn(aa);
-    // TODO ranks
-    if (w.rank != 1) throw new NYIError("`: unimplemented for rank≠1 ("+Main.formatAPL(w.shape)+" ≡ ⍴⍵)");
+    Fun f = aa.asFun();
     if (w.ia == 0) return w;
+    if (w.rank == 0) throw new DomainError("`: rank must be at least 1");
+    int l = w.ia / w.shape[0];
     Value c = w.get(0);
     Value[] res = new Value[w.ia];
-    res[0] = c;
-    for (int i = 1; i<w.ia; i++) {
-      c = aaf.call(c, w.get(i));
-      res[i] = c;
-    }
-    return Arr.create(res);
+    int i = 0;
+    for (; i < l; i++) res[i] = w.get(i);
+    for (; i < w.ia; i++) res[i] = f.call(res[i-l], w.get(i));
+    return Arr.create(res, w.shape);
   }
   
   public Value call(Value aa, Value a, Value w, DerivedMop derv) {
