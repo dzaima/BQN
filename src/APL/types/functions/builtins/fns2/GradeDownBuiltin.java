@@ -10,11 +10,9 @@ public class GradeDownBuiltin extends Builtin {
   }
   
   public Value call(Value w) {
-    double[] res = new double[w.ia];
     Integer[] na = w.gradeDown();
-    for (int i = 0; i < na.length; i++) {
-      res[i] = na[i];
-    }
+    double[] res = new double[na.length];
+    for (int i = 0; i < na.length; i++) res[i] = na[i];
     return new DoubleArr(res);
   }
 }

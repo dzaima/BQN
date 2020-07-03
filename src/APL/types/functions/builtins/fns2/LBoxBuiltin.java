@@ -84,9 +84,9 @@ public class LBoxBuiltin extends Builtin {
   }
   
   public static Value getCell(int a, Value x, Callable blame) { // expects non-scalar x
-    int ca = x.shape[0]; // cell amount
-    int csz = x.ia/ca;   // cell size
-    int start = csz*Indexer.scal(a, ca, blame);
+    int cam = x.shape[0]; // cell amount
+    int csz = x.ia/cam;   // cell size
+    int start = csz*Indexer.scal(a, cam, blame);
     
     int[] sh = new int[x.rank-1];
     System.arraycopy(x.shape, 1, sh, 0, sh.length);

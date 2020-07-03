@@ -3,6 +3,7 @@ package APL.types;
 import APL.Type;
 import APL.errors.*;
 import APL.types.arrs.*;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.*;
 
@@ -74,22 +75,21 @@ public abstract class Value extends Obj implements Iterable<Value> {
   
   
   public Integer[] gradeUp() {
-    if (rank != 1) throw new DomainError("grading rank ≠ 1", this);
+    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
+    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeUp();
     Integer[] na = new Integer[ia];
-    
-    for (int i = 0; i < na.length; i++) {
-      na[i] = i;
-    }
+    for (int i = 0; i < na.length; i++) na[i] = i;
     Arrays.sort(na, (a, b) -> get(a).compareTo(get(b)));
+    
     return na;
   }
   public Integer[] gradeDown() {
-    if (rank != 1) throw new DomainError("grading rank ≠ 1", this);
-    Integer[] na = new Integer[ia];
+    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
+    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeDown();
     
-    for (int i = 0; i < na.length; i++) {
-      na[i] = i;
-    }
+    Integer[] na = new Integer[ia];
+    for (int i = 0; i < na.length; i++) na[i] = i;
+    
     Arrays.sort(na, (a, b) -> get(b).compareTo(get(a)));
     return na;
   }
