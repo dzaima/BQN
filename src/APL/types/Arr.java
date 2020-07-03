@@ -209,7 +209,7 @@ public abstract class Arr extends Value {
     StringBuilder b = new StringBuilder(">⟨");
     for (int i = 0; i < shape[0]; i++) {
       if (i != 0) b.append(",");
-      b.append(LBoxBuiltin.on(i, this, null).oneliner());
+      b.append(LBoxBuiltin.getCell(i, this, null).oneliner());
     }
     b.append("⟩");
     return b.toString();

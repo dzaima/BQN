@@ -1,6 +1,5 @@
 package APL.types.functions.builtins.mops;
 
-import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
@@ -14,7 +13,7 @@ public class ScanBuiltin extends Mop {
   public Value call(Value aa, Value w, DerivedMop derv) {
     Fun f = aa.asFun();
     if (w.ia == 0) return w;
-    if (w.rank == 0) throw new DomainError("`: rank must be at least 1");
+    if (w.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, w);
     int l = w.ia / w.shape[0];
     Value c = w.get(0);
     Value[] res = new Value[w.ia];

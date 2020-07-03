@@ -14,9 +14,7 @@ public abstract class Value extends Obj implements Iterable<Value> {
   Value(int[] shape) {
     this.shape = shape;
     rank = shape.length;
-    int tia = 1;
-    for (int i = 0; i < rank; i++) tia*= shape[i];
-    ia = tia;
+    ia = Arr.prod(shape);
   }
   Value(int[] shape, int ia, int rank) {
     this.shape = shape;

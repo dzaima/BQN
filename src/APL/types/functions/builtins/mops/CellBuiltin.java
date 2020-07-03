@@ -12,17 +12,21 @@ public class CellBuiltin extends Mop {
   
   public Value call(Value f, Value w, DerivedMop derv) {
     Fun ff = f.asFun();
-    if (w.rank == 0) throw new RankError(f+"˘: executed on a rank 0 array", this, w);
+    if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     int am = w.shape[0];
-    int csz = w.ia/am;
-    Value[] res = new Value[am];
-    Value[] wv = w.values();
+    
+    int csz = 1;
+    for (int i = 1; i < w.shape.length; i++) csz*= w.shape[i];
     int[] csh = new int[w.rank-1];
     System.arraycopy(w.shape, 1, csh, 0, csh.length);
+    
+    Value[] res = new Value[am];
+    Value[] wv = w.values();
     for (int i = 0; i < am; i++) {
       Value[] c = new Value[csz];
       System.arraycopy(wv, i*csz, c, 0, csz);
-      res[i] = ff.call(Arr.create(c, csh));
+      Arr a = Arr.create(c, csh);
+      res[i] = ff.call(a);
     }
     return GTBuiltin.merge(res, new int[]{am}, this);
   }

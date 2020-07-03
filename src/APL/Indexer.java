@@ -195,7 +195,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       Value c = v.get(i);
       if (!(c instanceof Primitive)) throw new DomainError(blame+": index must consist of integers", blame);
       int n = c.asInt();
-      if (n<0) n += ish[i];
+      if (n<0) n+= ish[i];
       if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
       ind = ish[i]*ind + n;
     }
@@ -205,8 +205,17 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   // same, with scalar index into vector
   public static int scal(int n, int[] ish, Callable blame) {
     if (ish.length!=1) throw new LengthError(blame+": amount of index parts should equal rank (scalar index, shape ≡ "+Main.formatAPL(ish)+")", blame);
-    if (n<0) n += ish[0];
-    if (n<0 || n>=ish[0]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+0+"] ≡ "+n+")", blame);
+    int o = n;
+    if (n<0) n+= ish[0];
+    if (n<0 || n>=ish[0]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos ≡ "+Num.formatInt(o)+")", blame);
+    return n;
+  }
+  
+  // ↑ but with ish unwrapped
+  public static int scal(int n, int am, Callable blame) {
+    int o = n;
+    if (n<0) n+= am;
+    if (n<0 || n>=am) throw new LengthError(blame+": indexing out-of-bounds (getting "+Num.formatInt(o)+" from "+am+")", blame);
     return n;
   }
   
