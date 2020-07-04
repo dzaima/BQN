@@ -104,7 +104,9 @@ public class SlashBuiltin extends Builtin {
     if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame, x);
     int depth = MatchBuiltin.full(w);
     int[][] am; // scalars are represented as 1-item int[]s
-    if (depth <= 1) {
+    if (w.ia == 0) {
+      return x;
+    } else if (depth <= 1) {
       am = new int[1][];
       am[0] = w.asIntVec();
       if (w.rank==1 && am[0].length!=x.shape[0]) throw new LengthError(blame+": wrong replicate length (length ≡ "+am[0].length+", shape ≡ "+Main.formatAPL(x.shape)+")", blame);
