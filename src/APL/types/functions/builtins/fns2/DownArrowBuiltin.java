@@ -1,10 +1,10 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
-import APL.errors.DomainError;
+import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 public class DownArrowBuiltin extends Builtin {
   public String repr() {
@@ -12,9 +12,10 @@ public class DownArrowBuiltin extends Builtin {
   }
   
   public Value call(Value w) { // TODO scalars? opt for nums?
+    if (w.rank==0) throw new RankError("↑: argument cannot be scalar", this, w);
     Value[] vs = w.values();
     int cells = w.shape[0];
-    int csz = w.ia/cells;
+    int csz = CellBuiltin.csz(w);
     Value[] res = new Value[cells+1];
   
     res[0] = w;

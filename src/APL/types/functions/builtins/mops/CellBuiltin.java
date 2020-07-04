@@ -1,15 +1,15 @@
 package APL.types.functions.builtins.mops;
 
 import APL.Main;
-import APL.errors.*;
+import APL.errors.LengthError;
 import APL.types.*;
-import APL.types.arrs.Rank0Arr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
 public class CellBuiltin extends Mop {
+  
   public String repr() {
     return "˘";
   }
@@ -52,7 +52,7 @@ public class CellBuiltin extends Mop {
   public static Value[] cells(Value x) {
     assert x.rank != 0;
     int cam = x.shape[0];
-    int csz = cam==0? 0 : x.ia/cam;
+    int csz = csz(x);
     int[] csh = Arrays.copyOfRange(x.shape, 1, x.shape.length);
     
     Value[] xv = x.values();
@@ -63,5 +63,12 @@ public class CellBuiltin extends Mop {
       res[i] = Arr.create(c, csh);
     }
     return res;
+  }
+  
+  
+  public static int csz(Value x) {
+    int csz = 1;
+    for (int i = 1; i < x.shape.length; i++) csz*= x.shape[i];
+    return csz;
   }
 }

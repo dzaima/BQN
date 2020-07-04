@@ -101,7 +101,7 @@ public class SlashBuiltin extends Builtin {
   
   
   public static Value replicate(Value w, Value x, Callable blame) { // a lot of valuecopy; todo special-case BitArr w
-    if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be a scalar", blame, x);
+    if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame, x);
     int depth = MatchBuiltin.full(w);
     int[][] am; // scalars are represented as 1-item int[]s
     if (depth <= 1) {

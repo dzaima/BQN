@@ -1,10 +1,10 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
-
-import java.util.Arrays;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 public class OrBuiltin extends Builtin {
   @Override public String repr() {
@@ -18,10 +18,13 @@ public class OrBuiltin extends Builtin {
   }
   
   public Value call(Value w) {
-    var order = w.gradeDown();
-    Value[] res = new Value[order.length];
-    Arrays.setAll(res, i -> w.get(order[i]));
-    return Arr.create(res);
+    if (w.rank==0) throw new RankError("∨: argument cannot be scalar", this, w);
+    Integer[] order = w.gradeDown();
+    Value[] vs = w.values();
+    Value[] res = new Value[w.ia];
+    int csz = CellBuiltin.csz(w);
+    for (int i = 0; i < order.length; i++) System.arraycopy(vs, order[i]*csz, res, i*csz, csz);
+    return Arr.create(res, w.shape);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

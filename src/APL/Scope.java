@@ -2,7 +2,7 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.*;
-import APL.tokenizer.types.*;
+import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
@@ -104,6 +104,7 @@ public class Scope {
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•pfx": return new Profiler(this);
         case "•pfo": return new Profiler.ProfilerOp(this);
+        case "•pfc": return new Profiler.ProfilerDop();
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
@@ -643,7 +644,7 @@ public class Scope {
     }
   }
   
-  private static class Profiler extends Builtin {
+  public static class Profiler extends Builtin {
     Profiler(Scope sc) {
       super(sc);
     }
@@ -656,12 +657,15 @@ public class Scope {
       arr[2] = new ChrArr("total ms");
       arr[3] = new ChrArr("avg ms");
       final int[] p = {4};
-      pfRes.forEach((s, pr) -> {
-        arr[p[0]++] = Main.toAPL(s);
+      ArrayList<String> ks = new ArrayList<>(pfRes.keySet());
+      Collections.sort(ks);
+      for (String k : ks) {
+        Pr pr = pfRes.get(k);
+        arr[p[0]++] = Main.toAPL(k);
         arr[p[0]++] = new Num(pr.am);
         arr[p[0]++] = new Num(Math.floor(pr.ms*1e6      )/1e6);
         arr[p[0]++] = new Num(Math.floor(pr.ms*1e6/pr.am)/1e6);
-      });
+      }
       pfRes.clear();
       return new HArr(arr, new int[]{arr.length>>2, 4});
     }
@@ -672,22 +676,19 @@ public class Scope {
     @Override public Value call(Value w) {
       return call(w, w);
     }
-    private static Pr get(Value a, Value w) {
-      String s = w.asString();
-      String k = a.asString();
+    private static Pr pr(Value ko, Value vo) {
+      String k = ko.asString();
       Pr p = pfRes.get(k);
-      if (p == null) pfRes.put(k, p = new Pr(Tokenizer.tokenize(s)));
-      p.am++;
+      if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString())));
       return p;
     }
   
     public Value call(Value a, Value w) {
-      Pr p = get(a, w);
-      BasicLines t = p.tok;
+      Pr p = pr(a, w); p.start();
       long sns = System.nanoTime();
-      Value res = Main.execLines(t, sc);
+      Value res = p.c.exec(sc);
       long ens = System.nanoTime();
-      p.ms+= (ens-sns)/1000000d;
+      p.end(ens-sns);
       return res;
     }
     
@@ -697,51 +698,85 @@ public class Scope {
         super(sc);
       }
       
-      Pr get(Obj f) {
+      Pr pr(Obj f) {
         String s = ((Value) f).asString();
         Pr p = pfRes.get(s);
         if (p == null) {
-          pfRes.put(s, p = new Pr(Tokenizer.tokenize(s)));
-          p.fn = (Fun) Main.execLines(p.tok, sc);
+          pfRes.put(s, p = new Pr(Main.comp(s)));
+          p.fn = (Fun) p.c.exec(sc);
         }
-        p.am++;
         return p;
       }
       
       public Value call(Value f, Value w, DerivedMop derv) {
-        Pr p = get(f);
-        
+        Pr p = pr(f); p.start();
         long sns = System.nanoTime();
         Value r = p.fn.call(w);
         long ens = System.nanoTime();
-        p.ms+= (ens-sns)/1000000d;
+        p.end(ens-sns);
         return r;
       }
       
       public Value call(Value f, Value a, Value w, DerivedMop derv) {
-        Pr p = get(f);
-        
+        Pr p = pr(f); p.start();
         long sns = System.nanoTime();
         Value r = p.fn.call(a, w);
         long ens = System.nanoTime();
-        p.ms+= (ens-sns)/1000000d;
+        p.end(ens-sns);
         return r;
       }
       
       public String repr() {
-        return "•PFO";
+        return "•_PFO";
+      }
+    }
+    public static class ProfilerDop extends Dop {
+      
+      public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
+        Pr p = pr(ww, null); Fun f = aa.asFun(); p.start();
+        long sns = System.nanoTime();
+        Value res = f.call(a, w);
+        long ens = System.nanoTime();
+        p.end(ens-sns);
+        return res;
+      }
+  
+      public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
+        Pr p = pr(ww, null); Fun f = aa.asFun(); p.start();
+        long sns = System.nanoTime();
+        Value res = f.call(w);
+        long ens = System.nanoTime();
+        p.end(ens-sns);
+        return res;
+      }
+      
+      
+      public String repr() {
+        return "•_PFC_";
       }
     }
   }
   
   private static class Pr {
-    private final BasicLines tok;
+    private final Comp c;
     private int am;
     private double ms;
     private Fun fn;
     
-    public Pr(BasicLines tok) {
-      this.tok = tok;
+    public Pr(Comp c) {
+      this.c = c;
+    }
+    
+    int lvl;
+    public void start() {
+      lvl++;
+    }
+    public void end(long ns) {
+      lvl--;
+      if (lvl==0) {
+        this.ms+= ns/1e6d;
+        am++;
+      }
     }
   }
   

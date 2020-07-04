@@ -1,9 +1,9 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.errors.RankError;
 import APL.types.*;
 import APL.types.functions.Builtin;
-
-import java.util.Arrays;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 public class AndBuiltin extends Builtin {
   @Override public String repr() {
@@ -16,11 +16,14 @@ public class AndBuiltin extends Builtin {
     return Num.ONE;
   }
   
-  public Value call(Value w) {
-    var order = w.gradeUp();
-    Value[] res = new Value[order.length];
-    Arrays.setAll(res, i -> w.get(order[i]));
-    return Arr.create(res);
+  public Value call(Value w) { // valuecopy
+    if (w.rank==0) throw new RankError("∧: argument cannot be scalar", this, w);
+    Integer[] order = w.gradeUp();
+    Value[] vs = w.values();
+    Value[] res = new Value[w.ia];
+    int csz = CellBuiltin.csz(w);
+    for (int i = 0; i < order.length; i++) System.arraycopy(vs, order[i]*csz, res, i*csz, csz);
+    return Arr.create(res, w.shape);
   }
   
   public Value call(Value a, Value w) {

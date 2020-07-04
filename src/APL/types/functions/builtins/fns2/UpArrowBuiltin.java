@@ -5,6 +5,7 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 public class UpArrowBuiltin extends Builtin {
   
@@ -13,9 +14,10 @@ public class UpArrowBuiltin extends Builtin {
   }
   
   public Value call(Value w) { // TODO scalars? opt for nums?
+    if (w.rank==0) throw new RankError("↑: argument cannot be scalar", this, w);
     Value[] vs = w.values();
     int cells = w.shape[0];
-    int csz = w.ia/cells;
+    int csz = CellBuiltin.csz(w);
     Value[] res = new Value[cells+1];
     int[] sh0 = w.shape.clone();
     sh0[0] = 0;

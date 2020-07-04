@@ -33,54 +33,32 @@ public class StileBuiltin extends Builtin {
   private static final D_NNeN DNF = new D_NNeN() {
     public double on(double a, double w) {
       double c = w % a;
-      if (c < 0) return c + a;
+      if (c!=0  &  (a>=0 ^ w>=0)) c+= a;
       return c;
     }
     public void on(double[] res, double a, double[] w) {
-      int ia = (int) a;
-      if (a == ia) {
-        if (ia > 0 && (ia & ia-1) == 0) {
-          // power of 2 ⍺
-          int mask = ia-1;
-          for (int i = 0; i < w.length; i++) {
-            int intv = (int) w[i];
-            if (intv == w[i]) res[i] = (intv & mask) + w[i]-intv;
-            else {
-              double c = w[i]%ia;
-              if (c < 0) res[i] = c + a;
-              else res[i] = c;
-            }
-          }
-        } else {
-          // integer ⍺
-          for (int i = 0; i < w.length; i++) {
-            double c = w[i]%ia;
-            if (c < 0) res[i] = c + a;
-            else res[i] = c;
-          }
-        }
-      } else {
-        // arbitrary double ⍺
-        for (int i = 0; i < w.length; i++) {
-          double c = w[i]%a;
-          if (c < 0) res[i] = c + a;
-          else res[i] = c;
-        }
+      for (int i = 0; i < w.length; i++) {
+        double wc = w[i];
+        double c = wc%a;
+        if (c!=0  &  (a>=0 ^ wc>=0)) c+= a;
+        res[i] = c;
       }
     }
     public void on(double[] res, double[] a, double w) {
-      if (w > 0) for (int i = 0; i < a.length; i++) res[i] = w % a[i];
-      else       for (int i = 0; i < a.length; i++) {
-        double c = w % a[i];
-        if (c < 0) res[i] = c + a[i];
-        else res[i] = c;
+      for (int i = 0; i < a.length; i++) {
+        double ac = a[i];
+        double c = w%ac;
+        if (c!=0  &  (ac>=0 ^ w>=0)) c+= ac;
+        res[i] = c;
       }
     }
     public void on(double[] res, double[] a, double[] w) {
       for (int i = 0; i < a.length; i++) {
-        double c = w[i] % a[i];
-        if (c < 0) res[i] = c + a[i];
-        else res[i] = c;
+        double ac = a[i];
+        double wc = w[i];
+        double c = wc%ac;
+        if (c!=0  &  (ac>=0 ^ wc>=0)) c+= ac;
+        res[i] = c;
       }
     }
     public Value call(BigValue a, BigValue w) {
