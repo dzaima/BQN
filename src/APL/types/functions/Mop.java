@@ -32,10 +32,10 @@ public abstract class Mop extends Callable {
     throw new DomainError(this+" doesn't support monadic inverting", this, w);
   }
   public Value callInvW(Value f, Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of ⍵", this, w);
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, w);
   }
   public Value callInvA(Value f, Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of ⍺", this, w);
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, w);
   }
   public Value under(Value aa, Value o, Value w, DerivedMop derv) {
     Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, derv)) : o;

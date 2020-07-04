@@ -5,9 +5,7 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.mops.ReduceBuiltin;
-
-import java.util.Arrays;
+import APL.types.functions.builtins.mops.*;
 
 public class SlashBuiltin extends Builtin {
   private static final Fun fn = new ReduceBuiltin().derive(new CeilingBuiltin());
@@ -102,201 +100,88 @@ public class SlashBuiltin extends Builtin {
   }
   
   
-  public static Value replicate(Value a, Value w, Callable blame) {
-    if (a.rank == 0) {
-      if (w.rank > 1) throw new RankError("⌿: rank of ⍵ should be ≤1 if ⍺ is a scalar", blame);
-      int sz = a.asInt();
-      if (sz < 0) {
-        int am = w.ia*-sz;
-        Value pr = w.prototype();
-        if (pr instanceof Num) return new DoubleArr(new double[am]);
-        Value[] res = new Value[am];
-        Value n = w.first() instanceof Char? Char.SPACE : Num.ZERO;
-        Arrays.fill(res, n);
-        return Arr.create(res);
-      }
-      
-      int am = w.ia*sz;
-      if (w instanceof BitArr) {
-        BitArr.BA res = new BitArr.BA(am);
-        BitArr.BR r = ((BitArr) w).read();
-        for (int i = 0; i < w.ia; i++) {
-          if (r.read()) res.fill(sz);
-          else          res.skip(sz);
-        }
-        return res.finish();
-      }
-      if (w.quickDoubleArr()) {
-        double[] res = new double[am];
-        double[] ds = w.asDoubleArr();
-        int ptr = 0;
-        for (int i = 0; i < w.ia; i++) {
-          double c = ds[i];
-          for (int j = 0; j < sz; j++) {
-            res[ptr++] = c;
-          }
-        }
-        return new DoubleArr(res);
-      }
-      Value[] res = new Value[am];
-      int ptr = 0;
-      for (int i = 0; i < w.ia; i++) {
-        Value c = w.get(i);
-        for (int j = 0; j < sz; j++) {
-          res[ptr++] = c;
-        }
-      }
-      return Arr.create(res);
-    }
-    
-    // ⍺.rank ≠ 0
-    if (a.rank != w.rank) throw new RankError("⌿: shapes of ⍺ & ⍵ must be equal (ranks "+a.rank+" vs "+w.rank + ")", blame);
-    if (!Arrays.equals(a.shape, w.shape)) throw new LengthError("⌿: shapes of ⍺ & ⍵ must be equal ("+ Main.formatAPL(a.shape) + " vs " + Main.formatAPL(w.shape) + ")", blame);
-    
-    if (a instanceof BitArr) {
-      BitArr ab = (BitArr) a;
-      ab.setEnd(false);
-      int sum = ab.isum();
-      if (w instanceof BitArr) {
-        BitArr.BA res = new BitArr.BA(sum);
-        long[] wba = ((BitArr) w).arr;
-        ((BitArr) a).setEnd(false);
-        long[] aba = ((BitArr) a).arr;
-        int ia = wba.length;
-        
-        for (int i = 0; i < ia; i++) {
-          long wcb = wba[i];
-          long acb = aba[i];
-          for (int o = 0; o < 64; o++) {
-            if ((acb&1)!=0) {
-              res.add(wcb&1);
-            }
-            wcb>>= 1;
-            acb>>= 1;
-          }
-        }
-        return res.finish();
-      }
-      if (w.quickDoubleArr()) {
-        if (sum > w.ia*.96) {
-          double[] ds = w.asDoubleArr();
-          double[] res = new double[sum];
-          
-          long[] la = ab.arr;
-          int l = la.length;
-          int am = 0, pos = 0;
-          for (int i = 0; i < l; i++) {
-            long c = la[i];
-            for (int s = 0; s < 64; s++) {
-              if ((c&1) == 0) {
-                if (am != 0) System.arraycopy(ds, i*64 + s - am, res, pos, am);
-                pos+= am;
-                am = 0;
-              } else am++;
-              c>>= 1;
-            }
-          }
-          if (am > 0) System.arraycopy(ds, ds.length - am, res, pos, am);
-          return new DoubleArr(res);
-        }
-        double[] ds = w.asDoubleArr();
-        double[] res = new double[sum];
-        long[] la = ab.arr;
-        int l = la.length;
-        int pos = 0;
-        for (int i = 0; i < l; i++) {
-          long c = la[i];
-          for (int s = 0; s < 64; s++) {
-            if ((c&1) != 0) {
-              res[pos++] = ds[i*64 + s];
-            }
-            c>>= 1;
-          }
-        }
-        return new DoubleArr(res);
-        // BitArr.BR r = ab.read();
-        // int pos = 0;
-        // for (int i = 0; i < w.ia; i++) {
-        //   if (r.read()) {
-        //     res[pos++] = ds[i];
-        //   }
-        // }
-        // return new DoubleArr(res);
-      }
-      if (w instanceof ChrArr) {
-        String ws = ((ChrArr) w).s;
-        char[] chars = new char[sum];
-        BitArr.BR r = ab.read();
-        int pos = 0;
-        for (int i = 0; i < w.ia; i++) {
-          if (r.read()) {
-            chars[pos++] = ws.charAt(i);
-          }
-        }
-        return new ChrArr(chars);
-      }
-      Value[] res = new Value[sum];
-      BitArr.BR r = ab.read();
-      int pos = 0;
-      for (int i = 0; i < w.ia; i++) {
-        if (r.read()) {
-          res[pos++] = w.get(i);
-        }
-      }
-      return Arr.create(res);
-    }
-    
-    
-    int total = 0;
-    int[] sizes = a.asIntArr();
-    for (int i = 0; i < a.ia; i++) {
-      total+= Math.abs(sizes[i]);
-    }
-    
-    if (w instanceof BitArr) {
-      BitArr.BA res = new BitArr.BA(total);
-      BitArr.BR r = ((BitArr) w).read();
-      for (int i = 0; i < w.ia; i++) {
-        int am = sizes[i];
-        if (r.read()) res.fill(am);
-        else          res.skip(am);
-      }
-      return res.finish();
-    }
-    if (w.quickDoubleArr()) {
-      int ptr = 0;
-      double[] wi = w.asDoubleArr();
-      double[] res = new double[total];
-      for (int i = 0; i < a.ia; i++) {
-        double c = wi[i];
-        int am = sizes[i];
-        if (sizes[i] < 0) {
-          for (int j = 0; j > am; j--) {
-            res[ptr++] = 0;
-          }
-        } else {
-          for (int j = 0; j < am; j++) {
-            res[ptr++] = c;
-          }
-        }
-      }
-      return new DoubleArr(res);
-      
+  public static Value replicate(Value w, Value x, Callable blame) { // a lot of valuecopy; todo special-case BitArr w
+    if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be a scalar", blame, x);
+    int depth = MatchBuiltin.full(w);
+    int[][] am; // scalars are represented as 1-item int[]s
+    if (depth <= 1) {
+      am = new int[1][];
+      am[0] = w.asIntVec();
+      if (w.rank==1 && am[0].length!=x.shape[0]) throw new LengthError(blame+": wrong replicate length (length ≡ "+am[0].length+", shape ≡ "+Main.formatAPL(x.shape)+")", blame);
     } else {
-      int ptr = 0;
-      Value[] res = new Value[total];
-      for (int i = 0; i < a.ia; i++) {
+      if (w.ia > x.rank) throw new DomainError(blame+": 𝕨 must have less items than ≠≢𝕩 ("+w.ia+" ≡ ≠𝕨, "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame, w);
+      am = new int[w.ia][];
+      for (int i = 0; i < w.ia; i++) {
         Value c = w.get(i);
-        int am = sizes[i];
-        if (sizes[i] < 0) {
-          am = -am;
-          c = c.prototype();
+        if (c.rank > 1) throw new RankError(blame+": depth 2 𝕨 cannot have rank "+c.rank+" items (contained shape "+Main.formatAPL(c.shape)+")", blame, w);
+        if (c.rank==1 && c.ia!=x.shape[i]) throw new LengthError(blame+": wrong replicate length ("+c.ia+" ≡ ≠"+i+"⊏𝕨, shape ≡ "+Main.formatAPL(x.shape)+")", blame);
+        am[i] = c.asIntArr();
+      }
+    }
+    
+    int rcam = 1; // result cell amount
+    int[] rsh = new int[x.rank]; // result shape
+    System.arraycopy(x.shape, am.length, rsh, am.length, x.shape.length-am.length);
+    for (int i = 0; i < am.length; i++) {
+      int s = 0;
+      if (am[i].length == 1) s = am[i][0]*x.shape[i];
+      else for (int k : am[i]) s+= k;
+      rsh[i] = s;
+      rcam*= s;
+    }
+    
+    int csz = 1; // cell size to replicate
+    for (int i = am.length; i < x.shape.length; i++) csz*= x.shape[i];
+    Value[] res = new Value[rcam*csz];
+    Value[] xv = x.values();
+    
+    recReplicate(res, 0, 0, 0, x.ia, xv, x.shape, am);
+    return Arr.create(res, rsh);
+  }
+  
+  private static int recReplicate(Value[] res, int rpos, int ipos, int d, int rsz, Value[] x, int[] xsh, int[][] am) {
+    if (d==am.length) {
+      System.arraycopy(x, ipos, res, rpos, rsz);
+      return rpos+rsz;
+    } else {
+      int[] c = am[d];
+      if (xsh[d] != 0) rsz/= xsh[d];
+      if (c.length == 1) {
+        int a = c[0];
+        for (int i = 0; i < xsh[d]; i++) {
+          for (int j = 0; j < a; j++) rpos = recReplicate(res, rpos, ipos, d+1, rsz, x, xsh, am);
+          ipos+= rsz;
         }
-        for (int j = 0; j < am; j++) {
-          res[ptr++] = c;
+      } else {
+        for (int a : c) {
+          for (int j = 0; j < a; j++) rpos = recReplicate(res, rpos, ipos, d+1, rsz, x, xsh, am);
+          ipos+= rsz;
         }
       }
-      return Arr.create(res);
+      return rpos;
     }
+  }
+  
+  // public Value callInvW(Value a, Value w) {
+  //   if (a.rank!=1 || w.rank!=1) throw new DomainError("/⁼: dyadic inverting only possible on rank 1 arguments", this, a.rank!=1?a:w);
+  //  
+  // }
+  
+  public Value underW(Value o, Value a, Value w) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
+    if (MatchBuiltin.full(a)!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector", this, a);
+    if (a.rank!=1 || w.rank!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, a.rank!=1?a:w);
+    double asum = a.sum();
+    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, w);
+    Value[] res = new Value[w.ia];
+    int ipos = 0;
+    double[] values = a.asDoubleArr();
+    for (int i = 0; i < values.length; i++) {
+      double d = values[i];
+      if (d!=0 && d!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector, contained "+Num.format(d));
+      if (d == 1) res[i] = v.get(ipos++);
+      else res[i] = w.get(i);
+    }
+    return Arr.create(res);
   }
 }

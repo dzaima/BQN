@@ -2,7 +2,7 @@ package APL.tokenizer.types;
 
 import APL.*;
 import APL.errors.*;
-import APL.tokenizer.*;
+import APL.tokenizer.Token;
 import APL.types.Value;
 
 import java.util.*;
@@ -275,12 +275,13 @@ public class DfnTok extends TokArr<LineTok> {
   }
   
   
-  public DfnTok(Comp code, char type) {
-    super("•COMP", 0, 5, new ArrayList<>());
-    immediate = funType(this, this, true);
+  public DfnTok(Comp code, char type, boolean imm) {
+    super("•COMPiled function", 0, 18, new ArrayList<>());
     this.type = type;
     comp = code;
-    bodies = null; // +TODO ..
+    bodies = new ArrayList<>();
+    bodies.add(new Body('a', imm));
+    immediate = imm;
   }
   
   public static boolean funType(Token t, DfnTok dt, boolean first) { // returns immediate, mutates dt's type; +TODO remove first

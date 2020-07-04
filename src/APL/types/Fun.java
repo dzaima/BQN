@@ -29,10 +29,10 @@ public abstract class Fun extends Callable {
     throw new DomainError(this+" doesn't support monadic inverting", this, w);
   }
   public Value callInvW(Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of ⍵", this, w);
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, w);
   }
   public Value callInvA(Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of ⍺", this, w);
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, w);
   }
   
   

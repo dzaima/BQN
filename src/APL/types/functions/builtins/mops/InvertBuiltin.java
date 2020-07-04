@@ -4,7 +4,7 @@ import APL.errors.NYIError;
 import APL.types.*;
 import APL.types.functions.*;
 
-public class InvertBuiltin extends Mop { // separate ⍵-inverse (equal to f⍣¯1)
+public class InvertBuiltin extends Mop { // separate ⍵-inverse (equal to f⍣¯1); +TODO merge with ⁼
   
   public Value call(Value f, Value w, DerivedMop derv) {
     Fun ff = isFn(f);

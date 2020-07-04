@@ -19,7 +19,7 @@ public class AtBuiltin extends Dop {
     return at(aa, ww, w, this);
   }
   
-  public static Value at(Obj aa, Obj ww, Value w, Callable blame) {
+  public static Value at(Value aa, Value ww, Value w, Callable blame) {
     int ia = w.ia;
     if (ww instanceof Fun) {
       Value vba = ((Fun) ww).call(w);
@@ -37,7 +37,7 @@ public class AtBuiltin extends Dop {
           if (ba[i]) matching[ptr++] = w.get(i);
         }
         aaa = ((Fun) aa).call(Arr.create(matching));
-      } else aaa = (Value) aa;
+      } else aaa = aa;
       Value[] ra = new Value[ia];
       if (aaa.rank == 0) {
         Value inner = aaa.get(0);
@@ -54,16 +54,15 @@ public class AtBuiltin extends Dop {
       }
       return Arr.create(ra, w.shape);
     } else {
-      Value wwa = (Value) ww;
   
-      Indexer.PosSh poss = Indexer.poss(wwa, w.shape, blame);
+      Indexer.PosSh poss = Indexer.poss(ww, w.shape, blame);
       Value repl;
       if (aa instanceof Fun) {
         Fun aaf = ((Fun) aa);
         Value arg = LBoxUBBuiltin.on(poss, w);
         repl = aaf.call(arg);
       } else {
-        repl = (Value) aa;
+        repl = aa;
       }
       return with(w, poss, repl, blame);
     }

@@ -12,9 +12,6 @@ public class ReplicateBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    return SlashBuiltin.replicate(a, w, this);
-  }
   
   
   public Value underW(Value o, Value a, Value w) {

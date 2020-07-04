@@ -299,7 +299,7 @@ public class Main {
     throw new DomainError("Expected boolean, got "+d);
   }
   
-  public static boolean bool(Obj v) {
+  public static boolean bool(Value v) {
     if (v instanceof Num) {
       double num = ((Num) v).num;
       if (num == 1) return true;

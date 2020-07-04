@@ -68,7 +68,7 @@ public class RepeatBuiltin extends Dop {
     if (am== 1) return aaf.callInvA(a, w);
     if (am==-1) return aaf.callInvA(w, a);
     
-    throw new DomainError("f⍣N: ⍺-inverting is only possible when N∊¯1 1", this, ww);
+    throw new DomainError("f⍣N: 𝕨-inverting is only possible when N∊¯1 1", this, ww);
   }
   
   public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {

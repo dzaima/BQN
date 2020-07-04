@@ -129,7 +129,9 @@ public class Scope {
           
           public Value call(Value a, Value w) {
             if (w.ia != 4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, w);
-            char type = ((Char) a).chr;
+            if (a.ia != 2) throw new DomainError("𝕨 of •COMP must be an array of type and immediateness");
+            char type = ((Char) a.get(0)).chr;
+            boolean imm = Main.bool(a.get(1));
             Value bc = w.get(0);
             Value obj = w.get(1);
             Value str = w.get(2);
@@ -152,9 +154,9 @@ public class Scope {
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
-            if (type == 'f') return new Dfn (new DfnTok(c, 'f'), sc);
-            if (type == 'd') return new Ddop(new DfnTok(c, 'd'), sc);
-            if (type == 'm') return new Dmop(new DfnTok(c, 'm'), sc);
+            if (type == 'f') return new Dfn (new DfnTok(c, 'f', imm), sc);
+            if (type == 'd') return new Ddop(new DfnTok(c, 'd', imm), sc);
+            if (type == 'm') return new Dmop(new DfnTok(c, 'm', imm), sc);
             throw new DomainError("•COMP: 𝕨 must be one of \"fdm\"");
           }
         };
@@ -474,7 +476,7 @@ public class Scope {
             }
           }
           
-          Obj cache = m.getRaw("cache");
+          Value cache = m.getRaw("cache");
           conn.setUseCaches(cache!=Null.NULL && Main.bool(cache));
           conn.setDoOutput(true);
           
@@ -545,7 +547,7 @@ public class Scope {
       }
       
       boolean raw = false;
-      Obj rawo = m.getRaw("raw");
+      Value rawo = m.getRaw("raw");
       if (rawo != Null.NULL) raw = Main.bool(rawo);
       
       return exec(w, dir, inp, raw);
