@@ -31,10 +31,12 @@ public class LBoxBuiltin extends Builtin {
   
     int ar = a.shape.length;
     int wr = w.shape.length;
-    if (a.ia==0 || a.get(0) instanceof Num) {
-      // int[] sh = new int[ar+wr-1];
-      // System.arraycopy(a.shape, 0, sh, 0, ar);
-      // System.arraycopy(w.shape, 1, sh, ar, wr -1);
+    if (a.ia==0) {
+      int[] sh = new int[ar+wr-1];
+      System.arraycopy(a.shape, 0, sh, 0, ar);
+      System.arraycopy(w.shape, 1, sh, ar, wr -1);
+      return Arr.create(new Value[0], sh);
+    } else if (a.get(0) instanceof Num) {
       double[] ds = a.asDoubleArr();
       Value[] res = new Value[ds.length];
       for (int i = 0; i < ds.length; i++) res[i] = getCell(Num.toInt(ds[i]), w, this);
