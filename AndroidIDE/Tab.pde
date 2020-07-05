@@ -3,7 +3,7 @@ abstract static class Tab extends SimpleMap {
   abstract void hide();
   abstract String name();
   void mouseWheel(int dir) { }
-  Obj getv(String k) {
+  Value getv(String k) {
     switch (k) {
       case "name": return Main.toAPL(name());
       case "close": return new Fun() {
@@ -29,13 +29,22 @@ abstract static class Tab extends SimpleMap {
 
 
 static class REPL extends Tab {
-  final ROText historyView;
+  final Nfield historyView;
   final APLField input;
+  final Drawable line = new Drawable(0, 0, 0, 0) {
+    void redraw() {
+      d.stroke(0x80D2D2D2);
+      d.strokeWeight(1);
+      d.line(historyView.x+4, historyView.y+historyView.h+2, historyView.x+historyView.w-4, historyView.y+historyView.h+2);
+    }
+  };
+  Interpreter it = new DzaimaBQN();
   ArrayList<String> inputs = new ArrayList();
   String tmpSaved;
   int iptr = 0; // can be ==input.size()
   REPL() {
-    historyView = new ROText(0, top, a.width, 340-top);
+    historyView = new Nfield(0, top, a.width, 340-top); // new ROText(0, top, a.width, 340-top);
+    historyView.bottom = true; historyView.editable = false;
     input = new APLField(0, 350, a.width, 40) {
       boolean apl() {
         return !(line.startsWith(":") || line.startsWith(")"));
@@ -44,28 +53,24 @@ static class REPL extends Tab {
         tmpSaved = null;
         inputs.add(line);
         iptr = inputs.size();
-        textln("  "+line+"\n");
+        textln("   "+line);
         if (line.startsWith(":")) {
           String cmd = line.substring(1);
           int i = cmd.indexOf(" "); 
           String nm = i==-1? cmd : cmd.substring(0, i);
           final String arg = i==-1? "" : cmd.substring(i+1);
           String argl = arg.toLowerCase();
-          if (nm.equals("hsz")) historyView.setSize(int(arg));
+          if (nm.equals("hsz")) historyView.setsz(int(arg));
           else if (nm.equals("isz")) {
             isz = int(arg);
             redrawAll();
           } else if (nm.equals("i")) {
-            if (argl.equals("dyalog")) {
-              it = new Dyalog();
-            }
-            if (argl.equals("dzaima")) {
-              it = new DzaimaAPL();
-            }
+            if (argl.equals("dyalog")) it = new Dyalog();
+            if (argl.equals("dzaima")) it = new DzaimaBQN();
           } else if (nm.equals("clear")) {
-            historyView.set(new ArrayList());
+            historyView.clear();
           } else if (nm.equals("g")) {
-            topbar.toNew(new Grapher(arg));
+            topbar.toNew(new Grapher(it, arg));
           } else if (nm.equals("tsz")) {
             top = int(arg);
             redrawAll();
@@ -77,41 +82,30 @@ static class REPL extends Tab {
               public void save(String t) {
                 try {
                   a.saveStrings(arg, new String[]{t});
-                  if (ex) Main.exec(ta.allText(), dzaimaSC);
+                  if (ex) try {
+                    it.exec(ta.allText());
+                  } catch (APLError e) {
+                    e.print(((DzaimaBQN)it).sys);
+                  }
+                  //if (ex) Main.exec(ta.allText(), ((DzaimaBQN) it).sys.gsc);
                 } catch (Throwable e) {
-                  println(e.getMessage());
-                  Main.lastError = e;
+                  e.printStackTrace();
                 }
               }
             });
-          } else if (nm.equals("ex")) {
-            String[] lns = a.loadStrings(arg);
-            if (lns != null) {
-              StringBuilder s = new StringBuilder();
-              for (String c : lns) s.append(c).append("\n");
-              for (String c : it.get(s.toString())) textln(c);
-            } else textln("file "+arg+" not found");
           } else if (nm.equals("ed")) {
-            Obj o = dzaimaSC.get(arg);
-            if (o instanceof Dfn) {
-              topbar.toNew(new Ed(nm, ((Dfn ) o).code.source()));
-            }
-            if (o instanceof Dmop) {
-              topbar.toNew(new Ed(nm, ((Dmop) o).code.source()));
-            }
-            if (o instanceof Ddop) {
-              topbar.toNew(new Ed(nm, ((Ddop) o).code.source()));
-            }
+            if (!(it instanceof DzaimaBQN)) { textln(":fx only available on dzaima/BQN"); return; }
+            Value o = it.exec(arg);
+                 if (o instanceof Dfn ) topbar.toNew(new Ed(nm, ((Dfn ) o).code.source()));
+            else if (o instanceof Dmop) topbar.toNew(new Ed(nm, ((Dmop) o).code.source()));
+            else if (o instanceof Ddop) topbar.toNew(new Ed(nm, ((Ddop) o).code.source()));
+            else textln("cannot edit type "+o.humanType(false));
           } else textln("Command "+nm+" not found");
           //else if (nm.equals(""))
           return;
         }
         
-        if (line.startsWith(")")) {
-          for (String s : it.special(line.substring(1))) textln(s);
-          return;
-        }
-        String[] res = it.get(line);
+        String[] res = it.repl(line);
         for (String ln : res) {
           textln(ln);
         }
@@ -143,16 +137,12 @@ static class REPL extends Tab {
         }
       }
       void textln(String ln) {
-        historyView.append(ln);
+        historyView.appendLns(ln);
       }
       void newline() {
-        try {
-          eval();
-        } catch (Throwable t) {
-          Main.lastError = t;
-          println(t.getMessage());
-        }
+        eval();
         clear();
+        historyView.end();
       }
     };
   }
@@ -163,21 +153,23 @@ static class REPL extends Tab {
     d.rectMode(CORNER);
     d.rect(0, top, d.width, freey()-top-ih);
     input.move(0, freey()-ih, d.width, ih);
-    historyView.move(0, top, d.width, freey()-top-ih);
+    historyView.move(0, top, d.width, freey()-top-ih-6);
     historyView.end();
     input.show();
     historyView.show();
+    line.show();
     textInput = input;
   }
   void hide() {
     input.hide();
     historyView.hide();
+    line.hide();
     if (textInput == input) textInput = null;
   }
   String name() {
     return "REPL";
   }
-  Obj getv(String k) {
+  Value getv(String k) {
     if (k.equals("eq")) return Main.toAPL(input.line);
     return super.getv(k);
   }
@@ -185,16 +177,19 @@ static class REPL extends Tab {
     if (k.equals("eq")) { input.clear(); input.append(((Value) v).asString()); }
     else super.setv(k, v);
   }
+  void mouseWheel(int dir) {
+    historyView.mouseWheel(dir);
+  }
 }
 
 
 
 abstract static class Editor extends Tab {
   String name;
-  APLTextarea ta;
+  Nfield ta;
   Editor(String name, String val) {
     this.name = name;
-    ta = new APLTextarea(0, 0, 0, 0) {
+    ta = new Nfield(0, 0, 10, 10) {
       void eval() {
         save(ta.allText());
       }
@@ -206,7 +201,7 @@ abstract static class Editor extends Tab {
       }
     };
     ta.append(val);
-    ta.cx = ta.cy = 0;
+    ta.setE(0, 0); ta.allE();
   }
   abstract void save(String val);
   void show() {
@@ -220,23 +215,31 @@ abstract static class Editor extends Tab {
   String name() {
     return name;
   }
+  void mouseWheel(int dir) {
+    ta.mouseWheel(dir);
+  }
 }
 
 
 static class Grapher extends Tab {
   Graph g;
   final APLField input;
-  Obj last;
-  Grapher(String def) {
+  Value last;
+  Interpreter it;
+  Grapher(Interpreter it, String def) {
     g = new Graph(0, top, d.width, freey()-top-isz);
     input = new APLField(0, 350, d.width, 40, def) {
       void eval() {
         modified();
       }
       void modified() {
-        if (it instanceof DzaimaAPL) {
-          last = ((DzaimaAPL) it).eval(line);
-          if (last instanceof Fun) g.newFun((Fun) last);
+        if (it instanceof DzaimaBQN) {
+          try {
+            last = it.exec(line);
+            g.newFun(last.asFun());
+          } catch (Throwable e) {
+            last = null;
+          }
         }
       }
       void extraSpecial(String s) {
@@ -266,7 +269,7 @@ static class Grapher extends Tab {
   void mouseWheel(int dir) {
     g.mouseWheel(dir);
   }
-  Obj getv(String k) {
+  Value getv(String k) {
     if (k.equals("eq")) return Main.toAPL(input.line);
     if (k.equals("am")) return new Num(g.pts);
     if (k.equals("ln")) return new Num(g.joined? 1 : 0);
@@ -279,7 +282,7 @@ static class Grapher extends Tab {
     if (k.equals("gd")) return new DoubleArr(new double[]{g.pts, g.joined? 1 : 0, g.ph, g.mul});
     return super.getv(k);
   }
-  void setv(String k, Obj v) {
+  void setv(String k, Value v) {
     if (k.equals("eq")) { input.clear(); input.append(((Value) v).asString()); }
     else if (k.equals("am"   )) g.pts = ((Value)v).asInt();
     else if (k.equals("ln"   )) g.joined = Main.bool(v);

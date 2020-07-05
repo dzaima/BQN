@@ -27,7 +27,6 @@ public class Main {
   static final long startingMillis = System.currentTimeMillis();
   public static Scanner console;
   public static Tokenable faulty;
-  public static Throwable lastError = null;
   public static void main(String[] args) {
     colorful = System.console() != null && System.getenv().get("TERM") != null;
     console = new Scanner(System.in);
@@ -42,9 +41,9 @@ public class Main {
             if (p.charAt(1) == '-') {
               switch (p) {
                 case "--help":
-                  println("Usage: APL [options]");
+                  println("Usage: BQN [options]");
                   println("Options:");
-                  println("-f file: execute the contents of the file");
+                  println("-f file: execute the contents of the file with all further arguments as •args");
                   println("-e code: execute the argument as APL");
                   println("-p code: execute the argument as APL and print its result");
                   println("-i     : execute STDIN as APL");
@@ -55,7 +54,6 @@ public class Main {
                   println("-b     : disable boxing");
                   println("-c     : disable colorful printing");
                   println("-q     : enable quoting strings");
-                  println("•A←B   : set •A to B");
                   println("-D file: run the file as SBCS");
                   println("-E a b : encode the file A in the SBCS, save as B");
                   println("If given no arguments, an implicit -r will be added");
@@ -68,11 +66,12 @@ public class Main {
               for (char c : p.substring(1).toCharArray()) {
                 switch (c) {
                   case 'f':
-                    String name = args[++i];
-                    execFile(name, sys.gsc);
+                    String name = args[++i]; i++;
+                    Value[] gargs = new Value[args.length-i];
+                    for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i + j]);
+                    sys.execFile(name, gargs);
+                    i = args.length;
                     break;
-                  case '•':
-                    throw new DomainError("• settings must be a separate argument");
                   case 'e':
                     String code = args[++i];
                     exec(code, sys.gsc);
@@ -167,25 +166,9 @@ public class Main {
         if (debug) printlvl = 0;
         if (!silentREPL) print("   ");
         if (!console.hasNext()) break;
-        try {
-          String cr = console.nextLine();
-          sys.line(cr);
-        } catch (APLError e) {
-          lastError = e;
-          e.print(sys);
-        } catch (Throwable e) {
-          lastError = e;
-          // colorprint(e + ": " + e.getMessage(), 246);
-          // if (faulty != null && faulty.getToken() != null) {
-          //   String s = repeat(" ", faulty.getToken().spos);
-          //   colorprint(faulty.getToken().raw, 217);
-          //   colorprint(s + "^", 217);
-          // }
-          String pmsg = e.getMessage();
-          String msg = e.getClass().getSimpleName();
-          if (pmsg != null && pmsg.length()!=0) msg+= ": "+pmsg;
-          new ImplementationError(msg + "; )jstack for stacktrace").print(sys);
-        }
+  
+        String cr = console.nextLine();
+        sys.lineCatch(cr);
       }
     }
   }
@@ -240,15 +223,6 @@ public class Main {
       ne.initCause(e);
       throw ne;
     }
-  }
-  public static Value execFile(String path, Scope sc) {
-    return exec(removeHashBang(readFile(path)), sc);
-  }
-  private static String removeHashBang(String source) {
-    if (source.charAt(0)=='#' && source.charAt(1)=='!') {
-      source = source.substring(source.indexOf('\n')+1);
-    }
-    return source;
   }
   
   public static Value exec(String s, Scope sc) {
@@ -310,7 +284,7 @@ public class Main {
   
   
   public static DoubleArr toAPL(int[] arr) {
-    var da = new double[arr.length];
+    double[] da = new double[arr.length];
     for (int i = 0; i < arr.length; i++) {
       da[i] = arr[i];
     }
@@ -318,7 +292,7 @@ public class Main {
   }
   
   public static DoubleArr toAPL(int[] arr, int[] sh) {
-    var da = new double[arr.length];
+    double[] da = new double[arr.length];
     for (int i = 0; i < arr.length; i++) {
       da[i] = arr[i];
     }

@@ -12,8 +12,4 @@ public class SyntaxError extends APLError {
   public SyntaxError(String s, Callable fun, Tokenable cause) {
     super(s, fun, cause);
   }
-  
-  public static void must(boolean b, String msg) {
-    if (!b) throw new SyntaxError(msg);
-  }
 }

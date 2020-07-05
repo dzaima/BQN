@@ -9,6 +9,7 @@ public class EmptyArr extends Arr {
   public static final int[] SHAPE0 = new int[]{0};
   public static final EmptyArr SHAPE0Q = new EmptyArr(SHAPE0, null);
   public static final EmptyArr SHAPE0N = new EmptyArr(SHAPE0, Num.ZERO);
+  public static final EmptyArr SHAPE0S = new EmptyArr(SHAPE0, Char.SPACE);
   public static final int[] NOINTS = new int[0];
   private final Value proto;
   public EmptyArr(int[] sh, Value proto) {
@@ -59,10 +60,10 @@ public class EmptyArr extends Arr {
     return new EmptyArr(sh, proto);
   }
   
-  private static final Value[] NO_VALUES = new Value[0];
+  public static final Value[] NOVALUES = new Value[0];
   @Override
   public Value[] valuesCopy() {
-    return NO_VALUES; // safe, copy or not - doesn't matter
+    return NOVALUES; // safe, copy or not - doesn't matter
   }
   
   @Override
@@ -72,7 +73,7 @@ public class EmptyArr extends Arr {
   
   
   
-  private static final Iterator<Value> EIT = new Iterator<>() {
+  private static final Iterator<Value> EIT = new Iterator<Value>() {
     public boolean hasNext() { return false; }
   
     public Value next() { throw new IllegalStateException("iterating empty array"); }

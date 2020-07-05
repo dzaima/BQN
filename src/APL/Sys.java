@@ -3,14 +3,15 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.Tokenizer;
 import APL.types.*;
-import APL.types.arrs.HArr;
+import APL.types.arrs.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public abstract class Sys {
   public Scope gsc; // global/top-level scope
   public Scope csc; // current scope in which things happen
   public boolean oneline;
+  public APLError lastError = null;
   
   public Sys() {
     gsc = csc = new Scope(this);
@@ -26,7 +27,8 @@ public abstract class Sys {
         else off(Main.exec(rest, csc).asInt());
         break;
       case "EX":
-        Main.execFile(parts[1], csc);
+        String full = cr.substring(cr.indexOf(" ")+1);
+        execFile(full);
         break;
       case "DEBUG":
         Main.debug = !Main.debug; // keeping these as static booleans to improve performance (plus getting Sys where needed might be extremely annoying)
@@ -43,29 +45,28 @@ public abstract class Sys {
       case "UOPT"        : var e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
       case "ATYPE"       : Main.println(Main.exec(rest, csc).humanType(false)); break;
       case "JSTACK":
-        if (Main.lastError != null) {
-          Main.lastError.printStackTrace();
+        if (lastError != null) {
+          lastError.printStackTrace();
         } else println("no stack to view");
         break;
-      case "STACK":
-        if (Main.lastError instanceof APLError) {
-          ArrayList<APLError.Frame> trace = ((APLError) Main.lastError).trace;
-          for (int i = 0; i < trace.size(); i++) {
-            println((trace.size()-i) + ":");
-            APLError.println(trace.get(i).msgs, this);
-          }
-        } else println("no stack to view");
+      case "STACK": {
+        if (lastError == null) { println("no stack to view"); break; }
+        ArrayList<APLError.Frame> trace = lastError.trace;
+        for (int i = 0; i < trace.size(); i++) {
+          println((trace.size()-i) + ":");
+          APLError.println(trace.get(i).msgs, this);
+        }
         break;
+      }
       case "CS":
         if (rest.length()==0) csc = gsc;
         else {
           boolean num = true;
           for (char c : rest.toCharArray()) if (c>'9' || c<'0') { num = false; break; }
           if (num) {
-            if (Main.lastError instanceof APLError) {
-              ArrayList<APLError.Frame> trace = ((APLError) Main.lastError).trace;
-              csc = trace.get(trace.size()-Integer.parseInt(rest)).sc;
-            } else throw new DomainError("no error to )cs to");
+            if (lastError == null) { println("no stack to )cs to"); break; }
+            ArrayList<APLError.Frame> trace = lastError.trace;
+            csc = trace.get(trace.size()-Integer.parseInt(rest)).sc;
           } else {
             Value v = Main.exec(rest, csc);
             if (v instanceof Callable) {
@@ -92,18 +93,48 @@ public abstract class Sys {
     }
   }
   
-  public void line(String cr) {
+  private static String removeHashBang(String source) {
+    if (source.charAt(0)=='#' && source.charAt(1)=='!') {
+      source = source.substring(source.indexOf('\n')+1);
+    }
+    return source;
+  }
+  public Value execFile(String path, Value[] args) {
+    int sl = path.indexOf("/")+1;
+    Value[] rargs = Arrays.copyOf(args, args.length+2);
+    rargs[args.length  ] = Main.toAPL(path.substring(sl));
+    rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
+    Scope sc = new Scope(gsc, rargs);
+    return Main.exec(removeHashBang(Main.readFile(path)), sc);
+  }
+  public Value execFile(String path) {
+    return execFile(path, EmptyArr.NOVALUES);
+  }
+  
+  public void line(String s) {
     Main.faulty = null;
-    if (cr.startsWith(")")) {
-      ucmd(cr.substring(1));
+    if (s.startsWith(")")) {
+      ucmd(s.substring(1));
     } else {
-      Comp comp = Main.comp(cr);
+      Comp comp = Main.comp(s);
       byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
       Value r = comp.exec(csc);
       if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
         println(r);
       }
     }
+  }
+  
+  public void lineCatch(String s) {
+    try {
+      line(s);
+    } catch (Throwable t) {
+      setLastError(t).print(this);
+    }
+  }
+  
+  public APLError setLastError(Throwable t) {
+    return lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
   }
   
   

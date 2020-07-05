@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Tokenizer {
   private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
-  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶";
+  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶◴";
   public static final String surrogateOps = "𝕩𝕏𝕨𝕎𝕗𝔽𝕘𝔾𝕤𝕊𝕣ℝ";
   private static boolean validNameStart(char c) {
     for (char l : validNames) if (l == c) return true;
@@ -41,9 +41,10 @@ public class Tokenizer {
       ts.add(r);
     }
     
-    LineTok tok() { // also handles strands because why not
+    LineTok tok(boolean pointless) { // also handles strands because why not
       int spos = size()==0? pos : ts.get(0).spos;
       int epos = size()==0? pos : ts.get(size()-1).epos;
+      if (pointless) return new LineTok(line, spos, epos, ts, '\0');
       ArrayList<Token> pts = new ArrayList<>();
       
       ArrayList<Token> cstr = new ArrayList<>();
@@ -148,14 +149,17 @@ public class Tokenizer {
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
           
           var lineTokens = new ArrayList<LineTok>();
-          for (Line ta : closed.a) lineTokens.add(ta.tok());
+          for (Line ta : closed.a) lineTokens.add(ta.tok(pointless));
           Token r;
           switch (c) {
-            case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
+            case ')': if (pointless) { ArrayList<Token> ts = new ArrayList<>(lineTokens); r = new ParenTok(raw, closed.pos, i+1, new LineTok(raw, closed.pos, len, ts, '\0')); } else {
+              if (lineTokens.size()!=1) throw new SyntaxError("parenthesis should be a single expression");
               r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0));
-              break;
+            }
+            break;
             case '}':
-              r = new DfnTok(raw, closed.pos, i+1, lineTokens);
+              if (pointless) r = new DfnTok(raw, closed.pos, i+1, lineTokens, true);
+              else r = new DfnTok(raw, closed.pos, i+1, lineTokens);
               break;
             case ']':
               r = new BracketTok(raw, closed.pos, i+1, lineTokens);
@@ -179,12 +183,11 @@ public class Tokenizer {
           while (i < len && validNameMid(raw.charAt(i))) i++;
           var name = raw.substring(li, i);
           tokens.add(new NameTok(raw, li, i, name));
-        } else if (c=='¯' && next=='∞') {
-          i+= 2;
-          tokens.add(new NumTok(raw, li, i, Double.NEGATIVE_INFINITY));
-        } else if (c == '∞') {
-          i++;
-          tokens.add(new NumTok(raw, li, i, Double.POSITIVE_INFINITY));
+        } else if ("∞π".indexOf(c)!=-1  ||  c=='¯' && "∞π".indexOf(next)!=-1) {
+          boolean neg = c=='¯';
+          i+= neg? 2 : 1;
+          double v = (neg? next : c) == '∞'? Double.POSITIVE_INFINITY : Math.PI;
+          tokens.add(new NumTok(raw, li, i, neg? -v : v));
         } else if (c>='0' && c<='9' || c=='¯' || c=='.' && next>='0' && next<='9') {
           boolean negative = c=='¯';
           if (negative) i++;
@@ -274,7 +277,7 @@ public class Tokenizer {
               str.append(raw.charAt(i));
             }
             i++;
-            SyntaxError.must(i < len, "unfinished string literal");
+            if (i >= len) throw new SyntaxError("unfinished string literal");
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
@@ -324,17 +327,21 @@ public class Tokenizer {
         Block closed = levels.remove(levels.size() - 1);
         
         var lineTokens = new ArrayList<LineTok>();
-        for (Line ta : closed.a) lineTokens.add(ta.tok());
+        for (Line ta : closed.a) lineTokens.add(ta.tok(true));
         Token r;
         switch (closed.b) {
-          case ')': if (lineTokens.size() != 1) throw new SyntaxError("parenthesis should be a single expression");
-            r = new ParenTok(raw, closed.pos, len, lineTokens.get(0));
+          case ')':
+            ArrayList<Token> ts = new ArrayList<>(lineTokens);
+            r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts, '\0'));
             break;
           case '}':
-            r = new DfnTok(raw, closed.pos, len, lineTokens);
+            r = new DfnTok(raw, closed.pos, len, lineTokens, true);
             break;
           case ']':
             r = new BracketTok(raw, closed.pos, len, lineTokens);
+            break;
+          case '⟩':
+            r = new ArrayTok(raw, closed.pos, len, lineTokens);
             break;
           default:
             throw new Error("this should really not happen "+closed.b);
@@ -348,7 +355,7 @@ public class Tokenizer {
     if (lines.size() > 0 && lines.get(lines.size()-1).size() == 0) lines.remove(lines.size()-1); // no trailing empties!!
     var expressions = new ArrayList<LineTok>();
     for (Line line : lines) {
-      expressions.add(line.tok());
+      expressions.add(line.tok(pointless));
     }
     return new BasicLines(raw, 0, len, expressions);
   }

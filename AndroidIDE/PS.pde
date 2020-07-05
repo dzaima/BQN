@@ -11,8 +11,8 @@ void psDraw() {
   else touches = new FakeTouch[0];
 }
 void settings() {
-  size(540, 830);
-  //size(1200, 800, JAVA2D);
+  //size(540, 830);
+  size(1200, 800, JAVA2D);
   //size(960, 540);
 }
 
@@ -150,3 +150,24 @@ static void endClip(PGraphics g) {
 }
 
 //*/
+
+
+//import java.awt.Color;
+//import java.awt.RenderingHints;
+//import java.awt.Graphics2D;
+//import java.util.Map;
+static void textS(PGraphics g, String s, float x, float y) {
+  //if (g.getNative() instanceof Graphics2D) {
+  //  Graphics2D g2d = (Graphics2D) g.getNative();
+  //  g2d.setRenderingHint(
+  //    RenderingHints.KEY_ANTIALIASING,
+  //    RenderingHints.VALUE_ANTIALIAS_OFF);
+  //  g2d.setRenderingHint(
+  //    RenderingHints.KEY_TEXT_ANTIALIASING,
+  //    RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
+  //  g2d.setColor(new Color(g.fillColor));
+  //  g2d.drawString(s, (int)x, (int)(y+g.textSize));
+  //} else {
+    g.text(s, x, y + (MOBILE? g.textSize*.333 : 0));
+  //}
+}

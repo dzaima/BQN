@@ -142,9 +142,10 @@ static class APLField extends Drawable implements TextReciever {
     if (sx != 0) saveUndo = true;
     if (sx == 0) {
     } else {
-      line = line.substring(0, sx-1) + line.substring(sx);
-      sx--;
-      ex--;
+      int am = Character.isLowSurrogate(line.charAt(sx-1))? 2 : 1;
+      line = line.substring(0, sx-am) + line.substring(sx);
+      sx-= am;
+      ex-= am;
     }
   }
   void special(String s) {
@@ -155,7 +156,8 @@ static class APLField extends Drawable implements TextReciever {
       if (sx!=ex && !a.cshift()) {
         sx = ex = Math.min(sx, ex);
       } else {
-        ex = Math.max(0, ex-1);
+        int am = ex==0? 0 : Character.isLowSurrogate(line.charAt(ex-1))? 2 : 1;
+        ex-= am;
         if (a.ctrl) {
           while (ex>0 && !Character.isAlphabetic(line.charAt(ex))) ex--;
           while (ex>0 &&  Character.isAlphabetic(line.charAt(ex))) ex--;
@@ -172,7 +174,10 @@ static class APLField extends Drawable implements TextReciever {
         if (ctrl) {
           while (ex<len && !Character.isAlphabetic(line.charAt(ex))) ex++;
           while (ex<len &&  Character.isAlphabetic(line.charAt(ex))) ex++;
-        } else ex = Math.min(len, ex+1);
+        } else {
+          int am = ex>=len-1? ex==len?0:1 : Character.isLowSurrogate(line.charAt(ex+1))? 2 : 1;
+          ex+= am;
+        }
         if (!cshift()) sx = ex;
       }
     }
@@ -274,7 +279,8 @@ static class APLField extends Drawable implements TextReciever {
       return;
     }
     if (sx != line.length()) {
-      line = line.substring(0, sx) + line.substring(sx+1);
+      int am = sx==line.length()-1? 1 : Character.isLowSurrogate(line.charAt(sx+1))? 2 : 1;
+      line = line.substring(0, sx) + line.substring(sx+am);
       saveUndo = true;
     }
   }

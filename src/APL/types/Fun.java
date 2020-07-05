@@ -578,6 +578,7 @@ public abstract class Fun extends Callable {
   public Fun asFun() {
     return this;
   }
+  public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
   @Override public int hashCode() {

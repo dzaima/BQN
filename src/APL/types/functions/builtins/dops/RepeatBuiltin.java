@@ -2,6 +2,7 @@ package APL.types.functions.builtins.dops;
 
 import APL.errors.DomainError;
 import APL.types.*;
+import APL.types.arrs.HArr;
 import APL.types.functions.*;
 
 public class RepeatBuiltin extends Dop {
@@ -11,15 +12,13 @@ public class RepeatBuiltin extends Dop {
   
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     Fun aaf = aa.asFun();
-    int am = ww.asFun().call(w).asInt();
-    if (am < 0) {
-      for (int i = 0; i < -am; i++) {
-        w = aaf.callInv(w);
-      }
-    } else for (int i = 0; i < am; i++) {
-      w = aaf.call(w);
-    }
-    return w;
+    Value wwa = ww.asFun().call(w);
+  
+    int[] bs = new int[2]; bounds(bs, wwa); bs[0]*=-1; // min, max
+    
+    Value nx = w; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInv(nx);
+    Value px = w; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call   (px);
+    return replace(wwa, neg, w, pos);
   }
   
   public Value callInv(Value aa, Value ww, Value w) {
@@ -39,15 +38,13 @@ public class RepeatBuiltin extends Dop {
   
   public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = aa.asFun();
-    int am = ww.asFun().call(a, w).asInt();
-    if (am < 0) {
-      for (int i = 0; i < -am; i++) {
-        w = aaf.callInvW(a, w);
-      }
-    } else for (int i = 0; i < am; i++) {
-      w = aaf.call(a, w);
-    }
-    return w;
+    Value wwa = ww.asFun().call(w);
+  
+    int[] bs = new int[2]; bounds(bs, wwa); bs[0]*=-1; // min, max
+  
+    Value nx = w; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInvW(a, nx);
+    Value px = w; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call    (a, px);
+    return replace(wwa, neg, w, pos);
   }
   
   public Value callInvW(Value aa, Value ww, Value a, Value w) {
@@ -62,6 +59,28 @@ public class RepeatBuiltin extends Dop {
     }
     return w;
   }
+  
+  private static void bounds(int[] res, Value v) {
+    if (v.quickDoubleArr()) {
+      for (double d : v.asDoubleArr()) {
+        int n = Num.toInt(d);
+        if (n < res[0]) res[0] = n;
+        else if (n > res[1]) res[1] = n;
+      }
+    } else for (Value c : v) bounds(res, c);
+  }
+  private static Value replace(Value c, Value[] n, Value z, Value[] p) {
+    if (c instanceof Num) {
+      int i = (int) ((Num) c).num;
+      return i==0? z : i<0? n[-i-1] : p[i-1];
+    }
+    Value[] vs = new Value[c.ia];
+    for (int i = 0; i < vs.length; i++) vs[i] = replace(c.get(i), n, z, p);
+    return Arr.create(vs, c.shape);
+  }
+  
+  
+  
   public Value callInvA(Value aa, Value ww, Value a, Value w) {
     Fun aaf = isFn(aa, '⍶');
     int am = ww.asInt();
@@ -76,6 +95,7 @@ public class RepeatBuiltin extends Dop {
     int n = ww.asInt();
     return repeat(aaf, n, o, w);
   }
+  
   public Value repeat(Fun aa, int n, Value o, Value w) { // todo don't do recursion?
     if (n==0) {
       return o instanceof Fun? ((Fun) o).call(w) : o;

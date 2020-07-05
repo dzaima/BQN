@@ -3,11 +3,12 @@ package APL.types.functions.trains;
 import APL.Type;
 import APL.errors.DomainError;
 import APL.types.*;
+import APL.types.functions.*;
 
 public class Fork extends Fun {
-  private final Obj f;
+  private final Value f;
   private final Fun g, h;
-  public Fork(Obj f, Fun g, Fun h) {
+  public Fork(Value f, Fun g, Fun h) {
     this.f = f;
     this.g = g;
     this.h = h;
@@ -19,31 +20,28 @@ public class Fork extends Fun {
   }
   
   public Value call(Value w) {
-    var right = (Value) h.call(w);
-    var left = (Value) (f instanceof Fun? ((Fun)f).call(w) : f);
-    return g.call(left, right);
+    Value r = h.call(w);
+    Value l = f.asFun().call(w);
+    return g.call(l, r);
   }
   public Value callInv(Value w) {
-    if (f instanceof Fun) throw new DomainError("(f g h)A cannot be inverted", this);
-    var left = (Value) f;
-    // System.out.println(f+";"+g+";"+h);
-    return h.callInv(g.callInvW(left, w));
+    if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
+    return h.callInv(g.callInvW(f, w));
   }
   public Value call(Value a, Value w) {
-    var left = (Value) (f instanceof Fun? ((Fun)f).call(a, w) : f);
-    var right = (Value) h.call(a, w);
-    return g.call(left, right);
+    Value r = h.call(a, w);
+    Value l = f.asFun().call(a, w);
+    return g.call(l, r);
   }
   
   @Override public Value callInvW(Value a, Value w) {
-    if (f instanceof Fun) throw new DomainError("A(f g h)B cannot be inverted", this);
-    Value left = (Value) f;
-    return h.callInvW(a, g.callInvW(left, w));
+    if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
+    return h.callInvW(a, g.callInvW(f, w));
   }
   
   @Override public Value callInvA(Value a, Value w) {
-    if (f instanceof Fun) throw new DomainError("A(f g h)B cannot be inverted", this);
-    return h.callInvA(g.callInvW((Value) f, a), w);
+    if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
+    return h.callInvA(g.callInvW(f, a), w);
   }
   
   @Override public String repr() {
@@ -51,11 +49,10 @@ public class Fork extends Fun {
   }
   
   public Value under(Value o, Value w) {
-    if (!(f instanceof Value)) throw new DomainError("(f g h)A cannot be inverted", this);
-    Value fa = (Value) f;
+    if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.under(new Fun() { public String repr() { return g.repr(); }
       public Value call(Value w) {
-        return g.underW(o, fa, w);
+        return g.underW(o, f, w);
       }
     }, w);
   }

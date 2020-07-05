@@ -12,12 +12,12 @@ static class APLTextarea extends Drawable implements TextReciever {
     super(x, y, w, h);
     lines = new ArrayList();
     lines.add("");
-    setsz(max(a.width, a.height)/40);
+    setsz(scale);
   }
   int tt = 0; // caret flicker timer
   int xoff = 0; // scroll
   int yoff = 0;
-
+  
   void redraw() {
     if (hl!=null) hl.g = d;
   }
@@ -33,7 +33,7 @@ static class APLTextarea extends Drawable implements TextReciever {
       textInput = this;
     }
     if (cy < 0 || cy > lines.size() || cx < 0 || cx > lines.get(cy).length()) {
-      lines.add("CX was "+cx+"; CY was "+cy);
+      lines.add("CX was "+cx+"; CY was "+cy+"; am = "+lines.size()+"; len = "+lines.get(cy).length());
       cx = 0;
       cy = 0;
     }
@@ -98,8 +98,8 @@ static class APLTextarea extends Drawable implements TextReciever {
     if (tt < 0) tt = 60;
     if (tt > 30 || this != textInput) {
       float px;
-      //if (mousePressed) px = x + max(textWidth(lines.get(cy).substring(0, cx)), 3) + xoff; else
-      px = x + max(chw * cx, 3) + xoff;
+      // if (a.mousePressed) px = x + max(chw * cx, 3) + xoff; else
+      px = x + max(a.textWidth(lines.get(cy).substring(0, cx)), 3) + xoff;
       d.stroke(th.caret);
       d.line(px, tsz*cy + yoff + y, px, tsz*(cy+1) + yoff + y);
     }
@@ -159,8 +159,9 @@ static class APLTextarea extends Drawable implements TextReciever {
       }
     } else {
       String ln = lines.get(cy);
-      lines.set(cy, ln.substring(0, cx-1) + ln.substring(cx));
-      cx--;
+      int am = Character.isLowSurrogate(ln.charAt(cx-1))? 2 : 1;
+      lines.set(cy, ln.substring(0, cx-am) + ln.substring(cx));
+      cx-= am;
     }
   }
   void special(String s) {
@@ -269,7 +270,8 @@ static class APLTextarea extends Drawable implements TextReciever {
   
   void left() {
     cursorMoved = true;
-    cx--;
+    int cll = lines.get(cy).length();
+    cx-= cx!=0 && cx-1<cll && Character.isLowSurrogate(lines.get(cy).charAt(cx-1))? 2 : 1;
     if (cx == -1) {
       if (cy == 0) cx = 0;
       else {
@@ -280,7 +282,8 @@ static class APLTextarea extends Drawable implements TextReciever {
   }
   void right() {
     cursorMoved = true;
-    cx++;
+    int cll = lines.get(cy).length();
+    cx+= cx<cll && Character.isHighSurrogate(lines.get(cy).charAt(cx))? 2 : 1;
     if (cx == lines.get(cy).length()+1) {
       if (cy == lines.size()-1) cx--;
       else {

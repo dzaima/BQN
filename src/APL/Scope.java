@@ -17,18 +17,31 @@ import java.util.*;
 
 
 public class Scope {
-  public final HashMap<String, Value> vars = new HashMap<>();
-  private Scope parent = null;
-  public Random rnd;
+  private final Scope parent;
+  public final HashMap<String, Value> vars;
   public final Sys sys;
+  public Random rnd;
+  public final Value[] args;
   public Scope(Sys s) {
-    rnd = new Random();
+    vars = new HashMap<>();
     sys = s;
+    parent = null;
+    args = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
+    rnd = new Random();
   }
   public Scope(Scope p) {
-    parent = p;
-    rnd = p.rnd;
+    vars = new HashMap<>();
     sys = p.sys;
+    parent = p;
+    args = p.args;
+    rnd = p.rnd;
+  }
+  public Scope(Scope inherit, Value[] args) {
+    vars = inherit.vars;
+    sys = inherit.sys;
+    parent = inherit.parent;
+    this.args = args;
+    rnd = inherit.rnd;
   }
   private Scope owner(String name) {
     if (vars.containsKey(name)) return this;
@@ -86,6 +99,9 @@ public class Scope {
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
+        case "•args": return new HArr(Arrays.copyOf(args, args.length-2));
+        case "•path": return args[args.length-1];
+        case "•name": return args[args.length-2];
         case "•l":
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser(this);
@@ -372,7 +388,7 @@ public class Scope {
         // return new StrMap(sc, vals);
         return new StrMap(new HashMap<>(wm.vals));
       }
-      var map = new StrMap();
+      StrMap map = new StrMap();
       for (Value v : w) {
         if (v.rank != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
         map.set(v.get(0), v.get(1));
@@ -385,7 +401,7 @@ public class Scope {
       if (a.rank != 1) throw new RankError("rank of ⍺ ≠ 1", this, a);
       if (w.rank != 1) throw new RankError("rank of ⍵ ≠ 1", this, w);
       if (a.ia != w.ia) throw new LengthError("both sides lengths should match", this, w);
-      var map = new StrMap();
+      StrMap map = new StrMap();
       for (int i = 0; i < a.ia; i++) {
         map.set(a.get(i), w.get(i));
       }
@@ -427,10 +443,15 @@ public class Scope {
     Ex(Scope sc) {
       super(sc);
     }
-    
+  
     public Value call(Value w) {
+      return call(EmptyArr.SHAPE0S, w);
+    }
+  
+    public Value call(Value a, Value w) {
       String path = w.asString();
-      return Main.execFile(path, sc);
+      if (a.rank != 1) throw new DomainError("•EX: 𝕨 must be a vector (had shape "+Main.formatAPL(a.shape)+")");
+      return sc.sys.execFile(path, a.values());
     }
   }
   private static class Lns extends Builtin {

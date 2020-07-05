@@ -14,7 +14,7 @@ public class BracketTok extends TokArr<LineTok> {
   @Override public String toRepr() {
     StringBuilder s = new StringBuilder("[");
     boolean tail = false;
-    for (var v : tokens) {
+    for (LineTok v : tokens) {
       if (tail) s.append(" ⋄ ");
       s.append(v.toRepr());
       tail = true;

@@ -294,7 +294,8 @@ public class Num extends Primitive {
     return toInt(num);
   } 
   public static int toInt(double d) {
-    return (int) d; // TODO not round
+    if (d%1!=0) throw new DomainError("Expected integer, got "+d);
+    return (int) d;
   }
   public double asDouble() {
     return num;

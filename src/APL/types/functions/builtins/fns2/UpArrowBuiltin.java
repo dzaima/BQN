@@ -71,7 +71,7 @@ public class UpArrowBuiltin extends Builtin {
         if (sh[i] == 0) { empty = true; break; }
       }
       if (empty) {
-        return Arr.create(new Value[0], sh);
+        return new EmptyArr(sh, w.safePrototype());
       } else {
         int[] ssh  = new int[w.rank]; System.arraycopy(sh , d, ssh , 0, w.rank);
         int[] soff = new int[w.rank]; System.arraycopy(off, d, soff, 0, w.rank);

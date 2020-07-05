@@ -39,7 +39,9 @@ public class EachBuiltin extends Mop {
     }
     
     int mr = Math.min(a.shape.length, w.shape.length);
-    if (!Arrays.equals(a.shape, 0, mr, w.shape, 0, mr)) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
+    for (int i = 0; i < mr; i++) {
+      if (a.shape[i] != w.shape[i]) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
+    }
     
     if (a.shape.length == w.shape.length) {
       Value[] n = new Value[w.ia];

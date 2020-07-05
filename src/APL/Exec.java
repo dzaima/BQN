@@ -184,21 +184,21 @@ public class Exec {
         if (Main.debug) printlvl("f g h");
         var h = lastFun();
         var g = lastFun();
-        var f = lastObj();
+        var f = lastVal();
         addE(new Fork(f, g, h));
         continue;
       }
       if (is("D!|NF", false, false)) {
         if (Main.debug) printlvl("A f");
         var f = lastFun();
-        var a = lastObj();
+        var a = lastFun();
         addE(new Atop(a, f));
         continue;
       }
       if (is("←FF", false, false)) {
         if (Main.debug) printlvl("g h");
         var h = lastFun();
-        var g = lastObj();
+        var g = lastFun();
         addE(new Atop(g, h));
         continue;
       }
@@ -207,7 +207,7 @@ public class Exec {
     if (end && llSize==2 && LN.l.type == 'F') {
       if (Main.debug) printlvl("g h");
       var h = lastFun();
-      var g = lastObj();
+      var g = lastFun();
       addE(new Atop(g, h));
     }
   }

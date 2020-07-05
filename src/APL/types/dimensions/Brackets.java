@@ -31,10 +31,6 @@ public class Brackets extends Callable {
     return "["+val+"]";
   }
   
-  public Fun asFun() {
-    throw new AssertionError("this object shouldn't be accessible");
-  }
-  
   public static Obj of(BracketTok t, Scope sc) {
     Value[] lns = new Value[t.tokens.size()];
     for (int i = 0; i < t.tokens.size(); i++) {
@@ -44,4 +40,7 @@ public class Brackets extends Callable {
     return GTBuiltin.merge(lns, new int[]{lns.length}, t);
   }
   
+  
+  public Fun asFun() { throw new AssertionError("this object shouldn't be accessible"); }
+  public boolean notIdentity() { throw new AssertionError("this object shouldn't be accessible"); }
 }

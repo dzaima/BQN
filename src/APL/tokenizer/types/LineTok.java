@@ -19,7 +19,7 @@ public class LineTok extends TokArr<Token> { // +TODO make things using this ver
   @Override public String toRepr() {
     StringBuilder s = new StringBuilder();
     boolean tail = false;
-    for (var v : tokens) {
+    for (Token v : tokens) {
       if (tail) s.append(" ");
       s.append(v.toRepr());
       tail = true;

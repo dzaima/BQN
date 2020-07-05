@@ -1,12 +1,12 @@
-static Interpreter it = new DzaimaAPL(); // current interpreter
 
 
 abstract static class Interpreter {
-  abstract String[] get(String code);
-  abstract String[] special(String ex);
+  abstract String[] repl(String ln);
+  abstract Value exec(String s);
 }
 static class Dyalog extends Interpreter {
-  String[] get(String code) {
+  Value exec(String s) { return null; }
+  String[] repl(String code) {
     try {
       Scanner s = send("eval", code);
       String ln = s.nextLine();
@@ -51,15 +51,31 @@ static class Dyalog extends Interpreter {
     return new String[0];
   }
 }
-static Scope dzaimaSC = new Scope();
+static Sys glSys = new Sys() {
+  void off(int i) {
+    System.exit(i);
+  }
+  String input() {
+    return null;
+  }
+  void println(String s) {
+    System.out.println(s);
+  }
+};
+static Scope dzaimaSC = glSys.gsc;
 static Fun layoutUpdate, actionCalled;
 static {
   Main.colorful = false;
 }
 
 
-class AppMap extends SimpleMap {
+static class AppMap extends SimpleMap {
   String toString() { return "app"; }
+  Interpreter it;
+  
+  AppMap(Interpreter it) {
+    this.it = it;
+  }
   
   void setv(String k, Obj v) {
     String s = k.toLowerCase();
@@ -73,7 +89,7 @@ class AppMap extends SimpleMap {
       default: throw new DomainError("setting non-existing key "+s+" for app");
     }
   }
-  Obj getv(String k) {
+  Value getv(String k) {
     String s = k.toLowerCase();
     if (s.matches("t\\d+")) {
       int i = Integer.parseInt(s.substring(1));
@@ -83,18 +99,19 @@ class AppMap extends SimpleMap {
       case "layout": return Main.toAPL(kb.data.getString("fullName"));
       case "set": return new Fun() {
         public String repr() { return "app.set"; }
-        public Value call(Value a, Value w) {
-          int[] is = a.asIntVec();
-          int x = is[0]; int y = is[1]; int dir = is[2];
-          Key key = kb.keys[y][x];
-          key.actions[dir] = new Action(parseJSONObject(w.asString()), kb, key);
+        public Value call(Value w, Value x) {
+          int[] is = w.asIntVec();
+          int xp  = is[0];
+          int yp  = is[1]; Key key = kb.keys[yp][xp];
+          int dir = is[2];
+          key.actions[dir] = new Action(a.parseJSONObject(x.asString()), kb, key);
           return Num.ONE;
         }
       };
       case "graph": return new Fun() {
         public String repr() { return "app.graph"; }
         public Value call(Value w) {
-          Grapher g = new Grapher(w.asString());
+          Grapher g = new Grapher(it, w.asString());
           topbar.toNew(g);
           return g;
         }
@@ -105,11 +122,11 @@ class AppMap extends SimpleMap {
           if (w.rank == 1) {
             w = w.squeeze();
             if (w instanceof ChrArr) {
-              copy(w.asString());
+              a.copy(w.asString());
               return Num.ONE;
             }
           }
-          copy(w.toString());
+          a.copy(w.toString());
           return Num.ONE;
         }
       };
@@ -124,21 +141,34 @@ class AppMap extends SimpleMap {
     }
   }
 }
-static AppMap appobj;
-{
-  appobj = new AppMap();
-  dzaimaSC.set("app", appobj);
-}
 
 
-static class DzaimaAPL extends Interpreter {
-  
-  Obj eval(String code) {
-    try {
-      return Main.exec(code, dzaimaSC);
-    } catch (Throwable e) {
-      return Main.toAPL(e.toString());
+static class DzaimaBQN extends Interpreter {
+  final Sys sys = new Sys() {
+    void off(int code) {
+      System.exit(code);
     }
+    String input() {
+      return "";
+    }
+    void println(String s) {
+      System.out.println(s);
+      mainREPL.historyView.appendLns(s);
+      mainREPL.historyView.end();
+    }
+  };
+  
+  DzaimaBQN() {
+    sys.gsc.set("app", new AppMap(this));
+  }
+  
+  Value exec(String code) {
+    return Main.exec(code, sys.gsc);
+  }
+  
+  String[] repl(String ln) {
+    sys.lineCatch(ln);
+    return new String[0];
   }
   
   String[] get(String code) {
@@ -147,7 +177,7 @@ static class DzaimaAPL extends Interpreter {
       if (v == null) return new String[0];
       return v.toString().split("\n");
     } catch (APLError e) {
-      e.print();
+      e.print(sys);
       return new String[0];
     } catch (Throwable e) {
       ArrayList<String> lns = new ArrayList();
@@ -163,7 +193,7 @@ static class DzaimaAPL extends Interpreter {
   }
   String[] special(String ex) {
     try {
-      Main.ucmd(dzaimaSC, ex);
+      sys.ucmd(ex);
     } catch (Throwable e) {
       e.printStackTrace();
     }
@@ -179,7 +209,7 @@ static class Ed extends Editor {
       dzaimaSC.set(name, Main.exec(val, dzaimaSC));
     } catch (Throwable t) {
       println(t.getMessage());
-      Main.lastError = t;
+      glSys.lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
     }
   }
 }

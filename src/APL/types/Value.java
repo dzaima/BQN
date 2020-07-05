@@ -192,7 +192,7 @@ public abstract class Value extends Obj implements Iterable<Value> {
   public double asDouble() {
     throw new DomainError("Using "+this.humanType(true)+" as a number", this);
   }
-  public boolean quickDoubleArr() { // if true, asDoubleArr must succeed; warning: also succeeds on a primitive number
+  public boolean quickDoubleArr() { // if true, asDoubleArr must succeed; warning: also true for a primitive number
     return false;
   }
   public Value squeeze() {
@@ -248,5 +248,8 @@ public abstract class Value extends Obj implements Iterable<Value> {
         return Value.this;
       }
     };
+  }
+  public /*open*/ boolean notIdentity() {
+    return false;
   }
 }

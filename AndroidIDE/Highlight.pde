@@ -63,9 +63,11 @@ static class SyntaxHighlight {
       String cln = lns[ln];
       for (int i = 0; i < cln.length(); i++) {
         char cc = cln.charAt(i);
+        String ccs = Character.toString(cc);
+        if (Character.isHighSurrogate(cc)) ccs+= cln.charAt(++i);
         int pos = i + lnstarts[ln];
         g.fill(cs[pos]);
-        textS(g, cc, cx, y + ln*sz);
+        textS(g, ccs, cx, y + ln*sz);
         int markcol = mark[pos];
         if (markcol != 0) {
           g.fill(markcol);
@@ -100,54 +102,43 @@ static class SyntaxHighlight {
   void err(int i) {
     mark[i] = th.err;
   }
-  Scope sc = new Scope();
   void walk(Token t, int dlvl) {
-    int dfncol = dlvl < 0? th.err : dlvl >= th.dfn.length? th.dfn[0] : th.dfn[dlvl];
+    int dfncol = dlvl<0 || dlvl>=th.dfn.length? th.dfn[0] : th.dfn[dlvl];
     if (t instanceof NumTok) set(t, th.num);
     if (t instanceof BigTok) set(t, th.num);
-    if (t instanceof SetTok) set(t, th.set);
+    if (t instanceof SetTok) set(t, th.dmd);
+    if (t instanceof ModTok) set(t, th.dmd);
     if (t instanceof ErrTok) set(t, th.err);
     if (t instanceof StrTok) set(t, th.str);
     if (t instanceof ChrTok) set(t, th.str);
+    if (t instanceof StranderTok) set(t, th.arr);
     
     if (t instanceof CommentTok) set(t, th.com);
-    if (t instanceof ColonTok || t instanceof DColonTok) set(t, dfncol);
+    if (t instanceof ColonTok || t instanceof SemiTok) set(t, dfncol);
     if (t instanceof DiamondTok) set(t, th.dmd);
+    
+    if (t instanceof NameTok) {
+      if (t.type=='f') set(t, th.fn);
+      if (t.type=='m') set(t, th.mop);
+      if (t.type=='d') set(t, th.dop);
+    }
     
     if (t instanceof  OpTok) {
       switch(((OpTok) t).op) {
-        case "⎕": set(t, th.quad); break; // important - otherwise uses stdin
-        case "⍞": set(t, th.quad); break; // ^
-        case "⍺": set(t, dfncol ); break;
-        case "⍵": set(t, dfncol ); break;
-        case "⍶": set(t, dfncol ); break;
-        case "⍹": set(t, dfncol ); break;
-        case "∇": set(t, dfncol ); break;
-        case "⍬": set(t, th.zil ); break;
+        case "•": set(t, th.def); break;
+        case "𝕨": case "𝕎": case "𝕩": case "𝕏":
+        case "𝕗": case "𝔽": case "𝕘": case "𝔾":
+        case "𝕊":
+          set(t, dfncol ); break;
         default: {
-          int col;
-          try {
-            Obj o = new Exec(LineTok.inherit(t), sc).exec();
-            col = o instanceof Fun? th.fn
-                : o instanceof Mop? th.mop
-                : o instanceof Dop? th.dop
-                : th.err;
-          } catch(Throwable e) {
-            col = th.err;
-          }
-          set(t, col);
+          char tp = Comp.typeof(t);
+          set(t, tp=='a'||tp=='A'? th.arr : tp=='f'? th.fn : tp=='m'? th.mop : tp=='d'? th.dop : th.err);
         }
       }
     }
     if (t instanceof ParenTok) {
+      walk(((ParenTok)t).ln, dlvl);
       if (t.raw.charAt(t.epos-1) != ')') err(t.spos);
-      else {
-        pairs[t.spos  ] = t.epos-1;
-        pairs[t.epos-1] = t.spos  ;
-      }
-    }
-    if (t instanceof BracketTok) {
-      if (t.raw.charAt(t.epos-1) != ']') err(t.spos);
       else {
         pairs[t.spos  ] = t.epos-1;
         pairs[t.epos-1] = t.spos  ;
@@ -170,23 +161,32 @@ static class SyntaxHighlight {
         walk(c, ndlvl);
       }
     }
+    if (t instanceof ArrayTok) {
+      if (t.raw.charAt(t.epos-1) != '⟩') {
+        err(t.spos);
+      } else {
+        set(t.spos  , th.arr);
+        set(t.epos-1, th.arr);
+        pairs[t.spos  ] = t.epos-1;
+        pairs[t.epos-1] = t.spos  ;
+      }
+    }
   }
 }
 static class Theme {
   int def = #D2D2D2;
   int err = #FF0000;
-  int com = #BBBBBB;
-  int num = #AA88BB;
-  
-  int set = #FFFF00;
-  int quad= def    ;
-  int str = #DDAAEE;
-  int zil = #DD99FF;
+  int com = #898989;
+  int num = #ff6E6E;
+  int arr = #DD99FF;
   
   int dmd = #FFFF00;
-  int fn  = #00FF00;
-  int mop = #FF9955;
+  int str = #6A9FFB;
+  
+  int fn  = #57d657;
+  int mop = #EB60DB;
   int dop = #FFDD66;
+  
   int pair= #777799;
   
   int caret = def;

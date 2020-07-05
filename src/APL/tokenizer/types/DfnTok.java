@@ -84,8 +84,15 @@ public class DfnTok extends TokArr<LineTok> {
     for (int i = 0; i < bodies.size(); i++) bodies.get(i).start = offs[i];
     
     this.bodies = bodies;
-  }  
+  }
   
+  public DfnTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) {
+    super(line, spos, epos, tokens);
+    assert pointless;
+    comp = null;
+    immediate = false;
+    bodies = null;
+  }
   
   public static class Body {
     public int start;
@@ -271,6 +278,7 @@ public class DfnTok extends TokArr<LineTok> {
       }
       nsc.vars.clear();
     }
+    type = 'a';
     throw new DomainError("No dfn header matched", this);
   }
   
@@ -313,7 +321,7 @@ public class DfnTok extends TokArr<LineTok> {
   @Override public String toRepr() {
     StringBuilder s = new StringBuilder("{");
     boolean tail = false;
-    for (var v : tokens) {
+    for (LineTok v : tokens) {
       if (tail) s.append(" ⋄ ");
       s.append(v.toRepr());
       tail = true;

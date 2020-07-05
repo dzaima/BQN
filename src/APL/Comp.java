@@ -206,7 +206,7 @@ public class Comp {
         case TR2D: {
           Value f = (Value) s.pop();
           Value g = (Value) s.pop();
-          Atop d = new Atop(f, g.asFun()); d.token = f.token;
+          Atop d = new Atop(f.asFun(), g.asFun()); d.token = f.token;
           s.push(d);
           break;
         }
@@ -222,7 +222,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Value g = (Value) s.pop();
           Value h = (Value) s.pop();
-          Obj d = f instanceof Nothing? new Atop(g, h.asFun()) : new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
+          Obj d = f instanceof Nothing? new Atop(g.asFun(), h.asFun()) : new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
           s.push(d);
           break;
         }
@@ -289,8 +289,7 @@ public class Comp {
         default: throw new InternalError("Unknown bytecode "+ bc[pi]);
       }
     }
-    assert s.peek() instanceof Value;
-    return Main.san(s.peek()); // +todo just cast?
+    return (Value) s.peek();
     } catch (Throwable t) {
       APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
       ArrayList<APLError.Mg> mgs = new ArrayList<>();
@@ -937,16 +936,8 @@ public class Comp {
       compP(m, ((ParenTok) tk).ln, false);
       return;
     }
-    if (tk instanceof NumTok) {
-      m.push(((NumTok) tk).val);
-      return;
-    }
-    if (tk instanceof ChrTok) {
-      m.push(((ChrTok) tk).val);
-      return;
-    }
-    if (tk instanceof StrTok) {
-      m.push(((StrTok) tk).val);
+    if (tk instanceof ConstTok) {
+      m.push(((ConstTok) tk).val);
       return;
     }
     if (tk instanceof LineTok) {

@@ -18,12 +18,12 @@ public class BeforeBuiltin extends Dop {
   }
   
   public Value callInv(Value aa, Value ww, Value w) {
-    if (aa instanceof Fun || aa instanceof Mop || aa instanceof Dop) throw new DomainError("𝕗⊸𝔾⁼: 𝕗 cannot be a function", this, aa); // +TODO make a saner checking way
+    if (aa.notIdentity()) throw new DomainError("𝕗⊸𝔾⁼: 𝕗 cannot be a function", this, aa);
     return ww.asFun().callInvW(aa, w);
   }
   
   public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    if (aa instanceof Fun || aa instanceof Mop || aa instanceof Dop) throw new DomainError("⌾(𝕗⊸𝔾): 𝕗 cannot be a function", this, aa); // +TODO make a saner checking way
+    if (aa.notIdentity()) throw new DomainError("⌾(𝕗⊸𝔾): 𝕗 cannot be a function", this, aa);
     return ww.asFun().underW(o, aa, w);
   }
 }

@@ -62,7 +62,7 @@ public class TildeBuiltin extends Builtin {
     boolean[] leave = new boolean[a.ia];
     a: for (int i = 0; i < a.ia; i++) {
       Value v = a.get(i);
-      for (var c : w) {
+      for (Value c : w) {
         if (v.equals(c)) continue a;
       }
       leave[i] = true;

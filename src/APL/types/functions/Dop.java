@@ -68,6 +68,7 @@ public abstract class Dop extends Callable {
   public Fun asFun() {
     throw new SyntaxError("Cannot interpret a composition as a function");
   }
+  public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
   @Override public int hashCode() {

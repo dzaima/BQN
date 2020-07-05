@@ -64,6 +64,7 @@ public abstract class Mop extends Callable {
   public Fun asFun() {
     throw new SyntaxError("Cannot interpret a modifier as a function");
   }
+  public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
   @Override public int hashCode() {

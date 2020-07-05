@@ -3,7 +3,7 @@ static class ROText extends Drawable {
   ROText(int x, int y, int w, int h) {
     super(x, y, w, h);
     s = new ArrayList();
-    setSize(max(d.width, d.height)/40);
+    setSize(scale);
   }
   int xoff = 0; // scroll
   int yoff = 0;
@@ -23,9 +23,10 @@ static class ROText extends Drawable {
     d.line(x, y+h, x+w, y+h);
     int dy = -s.size();
     d.clip(x+border, y+3, w-border*2, h-6);
-    for (String s : s) {
-      d.text(s, x+border + xoff, y + dy*tsz + yoff);
+    for (String c : s) {
+      float cy = dy*tsz + yoff;
       dy++;
+      if (cy>-tsz && cy<h) d.text(c, x+border + xoff, y+cy);
     }
     endClip(d);
     redraw = false;

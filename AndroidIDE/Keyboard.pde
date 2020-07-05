@@ -37,6 +37,7 @@ class Keyboard extends Drawable {
     redraw();
   }
   void redraw() {
+    if (w==0||h==0) return;
     if (visible) {
       for (Key[] row : keys) for (Key k : row) k.redraw();
     }
@@ -45,6 +46,7 @@ class Keyboard extends Drawable {
   Key start;
   
   void tick() {
+    if (w==0||h==0) return;
     if (!pmousePressed && mousePressed && smouseIn()) {
       int mx = (mouseX-x) / kw;
       int my = (mouseY-y) / kh;
@@ -133,6 +135,7 @@ class Key extends Drawable {
   }
   
   void redraw(Action hl) { // highlight
+    if (w==0 || h==0) return;
     rectMode(CORNER);
     fill(b.start == this && (hl == actions[0])? g.lerpColor(col, #aaaaaa, .1) : col);
     noStroke();
@@ -179,7 +182,7 @@ class Key extends Drawable {
 }
 
 
-class Action {
+static class Action {
   final String chr, spec, type, gotof;
   final int rep;
   final Keyboard b;
@@ -220,7 +223,7 @@ class Action {
       case "rdel": textInput.rdelete(); return;
       case "clear": textInput.clear(); return;
       case "enter": textInput.append("\n"); return;
-      case "vkb": openKeyboard(); return;
+      case "vkb": a.openKeyboard(); return;
       case "shift": 
         b.shiftMode++;
         if (b.shiftMode > 2) b.shiftMode = 0;

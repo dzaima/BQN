@@ -53,7 +53,7 @@ public class StrMap extends APLMap {
   
   @Override
   public Arr allValues() {
-    var items = new ArrayList<Value>();
+    ArrayList<Value> items = new ArrayList<>();
     for (Obj o : vals.values()) {
       if (o instanceof Value) items.add((Value) o);
     }
@@ -61,7 +61,7 @@ public class StrMap extends APLMap {
   }
   
   @Override public Arr allKeys() {
-    var items = new ArrayList<Value>();
+    ArrayList<Value> items = new ArrayList<>();
     for (String o : vals.keySet()) {
       items.add(Main.toAPL(o));
     }
