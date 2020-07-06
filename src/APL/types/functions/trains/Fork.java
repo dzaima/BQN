@@ -3,7 +3,6 @@ package APL.types.functions.trains;
 import APL.Type;
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.functions.*;
 
 public class Fork extends Fun {
   private final Value f;

@@ -14,9 +14,6 @@ public class IotaUBBuiltin extends Builtin {
     return "⍸";
   }
   
-  public IotaUBBuiltin(Scope sc) {
-    super(sc);
-  }
   public Value call(Value w) {
     int sum = (int)w.sum();
     if (w.rank == 1) {

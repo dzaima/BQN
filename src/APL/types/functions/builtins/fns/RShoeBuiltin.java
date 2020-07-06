@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.fns;
 
-import APL.*;
+import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.functions.Builtin;
@@ -8,10 +8,6 @@ import APL.types.functions.Builtin;
 public class RShoeBuiltin extends Builtin {
   @Override public String repr() {
     return "⊃";
-  }
-  
-  public RShoeBuiltin(Scope sc) {
-    super(sc);
   }
   
   public Value call(Value w) {

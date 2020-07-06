@@ -14,10 +14,6 @@ public class IotaBuiltin extends Builtin {
     return "⍳";
   }
   
-  public IotaBuiltin(Scope sc) {
-    super(sc);
-  }
-  
   public Value call(Value w) {
     if (w instanceof Primitive) {
       if (w instanceof Num) {

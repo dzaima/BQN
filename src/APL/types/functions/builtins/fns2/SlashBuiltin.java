@@ -5,7 +5,7 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.mops.*;
+import APL.types.functions.builtins.mops.ReduceBuiltin;
 
 public class SlashBuiltin extends Builtin {
   private static final Fun fn = new ReduceBuiltin().derive(new CeilingBuiltin());

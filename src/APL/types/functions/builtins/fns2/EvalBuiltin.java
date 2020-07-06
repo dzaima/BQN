@@ -8,9 +8,9 @@ public class EvalBuiltin extends Builtin {
   @Override public String repr() {
     return "⍎";
   }
-  
+  public final Scope sc;
   public EvalBuiltin(Scope sc) {
-    super(sc);
+    this.sc = sc;
   }
   
   public Value call(Value w) {

@@ -44,6 +44,8 @@ void handleCoded(int keyCode) {
   else if (keyCode == java.awt.event.KeyEvent.VK_RIGHT     ) textInput.special("right");
   else if (keyCode == java.awt.event.KeyEvent.VK_HOME      ) textInput.special("home");
   else if (keyCode == java.awt.event.KeyEvent.VK_END       ) textInput.special("end");
+       if (keyCode == java.awt.event.KeyEvent.VK_PAGE_UP   ) textInput.special("pgup");
+  else if (keyCode == java.awt.event.KeyEvent.VK_PAGE_DOWN ) textInput.special("pgdn");
 }
 KeyEvent fixKE(KeyEvent e) {
   return e;

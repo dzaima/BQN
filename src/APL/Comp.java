@@ -880,7 +880,7 @@ public class Comp {
         }
       }
     }
-    throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName());
+    throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName(), t);
   }
   
   

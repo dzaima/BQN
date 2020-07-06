@@ -12,12 +12,7 @@ public abstract class Fun extends Callable {
     return null;
   }
   
-  protected Fun(Scope sc) {
-    super(sc);
-  }
-  protected Fun() {
-    super(null);
-  }
+  protected Fun() { }
   public Value call(Value w) {
     throw new IncorrectArgsError("function "+toString()+" called monadically", this, w);
   }

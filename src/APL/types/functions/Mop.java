@@ -1,17 +1,12 @@
 package APL.types.functions;
 
-import APL.*;
+import APL.Type;
 import APL.errors.*;
 import APL.types.*;
 
 public abstract class Mop extends Callable {
   
-  protected Mop(Scope sc) {
-    super(sc);
-  }
-  protected Mop() {
-    super(null);
-  }
+  protected Mop() { }
   
   @Override
   public Type type() {

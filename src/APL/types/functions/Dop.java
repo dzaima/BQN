@@ -1,17 +1,12 @@
 package APL.types.functions;
 
-import APL.*;
+import APL.Type;
 import APL.errors.*;
 import APL.types.*;
 
 public abstract class Dop extends Callable {
   
-  protected Dop(Scope sc) {
-    super(sc);
-  }
-  protected Dop() {
-    super(null);
-  }
+  protected Dop() { }
   
   @Override
   public Type type() {

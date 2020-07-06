@@ -10,7 +10,7 @@ import APL.types.functions.MutArr;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Scanner;
 
 @SuppressWarnings("WeakerAccess") // for use as a library
 public class Main {

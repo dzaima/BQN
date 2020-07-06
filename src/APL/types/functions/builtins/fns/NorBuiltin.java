@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.fns;
 
-import APL.*;
+import APL.Main;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
@@ -9,10 +9,6 @@ import APL.types.functions.builtins.fns2.NotBuiltin;
 public class NorBuiltin extends Builtin {
   @Override public String repr() {
     return "⍱";
-  }
-  
-  public NorBuiltin(Scope sc) {
-    super(sc);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

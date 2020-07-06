@@ -10,7 +10,6 @@ public class Brackets extends Callable {
   public final Value val;
   
   public Brackets(Value val) {
-    super(null);
     this.val = val;
   }
   

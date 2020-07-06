@@ -8,9 +8,10 @@ import APL.types.*;
 
 public class Dfn extends Fun {
   public final DfnTok code;
+  public final Scope sc;
   
   public Dfn(DfnTok t, Scope sc) {
-    super(sc);
+    this.sc = sc;
     code = t;
   }
   

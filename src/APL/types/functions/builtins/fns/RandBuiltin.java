@@ -1,5 +1,6 @@
 package APL.types.functions.builtins.fns;
 
+import APL.Scope;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -9,8 +10,14 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class RandBuiltin extends Builtin {
-  @Override public String repr() {
+  private final Scope sc;
+  
+  public String repr() {
     return "?";
+  }
+  
+  protected RandBuiltin(Scope sc) {
+    this.sc = sc;
   }
   
   private final NumMV nf = new NumMV() {

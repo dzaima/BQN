@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.dops;
 
-import APL.*;
+import APL.Main;
 import APL.types.*;
 import APL.types.functions.*;
 
@@ -9,10 +9,6 @@ import java.util.ArrayList;
 public class CRepeatBuiltin extends Dop {
   @Override public String repr() {
     return "⍡";
-  }
-  
-  public CRepeatBuiltin(Scope sc) {
-    super(sc);
   }
   
   @Override public Value call(Value aa, Value ww, Value w, DerivedDop derv) {

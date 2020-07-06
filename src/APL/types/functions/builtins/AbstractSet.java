@@ -4,9 +4,6 @@ import APL.Type;
 import APL.types.*;
 
 public abstract class AbstractSet extends Callable {
-  public AbstractSet() {
-    super(null);
-  }
   
   public abstract Value call(Obj a, Value w, boolean update);
   

@@ -90,9 +90,9 @@ public class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "•time": return new Timer(this, true);
-        case "•htime": return new Timer(this, false);
-        case "•ex": return new Ex(this);
+        case "•time": return new Timer(true);
+        case "•htime": return new Timer(false);
+        case "•ex": return new Ex();
         case "•lns": return new Lns();
         case "•sh": return new Shell();
         case "•nc": return new NC();
@@ -104,14 +104,14 @@ public class Scope {
         case "•name": return args[args.length-2];
         case "•l":
         case "•la": return Main.lAlphabet;
-        case "•erase": return new Eraser(this);
+        case "•erase": return new Eraser();
         case "•gc": System.gc(); return Num.ONE;
         case "•gclog": return new GCLog(this);
         case "•null": return Null.NULL;
         case "•map": case "•NS": return new MapGen();
-        case "•dl": return new Delay(this);
+        case "•dl": return new Delay();
         case "•dr": return new DR();
-        case "•ucs": return new UCS(this);
+        case "•ucs": return new UCS();
         case "•hash": return new Hasher();
         case "•io": return Num.ZERO;
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
@@ -139,7 +139,8 @@ public class Scope {
             return null;
           }
         };
-        case "•comp": return new Builtin(this) {
+        case "•comp": return new Builtin() {
+          
           public String repr() {
             return "•COMP";
           }
@@ -171,13 +172,13 @@ public class Scope {
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
-            if (type == 'f') return new Dfn (new DfnTok(c, 'f', imm), sc);
-            if (type == 'd') return new Ddop(new DfnTok(c, 'd', imm), sc);
-            if (type == 'm') return new Dmop(new DfnTok(c, 'm', imm), sc);
+            if (type == 'f') return new Dfn (new DfnTok(c, 'f', imm), Scope.this);
+            if (type == 'd') return new Ddop(new DfnTok(c, 'd', imm), Scope.this);
+            if (type == 'm') return new Dmop(new DfnTok(c, 'm', imm), Scope.this);
             throw new DomainError("•COMP: 𝕨 must be one of \"fdm\"");
           }
         };
-        case "•bc": return new Fun(this) {
+        case "•bc": return new Fun() {
           public String repr() {
             return "•BC";
           }
@@ -189,7 +190,7 @@ public class Scope {
           
         };
         case "•opt": case "•optimize":
-          return new Optimizer(this);
+          return new Optimizer();
       }
     }
     Value f = vars.get(name);
@@ -224,11 +225,12 @@ public class Scope {
   }
   
   static class GCLog extends Builtin {
-  
+    private final Scope sc;
+    
     protected GCLog(Scope sc) {
-      super(sc);
+      this.sc = sc;
     }
-  
+    
     @Override public String repr() {
       return "•GCLOG";
     }
@@ -261,13 +263,12 @@ public class Scope {
       }
     }
   }
-  static class Timer extends Builtin {
-    final boolean raw;
+  class Timer extends Builtin {
+    public final boolean raw;
     @Override public String repr() {
       return "•TIME";
     }
-    Timer(Scope sc, boolean raw) {
-      super(sc);
+    Timer(boolean raw) {
       this.raw = raw;
     }
     public Value call(Value w) {
@@ -288,14 +289,14 @@ public class Scope {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          testCompiled.exec(sc);  
+          testCompiled.exec(Scope.this);  
           long end = System.nanoTime();
           r[i] = end-start;
         }
         return new DoubleArr(r);
       } else {
         long start = System.nanoTime();
-        for (int i = 0; i < n; i++) testCompiled.exec(sc);
+        for (int i = 0; i < n; i++) testCompiled.exec(Scope.this);
         long end = System.nanoTime();
         if (raw) {
           return new Num((end-start)/n);
@@ -310,25 +311,19 @@ public class Scope {
       }
     }
   }
-  static class Eraser extends Builtin {
-    @Override public String repr() {
+  class Eraser extends Builtin {
+    public String repr() {
       return "•ERASE";
-    }
-    Eraser(Scope sc) {
-      super(sc);
     }
     
     public Value call(Value w) {
-      sc.set(w.asString(), null);
+      Scope.this.set(w.asString(), null);
       return w;
     }
   }
   static class Delay extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•DL";
-    }
-    Delay(Scope sc) {
-      super(sc);
     }
     
     public Value call(Value w) {
@@ -342,36 +337,32 @@ public class Scope {
     }
   }
   static class UCS extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•UCS";
-    }
-    UCS(Scope sc) {
-      super(sc);
     }
     
     public Value call(Value w) {
       return numChrM(new NumMV() {
-        @Override public Value call(Num c) {
+        public Value call(Num c) {
           return Char.of((char) c.asInt());
         }
   
-        @Override public boolean retNum() {
+        public boolean retNum() {
           return false;
         }
       }, c->Num.of(c.chr), w);
     }
     
-    @Override public Value callInv(Value w) {
+    public Value callInv(Value w) {
       return call(w);
     }
   }
   
   private static class MapGen extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•MAP";
     }
     
-    @Override
     public Value call(Value w) {
       if (w instanceof StrMap) {
         StrMap wm = (StrMap) w;
@@ -396,7 +387,6 @@ public class Scope {
       return map;
     }
     
-    @Override
     public Value call(Value a, Value w) {
       if (a.rank != 1) throw new RankError("rank of ⍺ ≠ 1", this, a);
       if (w.rank != 1) throw new RankError("rank of ⍵ ≠ 1", this, w);
@@ -410,13 +400,10 @@ public class Scope {
   }
   
   private class Optimizer extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•OPT";
     }
-    Optimizer(Scope sc) {
-      super(sc);
-    }
-    @Override
+    
     public Value call(Value w) {
       String name = w.asString();
       Value v = Scope.this.get(name);
@@ -427,39 +414,34 @@ public class Scope {
     }
   }
   private static class ClassGetter extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•CLASS";
     }
-    @Override
     public Value call(Value w) {
       return new ChrArr(w.getClass().getCanonicalName());
     }
   }
   
-  private static class Ex extends Builtin {
-    @Override public String repr() {
+  private class Ex extends Builtin {
+    public String repr() {
       return "•EX";
     }
-    Ex(Scope sc) {
-      super(sc);
-    }
-  
+    
     public Value call(Value w) {
       return call(EmptyArr.SHAPE0S, w);
     }
   
     public Value call(Value a, Value w) {
       String path = w.asString();
-      if (a.rank != 1) throw new DomainError("•EX: 𝕨 must be a vector (had shape "+Main.formatAPL(a.shape)+")");
-      return sc.sys.execFile(path, a.values());
+      if (a.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(a.shape)+")");
+      return Scope.this.sys.execFile(path, a.values());
     }
   }
   private static class Lns extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•LNS";
     }
     
-    @Override
     public Value call(Value w) {
       String path = w.asString();
       String[] a = Main.readFile(path).split("\n");
@@ -476,7 +458,7 @@ public class Scope {
       return def;
     }
     
-    @Override public Value call(Value a, Value w) {
+    public Value call(Value a, Value w) {
       if (a instanceof APLMap) {
         try {
           URL url = new URL(w.asString());
@@ -537,17 +519,15 @@ public class Scope {
   }
   
   
-  private static class Shell extends Fun {
-    @Override public String repr() {
+  private static class Shell extends Builtin {
+    public String repr() {
       return "•SH";
     }
     
-    @Override
     public Value call(Value w) {
       return exec(w, null, null, false);
     }
     
-    @Override
     public Value call(Value a, Value w) {
       APLMap m = (APLMap) a;
       
@@ -620,12 +600,12 @@ public class Scope {
   }
   
   
-  private class NC extends Fun {
-    @Override public String repr() {
+  private class NC extends Builtin {
+    public String repr() {
       return "•NC";
     }
     
-    @Override public Value call(Value w) {
+    public Value call(Value w) {
       Obj obj = Scope.this.get(w.asString());
       if (obj == null) return Num.ZERO;
       if (obj instanceof Fun  ) return Num.NUMS[3];
@@ -638,18 +618,18 @@ public class Scope {
   
   
   private static class Hasher extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•HASH";
     }
-    @Override public Value call(Value w) {
+    public Value call(Value w) {
       return Num.of(w.hashCode());
     }
   }
   private static class Stdin extends Builtin {
-    @Override public String repr() {
+    public String repr() {
       return "•STDIN";
     }
-    @Override public Value call(Value w) {
+    public Value call(Value w) {
       if (w instanceof Num) {
         int n = w.asInt();
         ArrayList<Value> res = new ArrayList<>(n);
@@ -666,8 +646,9 @@ public class Scope {
   }
   
   public static class Profiler extends Builtin {
+    private final Scope sc;
     Profiler(Scope sc) {
-      super(sc);
+      this.sc = sc;
     }
     
     static final HashMap<String, Pr> pfRes = new HashMap<>();
@@ -691,10 +672,10 @@ public class Scope {
       return new HArr(arr, new int[]{arr.length>>2, 4});
     }
     
-    @Override public String repr() {
+    public String repr() {
       return "•PFX";
     }
-    @Override public Value call(Value w) {
+    public Value call(Value w) {
       return call(w, w);
     }
     private static Pr pr(Value ko, Value vo) {
@@ -714,9 +695,9 @@ public class Scope {
     }
     
     static class ProfilerOp extends Mop {
-      
+      Scope sc;
       public ProfilerOp(Scope sc) {
-        super(sc);
+        this.sc = sc;
       }
       
       Pr pr(Obj f) {
@@ -801,8 +782,8 @@ public class Scope {
     }
   }
   
-  private static class Big extends Fun {
-    @Override public Value call(Value w) {
+  private static class Big extends Builtin {
+    public Value call(Value w) {
       return rec(w);
     }
     private Value rec(Value w) {
@@ -816,7 +797,7 @@ public class Scope {
       return HArr.create(va, w.shape);
     }
     
-    @Override public Value callInv(Value w) {
+    public Value callInv(Value w) {
       return recN(w);
     }
     private Value recN(Value w) {
@@ -830,12 +811,12 @@ public class Scope {
       }
       return HArr.create(va, w.shape);
     }
-    @Override public String repr() {
+    public String repr() {
       return "•BIG";
     }
   }
   
-  private static class DR extends Fun {
+  private static class DR extends Builtin {
     /*
        0=100| - unknown
        1=100| - bit

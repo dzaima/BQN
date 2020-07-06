@@ -4,7 +4,10 @@ import APL.errors.*;
 import APL.tokenizer.Tokenizer;
 import APL.types.*;
 import APL.types.arrs.*;
+import APL.types.functions.builtins.fns2.EvalBuiltin;
+import APL.types.functions.userDefined.*;
 
+import java.io.*;
 import java.util.*;
 
 public abstract class Sys {
@@ -46,7 +49,9 @@ public abstract class Sys {
       case "ATYPE"       : Main.println(Main.exec(rest, csc).humanType(false)); break;
       case "JSTACK":
         if (lastError != null) {
-          lastError.printStackTrace();
+          ByteArrayOutputStream os = new ByteArrayOutputStream();
+          lastError.printStackTrace(new PrintStream(os));
+          println(os.toString());
         } else println("no stack to view");
         break;
       case "STACK": {
@@ -70,7 +75,11 @@ public abstract class Sys {
           } else {
             Value v = Main.exec(rest, csc);
             if (v instanceof Callable) {
-              Scope nsc = ((Callable) v).sc;
+              Scope nsc = null;
+              if (v instanceof Dfn ) nsc = ((Dfn ) v).sc;
+              if (v instanceof Dmop) nsc = ((Dmop) v).sc;
+              if (v instanceof Ddop) nsc = ((Ddop) v).sc;
+              if (v instanceof EvalBuiltin) nsc = ((EvalBuiltin) v).sc;
               if (nsc == null) throw new DomainError("argument to )cs didn't contain scope information");
               else csc = nsc;
               break;

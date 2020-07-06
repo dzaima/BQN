@@ -3,7 +3,6 @@ package APL.types.functions.builtins.fns;
 import APL.types.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.dops.AtBuiltin;
-import APL.types.functions.builtins.fns2.SlashBuiltin;
 
 public class ReplicateBuiltin extends Builtin {
   @Override public String repr() {

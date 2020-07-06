@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.fns;
 
-import APL.*;
+import APL.Main;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
@@ -10,11 +10,6 @@ public class NandBuiltin extends Builtin {
   @Override public String repr() {
     return "⍲";
   }
-  
-  public NandBuiltin(Scope sc) {
-    super(sc);
-  }
-  
   
   private static final D_NNeN DNF = new D_NNeN() {
     public double on(double a, double w) {

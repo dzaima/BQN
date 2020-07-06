@@ -11,10 +11,6 @@ public class AtBuiltin extends Dop {
     return "@";
   }
   
-  public AtBuiltin(Scope sc) {
-    super(sc);
-  }
-  
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
     return at(aa, ww, w, this);
   }

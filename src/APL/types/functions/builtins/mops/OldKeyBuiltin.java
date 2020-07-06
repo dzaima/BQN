@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.mops;
 
-import APL.*;
+import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.HArr;
@@ -11,10 +11,6 @@ import java.util.*;
 public class OldKeyBuiltin extends Mop {
   @Override public String repr() {
     return "⌸";
-  }
-  
-  public OldKeyBuiltin(Scope sc) {
-    super(sc);
   }
   
   public Value call(Value f, Value w, DerivedMop derv) {

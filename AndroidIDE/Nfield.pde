@@ -1,7 +1,7 @@
 static class Nfield extends Drawable implements TextReciever {
   ArrayList<Line> lns;
   int sx, sy, ex, ey;
-  float xoff, ryoff, yoff; // yoff is the target yoff, ryoff is what's actually used for drawing
+  float xoff, dyoff, yoff; // yoff is the target yoff, dyoff is what's actually used for drawing
   boolean textChanged = true; // implies moved
   boolean moved = true;
   boolean bottom;
@@ -36,7 +36,7 @@ static class Nfield extends Drawable implements TextReciever {
     beginClip(d, x, y, w, h);
     d.textSize(chrH);
     if (a.mousePressed && smouseIn() && (MOBILE || a.mouseButton==CENTER)) {
-      yoff+= a.mouseY-a.pmouseY; ryoff = yoff;
+      yoff+= a.mouseY-a.pmouseY; dyoff = yoff;
       xoff+= a.mouseX-a.pmouseX;
     }
     
@@ -56,23 +56,23 @@ static class Nfield extends Drawable implements TextReciever {
       } else {
         if (yoff > 0) yoff = 0;
       }
-      ryoff = ryoff + (yoff-ryoff)*.4;
-      if (Math.abs(yoff-ryoff) < 1) ryoff = yoff;
+      dyoff = dyoff + (yoff-dyoff)*.6;
+      if (Math.abs(yoff-dyoff) < 1) dyoff = yoff;
     }
     
     if (textChanged) moved = true;
     if (moved || this!=textInput) tt = 70;
     if (moved) {
-      int py = (int) posy(ey);
+      int py = (int)(chrH*ey + yoff+y  + chrH*.1); // cannot use posy because that uses dyoff 
       int yb = (int) (h-chrH*1.3);
       if (py < y   ) yoff =  -ey*chrH;
       if (py > y+yb) yoff =  -ey*chrH+yb;
-      if (Math.abs(ryoff-yoff) > h/5) ryoff = yoff+Math.signum(ryoff-yoff)*(h/5);
+      if (Math.abs(dyoff-yoff) > h/10) dyoff = yoff+Math.signum(dyoff-yoff)*(h/10);
       moved = false;
     }
     
     if (smouseIn()) {
-      int cy = constrain(floor((a.mouseY-y-ryoff)/chrH), 0, lns.size()-1);
+      int cy = constrain(floor((a.mouseY-y-dyoff)/chrH), 0, lns.size()-1);
       int cx = constrain(round((a.mouseX-x-xoff)/chrW), 0, len(cy));
       if (MOBILE) {
         if (pmousePressed && !a.mousePressed && dist(a.mouseX, a.mouseY, smouseX, smouseY) < 10) {
@@ -94,28 +94,25 @@ static class Nfield extends Drawable implements TextReciever {
       d.fill(0x20ffffff);
       d.noStroke();
       boolean swp = swapped();
-      int csx = swp? ex : sx;
-      int csy = swp? ey : sy;
-      int cex = swp? sx : ex;
-      int cey = swp? sy : ey;
-      PVector ps = pos(csy, csx);
-      PVector pe = pos(cey, cex);
+      if (swp) swap();
+      PVector ps = pos(sy, sx);
+      PVector pe = pos(ey, ex);
       if (sy == ey) {
         d.rect(ps.x, ps.y, pe.x, pe.y+chrH);
       } else {
         float p0 = posx(0);
-        d.rect(ps.x, ps.y, posx(len(csy)), ps.y+chrH);
-        d.rect(p0  , pe.y, pe.x          , pe.y+chrH);
-        for (int i = csy+1; i <= cey-1; i++) d.rect(p0, posy(i), posx(len(i)), posy(i)+chrH);
+        d.rect(ps.x, ps.y, posx(len(sy)), ps.y+chrH);
+        d.rect(p0  , pe.y, pe.x         , pe.y+chrH);
+        for (int i = sy+1; i <= ey-1; i++) d.rect(p0, posy(i), posx(len(i)), posy(i)+chrH);
       }
+      if (swp) swap();
     }
     
     if (textChanged) {
       hl = new SyntaxHighlight(allText(), th, d);
       textChanged = false;
     }
-    if (hl!=null) hl.draw(x + xoff, y + ryoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex)); // draw text
-    
+    if (hl!=null) hl.draw(x + xoff, y + dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex)); // draw text
     
     
     tt--;
@@ -132,7 +129,7 @@ static class Nfield extends Drawable implements TextReciever {
     return x + chrW*cx + xoff;
   }
   float posy(int cy) {
-    return chrH*cy + ryoff+y  + chrH*.1;
+    return chrH*cy + dyoff+y  + chrH*.1;
   }
   PVector pos(int cy, int cx) {
     return new PVector(posx(cx), posy(cy));
@@ -149,11 +146,11 @@ static class Nfield extends Drawable implements TextReciever {
     return sy==ey? sx>ex : sy>ey;
   }
   void order() {
-    if (swapped()) {
-      int t;
-      t = sx; sx = ex; ex = t;
-      t = sy; sy = ey; ey = t;
-    }
+    if (swapped()) swap();
+  }
+  void swap() { int t;
+    t = sx; sx = ex; ex = t;
+    t = sy; sy = ey; ey = t;
   }
   void setS(int y, int x) { sx = x; sy = y; moved = true; }
   void setE(int y, int x) { ex = x; ey = y; moved = true; }
@@ -250,7 +247,7 @@ static class Nfield extends Drawable implements TextReciever {
     ey = lns.size()-1;
     ex = len(ey);
     allE();
-    ryoff = yoff = h-chrH*lns.size()-chrH;
+    dyoff = yoff = h-chrH*lns.size()-chrH;
   }
   
   String allText() {
@@ -263,14 +260,16 @@ static class Nfield extends Drawable implements TextReciever {
   }
   String getsel() {
     if (sy == ey) {
-      return tostr(lns.get(sy).get(sx, ex));
+      return tostr(lns.get(sy).get(Math.min(sx, ex), Math.max(sx, ex)));
     } else {
+      boolean swp = swapped(); if (swp) swap();
       StringBuilder b = new StringBuilder();
       Line s = lns.get(sy);
       Line e = lns.get(ey);
       b.append(tostr(s.get(sx, s.len))).append('\n');
       for (int i = sy+1; i <= ey-1; i++) b.append(lns.get(i).toString()).append('\n');
       b.append(tostr(e.get(0, ex)));
+      if (swp) swap();
       return b.toString();
     }
   }
@@ -329,8 +328,11 @@ static class Nfield extends Drawable implements TextReciever {
     } else if (s.equals("sall")) {
       sx=sy=0;
       ey=lns.size()-1; ex = len(ey);
-    } else if (s.equals("home")) {
-    } else if (s.equals("home")) {
+    } else if (s.equals("pgdn") || s.equals("pgup")) { moved = true;
+      int d = s.equals("pgdn")? 1 : -1;
+      int ca = constrain(((int)(h/chrH)-3)*d+ey, 0, lns.size()-1)-ey;
+      yoff-= ca*chrH; ey+= ca;
+      ex = Math.min(ex, len(ey)); if (!shift) allE();
     } else if (s.equals("home")) {
     } else extraSpecial(s);
   }

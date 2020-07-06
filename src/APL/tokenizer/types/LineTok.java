@@ -2,7 +2,7 @@ package APL.tokenizer.types;
 
 import APL.tokenizer.Token;
 
-import java.util.*;
+import java.util.List;
 
 public class LineTok extends TokArr<Token> { // +TODO make things using this verify end
   public char end;

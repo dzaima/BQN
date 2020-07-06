@@ -1,7 +1,7 @@
 package APL.types.functions.builtins.dops;
 
 import APL.errors.DomainError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 
 public class BeforeBuiltin extends Dop {
