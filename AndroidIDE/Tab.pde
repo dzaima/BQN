@@ -55,6 +55,7 @@ static class REPL extends Tab {
           inputs.add(line);
           iptr = inputs.size();
           textln("   "+line);
+          println("   "+line);
           if (line.startsWith(":")) {
             String cmd = line.substring(1);
             int i = cmd.indexOf(" "); 

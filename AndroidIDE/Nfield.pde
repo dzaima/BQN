@@ -171,6 +171,9 @@ static class Nfield extends Drawable implements TextReciever {
       if (ey+1 == lns.size()) return false;
       ex = 0;
       ey++;
+    } else if (ctrl) {
+      boolean m = mode(l.ints[ex]);
+      while (ex!=l.len && mode(l.ints[ex])==m) ex++;
     } else ex++;
     if (!shift) allE();
     return true;
@@ -184,9 +187,16 @@ static class Nfield extends Drawable implements TextReciever {
       if (ey == 0) return false;
       ey--;
       ex = len(ey);
+    } else if (ctrl) {
+      Line l = lns.get(ey);
+      boolean m = mode(l.ints[ex-1]);
+      while (ex>0 && mode(l.ints[ex-1])==m) ex--;
     } else ex--;
     if (!shift) allE();
     return true;
+  }
+  boolean mode(int c) {
+    return c>='a'&&c<='z' || c>='A'&&c<='Z';
   }
   void ldelete() { if (!editable) return; textChanged = true;
     if (!sel()) movel(true);

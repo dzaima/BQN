@@ -109,7 +109,7 @@ public abstract class Sys {
     return source;
   }
   public Value execFile(String path, Value[] args) {
-    int sl = path.indexOf("/")+1;
+    int sl = path.lastIndexOf("/")+1;
     Value[] rargs = Arrays.copyOf(args, args.length+2);
     rargs[args.length  ] = Main.toAPL(path.substring(sl));
     rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
