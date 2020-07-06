@@ -150,7 +150,9 @@ static class APLField extends Drawable implements TextReciever {
   }
   void special(String s) {
     tt = 0;
-    if (s.equals("eval")) {
+    if (s.equals("newline")) {
+      append("\n");
+    } else if (s.equals("eval")) {
       eval();
     } else if (s.equals("left")) {
       if (sx!=ex && !a.cshift()) {

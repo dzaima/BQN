@@ -123,7 +123,11 @@ void keyPressed(KeyEvent e) {
       else if (keyCode == java.awt.event.KeyEvent.VK_PAGE_DOWN && ctrl) topbar.move( 1);
       else handleCoded(keyCode);
     } else {
-      if (key == 8) textInput.ldelete();
+      if (ctrl && key>='0' && key<='9') {
+        int i = Math.min(key=='0'?9:key-'1', topbar.tabs.size()-1);
+        topbar.to(topbar.tabs.get(i));
+      }
+      else if (key == 8) textInput.ldelete();
       else if (key ==  26 && keyCode ==  90) textInput.special("undo");
       else if (key ==  25 && keyCode ==  89) textInput.special("redo");
       else if (key ==   3 && keyCode ==  67) textInput.special("copy");
@@ -133,7 +137,8 @@ void keyPressed(KeyEvent e) {
       else if (key ==  19 && keyCode ==  83) textInput.special("eval");
       else if (key ==   1 && keyCode ==  65) textInput.special("sall");
       else if (key ==  23 && keyCode ==  87) textInput.special("close");
-      else if (key >= 54589 && key <= 54633) {
+      else if (key == 10) textInput.special("newline");
+      else if (key >= 54589 && key <= 54633) { // double-strucks
         textInput.append(new String(new char[]{55349, (char)(key+2048)})); // yay…
       }
       else textInput.append(Character.toString(key));

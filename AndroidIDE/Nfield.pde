@@ -274,7 +274,17 @@ static class Nfield extends Drawable implements TextReciever {
     }
   }
   void special(String s) {
-    if (s.equals("eval")) {
+    if (s.equals("newline")) { textChanged = true;
+      if (sel()) ldelete();
+      Line l = lns.get(ey);
+      int sa = 0;
+      while (sa!=l.len && l.ints[sa]==32) sa++;
+      int[] is = new int[sa];
+      for (int i = 0; i < sa; i++) is[i] = 32;
+      lns.add(ey+1, new Line(is));
+      ey++; ex = sa;
+      allE();
+    } else if (s.equals("eval")) {
       eval();
     } else if (s.equals("left")) {
       movel(cshift());
@@ -319,9 +329,17 @@ static class Nfield extends Drawable implements TextReciever {
       //int sel = hl.sel(fullPos());
       //if (sel != -1) to(sel);
     } else if (s.equals("home")) {
-      if(ctrl)ey=0           ; ex=0;       if(!cshift()) allE(); moved = true; // TODO short shift?
+      Line l = lns.get(ey);
+      if (ex==0) while (ex < l.len && l.ints[ex]==32) ex++;
+      else { int i = 0;
+        while (i!=l.len && l.ints[i]==32) i++;
+        ex = i==ex? 0 : i;
+      }
+      if(ctrl) { ex=ey=0; }
+      if(!cshift()) allE(); moved = true; // TODO short shift?
     } else if (s.equals("end")) {
-      if(ctrl)ey=lns.size()-1; ex=len(ey); if(!cshift()) allE(); moved = true;
+      if(ctrl) ey=lns.size()-1; ex=len(ey);
+      if(!cshift()) allE(); moved = true;
     } else if (s.equals("copy")) {
       if (!sel()) { sx = 0; ex = len(sy); }
       a.copy(getsel());
@@ -333,7 +351,22 @@ static class Nfield extends Drawable implements TextReciever {
       int ca = constrain(((int)(h/chrH)-3)*d+ey, 0, lns.size()-1)-ey;
       yoff-= ca*chrH; ey+= ca;
       ex = Math.min(ex, len(ey)); if (!shift) allE();
-    } else if (s.equals("home")) {
+    } else if (s.equals("cut")) { if (!editable) { special("copy"); return; } textChanged = true;
+      if (!sel()) {
+        a.copy(lns.get(ey).toString()+"\n");
+        lns.remove(ey);
+        if (lns.size()==0) clear();
+        else if (ey == lns.size()) ey--;
+        ex = 0;
+        allE();
+      } else {
+        special("copy");
+        ldelete();
+      }
+    } else if (s.equals("")) {
+    } else if (s.equals("")) {
+    } else if (s.equals("")) {
+    } else if (s.equals("")) {
     } else extraSpecial(s);
   }
   void extraSpecial(String s) {
@@ -353,6 +386,10 @@ static class Line {
     ints = tocps(s);
     len = ints.length;
   }
+  Line(int[] is) {
+    ints = is;
+    len = is.length;
+  }
   String toString() {
     return tostr(ints);
   }
@@ -362,9 +399,6 @@ static class Line {
     System.arraycopy(ints, ex, n, sx, len-ex);
     ints = n;
     len = n.length;
-  }
-  void deleteAfter(int sx) {
-    delete(sx, len);
   }
   int insert(int x, String s) {
     int[] is = tocps(s);

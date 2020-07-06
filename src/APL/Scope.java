@@ -43,7 +43,7 @@ public class Scope {
     this.args = args;
     rnd = inherit.rnd;
   }
-  private Scope owner(String name) {
+  public Scope owner(String name) {
     if (vars.containsKey(name)) return this;
     else if (parent == null) return null;
     else return parent.owner(name);

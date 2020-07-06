@@ -50,64 +50,78 @@ static class REPL extends Tab {
         return !(line.startsWith(":") || line.startsWith(")"));
       }
       void eval() {
-        tmpSaved = null;
-        inputs.add(line);
-        iptr = inputs.size();
-        textln("   "+line);
-        if (line.startsWith(":")) {
-          String cmd = line.substring(1);
-          int i = cmd.indexOf(" "); 
-          String nm = i==-1? cmd : cmd.substring(0, i);
-          final String arg = i==-1? "" : cmd.substring(i+1);
-          String argl = arg.toLowerCase();
-          if (nm.equals("hsz")) historyView.setsz(int(arg));
-          else if (nm.equals("isz")) {
-            isz = int(arg);
-            redrawAll();
-          } else if (nm.equals("i")) {
-            if (argl.equals("dyalog")) it = new Dyalog();
-            if (argl.equals("dzaima")) it = new DzaimaBQN();
-          } else if (nm.equals("clear")) {
-            historyView.clear();
-          } else if (nm.equals("g")) {
-            topbar.toNew(new Grapher(it, arg));
-          } else if (nm.equals("tsz")) {
-            top = int(arg);
-            redrawAll();
-          } else if (nm.equals("f") || nm.equals("fx")) {
-            final boolean ex = nm.equals("fx");
-            String[] ps = arg.split("/");
-            String[] lns = a.loadStrings(arg);
-            topbar.toNew(new Editor(ps[ps.length-1], lns==null? "" : join(lns, "\n")) {
-              public void save(String t) {
-                try {
-                  a.saveStrings(arg, new String[]{t});
-                  if (ex) try {
-                    it.exec(ta.allText());
-                  } catch (APLError e) {
-                    e.print(((DzaimaBQN)it).sys);
+        try {
+          tmpSaved = null;
+          inputs.add(line);
+          iptr = inputs.size();
+          textln("   "+line);
+          if (line.startsWith(":")) {
+            String cmd = line.substring(1);
+            int i = cmd.indexOf(" "); 
+            String nm = i==-1? cmd : cmd.substring(0, i);
+            final String arg = i==-1? "" : cmd.substring(i+1);
+            String argl = arg.toLowerCase();
+            if (nm.equals("hsz")) historyView.setsz(int(arg));
+            else if (nm.equals("isz")) {
+              isz = int(arg);
+              redrawAll();
+            } else if (nm.equals("i")) {
+              if (argl.equals("dyalog")) it = new Dyalog();
+              if (argl.equals("dzaima")) it = new DzaimaBQN();
+            } else if (nm.equals("clear")) {
+              historyView.clear();
+            } else if (nm.equals("g")) {
+              topbar.toNew(new Grapher(it, arg));
+            } else if (nm.equals("tsz")) {
+              top = int(arg);
+              redrawAll();
+            } else if (nm.equals("f") || nm.equals("fx")) {
+              final boolean ex = nm.equals("fx");
+              String[] ps = arg.split("/");
+              String[] lns = a.loadStrings(arg);
+              topbar.toNew(new Editor(ps[ps.length-1], lns==null? "" : join(lns, "\n")) {
+                public void save(String t) {
+                  try {
+                    a.saveStrings(arg, new String[]{t});
+                    if (ex) try {
+                      it.exec(ta.allText());
+                    } catch (APLError e) {
+                      e.print(((DzaimaBQN)it).sys);
+                    }
+                    //if (ex) Main.exec(ta.allText(), ((DzaimaBQN) it).sys.gsc);
+                  } catch (Throwable e) {
+                    e.printStackTrace();
                   }
-                  //if (ex) Main.exec(ta.allText(), ((DzaimaBQN) it).sys.gsc);
-                } catch (Throwable e) {
-                  e.printStackTrace();
                 }
+              });
+            } else if (nm.equals("ed")) {
+              if (!(it instanceof DzaimaBQN)) { textln(":ed only available on dzaima/BQN"); return; }
+              Scope sc = ((DzaimaBQN)it).sys.csc;
+              String vn = arg;
+              if (vn.startsWith("_")) {
+                vn = vn.substring(1);
+                if (vn.endsWith("_")) vn = vn.substring(0, vn.length()-1);
               }
-            });
-          } else if (nm.equals("ed")) {
-            if (!(it instanceof DzaimaBQN)) { textln(":fx only available on dzaima/BQN"); return; }
-            Value o = it.exec(arg);
-                 if (o instanceof Dfn ) topbar.toNew(new Ed(nm, ((Dfn ) o).code.source()));
-            else if (o instanceof Dmop) topbar.toNew(new Ed(nm, ((Dmop) o).code.source()));
-            else if (o instanceof Ddop) topbar.toNew(new Ed(nm, ((Ddop) o).code.source()));
-            else textln("cannot edit type "+o.humanType(false));
-          } else textln("Command "+nm+" not found");
-          //else if (nm.equals(""))
-          return;
-        }
-        
-        String[] res = it.repl(line);
-        for (String ln : res) {
-          textln(ln);
+              vn = vn.toLowerCase();
+              sc = sc.owner(vn);
+              if (sc == null) { textln("variable "+vn+" didn't exist"); return; }
+              Value o = sc.get(vn);
+                   if (o instanceof Dfn ) topbar.toNew(new Ed(sc, vn, ((Dfn ) o).code.source()));
+              else if (o instanceof Dmop) topbar.toNew(new Ed(sc, vn, ((Dmop) o).code.source()));
+              else if (o instanceof Ddop) topbar.toNew(new Ed(sc, vn, ((Ddop) o).code.source()));
+              else textln("cannot edit type "+(o instanceof Fun? o.getClass().getSimpleName() : o.humanType(false)));
+            } else textln("Command "+nm+" not found");
+            //else if (nm.equals(""))
+            return;
+          }
+          
+          String[] res = it.repl(line);
+          for (String ln : res) {
+            textln(ln);
+          }
+        } catch (Throwable t) {
+          APLError e = t instanceof APLError? (APLError)t : new ImplementationError(t);
+          e.print(((DzaimaBQN)it).sys);
         }
       }
       void extraSpecial(String s) {

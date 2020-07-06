@@ -42,11 +42,11 @@ public abstract class Sys {
       case "ONELINE":
         oneline = !oneline;
         break;
-      case "TOKENIZE"    : Main.println(Tokenizer.tokenize(rest).toTree("")); break;
-      case "TOKENIZEREPR": Main.println(Tokenizer.tokenize(rest).toRepr()); break;
-      case "CLASS"       : var r = Main.exec(rest, csc); Main.println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
+      case "TOKENIZE"    : println(Tokenizer.tokenize(rest).toTree("")); break;
+      case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
+      case "CLASS"       : var r = Main.exec(rest, csc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : var e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
-      case "ATYPE"       : Main.println(Main.exec(rest, csc).humanType(false)); break;
+      case "ATYPE"       : println(Main.exec(rest, csc).humanType(false)); break;
       case "JSTACK":
         if (lastError != null) {
           ByteArrayOutputStream os = new ByteArrayOutputStream();

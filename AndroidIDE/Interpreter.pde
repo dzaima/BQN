@@ -163,7 +163,7 @@ static class DzaimaBQN extends Interpreter {
   }
   
   Value exec(String code) {
-    return Main.exec(code, sys.gsc);
+    return Main.exec(code, sys.csc);
   }
   
   String[] repl(String ln) {
@@ -201,12 +201,16 @@ static class DzaimaBQN extends Interpreter {
   }
 }
 static class Ed extends Editor {
-  Ed(String name, String val) {
+  Scope sc;
+  Ed(Scope sc, String name, String val) {
     super(name, val);
+    this.sc = sc;
   }
   void save(String val) {
+    println(val);
     try {
-      dzaimaSC.set(name, Main.exec(val, dzaimaSC));
+      println(name, Main.exec(val, sc));
+      sc.set(name, Main.exec(val, sc));
     } catch (Throwable t) {
       println(t.getMessage());
       glSys.lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);

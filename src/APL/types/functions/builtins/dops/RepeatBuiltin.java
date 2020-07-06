@@ -37,7 +37,7 @@ public class RepeatBuiltin extends Dop {
   
   public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
     Fun aaf = aa.asFun();
-    Value wwa = ww.asFun().call(w);
+    Value wwa = ww.asFun().call(a, w);
   
     int[] bs = new int[2]; bounds(bs, wwa); bs[0]*=-1; // min, max
   
