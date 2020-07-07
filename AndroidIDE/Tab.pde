@@ -241,7 +241,7 @@ static class Grapher extends Tab {
   final APLField input;
   Value last;
   Interpreter it;
-  Grapher(Interpreter it, String def) {
+  Grapher(final Interpreter it, String def) {
     g = new Graph(0, top, d.width, freey()-top-isz);
     input = new APLField(0, 350, d.width, 40, def) {
       void eval() {

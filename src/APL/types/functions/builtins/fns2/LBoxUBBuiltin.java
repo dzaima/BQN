@@ -49,7 +49,7 @@ public class LBoxUBBuiltin extends Builtin {
       return onArr(a, w, blame);
     }
   }
-
+  
   static Value onArr(Value a, Value w, Callable blame) {
     if (a instanceof Primitive) throw new DomainError(blame+": indices must all be vectors when nesting (found "+a+")", blame);
     if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {

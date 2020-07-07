@@ -290,7 +290,7 @@ public class Num extends Primitive {
   }
   
   @Override
-  public int asInt() { // warning: rounds
+  public int asInt() {
     return toInt(num);
   } 
   public static int toInt(double d) {

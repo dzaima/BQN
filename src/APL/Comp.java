@@ -29,9 +29,9 @@ public class Comp {
     this.tk = tk;
   }
   
-  public static final byte PUSH =  0; // 1B; 2
-  public static final byte VARO =  1; // 1B; x/𝕨/𝕏
-  public static final byte VARM =  2; // 1B; mutable x/𝕨/𝕏
+  public static final byte PUSH =  0; // N; 2
+  public static final byte VARO =  1; // N; x/𝕨/𝕏
+  public static final byte VARM =  2; // N; mutable x/𝕨/𝕏
   public static final byte ARRO =  3; // 1B; 1‿2‿3 / ⟨1⋄2⋄3⟩; compilers job to extend past 255 (or maybe another op?)
   public static final byte ARRM =  4; // 1B; mutable x‿y‿z / ⟨x⋄y⋄z)
   public static final byte FN1C =  5; // monadic call
@@ -44,16 +44,12 @@ public class Comp {
   public static final byte SETU = 12; // set upd; _  ↩_;
   public static final byte SETM = 13; // set mod; _ F↩_;
   public static final byte POPS = 14; // pop object from stack
-  public static final byte DFND = 15; // 1B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
+  public static final byte DFND = 15; // N; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
   public static final byte FN1O = 16; // optional monadic call
   public static final byte FN2O = 17; // optional dyadic call
   public static final byte CHKV = 18; // error if ToS is ·
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   public static final byte OP2H = 20; // derive composition to modifier
-  public static final byte DFND2= 21; // 2B; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
-  public static final byte VARO2= 22; // 2B; x/𝕨/𝕏
-  public static final byte VARM2= 23; // 2B; mutable x/𝕨/𝕏
-  public static final byte PUSH2= 24; // 1B; 2
   public static final byte RETN = 25; // returns, giving ToS
 // public static final byte ____ = 6;
   
@@ -64,10 +60,10 @@ public class Comp {
   
   
   static class Stk {
-    Obj[] vals = new Obj[4];
-    int sz = 0;
+    private Obj[] vals = new Obj[4];
+    private int sz = 0;
     void push(Obj o) {
-      if (sz==vals.length) dbl();
+      if (sz>=vals.length) vals = Arrays.copyOf(vals, vals.length<<1);
       vals[sz++] = o;
     }
     Obj pop() {
@@ -79,9 +75,6 @@ public class Comp {
       return vals[sz-1];
     }
   
-    private void dbl() {
-      vals = Arrays.copyOf(vals, vals.length<<1);
-    }
   }
   
   public static final boolean DBGPROG = true;
@@ -89,58 +82,47 @@ public class Comp {
     return exec(sc, 0);
   }
   public Value exec(Scope sc, int spt) {
-  
     Value last = null;
     int pi = spt;
     try {
     int i = spt;
     Stk s = new Stk();
+    // Stack<Obj> s = new Stack<>();
     exec: while (i != bc.length) {
       pi = i;
       i++;
       switch (bc[pi]) {
         case PUSH: {
-          s.push(objs[bc[i++] & 0xff]);
-          break;
-        }
-        case PUSH2: {
-          s.push(objs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]);
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          s.push(objs[n]);
           break;
         }
         case VARO: {
-          Value got = sc.get(strs[bc[i++] & 0xff]);
-          if (got == null) throw new ValueError("Unknown variable \"" + strs[bc[i - 1] & 0xff] + "\"");
-          s.push(got);
-          break;
-        }
-        case VARO2: {
-          Value got = sc.get(strs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]);
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          Value got = sc.get(strs[n]);
           if (got == null) throw new ValueError("Unknown variable \"" + strs[bc[i - 1] & 0xff] + "\"");
           s.push(got);
           break;
         }
         case VARM: {
-          s.push(new Variable(sc, strs[bc[i++] & 0xff]));
-          break;
-        }
-        case VARM2: {
-          s.push(new Variable(sc, strs[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)]));
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          s.push(new Variable(sc, strs[n]));
           break;
         }
         case ARRO: {
-          int am = bc[i++]&0xff;
-          Value[] vs = new Value[am];
-          for (int j = 0; j < am; j++) {
-            vs[am-j-1] = (Value) s.pop();
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          Value[] vs = new Value[n];
+          for (int j = 0; j < n; j++) {
+            vs[n-j-1] = (Value) s.pop();
           }
           s.push(Arr.create(vs));
           break;
         }
         case ARRM: {
-          int am = bc[i++]&0xff;
-          Settable[] vs = new Settable[am];
-          for (int j = 0; j < am; j++) {
-            vs[am-j-1] = (Settable) s.pop();
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          Settable[] vs = new Settable[n];
+          for (int j = 0; j < n; j++) {
+            vs[n-j-1] = (Settable) s.pop();
           }
           s.push(new SettableArr(vs));
           break;
@@ -253,12 +235,8 @@ public class Comp {
           break;
         }
         case DFND: {
-          DfnTok dfn = dfns[bc[i++] & 0xff];
-          s.push(UserDefined.of(dfn, sc));
-          break;
-        }
-        case DFND2: {
-          DfnTok dfn = dfns[((bc[i++] & 0xff)<<8) | (bc[i++] & 0xff)];
+          int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          DfnTok dfn = dfns[n];
           s.push(UserDefined.of(dfn, sc));
           break;
         }
@@ -330,11 +308,12 @@ public class Comp {
         i++;
         String cs;
         switch (bc[pi]) {
-          case PUSH: cs = " PUSH " + safeObj(bc[i++]&0xff); break;
-          case VARO: cs = " VARO " + safeStr(bc[i++]&0xff); break;
-          case VARM: cs = " VARM " + safeStr(bc[i++]&0xff); break;
-          case ARRO: cs = " ARRO " + (bc[i++]&0xff); break;
-          case ARRM: cs = " ARRM " + (bc[i++]&0xff); break;
+          case PUSH: cs = " PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARO: cs = " VARO " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARM: cs = " VARM " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
+          case DFND: cs = " DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case ARRO: cs = " ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case ARRM: cs = " ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case FN1C: cs = " FN1C"; break;
           case FN2C: cs = " FN2C"; break;
           case OP1D: cs = " OP1D"; break;
@@ -345,16 +324,11 @@ public class Comp {
           case SETU: cs = " SETU"; break;
           case SETM: cs = " SETM"; break;
           case POPS: cs = " POPS"; break;
-          case DFND: cs = " DFND " + (bc[i++]&0xff); break;
           case FN1O: cs = " FN1O"; break;
           case FN2O: cs = " FN2O"; break;
           case CHKV: cs = " CHKV"; break;
           case TR3O: cs = " TR3O"; break;
           case OP2H: cs = " OP2H"; break;
-          case DFND2:cs = " DFND2 " + ((bc[i++]&0xff)*256 + (bc[i++]&0xff)); break;
-          case VARO2:cs = " VARO2 " + safeStr(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
-          case VARM2:cs = " VARM2 " + safeStr(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
-          case PUSH2:cs = " PUSH2 " + safeObj(((bc[i++]&0xff)*256 + (bc[i++]&0xff))); break;
           case RETN: cs = " RETN"; break;
           case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
@@ -366,7 +340,7 @@ public class Comp {
           b.append(Integer.toHexString(c%16).toUpperCase());
           b.append(' ');
         }
-        b.append(Main.repeat("   ", 3 - (i-pi)));
+        b.append(Main.repeat("   ", 3 - (i-pi))); // relies on this not erroring if the padding would need to be negative
         b.append(cs);
         b.append('\n');
       }
@@ -392,6 +366,22 @@ public class Comp {
     }
     b.deleteCharAt(b.length()-1);
     return b.toString();
+  }
+  
+  
+  private int l7dec(byte[] bc, int i) {
+    int n=0, h=0;
+    while (true) {
+      if (i >= bc.length) return -1;
+      n|= (bc[i]&0x7f)<<h;
+      h+=7;
+      if (bc[i]>=0) return n;
+      i++;
+    }
+  }
+  private int l7end(byte[] bc, int i) { // returns first index after end
+    while (i<bc.length && bc[i]<0) i++;
+    return i+1;
   }
   
   private String safeObj(int l) {
@@ -426,46 +416,37 @@ public class Comp {
     ArrayList<String> strs = new ArrayList<>();
     ArrayList<Byte> bc = new ArrayList<>();
     ArrayList<Token> ref = new ArrayList<>();
-  
+    
+    
+    public void addNum(int n) {
+      do {
+        byte b = (byte) (n&0x7f);
+        n>>= 7;
+        if (n!=0) b|= 0x80;
+        bc.add(b); ref.add(null);
+      } while (n != 0);
+    }
+    
     public void push(Value o) {
-      int sz = objs.size();
-      if (sz >= 256) {
-        if (sz >= 65536) throw new SyntaxError(">65536 objects in one unit");
-        add(o.token, PUSH2, (byte) (sz/256), (byte) (sz%256));
-      } else {
-        add(o.token, PUSH, (byte) sz);
-      }
+      add(o.token, PUSH);
+      addNum(objs.size());
       objs.add(o);
     }
+  
     public void push(DfnTok o) {
-      int sz = dfns.size();
-      if (sz >= 256) {
-        if (sz >= 65536) throw new SyntaxError(">65536 dfns in one unit");
-        add(o, DFND2, (byte) (sz/256), (byte) (sz%256));
-      } else {
-        add(o, DFND, (byte) sz);
-      }
+      add(o, DFND);
+      addNum(dfns.size());
       dfns.add(o);
     }
     
-    public void varo(String s) {
-      int sz = strs.size();
-      if (sz >= 256) {
-        if (sz >= 65536) throw new SyntaxError(">65536 variables in one unit");
-        add(VARO2, (byte) (sz/256), (byte) (sz%256));
-      } else {
-        add(VARO, (byte) sz);
-      }
+    public void varo(Token t, String s) {
+      add(t, VARO);
+      addNum(strs.size());
       strs.add(s);
     }
-    public void varm(String s) {
-      int sz = strs.size();
-      if (sz >= 256) {
-        if (sz >= 65536) throw new SyntaxError(">65536 mutable variables in one unit");
-        add(VARM2, (byte) (sz/256), (byte) (sz%256));
-      }else {
-        add(VARM, (byte) sz);
-      }
+    public void varm(Token t, String s) {
+      add(t, VARM);
+      addNum(strs.size());
       strs.add(s);
     }
     
@@ -888,23 +869,19 @@ public class Comp {
     assert tk.type != 0;
     if (mut) {
       if (tk instanceof NameTok) {
-        m.varm(((NameTok) tk).name);
+        m.varm(tk, ((NameTok) tk).name);
         return;
       }
       if (tk instanceof StrandTok) {
         List<Token> tks = ((StrandTok) tk).tokens;
-        int sz = tks.size();
         for (Token c : tks) compP(m, c, true);
-        if (sz > 255) throw new NYIError("array constants with >255 items", tk);
-        m.add(tk, ARRM, (byte) sz);
+        m.add(tk, ARRM); m.addNum(tks.size());
         return;
       }
       if (tk instanceof ArrayTok) {
         List<LineTok> tks = ((ArrayTok) tk).tokens;
-        int sz = tks.size();
         for (LineTok c : tks) compP(m, c, true);
-        if (sz > 255) throw new NYIError("array constants with >255 items", tk);
-        m.add(tk, ARRM, (byte) sz);
+        m.add(tk, ARRM); m.addNum(tks.size());
         return;
       }
       if (tk instanceof ParenTok) {
@@ -926,7 +903,7 @@ public class Comp {
         int aid = Tokenizer.surrogateOps.indexOf(op);
         if (aid != -1) {
           aid = aid/4*4;
-          m.varm(Tokenizer.surrogateOps.substring(aid, aid+2));
+          m.varm(tk, Tokenizer.surrogateOps.substring(aid, aid+2));
           return;
         }
       }
@@ -994,10 +971,10 @@ public class Comp {
       String s = op.op;
       switch (s) {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣":
-          m.varo(s);
+          m.varo(tk, s);
           return;
         case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊": case "ℝ":
-          m.varo(new String(new char[]{55349, (char) (s.charAt(1)+26)})); // lowercase
+          m.varo(tk, new String(new char[]{55349, (char) (s.charAt(1)+26)})); // lowercase
           return;
         case "⍎": m.add(op, SPEC, EVAL ); return;
         case "•": m.add(op, SPEC, STDIN); return;
@@ -1005,7 +982,7 @@ public class Comp {
       }
     }
     if (tk instanceof NameTok) {
-      m.varo(((NameTok) tk).name);
+      m.varo(tk, ((NameTok) tk).name);
       return;
     }
     if (tk instanceof StrandTok) { // +TODO (+↓) check for type A
@@ -1014,9 +991,7 @@ public class Comp {
       for (Token c : tks) compP(m, c, false);
       if (Main.debug) Main.printlvl--;
       
-      int sz = tks.size();
-      if (sz > 255) throw new NYIError("array constants with >255 items", tk);
-      m.add(tk, ARRO, (byte) sz);
+      m.add(tk, ARRO); m.addNum(tks.size());
       return;
     }
     if (tk instanceof ArrayTok) {
@@ -1025,9 +1000,7 @@ public class Comp {
       for (LineTok c : tks) compP(m, c, false);
       if (Main.debug) Main.printlvl--;
       
-      int sz = tks.size();
-      if (sz > 255) throw new NYIError("array constants with >255 items", tk);
-      m.add(tk, ARRO, (byte) sz);
+      m.add(tk, ARRO); m.addNum(tks.size());
       return;
     }
     if (tk instanceof SetTok || tk instanceof ModTok) {
