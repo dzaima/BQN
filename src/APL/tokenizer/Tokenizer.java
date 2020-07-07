@@ -290,13 +290,10 @@ public class Tokenizer {
             lines.add(new Line(raw, li));
           }
           i++;
-        } else if (c == '⍝') {
+        } else if (c == '#') {
           i++;
           while (i < len && raw.charAt(i) != '\n') i++;
           if (pointless) tokens.add(new CommentTok(raw, li, i));
-        } else if (c == '#') {
-          tokens.add(new ScopeTok(raw, i, i+1));
-          i++;
         } else if (c == '·') {
           tokens.add(new NothingTok(raw, i, i+1));
           i++;
