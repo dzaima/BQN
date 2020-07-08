@@ -189,8 +189,9 @@ public class Scope {
           }
           
           public Value call(Value w) {
-            DfnTok s = w instanceof Dfn? ((Dfn) w).code : w instanceof Ddop? ((Ddop) w).code : ((Dmop) w).code;
-            return Main.toAPL(s.comp.fmt());
+            DfnTok s = w instanceof Dfn? ((Dfn) w).code : w instanceof Ddop? ((Ddop) w).code : w instanceof Dmop? ((Dmop) w).code : null;
+            if (s != null) return Main.toAPL(s.comp.fmt());
+            return call(Scope.this.get("•comp").asFun().call(new HArr(new Value[]{Char.of('f'), Num.ZERO}  ), w));
           }
           
         };
