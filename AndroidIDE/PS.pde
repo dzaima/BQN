@@ -6,14 +6,25 @@ class FakeTouch { // for interoperability with android mode
   FakeTouch(int x, int y) { this.x = x; this.y = y; }
 }
 FakeTouch[] touches = new FakeTouch[0];
+
+void settings() {
+  size(540, 830);
+  //size(1200, 800, JAVA2D);
+  //size(960, 540);
+}
+int pw, ph;
+void psSetup() {
+  surface.setResizable(true);
+}
 void psDraw() {
   if (mousePressed) touches = new FakeTouch[] { new FakeTouch(mouseX, mouseY) };
   else touches = new FakeTouch[0];
-}
-void settings() {
-  //size(540, 830);
-  size(1200, 800, JAVA2D);
-  //size(960, 540);
+  if (pw!=width || ph!=height) {
+    println(pw, ph);
+    redrawAll();
+    pw = width;
+    ph = height;
+  }
 }
 
 import java.awt.datatransfer.*;
@@ -72,6 +83,9 @@ Drawable clipRec;
 void settings() {
   //fullScreen();
   size(displayWidth, displayHeight);
+}
+void psSetup() {
+  orientation(PORTRAIT);
 }
 void psDraw() {
   if (gottenClip != null) {
@@ -170,6 +184,6 @@ static void textS(PGraphics g, String s, float x, float y) {
   //  g2d.setColor(new Color(g.fillColor));
   //  g2d.drawString(s, (int)x, (int)(y+g.textSize));
   //} else {
-    g.text(s, x, y + (MOBILE? g.textSize*.333 : 0));
+    g.text(s, x, y + (MOBILE? g.textSize*.2 : 0)); // .333
   //}
 }

@@ -34,13 +34,14 @@ static REPL mainREPL;
 void setup() {
   d = g;
   a = this;
+  psSetup();
   if (screen==null) screen = new ArrayList();
   background(#0a0a0a);
   textFont(createFont("BQN386.ttf", 48));
   int max = max(displayWidth, displayHeight);
-  scale = (int)(max/(MOBILE? 40 : 86));
+  scale = (int)(max/(MOBILE? 50 : 86));
   println(scale);
-  top = isz = scale;
+  top = MOBILE? scale*3/2 : scale;
   
   
   newKb();

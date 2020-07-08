@@ -1,4 +1,4 @@
-class Keyboard extends Drawable {
+static class Keyboard extends Drawable {
   int xam, yam;
   int kw, kh; // key width/height
   JSONObject data;
@@ -47,15 +47,15 @@ class Keyboard extends Drawable {
   
   void tick() {
     if (w==0||h==0) return;
-    if (!pmousePressed && mousePressed && smouseIn()) {
-      int mx = (mouseX-x) / kw;
-      int my = (mouseY-y) / kh;
+    if (!pmousePressed && a.mousePressed && smouseIn()) {
+      int mx = (a.mouseX-x) / kw;
+      int my = (a.mouseY-y) / kh;
       if (mx >= 0 && my >= 0 && mx < xam && my < yam) {
         start = keys[my][mx];
         start.redraw();
       }
     }
-    if (pmousePressed && !mousePressed && start != null) {
+    if (pmousePressed && !a.mousePressed && start != null) {
       Action a = findAction();
       Key t = start;
       start = null;
@@ -66,12 +66,12 @@ class Keyboard extends Drawable {
       }
     }
     if (start != null) {
-      Action a = findAction();
-      if (a != null) {
-        a.k.redraw(a);
-        int time = millis() - mouseStart;
+      Action at = findAction();
+      if (at != null) {
+        at.k.redraw(at);
+        int time = a.millis() - mouseStart;
         if (time > 200) {
-          if (a.rep!=-1 && frameCount%a.rep == 0) a.call();
+          if (at.rep!=-1 && a.frameCount%at.rep == 0) at.call();
         }
       }
     }
@@ -80,9 +80,9 @@ class Keyboard extends Drawable {
     return start.actions[actionId()];
   }
   int actionId() {
-    if (dist(mouseX, mouseY, smouseX, smouseY) > kh/3) { // gesture
-      int dx = mouseX - smouseX;
-      int dy = mouseY - smouseY;
+    if (dist(a.mouseX, a.mouseY, smouseX, smouseY) > kh/3) { // gesture
+      int dx = a.mouseX - smouseX;
+      int dy = a.mouseY - smouseY;
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 0) return 4;
         else        return 3;
@@ -119,7 +119,7 @@ static final float[][] corners = {
   {1, 0, 1, 1},
 };
 
-class Key extends Drawable {
+static class Key extends Drawable {
   Keyboard b;
   
   int col = #222222;
@@ -136,18 +136,18 @@ class Key extends Drawable {
   
   void redraw(Action hl) { // highlight
     if (w==0 || h==0) return;
-    rectMode(CORNER);
-    fill(b.start == this && (hl == actions[0])? g.lerpColor(col, #aaaaaa, .1) : col);
-    noStroke();
+    d.rectMode(CORNER);
+    d.fill(b.start==this && hl==actions[0]? d.lerpColor(col, #aaaaaa, .1) : col);
+    d.noStroke();
     int px = b.x + x*w;
     int py = b.y + y*h;
-    rect(px, py, w, h);
+    d.rect(px, py, w, h);
     if (hl != null) {
       for(int i = 1; i < 5; i++) {
         Action a = actions[i];
         if (a == hl) {
-          fill(g.lerpColor(col, #aaaaaa, .1));
-          triangle(px+w/2, py+h/2, px + w*corners[i][0], py + h*corners[i][1], px + w*corners[i][2], py + h*corners[i][3]);
+          d.fill(d.lerpColor(col, #aaaaaa, .1));
+          d.triangle(px+w/2, py+h/2, px + w*corners[i][0], py + h*corners[i][1], px + w*corners[i][2], py + h*corners[i][3]);
           break;
         }
       }
@@ -157,18 +157,15 @@ class Key extends Drawable {
       float[] offs = offsets[i];
       if (a == null) continue;
       String t = a.chr;
-      if (b.shiftMode != 0 && t.length() == 1) t = t.toUpperCase();
-      fill(255);
-      textAlign(CENTER, CENTER);
+      if (b.shiftMode!=0 && t.length()==1) t = t.toUpperCase();
+      d.fill(255);
+      d.textAlign(CENTER, CENTER);
       float yoff = 0;
+      float sz = i==0? h*.4f : h*.16f;
+      d.textSize(sz);
+      yoff+= sz*-.13f;
       
-      if (i == 0) {
-        textSize(h*.4f);
-      } else {
-        textSize(h*.16f);
-      }
-      
-      text(t, px + w*offs[0], py + h*offs[1] + yoff);
+      textS(d, t, px + w*offs[0], py + h*offs[1] + yoff);
     }
   }
   void load(JSONObject o) {
@@ -222,7 +219,6 @@ static class Action {
       case "del": textInput.ldelete(); return;
       case "rdel": textInput.rdelete(); return;
       case "clear": textInput.clear(); return;
-      case "enter": textInput.append("\n"); return;
       case "vkb": a.openKeyboard(); return;
       case "shift": 
         b.shiftMode++;

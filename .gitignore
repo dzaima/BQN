@@ -1,21 +1,14 @@
 out
 src/build
-.idea
+.idea/
 BQN.jar
 BQN.iml
-app/APL/src/
-app/build/
-app/APLApp/android/
-APLP5/code/APL8.jar
-app/APLApp/code/APL8\.jar
+
+AndroidIDE/java8/classes/
+AndroidIDE/java8/srcm/
+AndroidIDE/java8/err
 
 AndroidIDE/code/APL8\.jar
-
-AndroidIDE/data/temp/
-
 AndroidIDE/android/
-app/err
 
 *.apk
-
-AndroidIDE/build/

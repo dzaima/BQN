@@ -4,14 +4,14 @@ from subprocess import call
 import glob
 import os, re
 
-os.system('rm -rf ./APL/src')
-os.system('rm -rf ./build/')
-os.system('cp -rf ../src ./APL/src')
+os.system('rm -rf ./srcm')
+os.system('rm -rf ./classes')
+os.system('cp -rf ../../src ./srcm')
 
 print('copied')
 
 rtp='Float[][][]'
-for filename in glob.iglob('APL/src/APL/**/*.java', recursive=True):
+for filename in glob.iglob('srcm/**/*.java', recursive=True):
   with open(filename, 'r') as myfile:
     data=myfile.read()
   data = re.sub(' var ', ' '+rtp+' ', data)
@@ -22,7 +22,7 @@ print('replaced')
 for i in range(2):
 
 
-  os.system('APL/build -Xdiags:verbose 2> err');
+  os.system('./build8 -Xdiags:verbose 2> err');
   count = 0
   with open('err', 'r') as myfile:
     for line in myfile:
@@ -46,3 +46,4 @@ for i in range(2):
         
   print("error count:", count)
 os.system('./build8');
+os.system('rm -rf ./srcm')

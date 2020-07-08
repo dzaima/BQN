@@ -61,8 +61,8 @@ fs.readFile(process.argv[2], 'utf8', (e,c) => {
       let layout = layouts[layoutName];
       let w = layout.w;
       let h = layout.h;
-      let ps = arr.slice(0, h).map(c=>chunks(c, w+1).map(n=>n.slice(0, w)));
-      console.table(ps);
+      let ps = arr.slice(0, h).map(c=>chunks([...c], w+1).map(n=>n.slice(0, w)));
+      console.table(ps.map(c=>c.map(k=>k.join(''))));
       let res = [];
       for (let y = 0; y < h; y++) {
         let row = [];

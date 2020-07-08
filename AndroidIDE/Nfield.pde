@@ -6,6 +6,7 @@ static class Nfield extends Drawable implements TextReciever {
   boolean moved = true;
   boolean bottom;
   boolean editable = true;
+  boolean multiline = true;
   
   int tt; // caret flicker timer
   Nfield(int x, int y, int w, int h) {
@@ -29,6 +30,9 @@ static class Nfield extends Drawable implements TextReciever {
     yoff-= dir*chrH*4;
   }
   
+  
+  int lnTapMode = 0; // 0 - none; 1 - tapped; 2 - dragged
+  int lnTapTime = -100; // last millis() when a line was tapped
   void tick() {
     //println(allText(), sx,sy,ex,ey,lns.size(),len(0));
     if (!visible) return;
@@ -40,28 +44,9 @@ static class Nfield extends Drawable implements TextReciever {
       xoff+= a.mouseX-a.pmouseX;
     }
     
-    {
-      int max = 0;
-      for (Line l : lns) max = max(max, l.len);
-      float maxx = (max - 2)*chrW;
-      if (xoff < -maxx) xoff = (int) -maxx;
-      if (w > (max + 5)*chrW) xoff = 0;
-      if (xoff > 0) xoff = 0;
-      
-      float maxy = chrH * (lns.size() - 2);
-      if (yoff < -maxy) yoff = (int) -maxy;
-      
-      if (bottom) {
-        yoff = Math.min(yoff, h-2*chrH);
-      } else {
-        if (yoff > 0) yoff = 0;
-      }
-      dyoff = dyoff + (yoff-dyoff)*.6;
-      if (Math.abs(yoff-dyoff) < 1) dyoff = yoff;
-    }
-    
     if (textChanged) moved = true;
     if (moved || this!=textInput) tt = 70;
+    // keep caret on-screen
     if (moved) {
       int py = (int)(chrH*ey + yoff+y  + chrH*.1); // cannot use posy because that uses dyoff 
       int yb = (int) (h-chrH*1.3);
@@ -69,19 +54,54 @@ static class Nfield extends Drawable implements TextReciever {
       if (py > y+yb) yoff =  -ey*chrH+yb;
       if (Math.abs(dyoff-yoff) > h/10) dyoff = yoff+Math.signum(dyoff-yoff)*(h/10);
       moved = false;
+      
+      float left = chrW*ex+xoff+x;
+      if (left  <  chrW*3) xoff-= left -chrW*3;
+      float right = left-w;
+      if (right > -chrW*3) xoff-= right+chrW*3;
     }
-    
+    // drag/tap screen
     if (smouseIn()) {
       int cy = constrain(floor((a.mouseY-y-dyoff)/chrH), 0, lns.size()-1);
       int cx = constrain(round((a.mouseX-x-xoff)/chrW), 0, len(cy));
       if (MOBILE) {
         if (pmousePressed && !a.mousePressed && dist(a.mouseX, a.mouseY, smouseX, smouseY) < 10) {
+          lnTapMode = 1;
           set(cy, cx);
-        }
+        } else dragged();
       } else if (a.mousePressed && a.mouseButton==LEFT) {
         if (shift || pmousePressed) setE(cy, cx);
         else set(cy, cx);
+        if (!pmousePressed) lnTapMode = 1;
+        if (sx!=ex || sy!=ey) lnTapMode = 2;
       }
+    }
+    // correct offsets
+    {
+      int max = 0;
+      for (Line l : lns) max = max(max, l.len);
+      float maxx = (max - 2)*chrW;
+      if (xoff < -maxx) xoff = (int) -maxx;
+      if (w > max*chrW*2) xoff = 0;
+      xoff = Math.min(xoff, 0);
+      
+      float maxy = chrH * (lns.size() - 2);
+      if (yoff < -maxy) yoff = dyoff = (int) -maxy;
+      
+      float lim = bottom? h-2*chrH : 0;
+      if (yoff>lim || dyoff>lim) yoff = dyoff = lim;
+      
+      dyoff = dyoff + (yoff-dyoff)*.6;
+      if (Math.abs(yoff-dyoff) < 1) dyoff = yoff;
+      if (!multiline) dyoff = yoff = 0;
+    }
+    
+    
+    if (lnTapMode!=0 && !a.mousePressed) {
+      if (lnTapMode==1 && a.millis()-lnTapTime < 500) lnDTapped(sy);
+      else lnTapTime = a.millis();
+      lnTapped(ey);
+      lnTapMode = 0;
     }
     
     d.fill(#101010);
@@ -109,22 +129,40 @@ static class Nfield extends Drawable implements TextReciever {
     }
     
     if (textChanged) {
+      modified();
       hl = new SyntaxHighlight(allText(), th, d);
       textChanged = false;
     }
-    if (hl!=null) hl.draw(x + xoff, y + dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex)); // draw text
+    if (hl!=null && highlight()) { // main text drawing
+      hl.draw(x+xoff, y+dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex));
+    } else {
+      d.textAlign(LEFT, TOP);
+      d.textSize(chrH);
+      d.fill(th.def);
+      int cx = (int)(x+ xoff);
+      int cy = (int)(y+dyoff);
+      for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
+        String s = lns.get(ln).toString();
+        textS(d, s, cx, cy + ln*chrH);
+      }
+    }
     
     
     tt--;
     if (tt < 0) tt = 60;
     if ((tt>28 || tt<2) && editable) { // draw caret
       int dtt = tt>30? 3 : Math.abs(15-tt)-14;
+      d.strokeWeight(1);
       d.stroke(th.caret & (0x3fffffff | dtt<<30));
       PVector p = pos(ey, ex);
       d.line(p.x, p.y, p.x, p.y+chrH);
     }
     endClip(d);
   }
+  boolean highlight() {
+    return true;
+  }
+  
   float posx(int cx) {
     return x + chrW*cx + xoff;
   }
@@ -137,6 +175,7 @@ static class Nfield extends Drawable implements TextReciever {
   
   void redraw() {
     if (hl!=null) hl.g = d;
+    tick();
   }
   
   boolean sel() {
@@ -163,7 +202,7 @@ static class Nfield extends Drawable implements TextReciever {
   
   boolean mover(boolean shift) { moved = true;
     if (sel() && !shift) {
-      if (ey==sy? ex>sx : ey>sy) allE(); else allS();
+      order(); allE();
       return true;
     }
     Line l = lns.get(ey);
@@ -180,7 +219,7 @@ static class Nfield extends Drawable implements TextReciever {
   }
   boolean movel(boolean shift) { moved = true;
     if (sel() && !shift) {
-      if (ey==sy? ex>sx : ey>sy) allS(); else allE();
+      order(); allS();
       return true;
     }
     if (ex == 0) {
@@ -195,7 +234,11 @@ static class Nfield extends Drawable implements TextReciever {
     if (!shift) allE();
     return true;
   }
+  //char[] stop = "⋄()⟨⟩[]{}←↩".toCharArray();
   boolean mode(int c) {
+    //if (c==32) return true;
+    //for (char k : stop) if (k==c) return true;
+    //return false;
     return c>='a'&&c<='z' || c>='A'&&c<='Z';
   }
   void ldelete() { if (!editable) return; textChanged = true;
@@ -222,14 +265,22 @@ static class Nfield extends Drawable implements TextReciever {
   
   void append(String g) { if (!editable) return; textChanged = true;
     String[] gls = split(g, '\n');
+    if (!multiline && gls.length > 1) {
+      Line fln = lns.get(0);
+      for (int i = 0; i < gls.length; i++) {
+        lns.set(0, new Line(gls[i]));
+        special("newline");
+      }
+      lns.set(0, fln);
+      return;
+    }
     if (sel()) ldelete();
     
     if (gls.length == 1) {
       ex+= insert(ey, ex, gls[0]);
     } else {
       Line l = lns.get(sy);
-      int[] tail = l.get(sx, l.len);
-      l.delete(sx, l.len);
+      int[] tail = l.cut(sx, l.len);
       l.append(gls[0]);
       for (int i = 1; i < gls.length-1; i++) lns.add(sy+i, new Line(gls[i]));
       Line e = new Line(gls[gls.length-1]);
@@ -246,18 +297,12 @@ static class Nfield extends Drawable implements TextReciever {
   }
   int insert(int y, int x, String s) { textChanged = true;
     Line l = lns.get(y);
-    return l.insert(x, s);
+    return l.insert(x, tocps(s));
   }
   void clear() {
     sx=ex=sy=ey=0; textChanged = true;
     lns.clear();
     lns.add(new Line(""));
-  }
-  void end() {
-    ey = lns.size()-1;
-    ex = len(ey);
-    allE();
-    dyoff = yoff = h-chrH*lns.size()-chrH;
   }
   
   String allText() {
@@ -284,13 +329,15 @@ static class Nfield extends Drawable implements TextReciever {
     }
   }
   void special(String s) {
-    if (s.equals("newline")) { textChanged = true;
+    if (s.equals("newline") && multiline && editable) { textChanged = true;
       if (sel()) ldelete();
       Line l = lns.get(ey);
+      int[] tail = l.cut(ex, l.len);
       int sa = 0;
       while (sa!=l.len && l.ints[sa]==32) sa++;
-      int[] is = new int[sa];
+      int[] is = new int[sa+tail.length];
       for (int i = 0; i < sa; i++) is[i] = 32;
+      System.arraycopy(tail, 0, is, sa, tail.length);
       lns.add(ey+1, new Line(is));
       ey++; ex = sa;
       allE();
@@ -300,45 +347,44 @@ static class Nfield extends Drawable implements TextReciever {
       movel(cshift());
     } else if (s.equals("right")) {
       mover(cshift());
-    } else if (s.equals("up")) { moved = true;
+    } else if (s.equals("up") && multiline) { moved = true;
       if (ey > 0) {
         ey--;
         ex = Math.min(ex, len(ey));
       } else ex = 0;
       if (!cshift()) allE();
-    } else if (s.equals("down")) { moved = true;
+    } else if (s.equals("down") && multiline) { moved = true;
       if (ey < lns.size()-1) {
         ey++;
         ex = Math.min(ex, len(ey));
       } else ex = len(ey);
       if (!cshift()) allE();
-    } else if (s.equals("openPar")) {
+    } else if (s.startsWith("wrap")) {
       if (sel()) {
-        String sel = getsel();
-        ldelete();
-        append("(");
-        append(sel);
-        append(")");
-        movel(false);
+        order();
+        insert(ey, ex, s.substring(5,6));
+        insert(sy, sx, s.substring(4,5));
+        ex+= ey==sy? 2 : 1;
+      } else {
+        append(s.substring(4));
+        ex-=1; allE();
       }
-    } else if (s.equals("wrapPar")) {
-      
-    } else if (s.equals("undo")) {
+    } else if (s.equals("undo") && editable) { textChanged = true;
       //hptr+= hsz-1;
       //hptr%= hsz;
       //to(history[hptr]);
       //modified = true;
-    } else if (s.equals("redo")) {
+    } else if (s.equals("redo") && editable) { textChanged = true;
       //hptr++;
       //hptr%= hsz;
       //to(history[hptr]);
       //modified = true;
-    } else if (s.equals("paste")) {
+    } else if (s.equals("paste") && editable) {
       a.paste(this);
     } else if (s.equals("match")) {
       //int sel = hl.sel(fullPos());
       //if (sel != -1) to(sel);
-    } else if (s.equals("home")) {
+    } else if (s.equals("home") && (multiline || !ctrl)) {
       Line l = lns.get(ey);
       if (ex==0) while (ex < l.len && l.ints[ex]==32) ex++;
       else { int i = 0;
@@ -347,7 +393,7 @@ static class Nfield extends Drawable implements TextReciever {
       }
       if(ctrl) { ex=ey=0; }
       if(!cshift()) allE(); moved = true; // TODO short shift?
-    } else if (s.equals("end")) {
+    } else if (s.equals("end") && (multiline || !ctrl)) {
       if(ctrl) ey=lns.size()-1; ex=len(ey);
       if(!cshift()) allE(); moved = true;
     } else if (s.equals("copy")) {
@@ -356,11 +402,11 @@ static class Nfield extends Drawable implements TextReciever {
     } else if (s.equals("sall")) {
       sx=sy=0;
       ey=lns.size()-1; ex = len(ey);
-    } else if (s.equals("pgdn") || s.equals("pgup")) { moved = true;
+    } else if ((s.equals("pgdn") || s.equals("pgup")) && multiline) { moved = true;
       int d = s.equals("pgdn")? 1 : -1;
       int ca = constrain(((int)(h/chrH)-3)*d+ey, 0, lns.size()-1)-ey;
       yoff-= ca*chrH; ey+= ca;
-      ex = Math.min(ex, len(ey)); if (!shift) allE();
+      ex = Math.min(ex, len(ey)); if (!shift && !a.mousePressed) allE();
     } else if (s.equals("cut")) { if (!editable) { special("copy"); return; } textChanged = true;
       if (!sel()) {
         a.copy(lns.get(ey).toString()+"\n");
@@ -373,7 +419,27 @@ static class Nfield extends Drawable implements TextReciever {
         special("copy");
         ldelete();
       }
-    } else if (s.equals("")) {
+    } else if (s.equals("changecase")) {
+      Line l = lns.get(ey);
+      int[] is = l.ints;
+      int x = ex-1;
+      while(x>=0 && (is[x]>='a'&&is[x]<='z' || is[x]>='A'&&is[x]<='Z' || is[x]>='0'&&is[x]<='9')) x--;
+      if (x==ex-1) x--;
+      int n;
+      do {
+        x++;
+        if (x>=is.length || x<0) return;
+        int c = is[x];
+        n = 0;
+        if (c>='a' && c<='z') n = c-32;
+        if (c>='A' && c<='Z') n = c+32;
+        if (c>=120146 && c<=120171) n = c-26; // handles [cnpqrz] wrongly but whatever
+        if (c>=120120 && c<=120145) n = c+26; // handles invalid chars but whatever
+        if (c==120163) n = 'ℝ';
+        if (c=='ℝ'   ) n = 120163;
+      } while (n==0);
+      //println(n);
+      if (n!=0) { is[x] = n; textChanged = true; }
     } else if (s.equals("")) {
     } else if (s.equals("")) {
     } else if (s.equals("")) {
@@ -382,8 +448,11 @@ static class Nfield extends Drawable implements TextReciever {
   void extraSpecial(String s) {
     println("unknown special "+s);
   }
-  void eval() {
-  }
+  void eval() { }
+  void lnTapped(int y) { }
+  void dragged() { }
+  void lnDTapped(int y) { }
+  void modified() { }
   void pasted(String s) {
     append(s);
   }
@@ -410,8 +479,7 @@ static class Line {
     ints = n;
     len = n.length;
   }
-  int insert(int x, String s) {
-    int[] is = tocps(s);
+  int insert(int x, int[] is) {
     int[] n = new int[len+is.length];
     System.arraycopy(ints, 0, n, 0, x);
     System.arraycopy(is  , 0, n, x, is.length);
@@ -422,6 +490,11 @@ static class Line {
   }
   int[] get(int s, int e) {
     return Arrays.copyOfRange(ints, s, e);
+  }
+  int[] cut(int s, int e) {
+    int[] res = get(s, e);
+    delete(s, e);
+    return res;
   }
   void append(String s) { append(tocps(s)); }
   void append(int[] i) {

@@ -155,17 +155,17 @@ static class APLField extends Drawable implements TextReciever {
     } else if (s.equals("eval")) {
       eval();
     } else if (s.equals("left")) {
-      if (sx!=ex && !a.cshift()) {
+      if (sx!=ex && !cshift()) {
         sx = ex = Math.min(sx, ex);
       } else {
         int am = ex==0? 0 : Character.isLowSurrogate(line.charAt(ex-1))? 2 : 1;
         ex-= am;
-        if (a.ctrl) {
+        if (ctrl) {
           while (ex>0 && !Character.isAlphabetic(line.charAt(ex))) ex--;
           while (ex>0 &&  Character.isAlphabetic(line.charAt(ex))) ex--;
           if (ex<line.length() && !Character.isAlphabetic(line.charAt(ex))) ex++;
         }
-        if (!a.cshift()) sx = ex;
+        if (!cshift()) sx = ex;
       }
     }//asdas    asdas asd asd a   sdasda
     else if (s.equals("right")) {

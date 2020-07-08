@@ -1,9 +1,0 @@
-#!/bin/bash
-cd APL
-rm -rf src/build/APL
-cd src
-mkdir -p build
-javac -Xmaxerrs 1000 --release 8 -d ./build $(find APL -name '*.java')
-cd build
-jar cvfe BQN.jar APL.Main * > /dev/null
-cp BQN.jar ../../../../AndroidIDE/code/BQN8.jar
