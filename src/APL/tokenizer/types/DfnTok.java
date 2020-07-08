@@ -61,6 +61,7 @@ public class DfnTok extends TokArr<LineTok> {
     char htype = 0;
     for (Body b : bodies) {
       if (b.otype != 0) {
+        if (b.otype=='a' && bodies.size()>1) throw new DomainError("Value blocks must contain only 1 body", this);
         if (htype==0) htype = b.otype;
         else if (b.otype != htype) throw new SyntaxError("Different type headers in one function", b.token);
       }
@@ -70,6 +71,7 @@ public class DfnTok extends TokArr<LineTok> {
       if (type=='m' && htype=='f') throw new SyntaxError("Using modifier tokens with non-modifier header", this);
       type = htype;
     }
+    
     if (type=='m' || type=='d') {
       if (bodies.size() < 2) {
         immediate = bodies.get(0).immediate;
@@ -98,7 +100,7 @@ public class DfnTok extends TokArr<LineTok> {
     public int start;
     public final Token token;
     public final char ftype; // one of [mda] - monadic, dyadic, ambivalent
-    public final char otype; // one of [fmd\0] - function, modifier, composition, unknown
+    public final char otype; // one of [afmd\0] - value, function, modifier, composition, unknown
     public final boolean noHeader;
     public final boolean immediate;
     public final Token wM, fM, gM, xM;
@@ -112,13 +114,21 @@ public class DfnTok extends TokArr<LineTok> {
       int sz = ts.size();
       if (sz == 1) {
         Token a = ts.get(0);
-        if (type == 'a') { // 1: +TODO v:
-          otype = 'f'; ftype = 'm';
-          immediate = false;
-          
+        if (type == 'a') { // 1: or v:
           fM=gM=wM=null;
-          xM = a;
-          self = null;
+          if (a instanceof NameTok) { // v:
+            otype = 'a'; ftype = 'a';
+            immediate = true;
+  
+            xM=null;
+            self = ((NameTok) a).name;
+          } else { // 1:
+            otype = 'f'; ftype = 'm';
+            immediate = false;
+            
+            xM = a;
+            self = null;
+          }
         } else { // F: or _m: or _d_:
           otype = type; ftype = 'a';
           // if (!imm) throw new SyntaxError("Using 𝕨/𝕩 in immediate definition", a);
