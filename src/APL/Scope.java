@@ -146,10 +146,10 @@ public class Scope {
           }
           
           public Value call(Value a, Value w) {
-            if (w.ia != 4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, w);
-            if (a.ia != 2) throw new DomainError("𝕨 of •COMP must be an array of type and immediateness");
-            char type = ((Char) a.get(0)).chr;
-            boolean imm = Main.bool(a.get(1));
+            if (w.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, w);
+            char type = a.ia==0?0: ((Char) a.get(0)).chr;
+            if (a.ia!=2 && type!='a') throw new DomainError("𝕨 of •COMP must be an array of type and immediateness, or 'a'");
+            boolean imm = type=='a' || Main.bool(a.get(1));
             Value bc = w.get(0);
             Value obj = w.get(1);
             Value str = w.get(2);
@@ -175,7 +175,12 @@ public class Scope {
             if (type == 'f') return new Dfn (new DfnTok(c, 'f', imm), Scope.this);
             if (type == 'd') return new Ddop(new DfnTok(c, 'd', imm), Scope.this);
             if (type == 'm') return new Dmop(new DfnTok(c, 'm', imm), Scope.this);
-            throw new DomainError("•COMP: 𝕨 must be one of \"fdm\"");
+            if (type == 'a') {
+              DfnTok t = new DfnTok(c, 'a', imm);
+              Scope nsc = new Scope(Scope.this);
+              return t.comp.exec(nsc, t.start(nsc, null, null, null, null, Nothing.inst));
+            }
+            throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
           }
         };
         case "•bc": return new Fun() {

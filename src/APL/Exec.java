@@ -479,7 +479,7 @@ public class Exec {
     
       // case '…': return new EllipsisBuiltin();
       // case '⍮': return new SemiUBBuiltin();
-      // case '⍕': return new FormatBuiltin();
+      case '⍕': return new FormatBuiltin();
       case '⍎': return sc==null? null : new EvalBuiltin(sc);
       // case '⌿': return new ReplicateBuiltin();
       // case '⍀': return new ExpandBuiltin();
