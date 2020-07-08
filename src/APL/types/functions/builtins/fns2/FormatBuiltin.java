@@ -1,4 +1,4 @@
-package APL.types.functions.builtins.fns;
+package APL.types.functions.builtins.fns2;
 
 import APL.Main;
 import APL.types.Value;
@@ -13,10 +13,6 @@ public class FormatBuiltin extends Builtin {
   
   
   public Value call(Value w) {
-    if (w.rank == 1) {
-      w = w.squeeze();
-      if (w instanceof ChrArr) return Main.toAPL(w.asString());
-    }
     return Main.toAPL(w.toString());
   }
 }
