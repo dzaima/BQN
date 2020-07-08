@@ -11,7 +11,7 @@ import java.util.Optional;
 
 
 static PGraphics d;
-static AndroidIDE a;
+static app a;
 
 
 static ArrayList<Drawable> screen;
