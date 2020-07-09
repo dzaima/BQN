@@ -24,20 +24,20 @@ public class PlusBuiltin extends Builtin {
   }
   
   public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return a + w;
+    public double on(double w, double x) {
+      return w + x;
     }
-    public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = a + w[i];
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = w + x[i];
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] + w;
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] + x;
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] + w[i];
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] + x[i];
     }
-    public Value call(BigValue a, BigValue w) {
-      return new BigValue(a.i.add(w.i));
+    public Value call(BigValue w, BigValue x) {
+      return new BigValue(w.i.add(x.i));
     }
   };
   public Value call(Value w, Value x) {

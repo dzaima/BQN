@@ -104,20 +104,20 @@ public class GTBuiltin extends Builtin {
   }
   
   private static final D_NNeB DNF = new D_NNeB() {
-    public boolean on(double a, double w) {
-      return a > w;
+    public boolean on(double w, double x) {
+      return w > x;
     }
-    public void on(BitArr.BA res, double a, double[] w) {
-      for (double cw : w) res.add(a > cw);
+    public void on(BitArr.BA res, double w, double[] x) {
+      for (double cw : x) res.add(w > cw);
     }
-    public void on(BitArr.BA res, double[] a, double w) {
-      for (double ca : a) res.add(ca > w);
+    public void on(BitArr.BA res, double[] w, double x) {
+      for (double ca : w) res.add(ca > x);
     }
-    public void on(BitArr.BA res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res.add(a[i] > w[i]);
+    public void on(BitArr.BA res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res.add(w[i] > x[i]);
     }
-    public Value call(BigValue a, BigValue w) {
-      return a.i.compareTo(w.i) > 0? Num.ONE : Num.ZERO;
+    public Value call(BigValue w, BigValue x) {
+      return w.i.compareTo(x.i) > 0? Num.ONE : Num.ZERO;
     }
   };
   

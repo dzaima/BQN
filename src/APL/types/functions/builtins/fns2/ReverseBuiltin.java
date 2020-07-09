@@ -14,9 +14,9 @@ public class ReverseBuiltin extends Builtin {
   public Value call(Value x) {
     return on(x);
   }
-  public static Value on(Value w) {
-    if (w instanceof Primitive) return w;
-    return ((Arr) w).reverseOn(w.rank-1);
+  public static Value on(Value x) {
+    if (x instanceof Primitive) return x;
+    return ((Arr) x).reverseOn(x.rank-1);
   }
   public Value callInv(Value x) {
     return call(x);
@@ -34,31 +34,31 @@ public class ReverseBuiltin extends Builtin {
   
   
   
-  public static Value on(int a, Value w) {
-    if (w.ia==0) return w;
-    if (a == 0) return w;
-    a = Math.floorMod(a, w.shape[0]);
-    int csz = Arr.prod(w.shape, 1, w.shape.length);
+  public static Value on(int a, Value x) {
+    if (x.ia==0) return x;
+    if (a == 0) return x;
+    a = Math.floorMod(a, x.shape[0]);
+    int csz = Arr.prod(x.shape, 1, x.shape.length);
     int pA = csz*a; // first part
-    int pB = w.ia - pA; // second part
-    if (w instanceof BitArr) {
-      BitArr wb = (BitArr) w;
+    int pB = x.ia - pA; // second part
+    if (x instanceof BitArr) {
+      BitArr wb = (BitArr) x;
       BitArr.BA c = new BitArr.BA(wb.shape);
       c.add(wb, a, wb.ia);
       c.add(wb, 0, a);
       return c.finish();
-    } else if (w.quickDoubleArr()) {
-      double[] vs = w.asDoubleArr();
-      double[] res = new double[w.ia];
+    } else if (x.quickDoubleArr()) {
+      double[] vs = x.asDoubleArr();
+      double[] res = new double[x.ia];
       System.arraycopy(vs,  0, res, pB, pA);
       System.arraycopy(vs, pA, res,  0, pB);
-      return new DoubleArr(res, w.shape);
+      return new DoubleArr(res, x.shape);
     } else {
-      Value[] vs = w.values();
-      Value[] res = new Value[w.ia];
+      Value[] vs = x.values();
+      Value[] res = new Value[x.ia];
       System.arraycopy(vs,  0, res, pB, pA);
       System.arraycopy(vs, pA, res,  0, pB);
-      return Arr.create(res, w.shape);
+      return Arr.create(res, x.shape);
     }
   }
 }

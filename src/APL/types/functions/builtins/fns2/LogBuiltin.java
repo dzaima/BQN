@@ -13,21 +13,21 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
   static final double LN2 = Math.log(2);
   
   public static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return w.log(Num.E);
+    public Value call(Num x) {
+      return x.log(Num.E);
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.log(a[i]);
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Math.log(x[i]);
     }
-    public Num call(BigValue w) {
-      if (w.i.signum() <= 0) {
-        if (w.i.signum() == -1) throw new DomainError("logarithm of negative number", w);
+    public Num call(BigValue x) {
+      if (x.i.signum() <= 0) {
+        if (x.i.signum() == -1) throw new DomainError("logarithm of negative number", x);
         return Num.NEGINF;
       }
-      if (w.i.bitLength()<1023) return new Num(Math.log(w.i.doubleValue())); // safe quick path
-      int len = w.i.bitLength();
+      if (x.i.bitLength()<1023) return new Num(Math.log(x.i.doubleValue())); // safe quick path
+      int len = x.i.bitLength();
       int shift = len > 64? len - 64 : 0; // 64 msb should be enough to get most out of log
-      double d = w.i.shiftRight(shift).doubleValue();
+      double d = x.i.shiftRight(shift).doubleValue();
       return new Num(Math.log(d) + LN2*shift);
     }
   };
@@ -39,24 +39,24 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
   }
   
   public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return Math.log(w) / Math.log(a);
+    public double on(double w, double x) {
+      return Math.log(x) / Math.log(w);
     }
-    public void on(double[] res, double a, double[] w) {
-      double la = Math.log(a);
-      for (int i = 0; i < w.length; i++) res[i] = Math.log(w[i]) / la;
+    public void on(double[] res, double w, double[] x) {
+      double la = Math.log(w);
+      for (int i = 0; i < x.length; i++) res[i] = Math.log(x[i]) / la;
     }
-    public void on(double[] res, double[] a, double w) {
-      double lw = Math.log(w);
-      for (int i = 0; i < a.length; i++) res[i] = lw / Math.log(a[i]);
+    public void on(double[] res, double[] w, double x) {
+      double lw = Math.log(x);
+      for (int i = 0; i < w.length; i++) res[i] = lw / Math.log(w[i]);
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.log(w[i]) / Math.log(a[i]);
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = Math.log(x[i]) / Math.log(w[i]);
     }
-    public Value call(double a, BigValue w) {
-      double res = ((Num) NF.call(w)).num/Math.log(a);
-      if (a==2) { // quick path to make sure 2âŸ makes sense
-        int expected = w.i.bitLength()-1;
+    public Value call(double w, BigValue x) {
+      double res = ((Num) NF.call(x)).num/Math.log(w);
+      if (w==2) { // quick path to make sure 2âŸ makes sense
+        int expected = x.i.bitLength()-1;
         // System.out.println(res+" > "+expected);
         if (res < expected) return Num.of(expected);
         if (res >= expected+1) { // have to get the double juuuust below expected

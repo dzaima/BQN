@@ -14,34 +14,34 @@ public class OldNEBuiltin extends Builtin {
   
   
   private static final D_NNeB DNF = new D_NNeB() {
-    public boolean on(double a, double w) {
-      return a != w;
+    public boolean on(double w, double x) {
+      return w != x;
     }
-    public void on(BitArr.BA res, double a, double[] w) {
-      for (double cw : w) res.add(a != cw);
+    public void on(BitArr.BA res, double w, double[] x) {
+      for (double cw : x) res.add(w != cw);
     }
-    public void on(BitArr.BA res, double[] a, double w) {
-      for (double ca : a) res.add(ca != w);
+    public void on(BitArr.BA res, double[] w, double x) {
+      for (double ca : w) res.add(ca != x);
     }
-    public void on(BitArr.BA res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res.add(a[i] != w[i]);
+    public void on(BitArr.BA res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res.add(w[i] != x[i]);
     }
-    public Value call(BigValue a, BigValue w) {
-      return a.equals(w)? Num.ZERO : Num.ONE;
+    public Value call(BigValue w, BigValue x) {
+      return w.equals(x)? Num.ZERO : Num.ONE;
     }
   };
   private static final D_BB DBF = new D_BB() {
-    @Override public Value call(boolean a, BitArr w) {
-      if (a) return NotBuiltin.call(w);
+    @Override public Value call(boolean w, BitArr x) {
+      if (w) return NotBuiltin.call(x);
+      return x;
+    }
+    @Override public Value call(BitArr w, boolean x) {
+      if (x) return NotBuiltin.call(w);
       return w;
     }
-    @Override public Value call(BitArr a, boolean w) {
-      if (w) return NotBuiltin.call(a);
-      return a;
-    }
-    @Override public Value call(BitArr a, BitArr w) {
-      BitArr.BC bc = BitArr.create(w.shape);
-      for (int i = 0; i < bc.arr.length; i++) bc.arr[i] = a.arr[i] ^ w.arr[i];
+    @Override public Value call(BitArr w, BitArr x) {
+      BitArr.BC bc = BitArr.create(x.shape);
+      for (int i = 0; i < bc.arr.length; i++) bc.arr[i] = w.arr[i] ^ x.arr[i];
       return bc.finish();
     }
   };

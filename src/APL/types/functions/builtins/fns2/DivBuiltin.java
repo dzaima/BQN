@@ -12,14 +12,14 @@ public class DivBuiltin extends Builtin {
   
   
   private static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return Num.ONE.divide(w);
+    public Value call(Num x) {
+      return Num.ONE.divide(x);
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = 1/a[i];
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = 1/x[i];
     }
-    public Value call(BigValue w) {
-      throw new DomainError("reciprocal of biginteger", w);
+    public Value call(BigValue x) {
+      throw new DomainError("reciprocal of biginteger", x);
     }
   };
   public Value call(Value x) {
@@ -27,20 +27,20 @@ public class DivBuiltin extends Builtin {
   }
   
   private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return a / w;
+    public double on(double w, double x) {
+      return w/x;
     }
-    public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = a / w[i];
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = w / x[i];
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] / w;
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] / x;
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] / w[i];
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] / x[i];
     }
-    public Value call(BigValue a, BigValue w) {
-      return new BigValue(a.i.divide(w.i));
+    public Value call(BigValue w, BigValue x) {
+      return new BigValue(w.i.divide(x.i));
     }
   };
   public Value call(Value w, Value x) {

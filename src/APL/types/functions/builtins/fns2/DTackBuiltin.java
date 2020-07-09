@@ -30,13 +30,13 @@ public class DTackBuiltin extends Builtin {
     return on(w, x, this);
   }
   
-  public static Value on(Value a, Value w, Callable blame) {
-    if (!(a instanceof Primitive)) {
-      if (w instanceof BigValue) {
+  public static Value on(Value w, Value x, Callable blame) {
+    if (!(w instanceof Primitive)) {
+      if (x instanceof BigValue) {
         ArrayList<Value> res = new ArrayList<>();
-        BigInteger c = ((BigValue) w).i;
-        for (int i = 0; i < a.ia; i++) {
-          Value v = a.get(a.ia-i-1);
+        BigInteger c = ((BigValue) x).i;
+        for (int i = 0; i < w.ia; i++) {
+          Value v = w.get(w.ia-i-1);
           BigInteger[] dr = c.divideAndRemainder(BigValue.bigint(v));
           res.add(v instanceof Num? new Num(dr[1].intValue()) : new BigValue(dr[1]));
           c = dr[0];
@@ -44,40 +44,40 @@ public class DTackBuiltin extends Builtin {
         Collections.reverse(res);
         return HArr.create(res);
       }
-      int[] sh = new int[w.rank+a.rank];
-      if (a.rank != 1) throw new NYIError(blame+": 𝕨 with rank≥2 not yet implemented", blame);
+      int[] sh = new int[x.rank+w.rank];
+      if (w.rank != 1) throw new NYIError(blame+": 𝕨 with rank≥2 not yet implemented", blame);
       
-      System.arraycopy(a.shape, 0, sh, 0, a.rank); // ≡ for (int i = 0; i < a.rank; i++) sh[i] = a.shape[i];
-      System.arraycopy(w.shape, 0, sh, a.rank, w.rank); // ≡ for (int i = 0; i < w.rank; i++) sh[i+a.rank] = w.shape[i];
-      if (a.ia == 0) return new EmptyArr(sh, Num.ZERO);
-      double[] c = w.asDoubleArrClone();
-      double[] b = a.asDoubleArr();
-      double[] res = new double[w.ia * a.ia];
-      for (int i = 1; i < b.length; i++) if (b[i] == 0) throw new DomainError(blame+": 𝕨 contained a 0 as not the 1st element", blame, a);
+      System.arraycopy(w.shape, 0, sh, 0, w.rank); // ≡ for (int i = 0; i < a.rank; i++) sh[i] = a.shape[i];
+      System.arraycopy(x.shape, 0, sh, w.rank, x.rank); // ≡ for (int i = 0; i < w.rank; i++) sh[i+a.rank] = w.shape[i];
+      if (w.ia == 0) return new EmptyArr(sh, Num.ZERO);
+      double[] c = x.asDoubleArrClone();
+      double[] b = w.asDoubleArr();
+      double[] res = new double[x.ia * w.ia];
+      for (int i = 1; i < b.length; i++) if (b[i] == 0) throw new DomainError(blame+": 𝕨 contained a 0 as not the 1st element", blame, w);
       int last = b[0] == 0? 1 : 0;
       for (int i = b.length-1; i >= last; i--) {
-        int off = w.ia*i;
+        int off = x.ia*i;
         double cb = b[i];
-        for (int j = 0; j < w.ia; j++) {
+        for (int j = 0; j < x.ia; j++) {
           res[off + j] = c[j] % cb;
           c[j] = Math.floor(c[j] / cb);
         }
       }
       if (b[0] == 0) {
-        System.arraycopy(c, 0, res, 0, w.ia); // ≡ for (int j = 0; j < w.ia; j++) res[j] = c[j];
+        System.arraycopy(c, 0, res, 0, x.ia); // ≡ for (int j = 0; j < w.ia; j++) res[j] = c[j];
       }
       return new DoubleArr(res, sh);
     }
-    if (!(w instanceof Num)) {
-      if (w instanceof BigValue) {
-        BigInteger base = BigValue.bigint(a);
-        boolean bigBase = a instanceof BigValue;
-        BigInteger wlr = ((BigValue) w).i;
+    if (!(x instanceof Num)) {
+      if (x instanceof BigValue) {
+        BigInteger base = BigValue.bigint(w);
+        boolean bigBase = w instanceof BigValue;
+        BigInteger wlr = ((BigValue) x).i;
         int sign = wlr.signum();
         BigInteger wl = wlr.abs();
         int ibase = BigValue.safeInt(base);
         if (ibase <= 1) {
-          if (ibase==1 && sign!=0) throw new DomainError(blame+": 𝕨=1 and 𝕩≠0 isn't possible", blame, w);
+          if (ibase==1 && sign!=0) throw new DomainError(blame+": 𝕨=1 and 𝕩≠0 isn't possible", blame, x);
           if (ibase < 0) throw new DomainError(blame+": 𝕨 < 0", blame);
         }
         if (sign==0) return EmptyArr.SHAPE0N;
@@ -123,12 +123,12 @@ public class DTackBuiltin extends Builtin {
       }
       throw new NYIError(blame+": scalar 𝕨 and non-scalar 𝕩 not implemented", blame);
     }
-    double base = a.asDouble();
-    double num = w.asDouble();
+    double base = w.asDouble();
+    double num = x.asDouble();
     if (base <= 1) {
       if (base == 0) return Num.of(num);
-      if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame, a);
-      throw new DomainError(blame+": 𝕨 < 1", blame, a);
+      if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame, w);
+      throw new DomainError(blame+": 𝕨 < 1", blame, w);
     }
     var res = new ArrayList<Double>();
     if (num < 0) {

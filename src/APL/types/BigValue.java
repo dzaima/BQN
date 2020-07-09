@@ -28,10 +28,10 @@ public class BigValue extends Primitive {
   public BigValue(long n) {
     i = BigInteger.valueOf(n);
   }
-  public static BigInteger bigint(Value w) {
-    if (w instanceof Num) return bigint(((Num) w).num);
-    if (w instanceof BigValue) return ((BigValue) w).i;
-    throw new DomainError("Using "+w.humanType(true)+" as biginteger", w);
+  public static BigInteger bigint(Value x) {
+    if (x instanceof Num) return bigint(((Num) x).num);
+    if (x instanceof BigValue) return ((BigValue) x).i;
+    throw new DomainError("Using "+x.humanType(true)+" as biginteger", x);
   }
   public static BigInteger bigint(double d) {
     if (Math.abs(d) > Num.MAX_SAFE_INT) throw new DomainError("creating biginteger from possibly rounded value");

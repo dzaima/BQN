@@ -21,21 +21,21 @@ public class RandBuiltin extends Builtin {
   }
   
   private final NumMV nf = new NumMV() {
-    @Override public Value call(Num v) {
-      if (v.num == 0) return new Num(sc.rand(1d));
-      else return Num.of(sc.rand(v.asInt()));
+    @Override public Value call(Num x) {
+      if (x.num == 0) return new Num(sc.rand(1d));
+      else return Num.of(sc.rand(x.asInt()));
     }
-    @Override public void call(double[] res, double[] a) {
+    @Override public void call(double[] res, double[] x) {
       for (int i = 0; i < res.length; i++) {
-        res[i] = a[i]==0? sc.rand(1d) : Math.floor(sc.rand(a[i]));
+        res[i] = x[i]==0? sc.rand(1d) : Math.floor(sc.rand(x[i]));
       }
     }
-    @Override public Value call(BigValue w) {
-      if (w.i.signum()==0) throw new DomainError("?0L", w);
+    @Override public Value call(BigValue x) {
+      if (x.i.signum()==0) throw new DomainError("?0L", x);
       BigInteger n;
       do {
-        n = new BigInteger(w.i.bitLength(), sc.rnd);
-      } while (n.compareTo(w.i) >= 0);
+        n = new BigInteger(x.i.bitLength(), sc.rnd);
+      } while (n.compareTo(x.i) >= 0);
       return new BigValue(n);
     }
   };

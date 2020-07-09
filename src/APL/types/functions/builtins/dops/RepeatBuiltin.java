@@ -95,15 +95,15 @@ public class RepeatBuiltin extends Dop {
     return repeat(ff, n, o, x);
   }
   
-  public Value repeat(Fun f, int n, Value o, Value w) { // todo don't do recursion?
+  public Value repeat(Fun f, int n, Value o, Value x) { // todo don't do recursion?
     if (n==0) {
-      return o instanceof Fun? ((Fun) o).call(w) : o;
+      return o instanceof Fun? ((Fun) o).call(x) : o;
     }
     
     return repeat(f, n-1, new Fun() { public String repr() { return f.repr(); }
       public Value call(Value x) {
         return f.under(o, x);
       }
-    }, w);
+    }, x);
   }
 }

@@ -47,12 +47,12 @@ public class Fork extends Fun {
     return "("+f+" "+g+" "+h+")";
   }
   
-  public Value under(Value o, Value w) {
+  public Value under(Value o, Value x) {
     if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.under(new Fun() { public String repr() { return g.repr(); }
       public Value call(Value x) {
         return g.underW(o, f, x);
       }
-    }, w);
+    }, x);
   }
 }

@@ -15,37 +15,37 @@ public class RBoxBuiltin extends Builtin {
     return on(w, x, this);
   }
   
-  public static Value on(Value a, Value w, Callable blame) {
-    if (w.rank > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, w);
-    if (a.rank > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, a);
-    if (w.ia > 20 && a.ia > 20) {
+  public static Value on(Value w, Value x, Callable blame) {
+    if (x.rank > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, x);
+    if (w.rank > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, w);
+    if (x.ia > 20 && w.ia > 20) {
       HashMap<Value, Integer> map = new HashMap<>();
       int ctr = 0;
-      for (Value v : a) {
+      for (Value v : w) {
         map.putIfAbsent(v, ctr);
         ctr++;
       }
-      double[] res = new double[w.ia];
+      double[] res = new double[x.ia];
       ctr = 0;
-      double notfound = a.ia;
-      for (Value v : w) {
+      double notfound = w.ia;
+      for (Value v : x) {
         Integer f = map.get(v);
         res[ctr] = f==null? notfound : f;
         ctr++;
       }
       // w won't be a scalar
-      return new DoubleArr(res, w.shape);
+      return new DoubleArr(res, x.shape);
     }
-    double[] res = new double[w.ia];
+    double[] res = new double[x.ia];
     int i = 0;
-    for (Value wv : w) {
+    for (Value wv : x) {
       int j = 0;
-      for (Value av : a) {
+      for (Value av : w) {
         if (av.equals(wv)) break;
         j++;
       }
       res[i++] = j;
     }
-    return new DoubleArr(res, w.shape);
+    return new DoubleArr(res, x.shape);
   }
 }

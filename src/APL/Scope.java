@@ -358,8 +358,8 @@ public class Scope {
     
     public Value call(Value x) {
       return numChrM(new NumMV() {
-        public Value call(Num c) {
-          return Char.of((char) c.asInt());
+        public Value call(Num x) {
+          return Char.of((char) x.asInt());
         }
   
         public boolean retNum() {
@@ -801,30 +801,30 @@ public class Scope {
     public Value call(Value x) {
       return rec(x);
     }
-    private Value rec(Value w) {
-      if (w instanceof Num) return new BigValue(((Num) w).num);
-      if (w instanceof Primitive) return w;
-      Value[] pa = w.values();
+    private Value rec(Value x) {
+      if (x instanceof Num) return new BigValue(((Num) x).num);
+      if (x instanceof Primitive) return x;
+      Value[] pa = x.values();
       Value[] va = new Value[pa.length];
       for (int i = 0; i < pa.length; i++) {
         va[i] = rec(pa[i]);
       }
-      return HArr.create(va, w.shape);
+      return HArr.create(va, x.shape);
     }
     
     public Value callInv(Value x) {
       return recN(x);
     }
-    private Value recN(Value w) {
-      if (w instanceof BigValue) return ((BigValue) w).num();
-      if (w instanceof Primitive) return w;
-      if (w instanceof DoubleArr) return w;
-      Value[] pa = w.values();
+    private Value recN(Value x) {
+      if (x instanceof BigValue) return ((BigValue) x).num();
+      if (x instanceof Primitive) return x;
+      if (x instanceof DoubleArr) return x;
+      Value[] pa = x.values();
       Value[] va = new Value[pa.length];
       for (int i = 0; i < pa.length; i++) {
         va[i] = recN(pa[i]);
       }
-      return HArr.create(va, w.shape);
+      return HArr.create(va, x.shape);
     }
     public String repr() {
       return "•BIG";
@@ -857,8 +857,8 @@ public class Scope {
       if (x instanceof Primitive) return Num.of(  0);
       return Num.of(200); // idk ¯\_(ツ)_/¯
     }
-    public Value call(Value a, Value w) {
-      int[] is = a.asIntVec();
+    public Value call(Value w, Value x) {
+      int[] is = w.asIntVec();
       if (is.length != 2) throw new DomainError("•DR expected 𝕨 to have 2 items", this);
       int f = is[0];
       int t = is[1];
@@ -873,29 +873,29 @@ public class Scope {
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
             }
-          }, 1, w, this);
+          }, 1, x, this);
           if (f==5) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
             }
-          }, 0, w, this);
+          }, 0, x, this);
         } else {
           if (t==1) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
             }
-          }, 0, w, this);
+          }, 0, x, this);
           if (t==5) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
             }
-          }, 0, w, this);
+          }, 0, x, this);
         }
       }
-      throw new NYIError(a+"•DR not implemented", this);
+      throw new NYIError(w+"•DR not implemented", this);
     }
     public Value callInvW(Value w, Value x) {
       return call(ReverseBuiltin.on(w), x);

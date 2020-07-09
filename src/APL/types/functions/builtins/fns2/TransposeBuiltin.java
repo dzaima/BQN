@@ -12,49 +12,49 @@ public class TransposeBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    if (w.scalar()) return w;
-    if (w instanceof DoubleArr) {
-      double[] dw = w.asDoubleArr();
-      double[] res = new double[w.ia];
-      int[] sh = new int[w.rank];
-      for (int i = 0; i < w.rank; i++) {
-        sh[i] = w.shape[w.rank - i - 1];
+  public Value call(Value x) {
+    if (x.scalar()) return x;
+    if (x instanceof DoubleArr) {
+      double[] dw = x.asDoubleArr();
+      double[] res = new double[x.ia];
+      int[] sh = new int[x.rank];
+      for (int i = 0; i < x.rank; i++) {
+        sh[i] = x.shape[x.rank - i - 1];
       }
-      if (w.rank == 2) {
-        int ww = w.shape[0];
-        int wh = w.shape[1];
+      if (x.rank == 2) {
+        int ww = x.shape[0];
+        int wh = x.shape[1];
         int ip = 0;
-        for (int x = 0; x < ww; x++) {
-          int op = x;
-          for (int y = 0; y < wh; y++) {
+        for (int cx = 0; cx < ww; cx++) {
+          int op = cx;
+          for (int cy = 0; cy < wh; cy++) {
             res[op] = dw[ip++];
             op+= ww;
           }
         }
       } else {
         int ci = 0;
-        for (int[] c : new Indexer(w.shape)) {
-          int[] nc = new int[w.rank];
-          for (int i = 0; i < w.rank; i++) {
-            nc[i] = c[w.rank - i - 1];
+        for (int[] c : new Indexer(x.shape)) {
+          int[] nc = new int[x.rank];
+          for (int i = 0; i < x.rank; i++) {
+            nc[i] = c[x.rank - i - 1];
           }
           res[Indexer.fromShape(sh, nc)] = dw[ci++];
         }
       }
       return new DoubleArr(res, sh);
     }
-    Value[] arr = new Value[w.ia];
-    int[] ns = new int[w.rank];
-    for (int i = 0; i < w.rank; i++) {
-      ns[i] = w.shape[w.rank - i - 1];
+    Value[] arr = new Value[x.ia];
+    int[] ns = new int[x.rank];
+    for (int i = 0; i < x.rank; i++) {
+      ns[i] = x.shape[x.rank - i - 1];
     }
-    for (int[] c : new Indexer(w.shape)) {
-      int[] nc = new int[w.rank];
-      for (int i = 0; i < w.rank; i++) {
-        nc[i] = c[w.rank - i - 1];
+    for (int[] c : new Indexer(x.shape)) {
+      int[] nc = new int[x.rank];
+      for (int i = 0; i < x.rank; i++) {
+        nc[i] = c[x.rank - i - 1];
       }
-      arr[Indexer.fromShape(ns, nc)] = w.simpleAt(c);
+      arr[Indexer.fromShape(ns, nc)] = x.simpleAt(c);
     }
     return Arr.create(arr, ns);
   }

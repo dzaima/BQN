@@ -45,42 +45,42 @@ public abstract class Fun extends Callable {
   }
   
   public interface NumMV {
-    Value call(Num w);
+    Value call(Num x);
     default boolean retNum() {
       return true;
     }
-    default double call(double w) {
-      return call(new Num(w)).asDouble();
+    default double call(double x) {
+      return call(new Num(x)).asDouble();
     }
-    default void call(double[] res, double[] a) {
-      for (int i = 0; i < res.length; i++) res[i] = call(a[i]);
+    default void call(double[] res, double[] x) {
+      for (int i = 0; i < res.length; i++) res[i] = call(x[i]);
     }
-    default Value call(BigValue w) {
-      throw new DomainError("bigintegers not allowed here", w);
+    default Value call(BigValue x) {
+      throw new DomainError("bigintegers not allowed here", x);
     }
   }
   public interface ChrMV {
-    Value call(Char w);
-    default Arr call(ChrArr a) {
-      Value[] res = new Value[a.ia];
-      for (int i = 0; i < a.ia; i++) res[i] = call(Char.of(a.s.charAt(i)));
-      return new HArr(res, a.shape);
+    Value call(Char x);
+    default Arr call(ChrArr x) {
+      Value[] res = new Value[x.ia];
+      for (int i = 0; i < x.ia; i++) res[i] = call(Char.of(x.s.charAt(i)));
+      return new HArr(res, x.shape);
     }
   }
   public interface MapMV {
-    Value call(APLMap w);
+    Value call(APLMap x);
   }
   
   public interface AllMV {
-    Value call(Value w);
+    Value call(Value x);
   }
   
   
-  protected Value allM(AllMV f, Value w) {
-    if (w instanceof Primitive) {
-      return f.call(w);
+  protected Value allM(AllMV f, Value x) {
+    if (x instanceof Primitive) {
+      return f.call(x);
     } else {
-      Arr o = (Arr) w;
+      Arr o = (Arr) x;
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
         arr[i] = allM(f, o.get(i));
@@ -88,106 +88,106 @@ public abstract class Fun extends Callable {
       return new HArr(arr, o.shape);
     }
   }
-  protected Value numM(NumMV nf, Value w) {
-    if (w instanceof Arr) {
-      if (w.quickDoubleArr()) {
-        double[] res = new double[w.ia];
-        nf.call(res, w.asDoubleArr());
-        return new DoubleArr(res, w.shape);
+  protected Value numM(NumMV nf, Value x) {
+    if (x instanceof Arr) {
+      if (x.quickDoubleArr()) {
+        double[] res = new double[x.ia];
+        nf.call(res, x.asDoubleArr());
+        return new DoubleArr(res, x.shape);
       }
-      Arr o = (Arr) w;
+      Arr o = (Arr) x;
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
         arr[i] = numM(nf, o.get(i));
       }
       return new HArr(arr, o.shape);
     }
-    if (w instanceof Num     ) return nf.call((Num     ) w);
-    if (w instanceof BigValue) return nf.call((BigValue) w);
-    throw new DomainError("Expected number, got "+w.humanType(false), this, w);
+    if (x instanceof Num     ) return nf.call((Num     ) x);
+    if (x instanceof BigValue) return nf.call((BigValue) x);
+    throw new DomainError("Expected number, got "+x.humanType(false), this, x);
   }
   
-  protected Value numChrM(NumMV nf, ChrMV cf, Value w) {
-    if (w instanceof Arr) {
-      if (w instanceof DoubleArr && nf.retNum()) {
-        double[] res = new double[w.ia];
-        nf.call(res, w.asDoubleArr());
-        return new DoubleArr(res, w.shape);
+  protected Value numChrM(NumMV nf, ChrMV cf, Value x) {
+    if (x instanceof Arr) {
+      if (x instanceof DoubleArr && nf.retNum()) {
+        double[] res = new double[x.ia];
+        nf.call(res, x.asDoubleArr());
+        return new DoubleArr(res, x.shape);
       }
-      if (w instanceof ChrArr) return cf.call((ChrArr) w);
-      Arr o = (Arr) w;
+      if (x instanceof ChrArr) return cf.call((ChrArr) x);
+      Arr o = (Arr) x;
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
         arr[i] = numChrM(nf, cf, o.get(i));
       }
       return new HArr(arr, o.shape);
     }
-    if (w instanceof Char    ) return cf.call((Char    ) w);
-    if (w instanceof Num     ) return nf.call((Num     ) w);
-    if (w instanceof BigValue) return nf.call((BigValue) w);
-    throw new DomainError("Expected either number or character argument, got "+w.humanType(false), this, w);
+    if (x instanceof Char    ) return cf.call((Char    ) x);
+    if (x instanceof Num     ) return nf.call((Num     ) x);
+    if (x instanceof BigValue) return nf.call((BigValue) x);
+    throw new DomainError("Expected either number or character argument, got "+x.humanType(false), this, x);
   }
   
-  protected Value numChrMapM(NumMV nf, ChrMV cf, MapMV mf, Value w) {
-    if (w instanceof Arr) {
-      if (w.quickDoubleArr()) {
-        double[] res = new double[w.ia];
-        nf.call(res, w.asDoubleArr());
-        return new DoubleArr(res, w.shape);
+  protected Value numChrMapM(NumMV nf, ChrMV cf, MapMV mf, Value x) {
+    if (x instanceof Arr) {
+      if (x.quickDoubleArr()) {
+        double[] res = new double[x.ia];
+        nf.call(res, x.asDoubleArr());
+        return new DoubleArr(res, x.shape);
       }
-      Arr o = (Arr) w;
+      Arr o = (Arr) x;
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
         arr[i] = numChrMapM(nf, cf, mf, o.get(i));
       }
       return new HArr(arr, o.shape);
     }
-    if (w instanceof Char    ) return cf.call((Char    ) w);
-    if (w instanceof Num     ) return nf.call((Num     ) w);
-    if (w instanceof APLMap  ) return mf.call((APLMap  ) w);
-    if (w instanceof BigValue) return nf.call((BigValue) w);
-    throw new DomainError("Expected either number/char/map, got "+w.humanType(false), this, w);
+    if (x instanceof Char    ) return cf.call((Char    ) x);
+    if (x instanceof Num     ) return nf.call((Num     ) x);
+    if (x instanceof APLMap  ) return mf.call((APLMap  ) x);
+    if (x instanceof BigValue) return nf.call((BigValue) x);
+    throw new DomainError("Expected either number/char/map, got "+x.humanType(false), this, x);
   }
   
   
-  protected Value allD(D_AA f, Value a, Value w) {
-    if (a instanceof Primitive && w instanceof Primitive) return f.call(a, w);
+  protected Value allD(D_AA f, Value w, Value x) {
+    if (w instanceof Primitive && x instanceof Primitive) return f.call(w, x);
     
-    if (a.scalar()) {
-      Value af = a.first();
+    if (w.scalar()) {
+      Value w0 = w.first();
       
-      if (w.scalar()) {
-        return new Rank0Arr(allD(f, af, w.first()));
+      if (x.scalar()) {
+        return new Rank0Arr(allD(f, w0, x.first()));
       } else { // 𝕨 𝕩¨
-        Value[] arr = new Value[w.ia];
-        Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < w.ia; i++) {
-          arr[i] = allD(f, af, wi.next());
+        Value[] arr = new Value[x.ia];
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < x.ia; i++) {
+          arr[i] = allD(f, w0, xi.next());
         }
-        return new HArr(arr, w.shape);
+        return new HArr(arr, x.shape);
         
       }
     } else {
-      if (w.scalar()) { // 𝕨¨ 𝕩
-        Value wf = w.first();
+      if (x.scalar()) { // 𝕨¨ 𝕩
+        Value x0 = x.first();
         
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = allD(f, ai.next(), wf);
+        Value[] arr = new Value[w.ia];
+        Iterator<Value> ai = w.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = allD(f, ai.next(), x0);
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       } else { // 𝕨 ¨ 𝕩
-        Arr.eqShapes(a, w);
-        assert a.ia == w.ia;
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
+        Arr.eqShapes(w, x);
+        assert w.ia == x.ia;
+        Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = allD(f, ai.next(), wi.next());
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = allD(f, wi.next(), xi.next());
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       }
     }
@@ -200,356 +200,356 @@ public abstract class Fun extends Callable {
   
   
   public interface D_AA {
-    Value call(Value a, Value w);
+    Value call(Value w, Value x);
   }
   public abstract static class D_NNeN implements D_NN { // dyadic number-number equals number
-    public abstract double on(double a, double w);
-    public void on(double[] res, double a, double[] w) {
+    public abstract double on(double w, double x);
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) {
+        res[i] = on(w, x[i]);
+      }
+    }
+    public void on(double[] res, double[] w, double x) {
       for (int i = 0; i < w.length; i++) {
-        res[i] = on(a, w[i]);
+        res[i] = on(w[i], x);
       }
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) {
-        res[i] = on(a[i], w);
-      }
-    }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) {
-        res[i] = on(a[i], w[i]);
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) {
+        res[i] = on(w[i], x[i]);
       }
     }
     
-    public Value call(double a, double w) {
-      return new Num(on(a, w));
+    public Value call(double w, double x) {
+      return new Num(on(w, x));
     }
-    public Value call(double[] a, double[] w, int[] sh) {
+    public Value call(double[] w, double[] x, int[] sh) {
+      double[] res = new double[x.length];
+      on(res, w, x);
+      return new DoubleArr(res, sh);
+    }
+    public Value call(double w, double[] x, int[] sh) {
+      double[] res = new double[x.length];
+      on(res, w, x);
+      return new DoubleArr(res, sh);
+    }
+    public Value call(double[] w, double x, int[] sh) {
       double[] res = new double[w.length];
-      on(res, a, w);
+      on(res, w, x);
       return new DoubleArr(res, sh);
     }
-    public Value call(double a, double[] w, int[] sh) {
-      double[] res = new double[w.length];
-      on(res, a, w);
-      return new DoubleArr(res, sh);
-    }
-    public Value call(double[] a, double w, int[] sh) {
-      double[] res = new double[a.length];
-      on(res, a, w);
-      return new DoubleArr(res, sh);
-    }
-    public Value call(BigValue a, BigValue w) {
-      throw new DomainError("bigintegers not allowed here", w);
+    public Value call(BigValue w, BigValue x) {
+      throw new DomainError("bigintegers not allowed here", x);
     }
   }
   
   public abstract static class D_NNeB implements D_NN { // dyadic number-number equals boolean
-    public abstract boolean on(double a, double w);
-    public abstract void on(BitArr.BA res, double a, double[] w);
-    public abstract void on(BitArr.BA res, double[] a, double w);
-    public abstract void on(BitArr.BA res, double[] a, double[] w);
+    public abstract boolean on(double w, double x);
+    public abstract void on(BitArr.BA res, double w, double[] x);
+    public abstract void on(BitArr.BA res, double[] w, double x);
+    public abstract void on(BitArr.BA res, double[] w, double[] x);
     
-    public Value call(double a, double w) {
-      return on(a, w)? Num.ONE : Num.ZERO;
+    public Value call(double w, double x) {
+      return on(w, x)? Num.ONE : Num.ZERO;
     }
-    public Value call(double[] a, double[] w, int[] sh) {
+    public Value call(double[] w, double[] x, int[] sh) {
       BitArr.BA res = new BitArr.BA(sh);
-      on(res, a, w);
+      on(res, w, x);
       return res.finish();
     }
-    public Value call(double a, double[] w, int[] sh) {
+    public Value call(double w, double[] x, int[] sh) {
       BitArr.BA res = new BitArr.BA(sh);
-      on(res, a, w);
+      on(res, w, x);
       return res.finish();
     }
-    public Value call(double[] a, double w, int[] sh) {
+    public Value call(double[] w, double x, int[] sh) {
       BitArr.BA res = new BitArr.BA(sh);
-      on(res, a, w);
+      on(res, w, x);
       return res.finish();
     }
-    public Value call(BigValue a, BigValue w) {
-      throw new DomainError("bigintegers not allowed here", w);
+    public Value call(BigValue w, BigValue x) {
+      throw new DomainError("bigintegers not allowed here", x);
     }
   }
   
   
   public interface D_NN {
-    Value call(double   a, double   w);
-    Value call(double[] a, double[] w, int[] sh);
-    Value call(double   a, double[] w, int[] sh);
-    Value call(double[] a, double   w, int[] sh);
-    Value call(BigValue a, BigValue w);
-    default Value call(double a, BigValue w) { // special requirement for log; only needs to be handled in numD
-      return call(new BigValue(a), w);
+    Value call(double   w, double   x);
+    Value call(double[] w, double[] x, int[] sh);
+    Value call(double   w, double[] x, int[] sh);
+    Value call(double[] w, double   x, int[] sh);
+    Value call(BigValue w, BigValue x);
+    default Value call(double w, BigValue x) { // special requirement for log; only needs to be handled in numD
+      return call(new BigValue(w), x);
     }
   }
   public interface D_BB {
-    Value call(BitArr  a, BitArr  w);
-    Value call(boolean a, BitArr  w);
-    Value call(BitArr  a, boolean w);
+    Value call(BitArr  w, BitArr  x);
+    Value call(boolean w, BitArr  x);
+    Value call(BitArr  w, boolean x);
   }
   public interface D_CC {
-    Value call(char a, char w);
+    Value call(char w, char x);
   }
   
   
-  protected Value numD(D_NN f, Value a, Value w) {
-    if (a.scalar()) {
-      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
-        if (a instanceof Primitive & w instanceof Primitive) {
-          boolean an = a instanceof Num;
-          boolean wn = w instanceof Num;
-          if (an & wn) return f.call(((Num) a).num, ((Num) w).num);
-          if ((a instanceof BigValue|an) & (w instanceof BigValue|wn)) {
-            if (an) return f.call(((Num) a).num, (BigValue) w);
-            else return f.call((BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
+  protected Value numD(D_NN f, Value w, Value x) {
+    if (w.scalar()) {
+      if (x.scalar()) { // ⊃𝕨 ⊃𝕩
+        if (w instanceof Primitive & x instanceof Primitive) {
+          boolean an = w instanceof Num;
+          boolean wn = x instanceof Num;
+          if (an & wn) return f.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn)) {
+            if (an) return f.call(((Num) w).num, (BigValue) x);
+            else return f.call((BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
           }
-          throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
-        } else return new Rank0Arr(numD(f, a.first(), w.first()));
+          throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
+        } else return new Rank0Arr(numD(f, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
-        if (w.quickDoubleArr() && a instanceof Num) {
-          return f.call(a.asDouble(), w.asDoubleArr(), w.shape);
+        if (x.quickDoubleArr() && w instanceof Num) {
+          return f.call(w.asDouble(), x.asDoubleArr(), x.shape);
         }
-        Value af = a.first();
-        Iterator<Value> wi = w.iterator();
-        Value[] vs = new Value[w.ia];
-        for (int i = 0; i < w.ia; i++) {
-          vs[i] = numD(f, af, wi.next());
+        Value w0 = w.first();
+        Iterator<Value> xi = x.iterator();
+        Value[] vs = new Value[x.ia];
+        for (int i = 0; i < x.ia; i++) {
+          vs[i] = numD(f, w0, xi.next());
         }
-        return new HArr(vs, w.shape);
+        return new HArr(vs, x.shape);
         
       }
     } else {
-      if (w.scalar()) { // 𝕨 𝕩¨
-        if (a.quickDoubleArr() && w instanceof Num) {
-          return f.call(a.asDoubleArr(), w.asDouble(), a.shape);
+      if (x.scalar()) { // 𝕨 𝕩¨
+        if (w.quickDoubleArr() && x instanceof Num) {
+          return f.call(w.asDoubleArr(), x.asDouble(), w.shape);
         }
-        Value wf = w.first();
-        Iterator<Value> ai = a.iterator();
-        Value[] vs = new Value[a.ia];
-        for (int i = 0; i < a.ia; i++) {
-          vs[i] = numD(f, ai.next(), wf);
+        Value x0 = x.first();
+        Iterator<Value> wi = w.iterator();
+        Value[] vs = new Value[w.ia];
+        for (int i = 0; i < w.ia; i++) {
+          vs[i] = numD(f, wi.next(), x0);
         }
         
-        return new HArr(vs, a.shape);
+        return new HArr(vs, w.shape);
         
       } else { // 𝕨 ¨ 𝕩
-        Arr.eqShapes(a, w);
+        Arr.eqShapes(w, x);
         
-        if (a.quickDoubleArr() && w.quickDoubleArr()) {
-          return f.call(a.asDoubleArr(), w.asDoubleArr(), a.shape);
+        if (w.quickDoubleArr() && x.quickDoubleArr()) {
+          return f.call(w.asDoubleArr(), x.asDoubleArr(), w.shape);
         }
         
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
+        Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = numD(f, ai.next(), wi.next());
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = numD(f, wi.next(), xi.next());
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       }
     }
   }
-  protected Value bitD(D_NN n, D_BB b, Value a, Value w) {
-    if (a.scalar()) {
-      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
-        if (a instanceof Primitive & w instanceof Primitive) {
-          boolean an = a instanceof Num;
-          boolean wn = w instanceof Num;
-          if (an & wn) return n.call(((Num) a).num, ((Num) w).num);
-          if ((a instanceof BigValue|an) & (w instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) a).num) : (BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
-          throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
-        } else return new Rank0Arr(bitD(n, b, a.first(), w.first()));
+  protected Value bitD(D_NN n, D_BB b, Value w, Value x) {
+    if (w.scalar()) {
+      if (x.scalar()) { // ⊃𝕨 ⊃𝕩
+        if (w instanceof Primitive & x instanceof Primitive) {
+          boolean an = w instanceof Num;
+          boolean wn = x instanceof Num;
+          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
+            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
+        } else return new Rank0Arr(bitD(n, b, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
-        if (a instanceof Primitive) {
-          if (w instanceof BitArr && Main.isBool(a)) {
-            return b.call(Main.bool(a), (BitArr) w);
-          }
-          if (a instanceof Num && w.quickDoubleArr()) {
-            return n.call(a.asDouble(), w.asDoubleArr(), w.shape);
-          }
-        }
-        Value af = a.first();
-        Iterator<Value> wi = w.iterator();
-        Value[] vs = new Value[w.ia];
-        for (int i = 0; i < w.ia; i++) {
-          vs[i] = bitD(n, b, af, wi.next());
-        }
-        return new HArr(vs, w.shape);
-        
-      }
-    } else {
-      if (w.scalar()) { // 𝕨 𝕩¨
         if (w instanceof Primitive) {
-          if (a instanceof BitArr && Main.isBool(w)) {
-            return b.call((BitArr) a, Main.bool(w));
+          if (x instanceof BitArr && Main.isBool(w)) {
+            return b.call(Main.bool(w), (BitArr) x);
           }
-          if (a instanceof Num && a.quickDoubleArr()) {
-            return n.call(a.asDoubleArr(), w.asDouble(), a.shape);
+          if (w instanceof Num && x.quickDoubleArr()) {
+            return n.call(w.asDouble(), x.asDoubleArr(), x.shape);
           }
         }
-        Value wf = w.first();
-        Iterator<Value> ai = a.iterator();
-        Value[] vs = new Value[a.ia];
-        for (int i = 0; i < a.ia; i++) {
-          vs[i] = bitD(n, b, ai.next(), wf);
+        Value w0 = w.first();
+        Iterator<Value> xi = x.iterator();
+        Value[] vs = new Value[x.ia];
+        for (int i = 0; i < x.ia; i++) {
+          vs[i] = bitD(n, b, w0, xi.next());
+        }
+        return new HArr(vs, x.shape);
+        
+      }
+    } else {
+      if (x.scalar()) { // 𝕨 𝕩¨
+        if (x instanceof Primitive) {
+          if (w instanceof BitArr && Main.isBool(x)) {
+            return b.call((BitArr) w, Main.bool(x));
+          }
+          if (w instanceof Num && w.quickDoubleArr()) {
+            return n.call(w.asDoubleArr(), x.asDouble(), w.shape);
+          }
+        }
+        Value x0 = x.first();
+        Iterator<Value> ai = w.iterator();
+        Value[] vs = new Value[w.ia];
+        for (int i = 0; i < w.ia; i++) {
+          vs[i] = bitD(n, b, ai.next(), x0);
         }
         
-        return new HArr(vs, a.shape);
+        return new HArr(vs, w.shape);
         
       } else { // 𝕨 ¨ 𝕩
-        Arr.eqShapes(a, w);
+        Arr.eqShapes(w, x);
         
-        if (a instanceof BitArr && w instanceof BitArr) {
-          return b.call((BitArr) a, (BitArr) w);
+        if (w instanceof BitArr && x instanceof BitArr) {
+          return b.call((BitArr) w, (BitArr) x);
         }
         
-        if (a.quickDoubleArr() && w.quickDoubleArr()) {
-          return n.call(a.asDoubleArr(), w.asDoubleArr(), a.shape);
+        if (w.quickDoubleArr() && x.quickDoubleArr()) {
+          return n.call(w.asDoubleArr(), x.asDoubleArr(), w.shape);
         }
         
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
+        Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = bitD(n, b, ai.next(), wi.next());
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = bitD(n, b, wi.next(), xi.next());
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       }
     }
   }
   
   
-  protected Value numChrD(D_NN n, D_CC c, D_AA def, Value a, Value w) {
-    if (a.scalar()) {
-      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
-        if (a instanceof Primitive & w instanceof Primitive) {
-          boolean an = a instanceof Num;
-          boolean wn = w instanceof Num;
-          if (an & wn) return n.call(((Num) a).num, ((Num) w).num);
-          if ((a instanceof BigValue|an) & (w instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) a).num) : (BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
-          if (a instanceof Char & w instanceof Char) return c.call(((Char) a).chr, ((Char) w).chr);
-          return def.call(a, w);
-        } else return new Rank0Arr(numChrD(n, c, def, a.first(), w.first()));
+  protected Value numChrD(D_NN n, D_CC c, D_AA def, Value w, Value x) {
+    if (w.scalar()) {
+      if (x.scalar()) { // ⊃𝕨 ⊃𝕩
+        if (w instanceof Primitive & x instanceof Primitive) {
+          boolean an = w instanceof Num;
+          boolean wn = x instanceof Num;
+          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
+            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          if (w instanceof Char & x instanceof Char) return c.call(((Char) w).chr, ((Char) x).chr);
+          return def.call(w, x);
+        } else return new Rank0Arr(numChrD(n, c, def, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
-        if (a instanceof Num && w.quickDoubleArr()) {
-          return n.call(a.asDouble(), w.asDoubleArr(), w.shape);
+        if (w instanceof Num && x.quickDoubleArr()) {
+          return n.call(w.asDouble(), x.asDoubleArr(), x.shape);
         }
         
-        Value af = a.first();
-        Iterator<Value> wi = w.iterator();
-        Value[] vs = new Value[w.ia];
-        for (int i = 0; i < w.ia; i++) {
-          vs[i] = numChrD(n, c, def, af, wi.next());
+        Value w0 = w.first();
+        Iterator<Value> xi = x.iterator();
+        Value[] vs = new Value[x.ia];
+        for (int i = 0; i < x.ia; i++) {
+          vs[i] = numChrD(n, c, def, w0, xi.next());
         }
-        return new HArr(vs, w.shape);
+        return new HArr(vs, x.shape);
         
       }
     } else {
-      if (w.scalar()) { // 𝕨 𝕩¨
-        if (w instanceof Num && a.quickDoubleArr()) {
-          return n.call(a.asDoubleArr(), w.asDouble(), a.shape);
+      if (x.scalar()) { // 𝕨 𝕩¨
+        if (x instanceof Num && w.quickDoubleArr()) {
+          return n.call(w.asDoubleArr(), x.asDouble(), w.shape);
         }
-        Value wf = w.first();
-        Iterator<Value> ai = a.iterator();
-        Value[] vs = new Value[a.ia];
-        for (int i = 0; i < a.ia; i++) {
-          vs[i] = numChrD(n, c, def, ai.next(), wf);
+        Value x0 = x.first();
+        Iterator<Value> ai = w.iterator();
+        Value[] vs = new Value[w.ia];
+        for (int i = 0; i < w.ia; i++) {
+          vs[i] = numChrD(n, c, def, ai.next(), x0);
         }
         
-        return new HArr(vs, a.shape);
+        return new HArr(vs, w.shape);
       } else { // 𝕨 ¨ 𝕩
-        Arr.eqShapes(a, w);
+        Arr.eqShapes(w, x);
         
-        if (a.quickDoubleArr() && w.quickDoubleArr()) {
-          return n.call(a.asDoubleArr(), w.asDoubleArr(), a.shape);
+        if (w.quickDoubleArr() && x.quickDoubleArr()) {
+          return n.call(w.asDoubleArr(), x.asDoubleArr(), w.shape);
         }
         
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
+        Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = numChrD(n, c, def, ai.next(), wi.next());
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = numChrD(n, c, def, wi.next(), xi.next());
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       }
     }
   }
-  protected Value ncbaD(D_NN n, D_BB b, D_CC c, D_AA def, Value a, Value w) {
-    if (a.scalar()) {
-      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
-        if (a instanceof Primitive & w instanceof Primitive) {
-          boolean an = a instanceof Num;
-          boolean wn = w instanceof Num;
-          if (an & wn) return n.call(((Num) a).num, ((Num) w).num);
-          else if (a instanceof Char & w instanceof Char) return c.call(((Char) a).chr, ((Char) w).chr);
-          else if ((a instanceof BigValue|an) & (w instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) a).num) : (BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
-          else return def.call(a, w);
-        } else return new Rank0Arr(ncbaD(n, b, c, def, a.first(), w.first()));
+  protected Value ncbaD(D_NN n, D_BB b, D_CC c, D_AA def, Value w, Value x) {
+    if (w.scalar()) {
+      if (x.scalar()) { // ⊃𝕨 ⊃𝕩
+        if (w instanceof Primitive & x instanceof Primitive) {
+          boolean an = w instanceof Num;
+          boolean wn = x instanceof Num;
+          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
+          else if (w instanceof Char & x instanceof Char) return c.call(((Char) w).chr, ((Char) x).chr);
+          else if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
+            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          else return def.call(w, x);
+        } else return new Rank0Arr(ncbaD(n, b, c, def, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
-        if (a instanceof Primitive) {
-          if (w instanceof BitArr && Main.isBool(a)) {
-            return b.call(Main.bool(a), (BitArr) w);
-          }
-          if (a instanceof Num && w.quickDoubleArr()) {
-            return n.call(a.asDouble(), w.asDoubleArr(), w.shape);
-          }
-        }
-        
-        Value af = a.first();
-        Iterator<Value> wi = w.iterator();
-        Value[] vs = new Value[w.ia];
-        for (int i = 0; i < w.ia; i++) {
-          vs[i] = ncbaD(n, b, c, def, af, wi.next());
-        }
-        return new HArr(vs, w.shape);
-      }
-    } else {
-      if (w.scalar()) { // 𝕨 𝕩¨
         if (w instanceof Primitive) {
-          if (a instanceof BitArr && Main.isBool(w)) {
-            return b.call((BitArr) a, Main.bool(w));
+          if (x instanceof BitArr && Main.isBool(w)) {
+            return b.call(Main.bool(w), (BitArr) x);
           }
-          if (a instanceof Num && a.quickDoubleArr()) {
-            return n.call(a.asDoubleArr(), w.asDouble(), a.shape);
+          if (w instanceof Num && x.quickDoubleArr()) {
+            return n.call(w.asDouble(), x.asDoubleArr(), x.shape);
           }
-        }
-        Value wf = w.first();
-        Iterator<Value> ai = a.iterator();
-        Value[] vs = new Value[a.ia];
-        for (int i = 0; i < a.ia; i++) {
-          vs[i] = ncbaD(n, b, c, def, ai.next(), wf);
         }
         
-        return new HArr(vs, a.shape);
+        Value w0 = w.first();
+        Iterator<Value> xi = x.iterator();
+        Value[] vs = new Value[x.ia];
+        for (int i = 0; i < x.ia; i++) {
+          vs[i] = ncbaD(n, b, c, def, w0, xi.next());
+        }
+        return new HArr(vs, x.shape);
+      }
+    } else {
+      if (x.scalar()) { // 𝕨 𝕩¨
+        if (x instanceof Primitive) {
+          if (w instanceof BitArr && Main.isBool(x)) {
+            return b.call((BitArr) w, Main.bool(x));
+          }
+          if (w instanceof Num && w.quickDoubleArr()) {
+            return n.call(w.asDoubleArr(), x.asDouble(), w.shape);
+          }
+        }
+        Value x0 = x.first();
+        Iterator<Value> wi = w.iterator();
+        Value[] vs = new Value[w.ia];
+        for (int i = 0; i < w.ia; i++) {
+          vs[i] = ncbaD(n, b, c, def, wi.next(), x0);
+        }
+        
+        return new HArr(vs, w.shape);
         
       } else { // 𝕨 ¨ 𝕩
-        Arr.eqShapes(a, w);
+        Arr.eqShapes(w, x);
         
-        if (a instanceof BitArr && w instanceof BitArr) {
-          return b.call((BitArr) a, (BitArr) w);
+        if (w instanceof BitArr && x instanceof BitArr) {
+          return b.call((BitArr) w, (BitArr) x);
         }
-        if (a.quickDoubleArr() && w.quickDoubleArr()) {
-          return n.call(a.asDoubleArr(), w.asDoubleArr(), a.shape);
+        if (w.quickDoubleArr() && x.quickDoubleArr()) {
+          return n.call(w.asDoubleArr(), x.asDoubleArr(), w.shape);
         }
         
-        Value[] arr = new Value[a.ia];
-        Iterator<Value> ai = a.iterator();
+        Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
-        for (int i = 0; i < a.ia; i++) {
-          arr[i] = ncbaD(n, b, c, def, ai.next(), wi.next());
+        Iterator<Value> xi = x.iterator();
+        for (int i = 0; i < w.ia; i++) {
+          arr[i] = ncbaD(n, b, c, def, wi.next(), xi.next());
         }
-        return new HArr(arr, a.shape);
+        return new HArr(arr, w.shape);
         
       }
     }

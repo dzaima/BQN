@@ -357,18 +357,18 @@ public abstract class Arr extends Value {
     return true;
   }
   
-  public static void eqShapes(Value a, Value w) {
-    int[] as = a.shape;
-    int[] ws = w.shape;
-    if (as.length != ws.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", w);
+  public static void eqShapes(Value w, Value x) {
+    int[] as = w.shape;
+    int[] ws = x.shape;
+    if (as.length != ws.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", x);
     for (int i = 0; i < as.length; i++) {
-      if (as[i] != ws[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", w);
+      if (as[i] != ws[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", x);
     }
   }
-  public static void eqShapes(int[] a, int[] w, Callable blame) {
-    if (a.length != w.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(a) + " vs " + Main.formatAPL(w) + ")", blame);
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != w[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(a) + " vs " + Main.formatAPL(w) + ")", blame);
+  public static void eqShapes(int[] w, int[] x, Callable blame) {
+    if (w.length != x.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(w) + " vs " + Main.formatAPL(x) + ")", blame);
+    for (int i = 0; i < w.length; i++) {
+      if (w[i] != x[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(w) + " vs " + Main.formatAPL(x) + ")", blame);
     }
   }
 }

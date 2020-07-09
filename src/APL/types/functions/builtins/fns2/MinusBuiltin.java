@@ -11,14 +11,14 @@ public class MinusBuiltin extends Builtin {
   
   
   public static final NumMV NF = new NumMV() {
-    public Value call(Num n) {
-      return n.negate();
+    public Value call(Num x) {
+      return x.negate();
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = -a[i];
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = -x[i];
     }
-    public Value call(BigValue w) {
-      return new BigValue(w.i.negate());
+    public Value call(BigValue x) {
+      return new BigValue(x.i.negate());
     }
   };
   
@@ -27,20 +27,20 @@ public class MinusBuiltin extends Builtin {
   }
   
   public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return a - w;
+    public double on(double w, double x) {
+      return w - x;
     }
-    public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = a - w[i];
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = w - x[i];
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] - w;
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] - x;
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i] - w[i];
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = w[i] - x[i];
     }
-    public Value call(BigValue a, BigValue w) {
-      return new BigValue(a.i.subtract(w.i));
+    public Value call(BigValue w, BigValue x) {
+      return new BigValue(w.i.subtract(x.i));
     }
   };
   

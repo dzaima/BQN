@@ -29,12 +29,12 @@ public class Atop extends Fun {
     return h.callInvA(g.callInv(w), x);
   }
   
-  public Value under(Value o, Value w) {
+  public Value under(Value o, Value x) {
     return h.under(new Fun() { public String repr() { return g.repr(); }
       public Value call(Value x) {
         return g.under(o, x);
       }
-    }, w);
+    }, x);
   }
   
   @Override public String repr() {

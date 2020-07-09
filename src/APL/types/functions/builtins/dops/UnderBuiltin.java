@@ -43,19 +43,19 @@ public class UnderBuiltin extends Dop {
     }
   }
   
-  public static class BindA extends Fun {
-    final Value a;
+  public static class BindA extends Fun { // +todo think about merging with ⊸
+    final Value w;
     final Fun f;
-    public BindA(Value a, Fun f) {
-      this.a = a;
+    public BindA(Value w, Fun f) {
+      this.w = w;
       this.f = f;
     }
     
     public Value call(Value x) {
-      return f.call(a, x);
+      return f.call(w, x);
     }
     public Value callInv(Value x) {
-      return f.callInvW(a, x);
+      return f.callInvW(w, x);
     }
     
     public String repr() {

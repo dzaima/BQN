@@ -15,11 +15,11 @@ public class FloorBuiltin extends Builtin {
   }
   
   private static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return w.floor();
+    public Value call(Num x) {
+      return x.floor();
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.floor(a[i]);
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Math.floor(x[i]);
     }
   };
   public Value call(Value x) {
@@ -27,20 +27,20 @@ public class FloorBuiltin extends Builtin {
   }
   
   private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return Math.min(a, w);
+    public double on(double w, double x) {
+      return Math.min(w, x);
     }
-    public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = Math.min(a, w[i]);
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Math.min(w, x[i]);
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.min(a[i], w);
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = Math.min(w[i], x);
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.min(a[i], w[i]);
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = Math.min(w[i], x[i]);
     }
-    public Value call(BigValue a, BigValue w) {
-      return a.compareTo(w)>0? w : a;
+    public Value call(BigValue w, BigValue x) {
+      return w.compareTo(x)>0? x : w;
     }
   };
   public Value call(Value w, Value x) {

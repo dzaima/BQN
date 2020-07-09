@@ -15,14 +15,14 @@ public class StileBuiltin extends Builtin {
   
   
   private static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return w.abs();
+    public Value call(Num x) {
+      return x.abs();
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.abs(a[i]);
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Math.abs(x[i]);
     }
-    public Value call(BigValue w) {
-      return new BigValue(w.i.abs());
+    public Value call(BigValue x) {
+      return new BigValue(x.i.abs());
     }
   };
   
@@ -31,39 +31,39 @@ public class StileBuiltin extends Builtin {
   }
   
   private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      double c = w % a;
-      if (c!=0  &  (a>=0 ^ w>=0)) c+= a;
+    public double on(double w, double x) {
+      double c = x % w;
+      if (c!=0  &  (w>=0 ^ x>=0)) c+= w;
       return c;
     }
-    public void on(double[] res, double a, double[] w) {
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) {
+        double xc = x[i];
+        double c = xc%w;
+        if (c!=0  &  (w>=0 ^ xc>=0)) c+= w;
+        res[i] = c;
+      }
+    }
+    public void on(double[] res, double[] w, double x) {
       for (int i = 0; i < w.length; i++) {
         double wc = w[i];
-        double c = wc%a;
-        if (c!=0  &  (a>=0 ^ wc>=0)) c+= a;
+        double c = x%wc;
+        if (c!=0  &  (wc>=0 ^ x>=0)) c+= wc;
         res[i] = c;
       }
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) {
-        double ac = a[i];
-        double c = w%ac;
-        if (c!=0  &  (ac>=0 ^ w>=0)) c+= ac;
-        res[i] = c;
-      }
-    }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) {
-        double ac = a[i];
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) {
         double wc = w[i];
-        double c = wc%ac;
-        if (c!=0  &  (ac>=0 ^ wc>=0)) c+= ac;
+        double xc = x[i];
+        double c = xc%wc;
+        if (c!=0  &  (wc>=0 ^ xc>=0)) c+= wc;
         res[i] = c;
       }
     }
-    public Value call(BigValue a, BigValue w) {
-      BigInteger r = w.i.remainder(a.i);
-      if (r.signum()<0) r = r.add(a.i);
+    public Value call(BigValue w, BigValue x) {
+      BigInteger r = x.i.remainder(w.i);
+      if (r.signum()<0) r = r.add(w.i);
       return new BigValue(r);
     }
   };

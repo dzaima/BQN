@@ -10,19 +10,19 @@ public class MatchBuiltin extends Builtin {
   }
   
   
-  public static int lazy(Value w) {
+  public static int lazy(Value x) {
     int depth = 0;
-    while (!(w instanceof Primitive)) {
-      w = w.first();
+    while (!(x instanceof Primitive)) {
+      x = x.first();
       depth++;
     }
     return depth;
   }
-  public static int full(Value w) {
-    if (w instanceof Primitive) return 0;
-    if (w instanceof DoubleArr || w instanceof ChrArr || w instanceof BitArr) return 1;
+  public static int full(Value x) {
+    if (x instanceof Primitive) return 0;
+    if (x instanceof DoubleArr || x instanceof ChrArr || x instanceof BitArr) return 1;
     int depth = 0;
-    for (Value v : w) {
+    for (Value v : x) {
       depth = Math.max(depth, full(v));
     }
     return depth + 1;

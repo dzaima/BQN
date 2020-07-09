@@ -18,25 +18,25 @@ public class TildeBuiltin extends Builtin {
     return rec(x);
   }
   
-  private Value rec(Value w) {
-    if (w instanceof Arr) {
-      if (w instanceof BitArr) {
-        BitArr wb = (BitArr) w;
+  private Value rec(Value x) {
+    if (x instanceof Arr) {
+      if (x instanceof BitArr) {
+        BitArr wb = (BitArr) x;
         long[] res = new long[wb.llen()];
         for (int i = 0; i < res.length; i++) res[i] = ~wb.arr[i];
-        return new BitArr(res, w.shape);
+        return new BitArr(res, x.shape);
       }
       
-      if (w.quickDoubleArr()) {
+      if (x.quickDoubleArr()) {
         // for (int i = 0; i < w.length; i++) if (w[i] == 0) res[i>>6]|= 1L << (i&63);
-        BitArr.BA a = new BitArr.BA(w.shape);
-        for (double v : w.asDoubleArr()) a.add(v == 0);
+        BitArr.BA a = new BitArr.BA(x.shape);
+        for (double v : x.asDoubleArr()) a.add(v == 0);
         return a.finish();
       }
       
-      Arr o = (Arr) w;
+      Arr o = (Arr) x;
       if (o.ia>0 && o.get(0) instanceof Num) {
-        BitArr.BA a = new BitArr.BA(w.ia); // it's probably worth going all-in on creating a bitarr
+        BitArr.BA a = new BitArr.BA(x.ia); // it's probably worth going all-in on creating a bitarr
         for (int i = 0; i < o.ia; i++) {
           Value v = o.get(i);
           if (v instanceof Num) a.add(!Main.bool(v));
@@ -53,8 +53,8 @@ public class TildeBuiltin extends Builtin {
         arr[i] = rec(o.get(i));
       }
       return new HArr(arr, o.shape);
-    } else if (w instanceof Num) return Main.bool(w)? Num.ZERO : Num.ONE;
-    else throw new DomainError("Expected boolean, got "+w.humanType(false), this, w);
+    } else if (x instanceof Num) return Main.bool(x)? Num.ZERO : Num.ONE;
+    else throw new DomainError("Expected boolean, got "+x.humanType(false), this, x);
   }
   
   public Value call(Value w, Value x) {

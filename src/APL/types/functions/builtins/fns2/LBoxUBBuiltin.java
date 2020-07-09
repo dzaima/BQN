@@ -33,38 +33,38 @@ public class LBoxUBBuiltin extends Builtin {
     return on(w, x, this);
   }
   
-  public static Value on(Value a, Value w, Callable blame) {
-    if (w instanceof APLMap) {
-      Value[] res = new Value[a.ia];
-      APLMap map = (APLMap) w;
-      Value[] vs = a.values();
-      for (int i = 0; i < a.ia; i++) {
+  public static Value on(Value w, Value x, Callable blame) {
+    if (x instanceof APLMap) {
+      Value[] res = new Value[w.ia];
+      APLMap map = (APLMap) x;
+      Value[] vs = w.values();
+      for (int i = 0; i < w.ia; i++) {
         res[i] = map.getRaw(vs[i].asString());
       }
-      return Arr.create(res, a.shape);
+      return Arr.create(res, w.shape);
     }
-    if (a instanceof Primitive) {
-      return w.get(Indexer.scal(a.asInt(), w.shape, blame));
+    if (w instanceof Primitive) {
+      return x.get(Indexer.scal(w.asInt(), x.shape, blame));
     } else {
-      return onArr(a, w, blame);
+      return onArr(w, x, blame);
     }
   }
   
-  static Value onArr(Value a, Value w, Callable blame) {
-    if (a instanceof Primitive) throw new DomainError(blame+": indices must all be vectors when nesting (found "+a+")", blame);
-    if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {
-      Value[] vs = new Value[a.ia];
-      for (int i = 0; i < a.ia; i++) vs[i] = onArr(a.get(i), w, blame);
-      return Arr.create(vs, a.shape);
+  static Value onArr(Value w, Value x, Callable blame) {
+    if (w instanceof Primitive) throw new DomainError(blame+": indices must all be vectors when nesting (found "+w+")", blame);
+    if (w.ia>=1 && !(w.get(0) instanceof Primitive)) {
+      Value[] vs = new Value[w.ia];
+      for (int i = 0; i < w.ia; i++) vs[i] = onArr(w.get(i), x, blame);
+      return Arr.create(vs, w.shape);
     }
-    return w.get(Indexer.vec(a, w.shape, blame));
+    return x.get(Indexer.vec(w, x.shape, blame));
   }
   
   // only used by AtBuiltin
-  public static Value on(Indexer.PosSh poss, Value w) {
-    if (w.quickDoubleArr()) {
+  public static Value on(Indexer.PosSh poss, Value x) {
+    if (x.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
-      double[] wd = w.asDoubleArr();
+      double[] wd = x.asDoubleArr();
       int[] idxs = poss.vals;
       for (int i = 0; i < idxs.length; i++) {
         res[i] = wd[idxs[i]];
@@ -74,7 +74,7 @@ public class LBoxUBBuiltin extends Builtin {
     Value[] res = new Value[Arr.prod(poss.sh)];
     int[] idxs = poss.vals;
     for (int i = 0; i < idxs.length; i++) {
-      res[i] = w.get(idxs[i]);
+      res[i] = x.get(idxs[i]);
     }
     return Arr.create(res, poss.sh);
   }

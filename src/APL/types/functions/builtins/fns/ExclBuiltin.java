@@ -23,17 +23,17 @@ public class ExclBuiltin extends Builtin {
   }
   
   private static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return new Num(cache[Math.min(w.asInt(), 171)]);
+    public Value call(Num x) {
+      return new Num(cache[Math.min(x.asInt(), 171)]);
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) {
-        res[i] = cache[Math.min((int) a[i], 171)];
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) {
+        res[i] = cache[Math.min((int) x[i], 171)];
       }
     }
-    public Value call(BigValue w) {
-      if (w.i.bitLength() > 30) throw new DomainError("!: argument too big (𝕩 ≡ "+w+")", w); // otherwise intValue might ignore those!
-      int am = w.i.intValue();
+    public Value call(BigValue x) {
+      if (x.i.bitLength() > 30) throw new DomainError("!: argument too big (𝕩 ≡ "+x+")", x); // otherwise intValue might ignore those!
+      int am = x.i.intValue();
       BigInteger res = BigInteger.ONE;
       for (int i = 2; i <= am; i++) {
         res = res.multiply(BigInteger.valueOf(i));
@@ -46,7 +46,7 @@ public class ExclBuiltin extends Builtin {
     return numM(NF, x);
   }
   
-  public Value call(Value a0, Value x) {
+  public Value call(Value w0, Value x0) {
     return allD((a, w) -> {
       if (a instanceof BigValue || w instanceof BigValue) {
         
@@ -69,6 +69,6 @@ public class ExclBuiltin extends Builtin {
         return new BigValue(res);
       }
       return ((Num) w).binomial((Num) a);
-    }, a0, x);
+    }, w0, x0);
   }
 }

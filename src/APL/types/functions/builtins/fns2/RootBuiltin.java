@@ -11,19 +11,19 @@ public class RootBuiltin extends Builtin {
   
   
   private static final NumMV NF = new NumMV() {
-    public Value call(Num w) {
-      return w.root(Num.NUMS[2]);
+    public Value call(Num x) {
+      return x.root(Num.NUMS[2]);
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.sqrt(a[i]);
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Math.sqrt(x[i]);
     }
   };
   private static final NumMV NFi = new NumMV() {
-    public Value call(Num w) {
-      return Num.of(w.num*w.num);
+    public Value call(Num x) {
+      return Num.of(x.num*x.num);
     }
-    public void call(double[] res, double[] a) {
-      for (int i = 0; i < a.length; i++) res[i] = a[i]*a[i];
+    public void call(double[] res, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = x[i]*x[i];
     }
   };
   public Value call(Value x) {
@@ -34,18 +34,18 @@ public class RootBuiltin extends Builtin {
   }
   
   public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return Math.pow(w, 1/a);
+    public double on(double w, double x) {
+      return Math.pow(x, 1/w);
     }
-    public void on(double[] res, double a, double[] w) {
-      double pow = 1/a;
-      for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], pow);
+    public void on(double[] res, double w, double[] x) {
+      double pow = 1/w;
+      for (int i = 0; i < x.length; i++) res[i] = Math.pow(x[i], pow);
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.pow(w, 1/a[i]);
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = Math.pow(x, 1/w[i]);
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = Math.pow(w[i], 1/a[i]);
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = Math.pow(x[i], 1/w[i]);
     }
   };
   public Value call(Value w, Value x) {

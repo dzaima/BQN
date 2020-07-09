@@ -49,8 +49,8 @@ public final class BitArr extends Arr {
     return res;
   }
   
-  public static int sizeof(Value w) {
-    return w.ia+63 >> 6;
+  public static int sizeof(Value x) {
+    return x.ia+63 >> 6;
   }
   
   public static int sizeof(int[] sh) {

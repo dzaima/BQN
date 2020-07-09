@@ -13,31 +13,31 @@ public class ObliqueBuiltin extends Mop {
   
   
   
-  public Value call(Value f, Value w, DerivedMop derv) {
-    if (w.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, w);
+  public Value call(Value f, Value x, DerivedMop derv) {
+    if (x.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, x);
     Fun ff = f.asFun();
-    int[] sz = w.shape;
+    int[] sz = x.shape;
     int H = sz[0];
     int W = sz[1];
     int szM = Math.max(H, W);
     int szm = Math.min(H, W);
     int ram = H + W - 1;
-    if (ram <= 0) return new EmptyArr(EmptyArr.SHAPE0, w.safePrototype());
+    if (ram <= 0) return new EmptyArr(EmptyArr.SHAPE0, x.safePrototype());
     
     Value[] res = new Value[ram];
     
-    if (w.quickDoubleArr()) {
-      double[] vals = w.asDoubleArr();
+    if (x.quickDoubleArr()) {
+      double[] vals = x.asDoubleArr();
       double[][] rows = new double[ram][];
       for (int i = 0; i < ram; i++) {
         rows[i] = new double[i < szm? i + 1 : i >= szM? szm + szM - i - 1 : szm];
       }
       int p = 0;
-      for (int y = 0; y < H; y++) {
-        for (int x = 0; x < W; x++) {
+      for (int cy = 0; cy < H; cy++) {
+        for (int cx = 0; cx < W; cx++) {
           double v = vals[p++];
-          int ri = x + y;
-          int s = ri > W - 2? y + W - ri - 1 : y;
+          int ri = cx + cy;
+          int s = ri > W - 2? cy + W - ri - 1 : cy;
           rows[ri][s] = v;
         }
       }
@@ -49,17 +49,17 @@ public class ObliqueBuiltin extends Mop {
         res[i] = v;
       }
     } else {
-      Value[] vals = w.values();
+      Value[] vals = x.values();
       Value[][] rows = new Value[ram][];
       for (int i = 0; i < ram; i++) {
         rows[i] = new Value[i < szm? i + 1 : i >= szM? szm + szM - i - 1 : szm];
       }
       int p = 0;
-      for (int y = 0; y < H; y++) {
-        for (int x = 0; x < W; x++) {
+      for (int cy = 0; cy < H; cy++) {
+        for (int cx = 0; cx < W; cx++) {
           Value v = vals[p++];
-          int ri = x + y;
-          int s = ri > W - 2? y + W - ri - 1 : y;
+          int ri = cx + cy;
+          int s = ri > W - 2? cy + W - ri - 1 : cy;
           rows[ri][s] = v;
         }
       }

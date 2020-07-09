@@ -12,32 +12,32 @@ public class NorBuiltin extends Builtin {
   }
   
   private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double a, double w) {
-      return Main.bool(a)|Main.bool(w) ? 0 : 1;
+    public double on(double w, double x) {
+      return Main.bool(w)|Main.bool(x) ? 0 : 1;
     }
-    public void on(double[] res, double a, double[] w) {
-      for (int i = 0; i < w.length; i++) res[i] = Main.bool(a)|Main.bool(w[i]) ? 0 : 1;
+    public void on(double[] res, double w, double[] x) {
+      for (int i = 0; i < x.length; i++) res[i] = Main.bool(w)|Main.bool(x[i])? 0 : 1;
     }
-    public void on(double[] res, double[] a, double w) {
-      for (int i = 0; i < a.length; i++) res[i] = Main.bool(a[i])|Main.bool(w) ? 0 : 1;
+    public void on(double[] res, double[] w, double x) {
+      for (int i = 0; i < w.length; i++) res[i] = Main.bool(w[i])|Main.bool(x)? 0 : 1;
     }
-    public void on(double[] res, double[] a, double[] w) {
-      for (int i = 0; i < a.length; i++) res[i] = Main.bool(a[i])|Main.bool(w[i]) ? 0 : 1;
+    public void on(double[] res, double[] w, double[] x) {
+      for (int i = 0; i < w.length; i++) res[i] = Main.bool(w[i])|Main.bool(x[i])? 0 : 1;
     }
   };
   
   private static final D_BB DBF = new D_BB() {
-    @Override public Value call(boolean a, BitArr w) {
-      if (a) return BitArr.fill(w, false);
+    @Override public Value call(boolean w, BitArr x) {
+      if (w) return BitArr.fill(x, false);
+      return NotBuiltin.call(x);
+    }
+    @Override public Value call(BitArr w, boolean x) {
+      if (x) return BitArr.fill(w, false);
       return NotBuiltin.call(w);
     }
-    @Override public Value call(BitArr a, boolean w) {
-      if (w) return BitArr.fill(a, false);
-      return NotBuiltin.call(a);
-    }
-    @Override public Value call(BitArr a, BitArr w) {
-      BitArr.BC bc = new BitArr.BC(a.shape);
-      for (int i = 0; i < a.arr.length; i++) bc.arr[i] = ~(a.arr[i] | w.arr[i]);
+    @Override public Value call(BitArr w, BitArr x) {
+      BitArr.BC bc = new BitArr.BC(w.shape);
+      for (int i = 0; i < w.arr.length; i++) bc.arr[i] = ~(w.arr[i] | x.arr[i]);
       return bc.finish();
     }
   };

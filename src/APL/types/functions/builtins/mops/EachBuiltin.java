@@ -97,28 +97,28 @@ public class EachBuiltin extends Mop {
     return underW(f.asFun(), o, w, x, this);
   }
   
-  public static Value underW(Fun f, Obj o, Value a, Value w, Callable blame) {
-    if (a.rank!=0 && w.rank!=0 && !Arrays.equals(a.shape, w.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", blame, w);
-    int ia = Math.max(a.ia, w.ia);
+  public static Value underW(Fun f, Obj o, Value w, Value x, Callable blame) {
+    if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
+    int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
-    if (a.rank==0 && !(a instanceof Primitive)) a = new Rank0Arr(a.first()); // abuse that get doesn't check indexes for simple scalar extension
-    if (w.rank==0 && !(w instanceof Primitive)) w = new Rank0Arr(a.first());
-    rec(f, o, a, w, 0, new Value[ia], new Value[1], res2);
-    return Arr.create(res2, w.shape);
+    if (w.rank==0 && !(w instanceof Primitive)) w = new Rank0Arr(w.first()); // abuse that get doesn't check indexes for simple scalar extension
+    if (x.rank==0 && !(x instanceof Primitive)) x = new Rank0Arr(w.first());
+    rec(f, o, w, x, 0, new Value[ia], new Value[1], res2);
+    return Arr.create(res2, x.shape);
   }
   
-  private static void rec(Fun f, Obj o, Value a, Value w, int i, Value[] args, Value[] resPre, Value[] res) {
+  private static void rec(Fun f, Obj o, Value w, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
     if (i == args.length) {
-      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, w.shape)) : (Value) o;
+      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : (Value) o;
       resPre[0] = v;
     } else {
       res[i] = f.underW(new Fun() { public String repr() { return f.repr()+"¨"; }
         public Value call(Value x) {
           args[i] = x;
-          rec(f, o, a, w, i+1, args, resPre, res);
+          rec(f, o, w, x, i+1, args, resPre, res);
           return resPre[0].get(i);
         }
-      }, a.get(i), w.get(i));
+      }, w.get(i), x.get(i));
     }
   }
 }
