@@ -47,17 +47,17 @@ public class ExclBuiltin extends Builtin {
   }
   
   public Value call(Value w0, Value x0) {
-    return allD((a, w) -> {
-      if (a instanceof BigValue || w instanceof BigValue) {
+    return allD((w, x) -> {
+      if (w instanceof BigValue || x instanceof BigValue) {
         
         BigInteger res = BigInteger.ONE;
-        BigInteger al = BigValue.bigint(w);
-        BigInteger bl = BigValue.bigint(a);
+        BigInteger al = BigValue.bigint(x);
+        BigInteger bl = BigValue.bigint(w);
         if (al.compareTo(bl) < 0) return Num.ZERO;
   
         if (bl.compareTo(al.subtract(bl)) > 0) bl = al.subtract(bl);
         
-        if (bl.bitLength() > 30) throw new DomainError("!: arguments too big (𝕨 ≡ "+a+"; 𝕩 ≡ "+w+")", w);
+        if (bl.bitLength() > 30) throw new DomainError("!: arguments too big (𝕨 ≡ "+w+"; 𝕩 ≡ "+x+")", x);
         int ri = bl.intValue();
         
         for (int i = 0; i < ri; i++) {
@@ -68,7 +68,7 @@ public class ExclBuiltin extends Builtin {
         }
         return new BigValue(res);
       }
-      return ((Num) w).binomial((Num) a);
+      return ((Num) x).binomial((Num) w);
     }, w0, x0);
   }
 }

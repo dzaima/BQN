@@ -27,15 +27,15 @@ public class GroupBuiltin extends Builtin {
   
   public Value call(Value x) {
     if (x.rank != 1) throw new DomainError("⊔: rank of 𝕩 should be 1 (was "+ x.rank+")", this, x);
-    int[] wi = x.asIntVec();
+    int[] xi = x.asIntVec();
     int sz = 0;
-    for (int d : wi) sz = Math.max(sz, d);
+    for (int d : xi) sz = Math.max(sz, d);
     sz++;
     
     MutDA[] ds = new MutDA[sz];
     for (int i = 0; i < sz; i++) ds[i] = new MutDA();
-    for (int i = 0; i < wi.length; i++) {
-      int c = wi[i];
+    for (int i = 0; i < xi.length; i++) {
+      int c = xi[i];
       if (c>=0) ds[c].add(i);
       else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, x);
     }

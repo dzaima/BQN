@@ -60,14 +60,14 @@ public class RandBuiltin extends Builtin {
   
   public Value call(Value w, Value x) {
     ArrayList<Integer> vs = new ArrayList<>(x.ia);
-    int wi = x.asInt();
-    int ai = w.asInt();
-    for (int i = 0; i < wi; i++) {
+    int wi = w.asInt();
+    int xi = x.asInt();
+    for (int i = 0; i < xi; i++) {
       vs.add(i);
     }
     Collections.shuffle(vs, sc.rnd);
-    double[] res = new double[ai];
-    for (int i = 0; i < ai; i++) {
+    double[] res = new double[wi];
+    for (int i = 0; i < wi; i++) {
       res[i] = vs.get(i);
     }
     return new DoubleArr(res);

@@ -31,12 +31,12 @@ public class LBoxBuiltin extends Builtin {
     if (x.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
     if (w instanceof Num) return getCell(w.asInt(), x, this);
   
-    int ar = w.shape.length;
-    int wr = x.shape.length;
+    int wr = w.shape.length;
+    int xr = x.shape.length;
     if (w.ia==0) {
-      int[] sh = new int[ar+wr-1];
-      System.arraycopy(w.shape, 0, sh, 0, ar);
-      System.arraycopy(x.shape, 1, sh, ar, wr-1);
+      int[] sh = new int[wr+xr-1];
+      System.arraycopy(w.shape, 0, sh, 0, wr);
+      System.arraycopy(x.shape, 1, sh, wr, xr-1);
       return Arr.create(new Value[0], sh);
     } else if (w.get(0) instanceof Num) {
       double[] ds = w.asDoubleArr();
@@ -44,13 +44,13 @@ public class LBoxBuiltin extends Builtin {
       for (int i = 0; i < ds.length; i++) res[i] = getCell(Num.toInt(ds[i]), x, this);
       return GTBuiltin.merge(res, w.shape, this);
     } else {
-      if (ar > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
+      if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
       
       int shl = 0;
       Value[] av = w.values();
       for (Value c : av) shl+= c.rank;
-      int[] sh = new int[shl + wr-w.ia];
-      System.arraycopy(x.shape, w.ia, sh, shl, wr-w.ia);
+      int[] sh = new int[shl + xr-w.ia];
+      System.arraycopy(x.shape, w.ia, sh, shl, xr-w.ia);
       
       int cp = 0;
       for (Value c : av) {

@@ -41,9 +41,9 @@ public class EpsilonBuiltin extends Builtin {
   
   public Value call(Value w, Value x) {
     if (w.scalar()) {
-      Value a1 = w.first();
+      Value w0 = w.first();
       for (Value v : x) {
-        if (v.equals(a1)) {
+        if (v.equals(w0)) {
           return Num.ONE;
         }
       }
@@ -51,10 +51,10 @@ public class EpsilonBuiltin extends Builtin {
     }
     BitArr.BA ba = new BitArr.BA(w.shape);
     for (int i = 0; i < w.ia; i++) {
-      Value av = w.get(i);
+      Value w0 = w.get(i);
       boolean b = false;
       for (Value v : x) {
-        if (v.equals(av)) {
+        if (v.equals(w0)) {
           b = true;
           break;
         }

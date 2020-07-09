@@ -121,10 +121,10 @@ public class GTBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w, Value x) {
-    return numChrD(DNF, (ca, cw) -> ca>cw? Num.ONE : Num.ZERO,
-      (ca, cw) -> { throw new DomainError("comparing "+ ca.humanType(true)+" and "+cw.humanType(true), this); },
-      w, x
+  public Value call(Value w0, Value x0) {
+    return numChrD(DNF, (w, x) -> w>x? Num.ONE : Num.ZERO,
+      (w, x) -> { throw new DomainError("comparing "+ w.humanType(true)+" and "+x.humanType(true), this); },
+      w0, x0
     );
   }
   

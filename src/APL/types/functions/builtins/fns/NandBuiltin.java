@@ -13,7 +13,7 @@ public class NandBuiltin extends Builtin {
   
   private static final D_NNeN DNF = new D_NNeN() {
     public double on(double w, double x) {
-      return Main.bool(w)&Main.bool(x) ? 0 : 1;
+      return Main.bool(w)&Main.bool(x)? 0 : 1;
     }
     public void on(double[] res, double w, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = Main.bool(w)&Main.bool(x[i])? 0 : 1;

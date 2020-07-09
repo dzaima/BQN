@@ -12,9 +12,9 @@ public class DerivedSet extends AbstractSet {
     this.f = f;
   }
   
-  @Override public Value call(Obj a, Value w, boolean update) {
-    s.call(a, f.call(((Settable) a).get(), w), update);
-    return w;
+  @Override public Value call(Obj w, Value x, boolean update) {
+    s.call(w, f.call(((Settable) w).get(), x), update);
+    return x;
   }
   
   public String toString() {

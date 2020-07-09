@@ -13,9 +13,9 @@ public class SetBuiltin extends AbstractSet {
   
   
   
-  public Value call(Obj a, Value w, boolean update) {
-    set(a, w, update);
-    return w;
+  public Value call(Obj w, Value x, boolean update) {
+    set(w, x, update);
+    return x;
   }
   
   public static void set(Obj k, Value v, boolean update) {

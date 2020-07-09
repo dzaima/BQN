@@ -30,11 +30,11 @@ public class FindBuiltin extends Builtin {
           bc.set(ir);
         }
       } else if (w.quickDoubleArr() && x.quickDoubleArr()) {
-        double[] ad = w.asDoubleArr();
-        double[] wd = x.asDoubleArr();
+        double[] wd = w.asDoubleArr();
+        double[] xd = x.asDoubleArr();
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
-            if (ad[ia] != wd[ia + ir]) continue w;
+            if (wd[ia] != xd[ia + ir]) continue w;
           }
           bc.set(ir);
         }

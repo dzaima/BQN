@@ -263,8 +263,8 @@ public abstract class Arr extends Value {
     }
     if (v[0] instanceof Char) {
       StringBuilder s = new StringBuilder();
-      for (Value aV : v) {
-        if (aV instanceof Char) s.append(((Char) aV).chr);
+      for (Value cv : v) {
+        if (cv instanceof Char) s.append(((Char) cv).chr);
         else {
           s = null;
           break;
@@ -294,8 +294,8 @@ public abstract class Arr extends Value {
     }
     if (f instanceof Char) {
       StringBuilder s = new StringBuilder();
-      for (Value aV : v) {
-        if (aV instanceof Char) s.append(((Char) aV).chr);
+      for (Value cv : v) {
+        if (cv instanceof Char) s.append(((Char) cv).chr);
         else {
           s = null;
           break;
@@ -358,11 +358,11 @@ public abstract class Arr extends Value {
   }
   
   public static void eqShapes(Value w, Value x) {
-    int[] as = w.shape;
-    int[] ws = x.shape;
-    if (as.length != ws.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", x);
-    for (int i = 0; i < as.length; i++) {
-      if (as[i] != ws[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(as) + " vs " + Main.formatAPL(ws) + ")", x);
+    int[] ws = w.shape;
+    int[] xs = x.shape;
+    if (ws.length != xs.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")", x);
+    for (int i = 0; i < ws.length; i++) {
+      if (ws[i] != xs[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")", x);
     }
   }
   public static void eqShapes(int[] w, int[] x, Callable blame) {

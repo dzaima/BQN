@@ -5,7 +5,7 @@ import APL.types.*;
 
 public abstract class AbstractSet extends Callable {
   
-  public abstract Value call(Obj a, Value w, boolean update);
+  public abstract Value call(Obj w, Value x, boolean update);
   
   @Override
   public Type type() {

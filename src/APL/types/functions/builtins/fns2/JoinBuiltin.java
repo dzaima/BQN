@@ -92,7 +92,7 @@ public class JoinBuiltin extends Builtin {
       if (w.shape[i+a-c] != s) throw new LengthError("∾: lengths not matchable ("+new DoubleArr(w.shape)+" vs "+new DoubleArr(x.shape)+")", this);
       sh[i] = s;
     }
-    sh[0] = (a==c ? w.shape[0] : 1) + (b==c ? x.shape[0] : 1);
+    sh[0] = (a==c? w.shape[0] : 1) + (b==c? x.shape[0] : 1);
     
     if ((w instanceof BitArr || Main.isBool(w))
       && (x instanceof BitArr || Main.isBool(x))) {
@@ -117,44 +117,44 @@ public class JoinBuiltin extends Builtin {
   
   
   private static BitArr catBit(Value w, Value x, int[] sh) { // for ravel concatenating
-    boolean ab = w instanceof BitArr;
-    boolean wb = x instanceof BitArr;
+    boolean wb = w instanceof BitArr;
+    boolean xb = x instanceof BitArr;
     
     BitArr.BA res = new BitArr.BA(sh);
-    if (ab) res.add((BitArr) w);
+    if (wb) res.add((BitArr) w);
     else    res.add(Main.bool(w));
-    if (wb) res.add((BitArr) x);
+    if (xb) res.add((BitArr) x);
     else    res.add(Main.bool(x));
     
     return res.finish();
   }
   
   public static Value cat(Value w, Value x, int k, Callable blame) {
-    boolean aScalar = w.scalar(), wScalar = x.scalar();
-    if (aScalar && wScalar) return cat(new Shape1Arr(w.first()), x, 0, blame);
-    if (!aScalar && !wScalar) {
+    boolean wScalar = w.scalar(), xScalar = x.scalar();
+    if (wScalar && xScalar) return cat(new Shape1Arr(w.first()), x, 0, blame);
+    if (!wScalar && !xScalar) {
       if (w.rank != x.rank) throw new RankError("ranks not matchable", blame, x);
       for (int i = 0; i < w.rank; i++) {
         if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+new DoubleArr(w.shape)+" vs "+new DoubleArr(x.shape)+")", blame, x);
       }
     }
-    int[] rs = !aScalar ? w.shape.clone() : x.shape.clone(); // shape of the result
-    rs[k]+= aScalar || wScalar ? 1 : x.shape[k];
+    int[] rs = !wScalar? w.shape.clone() : x.shape.clone(); // shape of the result
+    rs[k]+= wScalar || xScalar? 1 : x.shape[k];
     int n0 = 1; for (int i = 0; i < k; i++) n0*= rs[i];             // product of major dimensions
-    int n1 = rs[k];                                                  // dimension to catenate on
+    int n1 = rs[k];                                                 // dimension to catenate on
     int n2 = 1; for (int i = k + 1; i < rs.length; i++) n2*= rs[i]; // product of minor dimensions
-    int ad = aScalar ? n2 : w.shape[k] * n2;                         // chunk size for 𝕨
-    int wd = wScalar ? n2 : x.shape[k] * n2;                         // chunk size for 𝕩
+    int wd = wScalar? n2 : w.shape[k] * n2;                         // chunk size for 𝕨
+    int xd = xScalar? n2 : x.shape[k] * n2;                         // chunk size for 𝕩
     
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
       double[] rv = new double[n0 * n1 * n2];                            // result values
-      copyChunksD(aScalar, w.asDoubleArr(), rv,  0, ad, ad + wd);
-      copyChunksD(wScalar, x.asDoubleArr(), rv, ad, wd, ad + wd);
+      copyChunksD(wScalar, w.asDoubleArr(), rv,  0, wd, wd + xd);
+      copyChunksD(xScalar, x.asDoubleArr(), rv, wd, xd, wd + xd);
       return new DoubleArr(rv, rs);
     } else {
       Value[] rv = new Value[n0 * n1 * n2];                            // result values
-      copyChunks(aScalar, w.values(), rv, 0, ad, ad + wd);
-      copyChunks(wScalar, x.values(), rv, ad, wd, ad + wd);
+      copyChunks(wScalar, w.values(), rv, 0, wd, wd + xd);
+      copyChunks(xScalar, x.values(), rv, wd, xd, wd + xd);
       return Arr.create(rv, rs);
     }
   }

@@ -385,11 +385,11 @@ public class Exec {
       }
     }
     int len = pt.length();
-    int ptrinc = fromStart ? 1 : -1;
+    int ptrinc = fromStart? 1 : -1;
     boolean pass = false;
     barNode = FN.r;
     Node cn = fromStart? FN.r : LN.l;
-    for (int i = fromStart ? 0 : len - 1; fromStart ? i<len : i>=0; i+= ptrinc) {
+    for (int i = fromStart? 0 : len - 1; fromStart? i<len : i>=0; i+= ptrinc) {
       char p = pt.charAt(i);
       boolean inv = false;
       if (p == '|') {

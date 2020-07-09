@@ -33,12 +33,12 @@ public class CellBuiltin extends Mop {
     // Value[] ac = cells(a);
     // Value[] wc = cells(w);
     if (w.rank==0 && x.rank==0) return ff.call(w, x);
-    Value[] ac = w.rank==0? ext(w, x.shape[0]) : cells(w);
-    Value[] wc = x.rank==0? ext(x, w.shape[0]) : cells(x);
-    if (ac.length != wc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    Value[] wc = w.rank==0? ext(w, x.shape[0]) : cells(w);
+    Value[] xc = x.rank==0? ext(x, w.shape[0]) : cells(x);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
     
-    Value[] res = new Value[ac.length];
-    for (int i = 0; i < res.length; i++) res[i] = ff.call(ac[i], wc[i]);
+    Value[] res = new Value[wc.length];
+    for (int i = 0; i < res.length; i++) res[i] = ff.call(wc[i], xc[i]);
     return GTBuiltin.merge(res, new int[]{res.length}, this);
   }
   

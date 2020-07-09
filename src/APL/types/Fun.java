@@ -172,9 +172,9 @@ public abstract class Fun extends Callable {
         Value x0 = x.first();
         
         Value[] arr = new Value[w.ia];
-        Iterator<Value> ai = w.iterator();
+        Iterator<Value> wi = w.iterator();
         for (int i = 0; i < w.ia; i++) {
-          arr[i] = allD(f, ai.next(), x0);
+          arr[i] = allD(f, wi.next(), x0);
         }
         return new HArr(arr, w.shape);
         
@@ -297,12 +297,12 @@ public abstract class Fun extends Callable {
     if (w.scalar()) {
       if (x.scalar()) { // ⊃𝕨 ⊃𝕩
         if (w instanceof Primitive & x instanceof Primitive) {
-          boolean an = w instanceof Num;
-          boolean wn = x instanceof Num;
-          if (an & wn) return f.call(((Num) w).num, ((Num) x).num);
-          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn)) {
-            if (an) return f.call(((Num) w).num, (BigValue) x);
-            else return f.call((BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          boolean wn = w instanceof Num;
+          boolean xn = x instanceof Num;
+          if (wn & xn) return f.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn)) {
+            if (wn) return f.call(((Num) w).num, (BigValue) x);
+            else return f.call((BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           }
           throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
         } else return new Rank0Arr(numD(f, w.first(), x.first()));
@@ -356,11 +356,11 @@ public abstract class Fun extends Callable {
     if (w.scalar()) {
       if (x.scalar()) { // ⊃𝕨 ⊃𝕩
         if (w instanceof Primitive & x instanceof Primitive) {
-          boolean an = w instanceof Num;
-          boolean wn = x instanceof Num;
-          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
-          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          boolean wn = w instanceof Num;
+          boolean xn = x instanceof Num;
+          if (wn & xn) return n.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn))
+            return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
         } else return new Rank0Arr(bitD(n, b, w.first(), x.first()));
         
@@ -393,10 +393,10 @@ public abstract class Fun extends Callable {
           }
         }
         Value x0 = x.first();
-        Iterator<Value> ai = w.iterator();
+        Iterator<Value> wi = w.iterator();
         Value[] vs = new Value[w.ia];
         for (int i = 0; i < w.ia; i++) {
-          vs[i] = bitD(n, b, ai.next(), x0);
+          vs[i] = bitD(n, b, wi.next(), x0);
         }
         
         return new HArr(vs, w.shape);
@@ -429,11 +429,11 @@ public abstract class Fun extends Callable {
     if (w.scalar()) {
       if (x.scalar()) { // ⊃𝕨 ⊃𝕩
         if (w instanceof Primitive & x instanceof Primitive) {
-          boolean an = w instanceof Num;
-          boolean wn = x instanceof Num;
-          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
-          if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          boolean wn = w instanceof Num;
+          boolean xn = x instanceof Num;
+          if (wn & xn) return n.call(((Num) w).num, ((Num) x).num);
+          if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn))
+            return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           if (w instanceof Char & x instanceof Char) return c.call(((Char) w).chr, ((Char) x).chr);
           return def.call(w, x);
         } else return new Rank0Arr(numChrD(n, c, def, w.first(), x.first()));
@@ -458,10 +458,10 @@ public abstract class Fun extends Callable {
           return n.call(w.asDoubleArr(), x.asDouble(), w.shape);
         }
         Value x0 = x.first();
-        Iterator<Value> ai = w.iterator();
+        Iterator<Value> wi = w.iterator();
         Value[] vs = new Value[w.ia];
         for (int i = 0; i < w.ia; i++) {
-          vs[i] = numChrD(n, c, def, ai.next(), x0);
+          vs[i] = numChrD(n, c, def, wi.next(), x0);
         }
         
         return new HArr(vs, w.shape);
@@ -487,12 +487,12 @@ public abstract class Fun extends Callable {
     if (w.scalar()) {
       if (x.scalar()) { // ⊃𝕨 ⊃𝕩
         if (w instanceof Primitive & x instanceof Primitive) {
-          boolean an = w instanceof Num;
-          boolean wn = x instanceof Num;
-          if (an & wn) return n.call(((Num) w).num, ((Num) x).num);
+          boolean wn = w instanceof Num;
+          boolean xn = x instanceof Num;
+          if (wn & xn) return n.call(((Num) w).num, ((Num) x).num);
           else if (w instanceof Char & x instanceof Char) return c.call(((Char) w).chr, ((Char) x).chr);
-          else if ((w instanceof BigValue|an) & (x instanceof BigValue|wn))
-            return n.call(an? new BigValue(((Num) w).num) : (BigValue) w, wn? new BigValue(((Num) x).num) : (BigValue) x);
+          else if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn))
+            return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           else return def.call(w, x);
         } else return new Rank0Arr(ncbaD(n, b, c, def, w.first(), x.first()));
         

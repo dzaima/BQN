@@ -129,59 +129,59 @@ public class Comp {
         }
         case FN1C: {
           Value f = (Value) s.pop();
-          Value w = (Value) s.pop();
+          Value x = (Value) s.pop();
           if (DBGPROG) { Main.faulty = f; last = f; }
-          s.push(f.asFun().call(w));
+          s.push(f.asFun().call(x));
           break;
         }
         case FN2C: {
-          Value a = (Value) s.pop();
-          Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          Value f = (Value) s.pop();
+          Value x = (Value) s.pop();
           if (DBGPROG) { Main.faulty = f; last = f; }
-          s.push(f.asFun().call(a, w));
+          s.push(f.asFun().call(w, x));
           break;
         }
         case FN1O: {
           Value f = (Value) s.pop();
-          Value w = (Value) s.pop();
+          Value x = (Value) s.pop();
           if (DBGPROG) { Main.faulty = f; last = f; }
-          if (w instanceof Nothing) s.push(w);
-          else s.push(f.asFun().call(w));
+          if (x instanceof Nothing) s.push(x);
+          else s.push(f.asFun().call(x));
           break;
         }
         case FN2O: {
-          Value a = (Value) s.pop();
-          Value f = (Value) s.pop();
           Value w = (Value) s.pop();
+          Value f = (Value) s.pop();
+          Value x = (Value) s.pop();
           if (DBGPROG) { Main.faulty = f; last = f; }
-          if (w instanceof Nothing) s.push(w);
-          else if (a instanceof Nothing) s.push(f.asFun().call(w));
-          else s.push(f.asFun().call(a, w));
+          if (x instanceof Nothing) s.push(x);
+          else if (w instanceof Nothing) s.push(f.asFun().call(x));
+          else s.push(f.asFun().call(w, x));
           break;
         }
         case OP1D: {
           Value f = (Value) s.pop();
-          Mop   o = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
+          Mop   r = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
           if (DBGPROG) { Main.faulty = f; last = f; }
-          Fun d = o.derive(f); d.token = o.token;
+          Fun d = r.derive(f); d.token = r.token;
           s.push(d);
           break;
         }
         case OP2D: {
           Value f = (Value) s.pop();
-          Dop   o = (Dop  ) s.pop();
+          Dop   r = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = o; last = o; }
-          Fun d = o.derive(f, g); d.token = o.token;
+          if (DBGPROG) { Main.faulty = r; last = r; }
+          Fun d = r.derive(f, g); d.token = r.token;
           s.push(d);
           break;
         }
         case OP2H: {
-          Dop   o = (Dop  ) s.pop();
+          Dop   r = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = o; last = o; }
-          Mop d = o.derive(g); d.token = o.token;
+          if (DBGPROG) { Main.faulty = r; last = r; }
+          Mop d = r.derive(g); d.token = r.token;
           s.push(d);
           break;
         }

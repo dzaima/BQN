@@ -40,7 +40,7 @@ public class IotaUBBuiltin extends Builtin {
       }
       return new DoubleArr(sub);
     } else {
-      double[] wd = x.asDoubleArr();
+      double[] xd = x.asDoubleArr();
       if (Main.vind) { // •VI←1
         double[][] res = new double[x.rank][sum];
         int ri = 0;
@@ -48,7 +48,7 @@ public class IotaUBBuiltin extends Builtin {
         int rank = res.length;
         for (int i = 0; i < x.ia; i++) {
           int[] p = idx.next();
-          int n = Num.toInt(wd[idx.pos()]);
+          int n = Num.toInt(xd[idx.pos()]);
           if (n > 0) {
             for (int k = 0; k < rank; k++) {
               for (int j = 0; j < n; j++) res[k][ri+j] = p[k];
@@ -65,7 +65,7 @@ public class IotaUBBuiltin extends Builtin {
         Indexer idx = new Indexer(x.shape);
         for (int i = 0; i < x.ia; i++) {
           int[] p = idx.next();
-          int n = Num.toInt(wd[idx.pos()]);
+          int n = Num.toInt(xd[idx.pos()]);
           if (n > 0) {
             DoubleArr pos = Main.toAPL(p);
             for (int j = 0; j < n; j++) res[ri++] = pos;

@@ -48,7 +48,7 @@ public class UpArrowBuiltin extends Builtin {
     int[] off = new int[rank];
     for (int i = 0; i < gsh.length; i++) {
       int d = gsh[i];
-      int s = i < diff ? 1 : x.shape[i - diff];
+      int s = i < diff? 1 : x.shape[i - diff];
       if (d > s) proto = true;
       if (d < 0) {
         sh[i] = -d;

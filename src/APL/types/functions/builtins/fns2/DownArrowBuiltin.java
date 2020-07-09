@@ -47,7 +47,7 @@ public class DownArrowBuiltin extends Builtin {
     int[] off = new int[sh.length];
     for (int i = 0; i < gsh.length; i++) {
       int am = gsh[i];
-      int s = i < diff ? 1 : x.shape[i - diff];
+      int s = i < diff? 1 : x.shape[i - diff];
       sh[i] = s - Math.abs(am);
       if (sh[i] < 0) sh[i] = 0;
       else if (am > 0) off[i] = am;

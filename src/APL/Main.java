@@ -252,9 +252,9 @@ public class Main {
     return tok.toRepr();
   }
   
-  public static boolean isBool(Value a) {
-    if (!(a instanceof Num)) return false;
-    Num n = (Num) a;
+  public static boolean isBool(Value x) {
+    if (!(x instanceof Num)) return false;
+    Num n = (Num) x;
     return n.num==0 || n.num==1;
   }
   

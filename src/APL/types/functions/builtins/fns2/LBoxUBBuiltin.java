@@ -64,10 +64,10 @@ public class LBoxUBBuiltin extends Builtin {
   public static Value on(Indexer.PosSh poss, Value x) {
     if (x.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
-      double[] wd = x.asDoubleArr();
+      double[] xd = x.asDoubleArr();
       int[] idxs = poss.vals;
       for (int i = 0; i < idxs.length; i++) {
-        res[i] = wd[idxs[i]];
+        res[i] = xd[idxs[i]];
       }
       return new DoubleArr(res, poss.sh);
     }

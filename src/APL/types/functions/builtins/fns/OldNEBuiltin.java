@@ -46,7 +46,7 @@ public class OldNEBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w, Value x) {
-    return ncbaD(DNF, DBF, (ca, cw) -> ca!=cw? Num.ONE : Num.ZERO, (ca, cw) -> ca.equals(cw)? Num.ZERO : Num.ONE, w, x);
+  public Value call(Value w0, Value x0) {
+    return ncbaD(DNF, DBF, (w, x) -> w!=x? Num.ONE : Num.ZERO, (w, x) -> w.equals(x)? Num.ZERO : Num.ONE, w0, x0);
   }
 }

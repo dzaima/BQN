@@ -24,14 +24,14 @@ public class LShoeBuiltin extends Builtin {
     if (x.rank != 1) throw new DomainError("⊂: 𝕩 should be of rank 1 ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
     if (w.rank != 1) throw new DomainError("⊂: 𝕨 should be of rank 1 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨)", this);
     if (w.ia+1 != x.ia) throw new LengthError("⊂: (1+≢𝕨) ≡ ≢𝕩 is required ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
-    int[] aa = w.asIntVec();
+    int[] wi = w.asIntVec();
     ArrayList<Value> parts = new ArrayList<>();
     
     if (x.quickDoubleArr()) {
       double[] vals = x.asDoubleArr();
       ArrayList<Double> cpart = new ArrayList<>();
-      for (int i = 0; i < aa.length; i++) {
-        int am = aa[i];
+      for (int i = 0; i < wi.length; i++) {
+        int am = wi[i];
         cpart.add(vals[i]);
         if (am > 0) {
           parts.add(new DoubleArr(cpart));
@@ -44,8 +44,8 @@ public class LShoeBuiltin extends Builtin {
     } else {
       Value[] vals = x.values();
       ArrayList<Value> cpart = new ArrayList<>();
-      for (int i = 0; i < aa.length; i++) {
-        int am = aa[i];
+      for (int i = 0; i < wi.length; i++) {
+        int am = wi[i];
         cpart.add(vals[i]);
         if (am > 0) {
           parts.add(Arr.create(cpart));

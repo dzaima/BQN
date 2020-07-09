@@ -32,21 +32,21 @@ public class ScanBuiltin extends Mop {
     
     if (x.quickDoubleArr()) {
       Value[] res = new Value[len-n+1];
-      double[] wa = x.asDoubleArr();
+      double[] xa = x.asDoubleArr();
       for (int i = 0; i < res.length; i++) {
         double[] curr = new double[n];
-        System.arraycopy(wa, i, curr, 0, n);
+        System.arraycopy(xa, i, curr, 0, n);
         res[i] = ff.call(new DoubleArr(curr));
       }
       return Arr.create(res);
     }
     
     Value[] res = new Value[len-n+1];
-    Value[] wa = x.values();
+    Value[] xa = x.values();
     for (int i = 0; i < res.length; i++) {
       Value[] curr = new Value[n];
       // for (int j = 0; j < n; j++) curr[j] = wa[i + j];
-      System.arraycopy(wa, i, curr, 0, n);
+      System.arraycopy(xa, i, curr, 0, n);
       res[i] = ff.call(Arr.create(curr));
     }
     return Arr.create(res);

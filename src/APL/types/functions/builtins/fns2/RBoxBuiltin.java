@@ -38,10 +38,10 @@ public class RBoxBuiltin extends Builtin {
     }
     double[] res = new double[x.ia];
     int i = 0;
-    for (Value wv : x) {
+    for (Value cx : x) {
       int j = 0;
-      for (Value av : w) {
-        if (av.equals(wv)) break;
+      for (Value cw : w) {
+        if (cw.equals(cx)) break;
         j++;
       }
       res[i++] = j;
