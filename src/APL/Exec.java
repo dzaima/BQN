@@ -566,6 +566,9 @@ public class Exec {
       case '⚇': return new DepthBuiltin();
       case '⊘': return new AmbivalentBuiltin();
       case '◶': return new CondBuiltin();
+      case '⎉': return new NCellBuiltin();
+      
+      
       // case '@': return new AtBuiltin(sc);
       // case '⍫': return new ObverseBuiltin();
       case '•': assert sc==null; return null;

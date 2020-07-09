@@ -1,4 +1,4 @@
-package APL.types.functions.builtins.fns;
+package APL.types.functions.builtins.fns2;
 
 import APL.Scope;
 import APL.errors.DomainError;
@@ -52,6 +52,10 @@ public class RandBuiltin extends Builtin {
       }
     }
     return numM(nf, w);
+  }
+  
+  public static Value on(Value w, Scope sc) {
+    return new RandBuiltin(sc).call(w);
   }
   
   public Value call(Value a, Value w) {

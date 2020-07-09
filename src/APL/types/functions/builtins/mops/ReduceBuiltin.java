@@ -16,7 +16,7 @@ public class ReduceBuiltin extends Mop {
   
   public Value call(Value f, Value w, DerivedMop derv) {
     Fun ff = f.asFun();
-    if (w.rank != 1) throw new DomainError("argument must have rank 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, f);
+    if (w.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, f);
     if (w.quickDoubleArr()) {
       if (f instanceof PlusBuiltin) return new Num(w.sum());
       if (f instanceof MulBuiltin) {
@@ -50,7 +50,7 @@ public class ReduceBuiltin extends Mop {
   }
   
   public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    if (w.rank != 1) throw new DomainError("argument must have rank 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, f);
+    if (w.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, f);
     return foldr(f.asFun(), w.values(), a, 0);
   }
 

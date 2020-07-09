@@ -22,9 +22,8 @@ public class CellBuiltin extends Mop {
     Value[] cells = cells(w);
     if (f instanceof LTBuiltin) return Arr.create(cells);
     
-    Value[] res = new Value[cells.length];
-    for (int i = 0; i < cells.length; i++) res[i] = ff.call(cells[i]);
-    return GTBuiltin.merge(res, new int[]{res.length}, this);
+    for (int i = 0; i < cells.length; i++) cells[i] = ff.call(cells[i]);
+    return GTBuiltin.merge(cells, new int[]{cells.length}, this);
   }
   
   public Value call(Value f, Value a, Value w, DerivedMop derv) {

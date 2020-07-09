@@ -124,6 +124,15 @@ public class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
+        case "•rand": return new Builtin() {
+          public Value call(Value w) {
+            return RandBuiltin.on(w, Scope.this);
+          }
+  
+          public String repr() {
+            return "•RAND";
+          }
+        };
         case "•r": return new Dop() {
           public String repr() { return "•_R_"; }
   
@@ -295,7 +304,7 @@ public class Scope {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          testCompiled.exec(Scope.this);  
+          testCompiled.exec(Scope.this);
           long end = System.nanoTime();
           r[i] = end-start;
         }

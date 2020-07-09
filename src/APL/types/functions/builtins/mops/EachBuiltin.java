@@ -24,42 +24,42 @@ public class EachBuiltin extends Mop {
     }
     return Arr.create(n, w.shape);
   }
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
+    if (x.scalar()) {
+      if (w.scalar()) return new Rank0Arr(ff.call(w.first(), x.first()));
+      Value[] n = new Value[w.ia];
+      for (int i = 0; i < n.length; i++) n[i] = ff.call(w.get(i), x.first());
+      return Arr.create(n, w.shape);
+    }
     if (w.scalar()) {
-      if (a.scalar()) return new Rank0Arr(ff.call(a.first(), w.first()));
-      Value[] n = new Value[a.ia];
-      for (int i = 0; i < n.length; i++) n[i] = ff.call(a.get(i), w.first());
-      return Arr.create(n, a.shape);
-    }
-    if (a.scalar()) {
-      Value[] n = new Value[w.ia];
-      for (int i = 0; i < n.length; i++) n[i] = ff.call(a.first(), w.get(i));
-      return Arr.create(n, w.shape);
+      Value[] n = new Value[x.ia];
+      for (int i = 0; i < n.length; i++) n[i] = ff.call(w.first(), x.get(i));
+      return Arr.create(n, x.shape);
     }
     
-    int mr = Math.min(a.shape.length, w.shape.length);
+    int mr = Math.min(w.shape.length, x.shape.length);
     for (int i = 0; i < mr; i++) {
-      if (a.shape[i] != w.shape[i]) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", derv, w);
+      if (w.shape[i] != x.shape[i]) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
     }
     
-    if (a.shape.length == w.shape.length) {
-      Value[] n = new Value[w.ia];
+    if (w.shape.length == x.shape.length) {
+      Value[] n = new Value[x.ia];
       for (int i = 0; i < n.length; i++) {
-        n[i] = ff.call(a.get(i), w.get(i));
+        n[i] = ff.call(w.get(i), x.get(i));
       }
-      return Arr.create(n, w.shape);
+      return Arr.create(n, x.shape);
     }
     
-    boolean ae = a.ia < w.ia; // a is expanded
-    int max = Math.max(a.ia, w.ia);
-    int min = Math.min(a.ia, w.ia);
+    boolean we = w.rank < x.rank; // w is expanded
+    int max = Math.max(w.ia, x.ia);
+    int min = Math.min(w.ia, x.ia);
     int ext = max/min;
     Value[] n = new Value[max];
     int r = 0;
-    if (ae) for (int i = 0; i < min; i++) { Value c = a.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(c, w.get(r)); r++; } }
-    else    for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(a.get(r), c); r++; } } 
-    return Arr.create(n, ae? w.shape : a.shape);
+    if (we) for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(c, x.get(r)); r++; } }
+    else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(w.get(r), c); r++; } } 
+    return Arr.create(n, we? x.shape : w.shape);
   }
   
   public Value callInv(Value f, Value w) {

@@ -248,6 +248,7 @@ public abstract class Arr extends Value {
     return create(v, new int[]{v.length});
   }
   public static Arr create(Value[] v, int[] sh) { // note, doesn't attempt individual item squeezing
+    assert Arr.prod(sh) == v.length : v.length+" ≢ ×´"+Main.formatAPL(sh);
     if (v.length == 0) return new EmptyArr(sh, null);
     if (v[0] instanceof Num) {
       double[] da = new double[v.length];
@@ -342,6 +343,11 @@ public abstract class Arr extends Value {
   public static int prod(int[] ia) {
     int r = 1;
     for (int i : ia) r*= i;
+    return r;
+  }
+  public static int prod(int[] is, int s, int e) {
+    int r = 1;
+    for (int i = s; i < e; i++) r*= is[i];
     return r;
   }
   
