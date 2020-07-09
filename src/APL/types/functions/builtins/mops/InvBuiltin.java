@@ -42,8 +42,8 @@ public class InvBuiltin extends Mop {
         return f.callInvW(w, x);
       }
       
-      public Value callInvW(Value a, Value w) {
-        return f.call(a, w);
+      public Value callInvW(Value w, Value x) {
+        return f.call(w, x);
       }
     };
   }
@@ -55,8 +55,8 @@ public class InvBuiltin extends Mop {
         return f.callInvA(w, x);
       }
       
-      public Value callInvA(Value a, Value w) {
-        return f.call(a, w);
+      public Value callInvA(Value w, Value x) {
+        return f.call(w, x);
       }
     };
   }

@@ -44,11 +44,11 @@ public class PlusBuiltin extends Builtin {
     return numD(DNF, w, x);
   }
   public Value callInv(Value x) { return call(x); }
-  public Value callInvW(Value a, Value w) {
-    return numD(MinusBuiltin.DNF, w, a);
+  public Value callInvW(Value w, Value x) {
+    return numD(MinusBuiltin.DNF, x, w);
   }
   
-  @Override public Value callInvA(Value a, Value w) {
-    return callInvW(w, a);
+  @Override public Value callInvA(Value w, Value x) {
+    return callInvW(x, w);
   }
 }

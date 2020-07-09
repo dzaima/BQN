@@ -20,11 +20,11 @@ public class DerivedMop extends Fun {
   public Value callInv(Value x) {
     return op.callInv(aa, x);
   }
-  public Value callInvW(Value a, Value w) {
-    return op.callInvW(aa, a, w);
+  public Value callInvW(Value w, Value x) {
+    return op.callInvW(aa, w, x);
   }
-  public Value callInvA(Value a, Value w) {
-    return op.callInvA(aa, a, w);
+  public Value callInvA(Value w, Value x) {
+    return op.callInvA(aa, w, x);
   }
   
   @Override public String repr() {

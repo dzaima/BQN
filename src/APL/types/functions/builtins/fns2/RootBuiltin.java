@@ -52,10 +52,10 @@ public class RootBuiltin extends Builtin {
     return numD(DNF, w, x);
   }
   
-  public Value callInvW(Value a, Value w) {
-    return numD(StarBuiltin.DNF, w, a);
+  public Value callInvW(Value w, Value x) {
+    return numD(StarBuiltin.DNF, x, w);
   }
-  public Value callInvA(Value a, Value w) {
-    return numD(LogBuiltin.DNF, a, w);
+  public Value callInvA(Value w, Value x) {
+    return numD(LogBuiltin.DNF, w, x);
   }
 }

@@ -897,8 +897,8 @@ public class Scope {
       }
       throw new NYIError(a+"•DR not implemented", this);
     }
-    public Value callInvW(Value a, Value w) {
-      return call(ReverseBuiltin.on(a), w);
+    public Value callInvW(Value w, Value x) {
+      return call(ReverseBuiltin.on(w), x);
     }
     public String repr() {
       return "•DR";

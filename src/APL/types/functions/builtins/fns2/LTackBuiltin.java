@@ -17,10 +17,10 @@ public class LTackBuiltin extends Builtin {
   public Value callInv(Value x) {
     return x;
   }
-  public Value callInvW(Value a, Value w) {
+  public Value callInvW(Value w, Value x) {
     throw new DomainError("⊣⁼ is impossible", this);
   }
-  public Value callInvA(Value a, Value w) {
-    return a;
+  public Value callInvA(Value w, Value x) {
+    return w;
   }
 }

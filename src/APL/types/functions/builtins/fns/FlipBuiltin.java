@@ -24,7 +24,7 @@ public class FlipBuiltin extends Builtin {
     throw new AssertionError();
   }
   
-  @Override public Value callInvW(Value a, Value w) {
-    return call(numM(MinusBuiltin.NF, a), w);
+  @Override public Value callInvW(Value w, Value x) {
+    return call(numM(MinusBuiltin.NF, w), x);
   }
 }

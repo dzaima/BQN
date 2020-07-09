@@ -72,10 +72,10 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
     return numD(DNF, w, x);
   }
   
-  @Override public Value callInvW(Value a, Value w) {
-    return numD(StarBuiltin.DNF, a, w);
+  @Override public Value callInvW(Value w, Value x) {
+    return numD(StarBuiltin.DNF, w, x);
   }
-  @Override public Value callInvA(Value a, Value w) {
-    return numD(RootBuiltin.DNF, a, w);
+  @Override public Value callInvA(Value w, Value x) {
+    return numD(RootBuiltin.DNF, w, x);
   }
 }

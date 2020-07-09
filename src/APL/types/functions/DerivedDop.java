@@ -21,11 +21,11 @@ public class DerivedDop extends Fun {
   public Value callInv(Value x) {
     return op.callInv(aa, ww, x);
   }
-  public Value callInvW(Value a, Value w) {
-    return op.callInvW(aa, ww, a, w);
+  public Value callInvW(Value w, Value x) {
+    return op.callInvW(aa, ww, w, x);
   }
-  public Value callInvA(Value a, Value w) {
-    return op.callInvA(aa, ww, a, w);
+  public Value callInvA(Value w, Value x) {
+    return op.callInvA(aa, ww, w, x);
   }
   @Override public String repr() {
     String wws = ww.toString();

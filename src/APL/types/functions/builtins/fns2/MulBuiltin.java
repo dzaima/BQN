@@ -71,16 +71,16 @@ public class MulBuiltin extends Builtin {
     return bitD(DNF, DBF, w, x);
   }
   
-  public Value callInvW(Value a, Value w) {
+  public Value callInvW(Value w, Value x) {
     try {
-      return new DivBuiltin().call(w, a);
+      return new DivBuiltin().call(x, w);
     } catch (DomainError e) {
       throw new DomainError(e.getMessage(), this, e.cause);
     }
   }
   
-  @Override public Value callInvA(Value a, Value w) {
-    return callInvW(w, a);
+  @Override public Value callInvA(Value w, Value x) {
+    return callInvW(x, w);
   }
   
   

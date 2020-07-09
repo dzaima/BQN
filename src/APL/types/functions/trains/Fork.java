@@ -33,14 +33,14 @@ public class Fork extends Fun {
     return g.call(l, r);
   }
   
-  @Override public Value callInvW(Value a, Value w) {
+  @Override public Value callInvW(Value w, Value x) {
     if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
-    return h.callInvW(a, g.callInvW(f, w));
+    return h.callInvW(w, g.callInvW(f, x));
   }
   
-  @Override public Value callInvA(Value a, Value w) {
+  @Override public Value callInvA(Value w, Value x) {
     if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
-    return h.callInvA(g.callInvW(f, a), w);
+    return h.callInvA(g.callInvW(f, w), x);
   }
   
   @Override public String repr() {
