@@ -11,28 +11,28 @@ public class OldJotDiaeresisBuiltin extends Dop {
   
   
   @Override
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return aaf.call(wwf.call(a, w));
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return aaf.call(wwf.call(w, x));
   }
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return aaf.call(wwf.call(w));
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return aaf.call(wwf.call(x));
   }
   
-  public Value callInv(Value aa, Value ww, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return aaf.call(wwf.call(w));
+  public Value callInv(Value f, Value g, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return aaf.call(wwf.call(x));
   }
   
-  public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.callInvW(a, aaf.callInv(w));
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.callInvW(w, aaf.callInv(x));
   }
   
-  public Value callInvA(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.callInvA(aaf.callInv(a), w);
+  public Value callInvA(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.callInvA(aaf.callInv(w), x);
   }
 }

@@ -12,29 +12,29 @@ public class UnderBuiltin extends Dop {
   
   
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun wwf = ww.asFun();
-    return wwf.under(aa, w);
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    Fun wwf = g.asFun();
+    return wwf.under(f, x);
   }
-  public Value callInv(Value aa, Value ww, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.under(InvBuiltin.invertM(aaf), w);
+  public Value callInv(Value f, Value g, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.under(InvBuiltin.invertM(aaf), x);
   }
   
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.under(new BindA(wwf.call(a), aaf), w);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.under(new BindA(wwf.call(w), aaf), x);
   }
-  public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun wwf = ww.asFun();
-    return wwf.under(new BindA(wwf.call(a), InvBuiltin.invertW(aa.asFun())), w);
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    Fun wwf = g.asFun();
+    return wwf.under(new BindA(wwf.call(w), InvBuiltin.invertW(f.asFun())), x);
   }
-  public Value callInvA(Value aa, Value ww, Value a, Value w) { // structural inverse is not possible; fall back to computational inverse
-    Fun wwf = ww.asFun();
-    Value a1 = wwf.call(a);
-    Value w1 = wwf.call(w);
+  public Value callInvA(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
+    Fun wwf = g.asFun();
+    Value a1 = wwf.call(w);
+    Value w1 = wwf.call(x);
     try {
-      return wwf.callInv(aa.asFun().callInvA(a1, w1));
+      return wwf.callInv(f.asFun().callInvA(a1, w1));
     } catch (DomainError e) { // but add a nice warning about it if a plausible error was received (todo better error management to not require parsing the message?)
       String msg = e.getMessage();
       if (msg.contains("doesn't support") && msg.contains("inverting")) {

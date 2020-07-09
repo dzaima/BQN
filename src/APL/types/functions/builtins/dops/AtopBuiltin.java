@@ -8,11 +8,11 @@ public class AtopBuiltin extends Dop {
     return "∘";
   }
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    return aa.asFun().call(ww.asFun().call(w));
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    return f.asFun().call(g.asFun().call(x));
   }
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    return aa.asFun().call(ww.asFun().call(a, w));
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    return f.asFun().call(g.asFun().call(w, x));
   }
   
   // +TODO inverses (from OldJotDiaeresisBuiltin)

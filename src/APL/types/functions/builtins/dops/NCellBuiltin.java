@@ -13,11 +13,11 @@ public class NCellBuiltin extends Dop {
     return "⎉";
   }
   
-  public Value call(Value aa, Value ww, Value x, DerivedDop derv) {
-    Fun aaf = aa.asFun();
-    Value ra = ww.asFun().call(x);
-    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, ww);
-    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, ww);
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun();
+    Value ra = g.asFun().call(x);
+    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
+    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.rank);
     int[] rsh = Arrays.copyOf(x.shape, rx);
     
@@ -27,11 +27,11 @@ public class NCellBuiltin extends Dop {
     return GTBuiltin.merge(cs, rsh, this);
   }
   
-  public Value call(Value aa, Value ww, Value w, Value x, DerivedDop derv) {
-    Fun ff = aa.asFun();
-    Value ra = ww.asFun().call(w, x);
-    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+ Main.formatAPL(ra.shape), this, ww);
-    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, ww);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    Fun ff = f.asFun();
+    Value ra = g.asFun().call(w, x);
+    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+ Main.formatAPL(ra.shape), this, g);
+    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.rank);
     int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.rank);
     

@@ -10,66 +10,66 @@ public class JotBuiltin extends Dop {
   }
   
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    if (ww instanceof Fun) {
-      if (aa instanceof Fun) {
-        return ((Fun)aa).call(((Fun)ww).call(w));
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    if (g instanceof Fun) {
+      if (f instanceof Fun) {
+        return ((Fun) f).call(((Fun) g).call(x));
       } else {
-        return ((Fun)ww).call(aa, w);
+        return ((Fun) g).call(f, x);
       }
     } else {
-      if (aa instanceof Fun) return ((Fun) aa).call(w, ww);
+      if (f instanceof Fun) return ((Fun) f).call(x, g);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
-  public Value callInv(Value aa, Value ww, Value w) {
-    if (ww instanceof Fun) {
-      if (aa instanceof Fun) {
-        return ((Fun)ww).callInv(((Fun)aa).callInv(w));
+  public Value callInv(Value f, Value g, Value x) {
+    if (g instanceof Fun) {
+      if (f instanceof Fun) {
+        return ((Fun) g).callInv(((Fun) f).callInv(x));
       } else {
-        return ((Fun)ww).callInvW(aa, w);
+        return ((Fun) g).callInvW(f, x);
       }
     } else {
-      if (aa instanceof Fun) return ((Fun) aa).callInvA(w, ww);
+      if (f instanceof Fun) return ((Fun) f).callInvA(x, g);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    if (!(aa instanceof Fun)) {
-      throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔽 is "+aa.humanType(true), this, aa);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    if (!(f instanceof Fun)) {
+      throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔽 is "+f.humanType(true), this, f);
     }
-    if (!(ww instanceof Fun)) {
-      throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔾 is "+ww.humanType(true), this, ww);
+    if (!(g instanceof Fun)) {
+      throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔾 is "+g.humanType(true), this, g);
     }
-    return ((Fun)aa).call(a, ((Fun)ww).call(w));
+    return ((Fun) f).call(w, ((Fun) g).call(x));
   }
   
-  public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.callInv(aaf.callInvW(a, w));
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.callInv(aaf.callInvW(w, x));
   }
   
-  public Value callInvA(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return aaf.callInvA(a, wwf.call(w));
+  public Value callInvA(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return aaf.callInvA(w, wwf.call(x));
   }
   
-  public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    if (ww instanceof Fun) {
-      Fun wwf = (Fun) ww;
-      if (aa instanceof Fun) {
-        Fun gf = (Fun) aa;
+  public Value under(Value f, Value g, Value o, Value w, DerivedDop derv) {
+    if (g instanceof Fun) {
+      Fun wwf = (Fun) g;
+      if (f instanceof Fun) {
+        Fun gf = (Fun) f;
         return wwf.under(new Fun() { public String repr() { return gf.repr(); }
           public Value call(Value x) {
             return gf.under(o, x);
           }
         }, w);
       } else {
-        return wwf.underW(o, aa, w);
+        return wwf.underW(o, f, w);
       }
     } else {
-      if (aa instanceof Fun) {
-        return ((Fun) aa).underA(o, w, ww);
+      if (f instanceof Fun) {
+        return ((Fun) f).underA(o, w, g);
       } else {
         throw new SyntaxError("arr∘arr makes no sense", this);
       }

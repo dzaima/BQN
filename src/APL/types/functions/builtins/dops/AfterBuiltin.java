@@ -9,21 +9,21 @@ public class AfterBuiltin extends Dop {
     return "⟜";
   }
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    return call(aa, ww, w, w, derv);
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    return call(f, g, x, x, derv);
   }
   
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    return aa.asFun().call(a, ww.asFun().call(w));
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    return f.asFun().call(w, g.asFun().call(x));
   }
   
-  public Value callInv(Value aa, Value ww, Value w) {
-    if (aa.notIdentity()) throw new DomainError("𝔽⟜𝕘⁼: 𝕘 cannot be a function", this, aa);
-    return aa.asFun().callInvA(w, ww);
+  public Value callInv(Value f, Value g, Value x) {
+    if (f.notIdentity()) throw new DomainError("𝔽⟜𝕘⁼: 𝕘 cannot be a function", this, f);
+    return f.asFun().callInvA(x, g);
   }
   
-  public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    if (aa.notIdentity()) throw new DomainError("⌾(𝔽⟜𝕘): 𝕘 cannot be a function", this, aa);
-    return ((Fun) aa).underA(o, w, ww);
+  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
+    if (f.notIdentity()) throw new DomainError("⌾(𝔽⟜𝕘): 𝕘 cannot be a function", this, f);
+    return ((Fun) f).underA(o, x, g);
   }
 }

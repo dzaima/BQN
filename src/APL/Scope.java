@@ -136,8 +136,8 @@ public class Scope {
         case "•r": return new Dop() {
           public String repr() { return "•_R_"; }
   
-          public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-            return Main.toAPL(w.asString().replaceAll(aa.asString(), ww.asString()));
+          public Value call(Value f, Value g, Value x, DerivedDop derv) {
+            return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
         case "•u": return new Builtin() {
@@ -749,19 +749,19 @@ public class Scope {
     }
     public static class ProfilerDop extends Dop {
       
-      public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-        Pr p = pr(ww, null); Fun f = aa.asFun(); p.start();
+      public Value call(Value aa, Value g, Value w, Value x, DerivedDop derv) {
+        Pr p = pr(g, null); Fun f = aa.asFun(); p.start();
         long sns = System.nanoTime();
-        Value res = f.call(a, w);
+        Value res = f.call(w, x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;
       }
   
-      public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-        Pr p = pr(ww, null); Fun f = aa.asFun(); p.start();
+      public Value call(Value aa, Value g, Value x, DerivedDop derv) {
+        Pr p = pr(g, null); Fun f = aa.asFun(); p.start();
         long sns = System.nanoTime();
-        Value res = f.call(w);
+        Value res = f.call(x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;

@@ -9,54 +9,54 @@ public class RepeatBuiltin extends Dop {
     return "⍟";
   }
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun();
-    Value wwa = ww.asFun().call(w);
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun();
+    Value wwa = g.asFun().call(x);
   
     int[] bs = new int[2]; bounds(bs, wwa); bs[0]*=-1; // min, max
     
-    Value nx = w; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInv(nx);
-    Value px = w; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call   (px);
-    return replace(wwa, neg, w, pos);
+    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInv(nx);
+    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call   (px);
+    return replace(wwa, neg, x, pos);
   }
   
-  public Value callInv(Value aa, Value ww, Value w) {
-    Fun aaf = aa.asFun();
-    if (ww instanceof Fun) throw new DomainError("(f⌾g)A cannot be inverted", this);
+  public Value callInv(Value f, Value g, Value x) {
+    Fun aaf = f.asFun();
+    if (g instanceof Fun) throw new DomainError("(f⌾g)A cannot be inverted", this);
     
-    int am = ww.asInt();
+    int am = g.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
-        w = aaf.call(w);
+        x = aaf.call(x);
       }
     } else for (int i = 0; i < am; i++) {
-      w = aaf.callInv(w);
+      x = aaf.callInv(x);
     }
-    return w;
+    return x;
   }
   
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun();
-    Value wwa = ww.asFun().call(a, w);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun();
+    Value wwa = g.asFun().call(w, x);
   
     int[] bs = new int[2]; bounds(bs, wwa); bs[0]*=-1; // min, max
   
-    Value nx = w; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInvW(a, nx);
-    Value px = w; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call    (a, px);
-    return replace(wwa, neg, w, pos);
+    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = aaf.callInvW(w, nx);
+    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = aaf.call    (w, px);
+    return replace(wwa, neg, x, pos);
   }
   
-  public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun();
-    int am = ww.asInt();
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun();
+    int am = g.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
-        w = aaf.call(a, w);
+        x = aaf.call(w, x);
       }
     } else for (int i = 0; i < am; i++) {
-      w = aaf.callInvW(a, w);
+      x = aaf.callInvW(w, x);
     }
-    return w;
+    return x;
   }
   
   private static void bounds(int[] res, Value v) {
@@ -80,19 +80,19 @@ public class RepeatBuiltin extends Dop {
   
   
   
-  public Value callInvA(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun();
-    int am = ww.asInt();
-    if (am== 1) return aaf.callInvA(a, w);
-    if (am==-1) return aaf.callInvA(w, a);
+  public Value callInvA(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun();
+    int am = g.asInt();
+    if (am== 1) return aaf.callInvA(w, x);
+    if (am==-1) return aaf.callInvA(x, w);
     
-    throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, ww);
+    throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, g);
   }
   
-  public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun();
-    int n = ww.asInt();
-    return repeat(aaf, n, o, w);
+  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun();
+    int n = g.asInt();
+    return repeat(aaf, n, o, x);
   }
   
   public Value repeat(Fun aa, int n, Value o, Value w) { // todo don't do recursion?

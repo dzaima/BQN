@@ -7,11 +7,11 @@ import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
 public class CondBuiltin extends Dop {
   
-  public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    return get(aa.asFun().call(w), ww).call(w);
+  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+    return get(f.asFun().call(x), g).call(x);
   }
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    return get(aa.asFun().call(a, w), ww).call(a, w);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    return get(f.asFun().call(w, x), g).call(w, x);
   }
   
   private Fun get(Value F, Value g) {

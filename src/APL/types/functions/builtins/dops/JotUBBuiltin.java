@@ -8,18 +8,18 @@ public class JotUBBuiltin extends Dop {
     return "⍛";
   }
   
-  public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.call(aaf.call(a), w);
+  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.call(aaf.call(w), x);
   }
   
-  public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.callInvW(aaf.call(a), w);
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return wwf.callInvW(aaf.call(w), x);
   }
   
-  public Value callInvA(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return aaf.callInv(wwf.callInvA(a, w));
+  public Value callInvA(Value f, Value g, Value w, Value x) {
+    Fun aaf = f.asFun(); Fun wwf = g.asFun();
+    return aaf.callInv(wwf.callInvA(w, x));
   }
 }
