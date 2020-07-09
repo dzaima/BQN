@@ -45,7 +45,7 @@ public class OldCatBuiltin extends Builtin {
       if (a.get(i) != v.get(i)) throw new DomainError("inverting , received non-equal prefixes", this);
     }
     if (w.rank==0) {
-      if (a.ia+1 != v.ia) throw new DomainError("original 𝕩 was of rank ⍬, which is not satisfiable", this);
+      if (a.ia+1 != v.ia) throw new DomainError("original 𝕩 was of rank 0, which is not satisfiable", this);
       return v.get(v.ia-1);
     }
     return UpArrowBuiltin.on(new int[]{v.ia-a.ia}, new int[]{a.ia}, v, this);

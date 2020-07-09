@@ -45,7 +45,7 @@ public class ShapeBuiltin extends Builtin {
           ia*= c;
         } else if (v.ia == 0) {
           if (emptyPos == null) emptyPos = i;
-          else throw new DomainError("⥊: shape contained multiple ⍬s", this, v);
+          else throw new DomainError("⥊: shape contained multiple ⟨⟩s", this, v);
         } else throw new DomainError("⥊: shape contained "+v.humanType(true), this, v);
       }
     }
@@ -113,7 +113,7 @@ public class ShapeBuiltin extends Builtin {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     for (int i = 0; i < a.ia; i++) {
       Value c = a.get(i);
-      if (!(c instanceof Num)) { // a⍬b ⥊ w - must use all items
+      if (!(c instanceof Num)) { // a‿⟨⟩‿b ⥊ w - must use all items
         if (w.rank == 0 && v.first() instanceof Primitive) return v.first();
         if (v.ia != w.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
         return v.ofShape(w.shape);

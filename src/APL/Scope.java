@@ -656,7 +656,7 @@ public class Scope {
         while (Main.console.hasNext()) res.add(Main.toAPL(Main.console.nextLine()));
         return new HArr(res);
       }
-      throw new DomainError("•STDIN needs either ⍬ or a number as 𝕩", this);
+      throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
     }
   }
   

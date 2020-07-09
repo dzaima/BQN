@@ -1,9 +1,8 @@
 package APL.types.functions.builtins.fns;
 
-import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.fns2.*;
+import APL.types.functions.builtins.fns2.MinusBuiltin;
 
 public class FlipBuiltin extends Builtin {
   @Override public String repr() {

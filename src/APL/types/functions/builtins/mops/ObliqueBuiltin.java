@@ -15,7 +15,7 @@ public class ObliqueBuiltin extends Mop {
   
   public Value call(Value f, Value w, DerivedMop derv) {
     if (w.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, w);
-    Fun ff = isFn(f);
+    Fun ff = f.asFun();
     int[] sz = w.shape;
     int H = sz[0];
     int W = sz[1];

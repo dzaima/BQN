@@ -29,7 +29,7 @@ public class IotaBuiltin extends Builtin {
       }
     }
     if (Main.vind) { // •VI←1
-      if (w.rank != 1) throw new DomainError("⍳: 𝕩 must be a vector ("+ Main.formatAPL(w.shape)+" ≡ ⍴𝕩)", this, w);
+      if (w.rank != 1) throw new DomainError("⍳: 𝕩 must be a vector ("+ Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this, w);
       int dim = w.ia;
       int[] shape = w.asIntVec();
       int prod = Arr.prod(shape);

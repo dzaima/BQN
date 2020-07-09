@@ -162,7 +162,7 @@ public class UpArrowBuiltin extends Builtin {
         }
         break chk;
       }
-      throw new LengthError("x⌾(N↓): x didn't match expected shape ("+Main.formatAPL(w.shape)+" ≡ ⍴x; expected "+Main.formatAPL(e)+")", blame);
+      throw new LengthError("x⌾(N↓): x didn't match expected shape ("+Main.formatAPL(w.shape)+" ≡ ≢x; expected "+Main.formatAPL(e)+")", blame);
     }
     Value[] r = new Value[origW.ia];
     int[] s = origW.shape;

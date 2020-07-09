@@ -50,10 +50,6 @@ public abstract class Mop extends Callable {
   }
   public abstract String repr();
   
-  protected Fun isFn(Value o) {
-    return o.asFun();
-  }
-  
   
   public Fun asFun() {
     throw new SyntaxError("Cannot interpret a modifier as a function");

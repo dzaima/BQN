@@ -21,9 +21,9 @@ public class LShoeBuiltin extends Builtin {
   }
   
   @Override public Value call(Value a, Value w) {
-    if (w.rank != 1) throw new DomainError("⊂: 𝕩 should be of rank 1 ("+Main.formatAPL(w.shape)+" ≡ ⍴𝕩)", this);
-    if (a.rank != 1) throw new DomainError("⊂: 𝕨 should be of rank 1 ("+Main.formatAPL(a.shape)+" ≡ ⍴𝕨)", this);
-    if (a.ia+1 != w.ia) throw new LengthError("⊂: (1+≢𝕨) ≡ ≢𝕩 is required ("+Main.formatAPL(a.shape)+" ≡ ⍴𝕨; "+Main.formatAPL(w.shape)+" ≡ ⍴𝕩)", this);
+    if (w.rank != 1) throw new DomainError("⊂: 𝕩 should be of rank 1 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this);
+    if (a.rank != 1) throw new DomainError("⊂: 𝕨 should be of rank 1 ("+Main.formatAPL(a.shape)+" ≡ ≢𝕨)", this);
+    if (a.ia+1 != w.ia) throw new LengthError("⊂: (1+≢𝕨) ≡ ≢𝕩 is required ("+Main.formatAPL(a.shape)+" ≡ ≢𝕨; "+Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this);
     int[] aa = a.asIntVec();
     ArrayList<Value> parts = new ArrayList<>();
     

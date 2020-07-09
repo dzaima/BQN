@@ -22,7 +22,7 @@ public class RepeatBuiltin extends Dop {
   
   public Value callInv(Value aa, Value ww, Value w) {
     Fun aaf = aa.asFun();
-    if (ww instanceof Fun) throw new DomainError("(f⍣g)A cannot be inverted", this);
+    if (ww instanceof Fun) throw new DomainError("(f⌾g)A cannot be inverted", this);
     
     int am = ww.asInt();
     if (am < 0) {
@@ -86,7 +86,7 @@ public class RepeatBuiltin extends Dop {
     if (am== 1) return aaf.callInvA(a, w);
     if (am==-1) return aaf.callInvA(w, a);
     
-    throw new DomainError("f⍣N: 𝕨-inverting is only possible when N∊¯1 1", this, ww);
+    throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, ww);
   }
   
   public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {

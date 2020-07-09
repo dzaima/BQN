@@ -10,7 +10,7 @@ public class EachRight extends Mop {
   }
   
   public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    Fun ff = isFn(f);
+    Fun ff = f.asFun();
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
       n[i] = ff.call(a, w.get(i)).squeeze();
@@ -19,6 +19,6 @@ public class EachRight extends Mop {
   }
   
   public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    return EachBuiltin.underW(isFn(aa), o, new Rank0Arr(a), w, this);
+    return EachBuiltin.underW(aa.asFun(), o, new Rank0Arr(a), w, this);
   }
 }

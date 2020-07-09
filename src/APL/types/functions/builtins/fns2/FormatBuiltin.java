@@ -2,7 +2,6 @@ package APL.types.functions.builtins.fns2;
 
 import APL.Main;
 import APL.types.Value;
-import APL.types.arrs.ChrArr;
 import APL.types.functions.Builtin;
 
 public class FormatBuiltin extends Builtin {

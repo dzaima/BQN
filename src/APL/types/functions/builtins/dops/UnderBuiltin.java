@@ -3,7 +3,7 @@ package APL.types.functions.builtins.dops;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.*;
-import APL.types.functions.builtins.mops.InvertBuiltin;
+import APL.types.functions.builtins.mops.InvBuiltin;
 
 public class UnderBuiltin extends Dop {
   @Override public String repr() {
@@ -18,7 +18,7 @@ public class UnderBuiltin extends Dop {
   }
   public Value callInv(Value aa, Value ww, Value w) {
     Fun aaf = aa.asFun(); Fun wwf = ww.asFun();
-    return wwf.under(InvertBuiltin.invertM(aaf), w);
+    return wwf.under(InvBuiltin.invertM(aaf), w);
   }
   
   public Value call(Value aa, Value ww, Value a, Value w, DerivedDop derv) {
@@ -27,7 +27,7 @@ public class UnderBuiltin extends Dop {
   }
   public Value callInvW(Value aa, Value ww, Value a, Value w) {
     Fun wwf = ww.asFun();
-    return wwf.under(new BindA(wwf.call(a), InvertBuiltin.invertW(aa.asFun())), w);
+    return wwf.under(new BindA(wwf.call(a), InvBuiltin.invertW(aa.asFun())), w);
   }
   public Value callInvA(Value aa, Value ww, Value a, Value w) { // structural inverse is not possible; fall back to computational inverse
     Fun wwf = ww.asFun();

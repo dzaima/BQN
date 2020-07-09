@@ -34,12 +34,12 @@ public class SemiUBBuiltin extends Builtin {
   
   public Value callInvW(Value a, Value w) {
     if (w.rank!=1 || w.shape[0]!=2) throw new DomainError("⍮⁼: 𝕩 must be a length 2 vector", this, w);
-    if (!w.get(0).equals(a)) throw new DomainError("⍮⁼: expected 𝕨≡⊃𝕩", this, w);
+    if (!w.get(0).equals(a)) throw new DomainError("⍮⁼: expected 𝕨≡⊑𝕩", this, w);
     return w.get(1);
   }
   public Value callInvA(Value a, Value w) {
     if (a.rank!=1 || a.shape[0]!=2) throw new DomainError("⍮˜⁼: 𝕨 must be a length 2 vector", this, a);
-    if (!a.get(1).equals(w)) throw new DomainError("⍮˜⁼: expected 𝕩≡⊃⌽𝕨", this, a);
+    if (!a.get(1).equals(w)) throw new DomainError("⍮˜⁼: expected 𝕩≡1⊑𝕨", this, a);
     return a.get(0);
   }
 }

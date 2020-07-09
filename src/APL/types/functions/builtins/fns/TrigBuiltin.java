@@ -84,7 +84,7 @@ public class TrigBuiltin extends Builtin {
         case -2: return Math.cos(w);
         case -3: return Math.tan(w);
       }
-      throw new DomainError("○⍣¯1: 𝕩 must be in (+,-)1…3");
+      throw new DomainError("○⁼: 𝕩 must be in (+,-)1…3");
     }
   };
   public Value callInvW(Value a, Value w) {

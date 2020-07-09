@@ -51,7 +51,7 @@ public class OldDownArrowBuiltin extends Builtin {
   public Value call(Value a, Value w) {
     int[] gsh = a.asIntVec();
     if (gsh.length == 0) return w;
-    if (gsh.length > w.rank) throw new DomainError("↓: ≢𝕨 should be less than ⍴⍴𝕩 ("+gsh.length+" = ≢𝕨; "+Main.formatAPL(w.shape)+" ≡ ⍴𝕩)", this);
+    if (gsh.length > w.rank) throw new DomainError("↓: ≢𝕨 should be less than ≠≢𝕩 ("+gsh.length+" = ≠𝕨; "+Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this);
     int[] sh = new int[w.rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     System.arraycopy(w.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);

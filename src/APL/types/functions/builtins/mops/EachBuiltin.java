@@ -71,7 +71,7 @@ public class EachBuiltin extends Mop {
   }
   
   public Value under(Value aa, Value o, Value w, DerivedMop derv) {
-    Fun aaf = isFn(aa);
+    Fun aaf = aa.asFun();
     Value[] res2 = new Value[w.ia];
     rec(aaf, o, w, 0, new Value[w.ia], new Value[1], res2);
     return Arr.create(res2, w.shape);
@@ -94,7 +94,7 @@ public class EachBuiltin extends Mop {
   
   
   public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    return underW(isFn(aa), o, a, w, this);
+    return underW(aa.asFun(), o, a, w, this);
   }
   
   public static Value underW(Fun aa, Obj o, Value a, Value w, Callable blame) {

@@ -24,7 +24,7 @@ public class ScanBuiltin extends Mop {
   }
   
   public Value call(Value aa, Value a, Value w, DerivedMop derv) {
-    Fun aaf = isFn(aa);
+    Fun aaf = aa.asFun();
     int n = a.asInt();
     int len = w.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);

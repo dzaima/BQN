@@ -4,7 +4,7 @@ import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
-public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *⁼ & √⍨⁼⍨
+public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *⁼ & √˜⁼˜
   @Override public String repr() {
     return "*⁼";
   }
