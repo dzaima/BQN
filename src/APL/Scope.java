@@ -445,7 +445,7 @@ public class Scope {
     public Value call(Value x) {
       return call(EmptyArr.SHAPE0S, x);
     }
-  
+    
     public Value call(Value w, Value x) {
       String path = x.asString();
       if (w.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
@@ -699,7 +699,7 @@ public class Scope {
       if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString())));
       return p;
     }
-  
+    
     public Value call(Value w, Value x) {
       Pr p = pr(w, x); p.start();
       long sns = System.nanoTime();
@@ -757,7 +757,7 @@ public class Scope {
         p.end(ens-sns);
         return res;
       }
-  
+      
       public Value call(Value f, Value g, Value x, DerivedDop derv) {
         Pr p = pr(g, null); Fun ff = f.asFun(); p.start();
         long sns = System.nanoTime();

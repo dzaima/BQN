@@ -30,7 +30,7 @@ public class LBoxBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     if (x.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
     if (w instanceof Num) return getCell(w.asInt(), x, this);
-  
+    
     int wr = w.shape.length;
     int xr = x.shape.length;
     if (w.ia==0) {

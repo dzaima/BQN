@@ -41,7 +41,7 @@ public abstract class APLMap extends Primitive {
       if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame, k);
       map.set(k, v);
     }
-  
+    
     public String toString() {
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;
       return v == null? "map@"+k : v.toString();

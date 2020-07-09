@@ -15,7 +15,7 @@ public class DepthBuiltin extends Dop {
     int d = g.asInt();
     if (d < 0) throw new NYIError("negative 𝕘 for ⚇", this, g);
     return on(ff, d, x, derv);
-  } 
+  }
   
   public static Value on(Fun f, int d, Value w, Fun blame) {
     int ld = MatchBuiltin.lazy(w);

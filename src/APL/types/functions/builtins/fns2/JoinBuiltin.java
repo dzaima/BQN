@@ -45,8 +45,8 @@ public class JoinBuiltin extends Builtin {
           ri+= s.length();
         }
         return Main.toAPL(new String(cs));
-      
-      
+        
+        
       } else if (first.quickDoubleArr()) {
         for (Value v : x) {
           if (v.rank != 1) return null;
@@ -55,7 +55,7 @@ public class JoinBuiltin extends Builtin {
           chki++;
         }
         double[] ds = new double[am];
-      
+        
         int ri = 0;
         for (int i = 0; i < x.ia; i++) {
           Value v = x.get(i);
@@ -65,13 +65,13 @@ public class JoinBuiltin extends Builtin {
         return new DoubleArr(ds);
       }
     }
-  
+    
     for (; chki < x.ia; chki++) {
       Value v = x.get(chki);
       if (v.rank != 1) return null;
       am+= v.ia;
     }
-  
+    
     Value[] vs = new Value[am];
     int ri = 0;
     for (Value v : x) {

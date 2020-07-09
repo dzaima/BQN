@@ -56,7 +56,7 @@ public class EachBuiltin extends Mop {
     Value[] n = new Value[max];
     int r = 0;
     if (we) for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(c, x.get(r)); r++; } }
-    else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(w.get(r), c); r++; } } 
+    else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = ff.call(w.get(r), c); r++; } }
     return Arr.create(n, we? x.shape : w.shape);
   }
   

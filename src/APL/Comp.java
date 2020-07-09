@@ -51,7 +51,7 @@ public class Comp {
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   public static final byte OP2H = 20; // derive composition to modifier
   public static final byte RETN = 25; // returns, giving ToS
-// public static final byte ____ = 6;
+  // public static final byte ____ = 6;
   
   public static final byte SPEC = -1; // special
   public static final byte   EVAL = 0; // ⍎
@@ -74,11 +74,11 @@ public class Comp {
     Obj peek() {
       return vals[sz-1];
     }
-  
+    
   }
   
   public static final boolean DBGPROG = true;
-  public Value exec(Scope sc) { 
+  public Value exec(Scope sc) {
     return exec(sc, 0);
   }
   public Value exec(Scope sc, int spt) {
@@ -432,7 +432,7 @@ public class Comp {
       addNum(objs.size());
       objs.add(o);
     }
-  
+    
     public void push(DfnTok o) {
       add(o, DFND);
       addNum(dfns.size());
@@ -567,17 +567,17 @@ public class Comp {
     public Res(char type) {
       this.type = type;
     }
-  
+    
     abstract void add(Mut m);
     Res mut() { throw new Error(getClass()+" cannot be mutated"); }
-  
+    
     public abstract Token lastTok();
   }
   
   static class ResTk extends Res {
     Token tk;
     private boolean mut;
-  
+    
     public ResTk(Token tk) {
       super(tk.type);
       this.tk = tk;
@@ -587,17 +587,17 @@ public class Comp {
     void add(Mut m) {
       compP(m, tk, mut);
     }
-  
+    
     Res mut() {
       assert !mut;
       mut = true;
       return this;
     }
-  
+    
     public Token lastTok() {
       return tk;
     }
-  
+    
     public String toString() {
       return tk==null? type+"" : tk.source();
     }
@@ -620,27 +620,27 @@ public class Comp {
     void add(Mut m) {
       m.add(tk, bc);
     }
-  
+    
     public Token lastTok() {
       return null;
     }
-  
+    
     public String toString() {
       return Arrays.toString(bc);
     }
   }
   static class ResMix extends Res {
     private final Res[] all;
-  
+    
     public ResMix(char type, Res... all) {
       super(type);
       this.all = all;
     }
-  
+    
     void add(Mut m) {
       for (Res r : all) r.add(m);
     }
-  
+    
     public Token lastTok() {
       for (int i = all.length-1; i >= 0; i--) {
         Res r = all[i];
@@ -649,7 +649,7 @@ public class Comp {
       }
       return null;
     }
-  
+    
     public String toString() {
       return Arrays.toString(all);
     }
@@ -852,7 +852,7 @@ public class Comp {
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
         if (last=='a' || last=='A') return t.type = last; // not as arg of dop/mop
         if (last == 'f') return t.type = 'f';
-  
+        
         if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
           for (char tp : tps) {
             if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
@@ -922,7 +922,7 @@ public class Comp {
       if (ts.size() == 0) return;
       if (ts.size() == 1) { compP(m, ts.get(0), false); return; }
       int i = ts.size()-1;
-  
+      
       LinkedList<Res> tps = new LinkedList<>();
       Res t0 = new ResTk(ts.get(i));
       tps.addFirst(t0);

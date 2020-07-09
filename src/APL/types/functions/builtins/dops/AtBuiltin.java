@@ -50,7 +50,7 @@ public class AtBuiltin extends Dop {
       }
       return Arr.create(ra, x.shape);
     } else {
-  
+      
       Indexer.PosSh poss = Indexer.poss(g, x.shape, blame);
       Value repl;
       if (f instanceof Fun) {

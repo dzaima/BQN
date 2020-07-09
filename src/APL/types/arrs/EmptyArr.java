@@ -75,7 +75,7 @@ public class EmptyArr extends Arr {
   
   private static final Iterator<Value> EIT = new Iterator<Value>() {
     public boolean hasNext() { return false; }
-  
+    
     public Value next() { throw new IllegalStateException("iterating empty array"); }
   };
   public Iterator<Value> iterator() {

@@ -12,7 +12,7 @@ public class RepeatBuiltin extends Dop {
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
     Fun ff = f.asFun();
     Value gf = g.asFun().call(x);
-  
+    
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
     Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = ff.callInv(nx);
@@ -38,9 +38,9 @@ public class RepeatBuiltin extends Dop {
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
     Fun ff = f.asFun();
     Value gf = g.asFun().call(w, x);
-  
+    
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
-  
+    
     Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = ff.callInvW(w, nx);
     Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = ff.call    (w, px);
     return replace(gf, neg, x, pos);

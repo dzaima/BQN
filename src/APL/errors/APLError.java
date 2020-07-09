@@ -75,7 +75,7 @@ public abstract class APLError extends RuntimeException {
     final String raw;
     int lns;
     int spos, epos; // in bounds of the line
-  
+    
     public Mg(Token t, char c, String raw, int lns, int spos, int epos) {
       this.t = t;
       this.c = c;
@@ -84,17 +84,17 @@ public abstract class APLError extends RuntimeException {
       this.spos = spos;
       this.epos = epos;
     }
-  
+    
     public static void add(ArrayList<Mg> l, Tokenable to, char c) {
       if (to == null) return;
       Token t = to.getToken();
       if (t == null) return;
       
       String raw = t.raw;
-  
+      
       int lns = raw.lastIndexOf("\n", t.spos) + 1; // not found handles itself
-  
-  
+      
+      
       int spos = t.spos - lns;
       int epos = t.epos - lns;
       

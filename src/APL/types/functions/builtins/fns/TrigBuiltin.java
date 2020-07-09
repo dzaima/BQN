@@ -50,7 +50,7 @@ public class TrigBuiltin extends Builtin {
         case 10: return Math.abs(x); // pointless
         case 11: return 0; // also pointless
         case 12: throw new DomainError("what even is phase");
-      
+        
         case  0: return Math.sqrt(1 - x*x); //Num.ONE.minus(n.pow(Num.TWO)).root(Num.TWO);
         case  -1: return Math.asin(x);
         case  -2: return Math.acos(x);

@@ -292,7 +292,7 @@ public class Num extends Primitive {
   @Override
   public int asInt() {
     return toInt(num);
-  } 
+  }
   public static int toInt(double d) {
     if (d%1!=0) throw new DomainError("Expected integer, got "+d);
     return (int) d;

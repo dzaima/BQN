@@ -461,7 +461,7 @@ public class Exec {
       // case '⊤': return new DTackBuiltin();
       // case '○': return new TrigBuiltin();
       // case '!': return new ExclBuiltin();
-    
+      
       // case '⊂': return new LShoeBuiltin();
       // case '⊇': return new RShoeUBBuiltin(sc);
       // case '⊃': return new RShoeBuiltin(sc);
@@ -476,7 +476,7 @@ public class Exec {
       // case '⍪': return new CommaBarBuiltin();
       // case '⊖': return new FlipBuiltin();
       case '⌽': return new ReverseBuiltin();
-    
+      
       // case '…': return new EllipsisBuiltin();
       // case '⍮': return new SemiUBBuiltin();
       case '⍕': return new FormatBuiltin();

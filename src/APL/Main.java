@@ -166,7 +166,7 @@ public class Main {
         if (debug) printlvl = 0;
         if (!silentREPL) print("   ");
         if (!console.hasNext()) break;
-  
+        
         String cr = console.nextLine();
         sys.lineCatch(cr);
       }
@@ -178,15 +178,15 @@ public class Main {
     public void off(int code) {
       System.exit(0);
     }
-  
+    
     public String input() {
       return Main.console.nextLine();
     }
-  
+    
     public void println(String s) {
       System.out.println(s);
     }
-  
+    
     public void colorprint(String s, int col) {
       if (Main.colorful) println("\u001b[38;5;" + col + "m" + s + "\u001b[0m");
       else println(s);

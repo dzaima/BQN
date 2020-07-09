@@ -147,7 +147,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
         if (ish.length == 1) return new PosSh(res, new int[]{res.length});
         return new PosSh(new int[]{fromShapeChk(ish, res, blame)}, Rank0Arr.SHAPE);
       }
-    
+      
       int[] res = new int[Arr.prod(rsh)];
       for (int i = 0; i < v.ia; i++) {
         Value c = v.get(i);
@@ -201,7 +201,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     }
     return ind;
   }
-
+  
   // same, with scalar index into vector
   public static int scal(int n, int[] ish, Callable blame) {
     if (ish.length!=1) throw new LengthError(blame+": amount of index parts should equal rank (scalar index, shape ≡ "+Main.formatAPL(ish)+")", blame);

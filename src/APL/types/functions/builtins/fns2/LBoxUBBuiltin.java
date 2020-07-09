@@ -88,10 +88,10 @@ public class LBoxUBBuiltin extends Builtin {
     } else {
       underWSub(v, w, vs, x.shape);
     }
-
+    
     return Arr.create(vs, x.shape);
   }
-
+  
   void underWSub(Value v, Value a, Value[] vs, int[] shape) {
     if (a instanceof Primitive) throw new DomainError(this+": indices must all be vectors when nesting (found "+a+")", this);
     if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {

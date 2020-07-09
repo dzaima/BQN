@@ -53,7 +53,7 @@ public class ReduceBuiltin extends Mop {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
     return foldr(f.asFun(), x.values(), w, 0);
   }
-
+  
   static Value foldr(Fun ff, Value[] a, Value init, int skip) {
     for (int i = a.length-skip-1; i >= 0; i--) {
       init = ff.call(a[i], init);

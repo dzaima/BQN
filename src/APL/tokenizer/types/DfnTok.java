@@ -52,7 +52,7 @@ public class DfnTok extends TokArr<LineTok> {
       } else {
         src = part;
         assert tail != 0;
-        int rid = parts.size()-i; 
+        int rid = parts.size()-i;
         body = new Body(tail==1? 'a' : rid==1? 'd' : 'm', funType(src, this));
       }
       bodies.add(body);
@@ -80,7 +80,7 @@ public class DfnTok extends TokArr<LineTok> {
         for (Body b : bodies) if (b.immediate) throw new SyntaxError("Immediate operator not allowed with multiple bodies", this);
       }
     } else immediate = false; // no {2+2} for now
-  
+    
     int[] offs = new int[parts.size()];
     comp = Comp.comp(bodySrcs, offs);
     for (int i = 0; i < bodies.size(); i++) bodies.get(i).start = offs[i];
@@ -105,7 +105,7 @@ public class DfnTok extends TokArr<LineTok> {
     public final boolean immediate;
     public final Token wM, fM, gM, xM;
     public final String self;
-  
+    
     public Body(LineTok header, boolean imm) {
       token = header;
       noHeader = false;
@@ -119,7 +119,7 @@ public class DfnTok extends TokArr<LineTok> {
           if (a instanceof NameTok) { // v:
             otype = 'a'; ftype = 'a';
             immediate = true;
-  
+            
             xM=null;
             self = ((NameTok) a).name;
           } else { // 1:
@@ -150,7 +150,7 @@ public class DfnTok extends TokArr<LineTok> {
             boolean wo = ce && op(c, "𝕨");
             otype = 'f'; ftype = wo? 'a' : ce? 'd' : 'm';
             immediate = false;
-  
+            
             wM = op(c, "𝕨")? null : c; // no 𝕨 handled automatically
             fM=gM=null;
             xM = op(e, "𝕩")? null : e;
@@ -164,7 +164,7 @@ public class DfnTok extends TokArr<LineTok> {
             boolean wo = be && op(b, "𝕨");
             otype = 'm'; ftype = wo? 'a' : be? 'd' : 'm';
             immediate = false;
-  
+            
             wM = op(b, "𝕨")? null : b;
             fM = op(c, "𝔽")||op(c, "𝕗")? null : c;
             gM = null;
@@ -179,7 +179,7 @@ public class DfnTok extends TokArr<LineTok> {
             boolean wo = ae && op(a, "𝕨");
             otype = 'd'; ftype = wo? 'a' : ae? 'd' : 'm';
             immediate = false;
-  
+            
             wM = op(a, "𝕨")? null : a;
             fM = op(b, "𝔽")||op(b, "𝕗")? null : b;
             gM = op(d, "𝔾")||op(d, "𝕘")? null : d;
@@ -216,7 +216,7 @@ public class DfnTok extends TokArr<LineTok> {
       }
       
     }
-  
+    
     public Body(char f, boolean imm) { // +TODO
       token = null;
       noHeader = true;
@@ -230,7 +230,7 @@ public class DfnTok extends TokArr<LineTok> {
     public boolean match(Scope sc, Value w, Value f, Value g, Value x) {
       if (ftype != 'a' && (ftype=='m') != (w==null)) return false;
       if (noHeader) return true;
-  
+      
       if (xM!=null) if (!matches(sc, xM, x)) return false;
       if (gM!=null) if (!matches(sc, gM, g)) return false;
       if (fM!=null) if (!matches(sc, fM, f)) return false;

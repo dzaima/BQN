@@ -9,7 +9,7 @@ public class NotBuiltin extends Builtin {
   public String repr() {
     return "¬";
   }
-
+  
   public Value call(Value x) {
     return rec(x);
   }

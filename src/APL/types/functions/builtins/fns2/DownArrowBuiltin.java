@@ -17,7 +17,7 @@ public class DownArrowBuiltin extends Builtin {
     int cells = x.shape[0];
     int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
-  
+    
     res[0] = x;
     
     for (int i = 1; i < cells; i++) {
@@ -28,7 +28,7 @@ public class DownArrowBuiltin extends Builtin {
       sh[0] = am;
       res[i] = Arr.create(c, sh);
     }
-  
+    
     int[] sh0 = x.shape.clone();
     sh0[0] = 0;
     res[cells] = new EmptyArr(sh0, null);

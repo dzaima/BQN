@@ -48,7 +48,7 @@ public class Tokenizer {
       ArrayList<Token> pts = new ArrayList<>();
       
       ArrayList<Token> cstr = new ArrayList<>();
-  
+      
       for (int i = 0; i < ts.size(); i++) {
         Token t1 = ts.get(i);
         if (t1 instanceof StranderTok) throw new SyntaxError("Bad strand syntax", t1);
@@ -100,7 +100,7 @@ public class Tokenizer {
   @SuppressWarnings("StringConcatenationInLoop") public static BasicLines tokenize(String raw, boolean pointless) { // pointless means unevaled things get tokens; mainly for syntax highlighting
     int li = 0;
     int len = raw.length();
-  
+    
     ArrayList<Block> levels = new ArrayList<>();
     levels.add(new Block(new ArrayList<>(), '⋄', 0));
     levels.get(0).a.add(new Line(raw, 0, new ArrayList<>()));
@@ -258,7 +258,7 @@ public class Tokenizer {
           i++;
         } else if (c == '\'') {
           if (i+2 >= len) throw new SyntaxError("unfinished character literal");
-          if (raw.charAt(i+2) != '\'') { 
+          if (raw.charAt(i+2) != '\'') {
             throw new SyntaxError("character literal must contain exactly 1"+(Character.isHighSurrogate(raw.charAt(i+1))?" UTF-16":"")+" character");
           }
           i+= 3;
