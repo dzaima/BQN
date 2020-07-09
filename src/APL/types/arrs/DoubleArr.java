@@ -93,7 +93,7 @@ public class DoubleArr extends Arr {
   @Override
   public double sum() {
     double r = 0;
-    for (double val : arr) r += val;
+    for (double val : arr) r+= val;
     return r;
   }
   
@@ -168,7 +168,7 @@ public class DoubleArr extends Arr {
     if (hash == 0) {
       for (double d : arr) {
         hash = hash*31;
-        if (d != 0d) hash += Double.hashCode(d); // ¯0 == 0
+        if (d != 0d) hash+= Double.hashCode(d); // ¯0 == 0
       }
       hash = shapeHash(hash);
     }

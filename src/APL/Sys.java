@@ -102,19 +102,13 @@ public abstract class Sys {
     }
   }
   
-  private static String removeHashBang(String source) {
-    if (source.charAt(0)=='#' && source.charAt(1)=='!') {
-      source = source.substring(source.indexOf('\n')+1);
-    }
-    return source;
-  }
   public Value execFile(String path, Value[] args) {
     int sl = path.lastIndexOf("/")+1;
     Value[] rargs = Arrays.copyOf(args, args.length+2);
     rargs[args.length  ] = Main.toAPL(path.substring(sl));
     rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
     Scope sc = new Scope(gsc, rargs);
-    return Main.exec(removeHashBang(Main.readFile(path)), sc);
+    return Main.exec(Main.readFile(path), sc);
   }
   public Value execFile(String path) {
     return execFile(path, EmptyArr.NOVALUES);

@@ -314,7 +314,7 @@ public class Scope {
         for (int i = 0; i < n; i++) testCompiled.exec(Scope.this);
         long end = System.nanoTime();
         if (raw) {
-          return new Num((end-start)/n);
+          return new Num((end-start)/(double)n);
         } else {
           double t = end-start;
           t/= n;

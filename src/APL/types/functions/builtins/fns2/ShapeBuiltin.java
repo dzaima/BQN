@@ -42,7 +42,7 @@ public class ShapeBuiltin extends Builtin {
         if (v instanceof Num) {
           int c = v.asInt();
           sh[i] = c;
-          ia *= c;
+          ia*= c;
         } else if (v.ia == 0) {
           if (emptyPos == null) emptyPos = i;
           else throw new DomainError("⥊: shape contained multiple ⍬s", this, v);

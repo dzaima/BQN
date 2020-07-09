@@ -21,7 +21,7 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value callInv(Value aa, Value ww, Value w) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     if (ww instanceof Fun) throw new DomainError("(f⍣g)A cannot be inverted", this);
     
     int am = ww.asInt();
@@ -47,7 +47,7 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value callInvW(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     int am = ww.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
@@ -81,7 +81,7 @@ public class RepeatBuiltin extends Dop {
   
   
   public Value callInvA(Value aa, Value ww, Value a, Value w) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     int am = ww.asInt();
     if (am== 1) return aaf.callInvA(a, w);
     if (am==-1) return aaf.callInvA(w, a);
@@ -90,7 +90,7 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value under(Value aa, Value ww, Value o, Value w, DerivedDop derv) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     int n = ww.asInt();
     return repeat(aaf, n, o, w);
   }

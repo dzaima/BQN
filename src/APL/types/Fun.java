@@ -304,7 +304,7 @@ public abstract class Fun extends Callable {
             if (an) return f.call(((Num) a).num, (BigValue) w);
             else return f.call((BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
           }
-          throw new DomainError("calling a number-only function with "+w.humanType(true), this);
+          throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
         } else return new Rank0Arr(numD(f, a.first(), w.first()));
         
       } else { // ⍺¨ ⍵
@@ -361,7 +361,7 @@ public abstract class Fun extends Callable {
           if (an & wn) return n.call(((Num) a).num, ((Num) w).num);
           if ((a instanceof BigValue|an) & (w instanceof BigValue|wn))
             return n.call(an? new BigValue(((Num) a).num) : (BigValue) a, wn? new BigValue(((Num) w).num) : (BigValue) w);
-          throw new DomainError("calling a number-only function with "+w.humanType(true), this);
+          throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
         } else return new Rank0Arr(bitD(n, b, a.first(), w.first()));
         
       } else { // ⍺¨ ⍵

@@ -54,11 +54,6 @@ public abstract class Dop extends Callable {
   }
   public abstract String repr();
   
-  protected Fun isFn(Obj o, char c) {
-    if (!(o instanceof Fun)) throw new SyntaxError(repr()+": "+c+" must be a function", this);
-    return (Fun) o;
-  }
-  
   
   public Fun asFun() {
     throw new SyntaxError("Cannot interpret a composition as a function");

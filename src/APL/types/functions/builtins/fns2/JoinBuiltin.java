@@ -33,7 +33,7 @@ public class JoinBuiltin extends Builtin {
         for (Value v : x) {
           if (v.rank != 1) return null;
           if (!(v instanceof ChrArr)) break typed;
-          am += v.ia;
+          am+= v.ia;
           chki++;
         }
         char[] cs = new char[am];
@@ -139,10 +139,10 @@ public class JoinBuiltin extends Builtin {
       }
     }
     int[] rs = !aScalar ? a.shape.clone() : w.shape.clone(); // shape of the result
-    rs[k] += aScalar || wScalar ? 1 : w.shape[k];
-    int n0 = 1; for (int i = 0; i < k; i++) n0 *= rs[i];             // product of major dimensions
+    rs[k]+= aScalar || wScalar ? 1 : w.shape[k];
+    int n0 = 1; for (int i = 0; i < k; i++) n0*= rs[i];             // product of major dimensions
     int n1 = rs[k];                                                  // dimension to catenate on
-    int n2 = 1; for (int i = k + 1; i < rs.length; i++) n2 *= rs[i]; // product of minor dimensions
+    int n2 = 1; for (int i = k + 1; i < rs.length; i++) n2*= rs[i]; // product of minor dimensions
     int ad = aScalar ? n2 : a.shape[k] * n2;                         // chunk size for ⍺
     int wd = wScalar ? n2 : w.shape[k] * n2;                         // chunk size for ⍵
     
@@ -161,11 +161,11 @@ public class JoinBuiltin extends Builtin {
   
   private static void copyChunks(boolean scalar, Value[] av, Value[] rv, int offset, int ad, int rd) {
     if (scalar) {
-      for (int i = offset; i < rv.length; i += rd) {
+      for (int i = offset; i < rv.length; i+= rd) {
         Arrays.fill(rv, i, i + ad, av[0]);
       }
     } else {
-      for (int i = offset, j = 0; i < rv.length; i += rd, j += ad) { // i:position in rv, j:position in av
+      for (int i = offset, j = 0; i < rv.length; i+= rd, j+= ad) { // i:position in rv, j:position in av
         System.arraycopy(av, j, rv, i, ad);
       }
     }
@@ -173,11 +173,11 @@ public class JoinBuiltin extends Builtin {
   
   private static void copyChunksD(boolean scalar, double[] av, double[] rv, int offset, int ad, int rd) {
     if (scalar) {
-      for (int i = offset; i < rv.length; i += rd) {
+      for (int i = offset; i < rv.length; i+= rd) {
         Arrays.fill(rv, i, i + ad, av[0]);
       }
     } else {
-      for (int i = offset, j = 0; i < rv.length; i += rd, j += ad) { // i:position in rv, j:position in av
+      for (int i = offset, j = 0; i < rv.length; i+= rd, j+= ad) { // i:position in rv, j:position in av
         System.arraycopy(av, j, rv, i, ad);
       }
     }

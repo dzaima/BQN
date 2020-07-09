@@ -75,7 +75,7 @@ public class MutArr extends Settable { // old version of SettableArr
       String s = "";
       for (Obj c : vs) {
         if (c instanceof Char) {
-          s += ((Char) c).chr;
+          s+= ((Char) c).chr;
         } else {
           s = null;
           break;

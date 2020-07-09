@@ -112,7 +112,7 @@ public abstract class Arr extends Value {
       int x=0, y=0;
       for (Value v : this) {
         if (v == null) v = Main.toAPL("NULLPTR");
-        simple &= v instanceof Primitive;
+        simple&= v instanceof Primitive;
         var c = v.toString().split("\n");
         var cw = 0;
         for (var ln : c) {

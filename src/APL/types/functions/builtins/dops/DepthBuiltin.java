@@ -11,7 +11,7 @@ public class DepthBuiltin extends Dop {
   }
   
   public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     int d = ww.asInt();
     if (d < 0) throw new NYIError("negative 𝕘 for ⚇", this, ww);
     return on(aaf, d, w, derv);

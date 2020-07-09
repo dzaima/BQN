@@ -12,7 +12,7 @@ public class CRepeatBuiltin extends Dop {
   }
   
   @Override public Value call(Value aa, Value ww, Value w, DerivedDop derv) {
-    Fun aaf = isFn(aa, '⍶');
+    Fun aaf = aa.asFun();
     if (ww instanceof Fun) {
       ArrayList<Value> res = new ArrayList<>();
       Value prev = w;

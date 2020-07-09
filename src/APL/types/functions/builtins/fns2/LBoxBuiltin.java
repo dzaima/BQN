@@ -19,7 +19,7 @@ public class LBoxBuiltin extends Builtin {
     int ia = 1;
     int[] nsh = new int[w.rank-1];
     System.arraycopy(w.shape, 1, nsh, 0, nsh.length);
-    for (int i = 1; i < w.shape.length; i++) ia *= w.shape[i];
+    for (int i = 1; i < w.shape.length; i++) ia*= w.shape[i];
     Value[] res = new Value[ia];
     for (int i = 0; i < ia; i++) { // valuecopy
       res[i] = w.get(i);

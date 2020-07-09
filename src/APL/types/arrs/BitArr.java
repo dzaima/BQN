@@ -153,7 +153,7 @@ public final class BitArr extends Arr {
     int r = 0;
     setEnd(false);
     for (long l : arr) {
-      r += Long.bitCount(l);
+      r+= Long.bitCount(l);
     }
     return r;
   }
@@ -177,7 +177,7 @@ public final class BitArr extends Arr {
       this.sh = sh;
     }
     public void add(boolean b) {
-      a[i] |= (b? 1L : 0L)<<o;
+      a[i]|= (b? 1L : 0L)<<o;
       o++;
       // i+= o==64? 1 : 0; // todo, idk ._.
       // o&= 63;
@@ -188,7 +188,7 @@ public final class BitArr extends Arr {
     }
     
     public void add(long l) { // expects a 0 or 1
-      a[i] |= l<<o;
+      a[i]|= l<<o;
       o++;
       if (o == 64) {
         o = 0;

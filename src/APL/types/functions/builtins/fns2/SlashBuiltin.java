@@ -83,7 +83,7 @@ public class SlashBuiltin extends Builtin {
     int ia = 1;
     for (int i = 0; i < sh.length; i++) {
       sh[i]+= 1;
-      ia *= sh[i];
+      ia*= sh[i];
     }
     double[] arr = new double[ia];
     for (Value v : w) {

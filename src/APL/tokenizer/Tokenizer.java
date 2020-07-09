@@ -223,7 +223,7 @@ public class Tokenizer {
               }
               int exp = Integer.parseInt(raw.substring(si, i));
               if (negExp) exp = -exp;
-              f *= Math.pow(10, exp);
+              f*= Math.pow(10, exp);
             }
             if (i<len && raw.charAt(i)=='L' && (i+1 == len || !validNameMid(raw.charAt(i+1)))) {
               if (hasExp || hasPoint) {

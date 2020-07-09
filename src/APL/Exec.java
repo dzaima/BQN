@@ -389,19 +389,19 @@ public class Exec {
     boolean pass = false;
     barNode = FN.r;
     Node cn = fromStart? FN.r : LN.l;
-    for (int i = fromStart ? 0 : len - 1; fromStart ? i<len : i>=0; i += ptrinc) {
+    for (int i = fromStart ? 0 : len - 1; fromStart ? i<len : i>=0; i+= ptrinc) {
       char p = pt.charAt(i);
       boolean inv = false;
       if (p == '|') {
         pass = everythingDone;
         barNode = cn;
-        i += ptrinc;
+        i+= ptrinc;
         p = pt.charAt(i);
       }
       if (cn==FN | cn==LN) return pass;
       if (p == '!') {
         inv = true;
-        i += ptrinc;
+        i+= ptrinc;
         p = pt.charAt(i);
       }
       Obj v = cn.val;
