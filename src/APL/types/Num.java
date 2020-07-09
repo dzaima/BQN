@@ -259,8 +259,8 @@ public class Num extends Primitive {
   }
   
   public Num binomial(Num w) {
-    if (  num % 1 != 0) throw new DomainError("binomial of non-integer ⍺", this);
-    if (w.num % 1 != 0) throw new DomainError("binomial of non-integer ⍵", w);
+    if (  num % 1 != 0) throw new DomainError("binomial of non-integer 𝕨", this);
+    if (w.num % 1 != 0) throw new DomainError("binomial of non-integer 𝕩", w);
     if (w.num > num) return Num.ZERO;
     
     double res = 1;

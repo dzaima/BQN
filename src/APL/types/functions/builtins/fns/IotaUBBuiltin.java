@@ -18,7 +18,7 @@ public class IotaUBBuiltin extends Builtin {
     int sum = (int)w.sum();
     if (w.rank == 1) {
       if (sum<0) {
-        for (Value v : w) if (v.asDouble() < 0) throw new DomainError("⍸: ⍵ contained "+v, this, w);
+        for (Value v : w) if (v.asDouble() < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, w);
       }
       var sub = new double[sum];
       int p = 0;
@@ -32,7 +32,7 @@ public class IotaUBBuiltin extends Builtin {
         var da = w.asDoubleArr();
         for (int i = 0; i < w.ia; i++) {
           int v = (int) da[i];
-          if (v < 0) throw new DomainError("⍸: ⍵ contained "+v, this, w);
+          if (v < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, w);
           for (int j = 0; j < v; j++) {
             sub[p++] = i;
           }
@@ -54,7 +54,7 @@ public class IotaUBBuiltin extends Builtin {
               for (int j = 0; j < n; j++) res[k][ri+j] = p[k];
             }
             ri+= n;
-          } else if (n != 0) throw new DomainError("⍸: ⍵ contained "+n, this, w);
+          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, w);
         }
         Value[] resv = new Value[rank];
         for (int i = 0; i < rank; i++) resv[i] = new DoubleArr(res[i]);
@@ -69,7 +69,7 @@ public class IotaUBBuiltin extends Builtin {
           if (n > 0) {
             DoubleArr pos = Main.toAPL(p);
             for (int j = 0; j < n; j++) res[ri++] = pos;
-          } else if (n != 0) throw new DomainError("⍸: ⍵ contained "+n, this, w);
+          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, w);
         }
         return new HArr(res);
       }

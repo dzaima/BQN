@@ -143,8 +143,8 @@ public class JoinBuiltin extends Builtin {
     int n0 = 1; for (int i = 0; i < k; i++) n0*= rs[i];             // product of major dimensions
     int n1 = rs[k];                                                  // dimension to catenate on
     int n2 = 1; for (int i = k + 1; i < rs.length; i++) n2*= rs[i]; // product of minor dimensions
-    int ad = aScalar ? n2 : a.shape[k] * n2;                         // chunk size for ⍺
-    int wd = wScalar ? n2 : w.shape[k] * n2;                         // chunk size for ⍵
+    int ad = aScalar ? n2 : a.shape[k] * n2;                         // chunk size for 𝕨
+    int wd = wScalar ? n2 : w.shape[k] * n2;                         // chunk size for 𝕩
     
     if (a.quickDoubleArr() && w.quickDoubleArr()) {
       double[] rv = new double[n0 * n1 * n2];                            // result values

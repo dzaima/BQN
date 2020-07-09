@@ -39,13 +39,13 @@ public class OldCatBuiltin extends Builtin {
   
   public Value underW(Value o, Value a, Value w) {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    if (a.rank>1) throw new NYIError(", inverted on rank "+a.rank+" ⍺", this);
-    if (v.rank>1) throw new NYIError(", inverted on rank "+v.rank+" ⍵", this);
+    if (a.rank>1) throw new NYIError(", inverted on rank "+a.rank+" 𝕨", this);
+    if (v.rank>1) throw new NYIError(", inverted on rank "+v.rank+" 𝕩", this);
     for (int i = 0; i < a.ia; i++) {
       if (a.get(i) != v.get(i)) throw new DomainError("inverting , received non-equal prefixes", this);
     }
     if (w.rank==0) {
-      if (a.ia+1 != v.ia) throw new DomainError("original ⍵ was of rank ⍬, which is not satisfiable", this);
+      if (a.ia+1 != v.ia) throw new DomainError("original 𝕩 was of rank ⍬, which is not satisfiable", this);
       return v.get(v.ia-1);
     }
     return UpArrowBuiltin.on(new int[]{v.ia-a.ia}, new int[]{a.ia}, v, this);

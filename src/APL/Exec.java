@@ -575,11 +575,6 @@ public class Exec {
       
       // case '⍬': return new DoubleArr(DoubleArr.EMPTY);
       // case '⍞': return new QuoteQuad();
-      // case '⍺': Obj o = sc.get("⍺"); if(o == null) throw new SyntaxError("No ⍺ found", t); return o;
-      // case '⍵':     o = sc.get("⍵"); if(o == null) throw new SyntaxError("No ⍵ found", t); return o;
-      // case '∇':     o = sc.get("∇"); if(o == null) throw new SyntaxError("No ∇ found", t); return o;
-      // case '⍶':     o = sc.get("⍶"); if(o == null) throw new SyntaxError("No ⍶ found", t); return o;
-      // case '⍹':     o = sc.get("⍹"); if(o == null) throw new SyntaxError("No ⍹ found", t); return o;
       
       // case 'ℝ': // the lone double-struck..
       case 55349: // double-struck surrogate pair

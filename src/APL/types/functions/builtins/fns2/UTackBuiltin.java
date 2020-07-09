@@ -40,9 +40,9 @@ public class UTackBuiltin extends Builtin {
         }
         return new BigValue(res);
       } else {
-        if (w.rank != 1) throw new NYIError(blame+": 1<≢⍴⍵", blame);
-        if (a.rank != 1) throw new DomainError(blame+": 1<≢⍴⍺", blame);
-        if (a.ia != w.shape[0]) throw new DomainError(blame+": (≢⍺) ≠ ≢⍵", blame);
+        if (w.rank != 1) throw new NYIError(blame+": 1<≢⍴𝕩", blame);
+        if (a.rank != 1) throw new DomainError(blame+": 1<≢⍴𝕨", blame);
+        if (a.ia != w.shape[0]) throw new DomainError(blame+": (≢𝕨) ≠ ≢𝕩", blame);
         BigInteger res = BigInteger.ZERO;
         for (int i = 0; i < a.ia; i++) {
           res = res.multiply(BigValue.bigint(a.get(i)));
@@ -76,7 +76,7 @@ public class UTackBuiltin extends Builtin {
         return new DoubleArr(r, sh);
       }
     } else {
-      if (a.ia != w.shape[0]) throw new DomainError(blame+": (≢⍺) ≠ ⊃⍴⍵", blame);
+      if (a.ia != w.shape[0]) throw new DomainError(blame+": (≢𝕨) ≠ ⊃⍴𝕩", blame);
       double[] d = w.asDoubleArr();
       double[] bases = a.asDoubleArr();
       int[] sh = new int[w.rank-1];

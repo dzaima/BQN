@@ -16,8 +16,8 @@ public class RBoxBuiltin extends Builtin {
   }
   
   public static Value on(Value a, Value w, Callable blame) {
-    if (w.rank > 1) throw new RankError("⍳: ⍵ had rank > 1", blame, w);
-    if (a.rank > 1) throw new RankError("⍳: ⍺ had rank > 1", blame, a);
+    if (w.rank > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, w);
+    if (a.rank > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, a);
     if (w.ia > 20 && a.ia > 20) {
       HashMap<Value, Integer> map = new HashMap<>();
       int ctr = 0;

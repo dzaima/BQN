@@ -75,7 +75,7 @@ public class Scope {
           } else {
             int[] args = val.asIntVec();
             if (args.length == 3) Num.setPrecision(args[0], args[1], args[2]);
-            else throw new DomainError("•pp expected either a scalar number or array of 3 integers as ⍵", val);
+            else throw new DomainError("•pp expected either a scalar number or array of 3 integers as 𝕩", val);
           }
           break;
         default:
@@ -403,8 +403,8 @@ public class Scope {
     }
     
     public Value call(Value a, Value w) {
-      if (a.rank != 1) throw new RankError("rank of ⍺ ≠ 1", this, a);
-      if (w.rank != 1) throw new RankError("rank of ⍵ ≠ 1", this, w);
+      if (a.rank != 1) throw new RankError("rank of 𝕨 ≠ 1", this, a);
+      if (w.rank != 1) throw new RankError("rank of 𝕩 ≠ 1", this, w);
       if (a.ia != w.ia) throw new LengthError("both sides lengths should match", this, w);
       StrMap map = new StrMap();
       for (int i = 0; i < a.ia; i++) {
@@ -656,7 +656,7 @@ public class Scope {
         while (Main.console.hasNext()) res.add(Main.toAPL(Main.console.nextLine()));
         return new HArr(res);
       }
-      throw new DomainError("•STDIN needs either ⍬ or a number as ⍵", this);
+      throw new DomainError("•STDIN needs either ⍬ or a number as 𝕩", this);
     }
   }
   
@@ -859,7 +859,7 @@ public class Scope {
     }
     public Value call(Value a, Value w) {
       int[] is = a.asIntVec();
-      if (is.length != 2) throw new DomainError("•DR expected ⍺ to have 2 items", this);
+      if (is.length != 2) throw new DomainError("•DR expected 𝕨 to have 2 items", this);
       int f = is[0];
       int t = is[1];
       if ((f==1 || f==3 || f==5)

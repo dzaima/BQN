@@ -27,7 +27,7 @@ public class ObverseBuiltin extends Dop {
     return wwf.call(a, w);
   }
   
-  public Value callInvA(Value aa, Value ww, Value a, Value w) { // fall-back to ⍶
+  public Value callInvA(Value aa, Value ww, Value a, Value w) { // fall-back to 𝔽
     Fun aaf = aa.asFun();
     return aaf.callInvA(a, w);
   }

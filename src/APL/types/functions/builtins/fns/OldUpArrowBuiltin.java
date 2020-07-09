@@ -27,7 +27,7 @@ public class OldUpArrowBuiltin extends Builtin {
   public Value call(Value a, Value w) {
     int[] gsh = a.asIntVec();
     if (gsh.length == 0) return w;
-    if (gsh.length > w.rank) throw new DomainError("↑: ≢⍺ should be less than ⍴⍴⍵ ("+gsh.length+" = ≢⍺; "+Main.formatAPL(w.shape)+" ≡ ⍴⍵)", this);
+    if (gsh.length > w.rank) throw new DomainError("↑: ≢𝕨 should be less than ⍴⍴𝕩 ("+gsh.length+" = ≢𝕨; "+Main.formatAPL(w.shape)+" ≡ ⍴𝕩)", this);
     int[] sh = new int[w.rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     System.arraycopy(w.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);
@@ -45,7 +45,7 @@ public class OldUpArrowBuiltin extends Builtin {
   // public Value call(Value a, Value w, DervDimFn dims) {
   //   int[] axV = a.asIntVec();
   //   int[] axK = dims.dims(w.rank);
-  //   if (axV.length != axK.length) throw new DomainError("↑: expected ⍺ and axis specification to have equal number of items (⍺≡"+Main.formatAPL(axV)+"; axis≡"+dims.format()+")", this, dims);
+  //   if (axV.length != axK.length) throw new DomainError("↑: expected 𝕨 and axis specification to have equal number of items (𝕨≡"+Main.formatAPL(axV)+"; axis≡"+dims.format()+")", this, dims);
   //   int[] sh = w.shape.clone();
   //   int[] off = new int[sh.length];
   //   for (int i = 0; i < axV.length; i++) {

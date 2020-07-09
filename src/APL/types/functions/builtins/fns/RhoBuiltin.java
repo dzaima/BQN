@@ -19,7 +19,7 @@ public class RhoBuiltin extends Builtin {
     return Main.toAPL(w.shape);
   }
   public Value call(Value a, Value w) {
-    if (a.rank > 1) throw new DomainError("⍴: multidimensional shape (⍴⍺ is "+Main.formatAPL(a.shape)+")", this, a);
+    if (a.rank > 1) throw new DomainError("⍴: multidimensional shape (⍴𝕨 is "+Main.formatAPL(a.shape)+")", this, a);
     int[] sh;
     int ia;
     Integer emptyPos = null;
@@ -47,7 +47,7 @@ public class RhoBuiltin extends Builtin {
         StringBuilder b = new StringBuilder();
         for (Value v : a) b.append(v).append(' ');
         b.deleteCharAt(b.length()-1);
-        throw new LengthError("⍴: empty dimension not perfect (⍺ ≡ "+b+"; "+(w.ia)+" = ≢⍵)", this, w);
+        throw new LengthError("⍴: empty dimension not perfect (𝕨 ≡ "+b+"; "+(w.ia)+" = ≢𝕩)", this, w);
       }
       sh[emptyPos] = w.ia/ia;
       return w.ofShape(sh);

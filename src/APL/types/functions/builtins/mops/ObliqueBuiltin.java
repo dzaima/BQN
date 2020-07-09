@@ -14,7 +14,7 @@ public class ObliqueBuiltin extends Mop {
   
   
   public Value call(Value f, Value w, DerivedMop derv) {
-    if (w.rank != 2) throw new DomainError("⍁: ⍵ must be a rank 2 array", this, w);
+    if (w.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, w);
     Fun ff = isFn(f);
     int[] sz = w.shape;
     int H = sz[0];
@@ -45,7 +45,7 @@ public class ObliqueBuiltin extends Mop {
       int rrank = res[0].rank; // required rank
       for (int i = 0; i < ram; i++) {
         Value v = ff.call(new DoubleArr(rows[i]));
-        if (v.rank != rrank) throw new RankError("⍁: ⍶ must return equal rank arrays", this, f);
+        if (v.rank != rrank) throw new RankError("⍁: 𝔽 must return equal rank arrays", this, f);
         res[i] = v;
       }
     } else {
@@ -67,7 +67,7 @@ public class ObliqueBuiltin extends Mop {
       int rrank = res[0].rank; // required rank
       for (int i = 0; i < ram; i++) {
         Value v = ff.call(new HArr(rows[i]));
-        if (v.rank != rrank) throw new DomainError("⍁: ⍶ must return equal rank arrays", this, f);
+        if (v.rank != rrank) throw new DomainError("⍁: 𝔽 must return equal rank arrays", this, f);
         res[i] = v;
       }
     }

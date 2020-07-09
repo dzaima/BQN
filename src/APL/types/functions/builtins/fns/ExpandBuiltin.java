@@ -10,8 +10,8 @@ public class ExpandBuiltin extends Builtin {
   }
   
   public Value call(Value a, Value w) {
-    if (a.rank != 1) throw new RankError("⍀: ⍺ bust be of rank 1", this, a);
-    if (w.rank >= 2) throw new NYIError("⍀: rank 2 or more ⍵", this, w);
+    if (a.rank != 1) throw new RankError("⍀: 𝕨 bust be of rank 1", this, a);
+    if (w.rank >= 2) throw new NYIError("⍀: rank 2 or more 𝕩", this, w);
     Value pr = null;
     int[] is = a.asIntArr(); // vectorness checked before
     int ram = 0;

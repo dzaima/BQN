@@ -158,7 +158,7 @@ public abstract class Fun extends Callable {
       
       if (w.scalar()) {
         return new Rank0Arr(allD(f, af, w.first()));
-      } else { // ⍺ ⍵¨
+      } else { // 𝕨 𝕩¨
         Value[] arr = new Value[w.ia];
         Iterator<Value> wi = w.iterator();
         for (int i = 0; i < w.ia; i++) {
@@ -168,7 +168,7 @@ public abstract class Fun extends Callable {
         
       }
     } else {
-      if (w.scalar()) { // ⍺¨ ⍵
+      if (w.scalar()) { // 𝕨¨ 𝕩
         Value wf = w.first();
         
         Value[] arr = new Value[a.ia];
@@ -178,7 +178,7 @@ public abstract class Fun extends Callable {
         }
         return new HArr(arr, a.shape);
         
-      } else { // ⍺ ¨ ⍵
+      } else { // 𝕨 ¨ 𝕩
         Arr.eqShapes(a, w);
         assert a.ia == w.ia;
         Value[] arr = new Value[a.ia];
@@ -295,7 +295,7 @@ public abstract class Fun extends Callable {
   
   protected Value numD(D_NN f, Value a, Value w) {
     if (a.scalar()) {
-      if (w.scalar()) { // ⊃⍺ ⊃⍵
+      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
         if (a instanceof Primitive & w instanceof Primitive) {
           boolean an = a instanceof Num;
           boolean wn = w instanceof Num;
@@ -307,7 +307,7 @@ public abstract class Fun extends Callable {
           throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
         } else return new Rank0Arr(numD(f, a.first(), w.first()));
         
-      } else { // ⍺¨ ⍵
+      } else { // 𝕨¨ 𝕩
         if (w.quickDoubleArr() && a instanceof Num) {
           return f.call(a.asDouble(), w.asDoubleArr(), w.shape);
         }
@@ -321,7 +321,7 @@ public abstract class Fun extends Callable {
         
       }
     } else {
-      if (w.scalar()) { // ⍺ ⍵¨
+      if (w.scalar()) { // 𝕨 𝕩¨
         if (a.quickDoubleArr() && w instanceof Num) {
           return f.call(a.asDoubleArr(), w.asDouble(), a.shape);
         }
@@ -334,7 +334,7 @@ public abstract class Fun extends Callable {
         
         return new HArr(vs, a.shape);
         
-      } else { // ⍺ ¨ ⍵
+      } else { // 𝕨 ¨ 𝕩
         Arr.eqShapes(a, w);
         
         if (a.quickDoubleArr() && w.quickDoubleArr()) {
@@ -354,7 +354,7 @@ public abstract class Fun extends Callable {
   }
   protected Value bitD(D_NN n, D_BB b, Value a, Value w) {
     if (a.scalar()) {
-      if (w.scalar()) { // ⊃⍺ ⊃⍵
+      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
         if (a instanceof Primitive & w instanceof Primitive) {
           boolean an = a instanceof Num;
           boolean wn = w instanceof Num;
@@ -364,7 +364,7 @@ public abstract class Fun extends Callable {
           throw new DomainError("calling a number-only function with "+a.humanType(true)+" and "+w.humanType(false), this);
         } else return new Rank0Arr(bitD(n, b, a.first(), w.first()));
         
-      } else { // ⍺¨ ⍵
+      } else { // 𝕨¨ 𝕩
         if (a instanceof Primitive) {
           if (w instanceof BitArr && Main.isBool(a)) {
             return b.call(Main.bool(a), (BitArr) w);
@@ -383,7 +383,7 @@ public abstract class Fun extends Callable {
         
       }
     } else {
-      if (w.scalar()) { // ⍺ ⍵¨
+      if (w.scalar()) { // 𝕨 𝕩¨
         if (w instanceof Primitive) {
           if (a instanceof BitArr && Main.isBool(w)) {
             return b.call((BitArr) a, Main.bool(w));
@@ -401,7 +401,7 @@ public abstract class Fun extends Callable {
         
         return new HArr(vs, a.shape);
         
-      } else { // ⍺ ¨ ⍵
+      } else { // 𝕨 ¨ 𝕩
         Arr.eqShapes(a, w);
         
         if (a instanceof BitArr && w instanceof BitArr) {
@@ -427,7 +427,7 @@ public abstract class Fun extends Callable {
   
   protected Value numChrD(D_NN n, D_CC c, D_AA def, Value a, Value w) {
     if (a.scalar()) {
-      if (w.scalar()) { // ⊃⍺ ⊃⍵
+      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
         if (a instanceof Primitive & w instanceof Primitive) {
           boolean an = a instanceof Num;
           boolean wn = w instanceof Num;
@@ -438,7 +438,7 @@ public abstract class Fun extends Callable {
           return def.call(a, w);
         } else return new Rank0Arr(numChrD(n, c, def, a.first(), w.first()));
         
-      } else { // ⍺¨ ⍵
+      } else { // 𝕨¨ 𝕩
         if (a instanceof Num && w.quickDoubleArr()) {
           return n.call(a.asDouble(), w.asDoubleArr(), w.shape);
         }
@@ -453,7 +453,7 @@ public abstract class Fun extends Callable {
         
       }
     } else {
-      if (w.scalar()) { // ⍺ ⍵¨
+      if (w.scalar()) { // 𝕨 𝕩¨
         if (w instanceof Num && a.quickDoubleArr()) {
           return n.call(a.asDoubleArr(), w.asDouble(), a.shape);
         }
@@ -465,7 +465,7 @@ public abstract class Fun extends Callable {
         }
         
         return new HArr(vs, a.shape);
-      } else { // ⍺ ¨ ⍵
+      } else { // 𝕨 ¨ 𝕩
         Arr.eqShapes(a, w);
         
         if (a.quickDoubleArr() && w.quickDoubleArr()) {
@@ -485,7 +485,7 @@ public abstract class Fun extends Callable {
   }
   protected Value ncbaD(D_NN n, D_BB b, D_CC c, D_AA def, Value a, Value w) {
     if (a.scalar()) {
-      if (w.scalar()) { // ⊃⍺ ⊃⍵
+      if (w.scalar()) { // ⊃𝕨 ⊃𝕩
         if (a instanceof Primitive & w instanceof Primitive) {
           boolean an = a instanceof Num;
           boolean wn = w instanceof Num;
@@ -496,7 +496,7 @@ public abstract class Fun extends Callable {
           else return def.call(a, w);
         } else return new Rank0Arr(ncbaD(n, b, c, def, a.first(), w.first()));
         
-      } else { // ⍺¨ ⍵
+      } else { // 𝕨¨ 𝕩
         if (a instanceof Primitive) {
           if (w instanceof BitArr && Main.isBool(a)) {
             return b.call(Main.bool(a), (BitArr) w);
@@ -515,7 +515,7 @@ public abstract class Fun extends Callable {
         return new HArr(vs, w.shape);
       }
     } else {
-      if (w.scalar()) { // ⍺ ⍵¨
+      if (w.scalar()) { // 𝕨 𝕩¨
         if (w instanceof Primitive) {
           if (a instanceof BitArr && Main.isBool(w)) {
             return b.call((BitArr) a, Main.bool(w));
@@ -533,7 +533,7 @@ public abstract class Fun extends Callable {
         
         return new HArr(vs, a.shape);
         
-      } else { // ⍺ ¨ ⍵
+      } else { // 𝕨 ¨ 𝕩
         Arr.eqShapes(a, w);
         
         if (a instanceof BitArr && w instanceof BitArr) {
