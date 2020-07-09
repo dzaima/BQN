@@ -35,6 +35,6 @@ public class Pick extends Settable {
   
   @Override
   public String toString() {
-    return var.name+"["+ val +"]";
+    return var.name+"["+val+"]";
   }
 }

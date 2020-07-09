@@ -53,7 +53,7 @@ public abstract class Value extends Obj implements Iterable<Value> {
     if ((l instanceof Char || lA) && r instanceof Num         ) return 1;
     if (l instanceof BigValue     && r instanceof BigValue    ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
     if (!lA && !rA) {
-      throw new DomainError("Failed to compare "+ l +" and "+r, r);
+      throw new DomainError("Failed to compare "+l+" and "+r, r);
     }
     if (!lA) return -1;
     if (!rA) return  1;

@@ -260,11 +260,11 @@ public class Comp {
               s.push(new Quad(sc).get());
               break;
             default:
-              throw new InternalError("Unknown special "+ bc[i-1]);
+              throw new InternalError("Unknown special "+bc[i-1]);
           }
           break;
         }
-        default: throw new InternalError("Unknown bytecode "+ bc[pi]);
+        default: throw new InternalError("Unknown bytecode "+bc[pi]);
       }
     }
     return (Value) s.peek();

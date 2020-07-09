@@ -22,7 +22,7 @@ public class SemiUBBuiltin extends Builtin {
       return new DoubleArr(new double[]{((Num) w).num, ((Num) x).num});
     }
     if (w instanceof Char && x instanceof Char) {
-      return new ChrArr(((Char) w).chr +""+ ((Char) x).chr);
+      return new ChrArr(((Char) w).chr+""+((Char) x).chr);
     }
     return Arr.create(new Value[]{w, x});
   }

@@ -17,7 +17,7 @@ public class GroupBuiltin extends Builtin {
     double[] ds = new double[2];
     int sz;
     void add(double i) {
-      if (sz>= ds.length) {
+      if (sz >= ds.length) {
         ds = Arrays.copyOf(ds, ds.length*2);
       }
       ds[sz] = i;
@@ -26,7 +26,7 @@ public class GroupBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    if (x.rank != 1) throw new DomainError("⊔: rank of 𝕩 should be 1 (was "+ x.rank+")", this, x);
+    if (x.rank != 1) throw new DomainError("⊔: rank of 𝕩 should be 1 (was "+x.rank+")", this, x);
     int[] xi = x.asIntVec();
     int sz = 0;
     for (int d : xi) sz = Math.max(sz, d);

@@ -100,7 +100,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     return x;
   }
   public static int fromShapeChk(int[] sh, Value pos, Callable blame) {
-    if (pos.rank > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+ Main.formatAPL(pos.shape)+")", blame);
+    if (pos.rank > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.formatAPL(pos.shape)+")", blame);
     if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
     int x = 0;
     double[] ds = pos.asDoubleArr();

@@ -96,7 +96,7 @@ public class LBoxUBBuiltin extends Builtin {
     if (a instanceof Primitive) throw new DomainError(this+": indices must all be vectors when nesting (found "+a+")", this);
     if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {
       if (a.rank != v.rank) throw new RankError(this+": shapes of nested indices and values must be equal (ranks "+a.rank+" vs "+v.rank + ")", this);
-      if (!Arrays.equals(a.shape, v.shape)) throw new LengthError(this+": shapes of nested indices and values must be equal ("+ Main.formatAPL(a.shape) + " vs " + Main.formatAPL(v.shape) + ")", this);
+      if (!Arrays.equals(a.shape, v.shape)) throw new LengthError(this+": shapes of nested indices and values must be equal ("+Main.formatAPL(a.shape)+" vs "+Main.formatAPL(v.shape)+")", this);
       for (int i = 0; i < a.ia; i++) underWSub(v.get(i), a.get(i), vs, shape);
     } else {
       vs[Indexer.vec(a, shape, this)] = v;

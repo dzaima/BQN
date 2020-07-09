@@ -20,7 +20,7 @@ public class FindBuiltin extends Builtin {
       if (w instanceof BitArr && x instanceof BitArr) {
         long[] ab = ((BitArr) w).arr;
         long[] wb = ((BitArr) x).arr;
-        w: for (int ir = 0; ir < x.ia- w.ia+1; ir++) {
+        w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
             int iw = ia + ir;
             long la = ab[ia>>6] >> (ia & 63);

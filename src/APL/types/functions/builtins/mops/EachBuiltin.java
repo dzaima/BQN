@@ -39,7 +39,7 @@ public class EachBuiltin extends Mop {
     }
     
     int mr = Math.min(w.shape.length, x.shape.length);
-    if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
+    if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
     
     if (w.shape.length == x.shape.length) {
       Value[] n = new Value[x.ia];
@@ -98,7 +98,7 @@ public class EachBuiltin extends Mop {
   }
   
   public static Value underW(Fun f, Obj o, Value w, Value x, Callable blame) {
-    if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
+    if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
     int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
     if (w.rank==0 && !(w instanceof Primitive)) w = new Rank0Arr(w.first()); // abuse that get doesn't check indexes for simple scalar extension

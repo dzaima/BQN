@@ -32,7 +32,7 @@ public class SettableArr extends Settable {
   
   @Override
   public String toString() {
-    if (Main.debug) return "vararr:"+ Arrays.toString(arr);
+    if (Main.debug) return "vararr:"+Arrays.toString(arr);
     return get().toString();
   }
   

@@ -25,7 +25,7 @@ public class RShoeBuiltin extends Builtin {
       if (x.rank != 1) throw new RankError("array rank was "+x.rank+", tried to get item at rank 0", this, x);
       if (x.ia == 0) throw new LengthError("⊃ on array with 0 elements", this, x);
       int p = w.asInt();
-      if (p >= x.ia) throw new DomainError("Tried to access item at position "+w+" while shape was "+ Main.formatAPL(x.shape), this);
+      if (p >= x.ia) throw new DomainError("Tried to access item at position "+w+" while shape was "+Main.formatAPL(x.shape), this);
       return x.get(p);
     }
     for (Value v : w) {

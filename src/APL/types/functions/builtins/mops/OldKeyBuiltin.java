@@ -58,7 +58,7 @@ public class OldKeyBuiltin extends Mop {
       Fun ff = (Fun) f;
       if (!Arrays.equals(w.shape, x.shape)) {
         if (w.rank != x.rank) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.rank+" vs "+x.rank+")", derv, x);
-        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+ Main.formatAPL(x.shape)+")", derv, x);
+        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
       }
       HashMap<Value, ArrayList<Value>> vals = new HashMap<>();
       ArrayList<Value> order = new ArrayList<>();

@@ -113,7 +113,7 @@ public class RhoBuiltin extends Builtin {
     }
     int[] sh = w.asIntVec();
     int am = Arr.prod(sh);
-    if (am > x.ia) throw new DomainError("⌾("+ Main.formatAPL(sh)+"⍴) applied on array with less items than "+am, this);
+    if (am > x.ia) throw new DomainError("⌾("+Main.formatAPL(sh)+"⍴) applied on array with less items than "+am, this);
     if (!Arrays.equals(sh, v.shape)) throw new DomainError("⌾⍴ expected equal amount of output & output items", this);
     Value[] vs = new Value[x.ia];
     System.arraycopy(v.values(), 0, vs, 0, am);

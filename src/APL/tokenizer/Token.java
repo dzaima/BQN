@@ -17,7 +17,7 @@ public abstract class Token implements Tokenable {
     return this;
   }
   public String toTree(String p) {
-    return p + this.getClass().getCanonicalName() + ' '+ spos + '-' + epos + '\n';
+    return p + this.getClass().getCanonicalName()+" "+spos+"-"+epos+"\n";
   }
   public abstract String toRepr();
   

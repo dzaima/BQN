@@ -26,7 +26,7 @@ public class UDBuiltin extends Builtin {
       }
     }
     if (Main.vind) { // •VI←1
-      if (x.rank != 1) throw new DomainError("↕: 𝕩 must be a vector ("+ Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, x);
+      if (x.rank != 1) throw new DomainError("↕: 𝕩 must be a vector ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, x);
       int dim = x.ia;
       int[] shape = x.asIntVec();
       int prod = Arr.prod(shape);

@@ -30,7 +30,7 @@ public class NCellBuiltin extends Dop {
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
     Fun ff = f.asFun();
     Value ra = g.asFun().call(w, x);
-    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+ Main.formatAPL(ra.shape), this, g);
+    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.rank);
     int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.rank);
