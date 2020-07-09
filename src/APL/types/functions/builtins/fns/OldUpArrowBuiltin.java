@@ -24,22 +24,22 @@ public class OldUpArrowBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    int[] gsh = a.asIntVec();
-    if (gsh.length == 0) return w;
-    if (gsh.length > w.rank) throw new DomainError("↑: ≢𝕨 should be less than ≠≢𝕩 ("+gsh.length+" = ≠𝕨; "+Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this);
-    int[] sh = new int[w.rank];
+  public Value call(Value w, Value x) {
+    int[] gsh = w.asIntVec();
+    if (gsh.length == 0) return x;
+    if (gsh.length > x.rank) throw new DomainError("↑: ≢𝕨 should be less than ≠≢𝕩 ("+gsh.length+" = ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
+    int[] sh = new int[x.rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
-    System.arraycopy(w.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);
+    System.arraycopy(x.shape, gsh.length, sh, gsh.length, sh.length - gsh.length);
     int[] off = new int[sh.length];
     for (int i = 0; i < gsh.length; i++) {
       int d = gsh[i];
       if (d < 0) {
         sh[i] = -d;
-        off[i] = w.shape[i]-sh[i];
+        off[i] = x.shape[i]-sh[i];
       } else off[i] = 0;
     }
-    return UpArrowBuiltin.on(sh, off, w, this);
+    return UpArrowBuiltin.on(sh, off, x, this);
   }
   
   // public Value call(Value a, Value w, DervDimFn dims) {

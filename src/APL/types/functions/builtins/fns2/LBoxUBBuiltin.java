@@ -29,8 +29,8 @@ public class LBoxUBBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    return on(a, w, this);
+  public Value call(Value w, Value x) {
+    return on(w, x, this);
   }
   
   public static Value on(Value a, Value w, Callable blame) {

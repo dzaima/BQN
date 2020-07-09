@@ -9,8 +9,8 @@ public class LaminateBuiltin extends Builtin {
   }
   
   private static final int[] MSH = new int[]{2};
-  public Value call(Value a, Value w) {
-    return GTBuiltin.merge(new Value[]{a, w}, MSH, this);
+  public Value call(Value w, Value x) {
+    return GTBuiltin.merge(new Value[]{w, x}, MSH, this);
   }
   
   public Value call(Value x) {

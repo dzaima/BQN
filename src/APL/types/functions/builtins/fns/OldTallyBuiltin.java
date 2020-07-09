@@ -13,7 +13,7 @@ public class OldTallyBuiltin extends Builtin {
     if (x.rank==0) return Num.ONE;
     return Num.of(x.shape[0]);
   }
-  public Value call(Value a, Value w) {
-    return a.equals(w)? Num.ZERO : Num.ONE;
+  public Value call(Value w, Value x) {
+    return w.equals(x)? Num.ZERO : Num.ONE;
   }
 }

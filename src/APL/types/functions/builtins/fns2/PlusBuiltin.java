@@ -40,8 +40,8 @@ public class PlusBuiltin extends Builtin {
       return new BigValue(a.i.add(w.i));
     }
   };
-  public Value call(Value a, Value w) {
-    return numD(DNF, a, w);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   public Value callInv(Value w) { return call(w); }
   public Value callInvW(Value a, Value w) {

@@ -14,8 +14,8 @@ public class DerivedMop extends Fun {
   public Value call(Value x) {
     return op.call(aa, x, this);
   }
-  public Value call(Value a, Value w) {
-    return op.call(aa, a, w, this);
+  public Value call(Value w, Value x) {
+    return op.call(aa, w, x, this);
   }
   public Value callInv(Value w) {
     return op.callInv(aa, w);

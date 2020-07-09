@@ -9,20 +9,20 @@ import java.util.*;
 
 public class LShoeStileBuiltin extends Builtin {
   
-  @Override public Value call(Value a, Value w) {
+  @Override public Value call(Value w, Value x) {
     HashMap<Value, Integer> counts = new HashMap<>();
-    for (Value ca : a) counts.put(ca, 0);
-    for (Value cw : w) {
+    for (Value ca : w) counts.put(ca, 0);
+    for (Value cw : x) {
       Integer pv = counts.get(cw);
       if (pv != null) counts.put(cw, pv + 1);
     }
-    double[] res = new double[a.ia];
+    double[] res = new double[w.ia];
     int i = 0;
-    for (Value ca : a) {
+    for (Value ca : w) {
       res[i] = counts.get(ca);
       i++;
     }
-    return new DoubleArr(res, a.shape);
+    return new DoubleArr(res, w.shape);
   }
   
   @Override public Value call(Value x) {

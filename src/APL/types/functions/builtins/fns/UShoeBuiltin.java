@@ -12,10 +12,10 @@ public class UShoeBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
+  public Value call(Value w, Value x) {
     var res = new ArrayList<Value>();
-    HashSet<Value> ws = new HashSet<>(Arrays.asList(w.values()));
-    for (Value v : a) if (ws.contains(v)) res.add(v);
+    HashSet<Value> ws = new HashSet<>(Arrays.asList(x.values()));
+    for (Value v : w) if (ws.contains(v)) res.add(v);
     return Arr.create(res);
   }
 }

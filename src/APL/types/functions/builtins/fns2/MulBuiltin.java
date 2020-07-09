@@ -67,8 +67,8 @@ public class MulBuiltin extends Builtin {
       return bc.finish();
     }
   };
-  public Value call(Value a, Value w) {
-    return bitD(DNF, DBF, a, w);
+  public Value call(Value w, Value x) {
+    return bitD(DNF, DBF, w, x);
   }
   
   public Value callInvW(Value a, Value w) {

@@ -10,8 +10,8 @@ public class RShoeUBBuiltin extends Builtin {
     return "⊇";
   }
   
-  public Value call(Value a, Value w) {
-    return LBoxUBBuiltin.on(a, w, this);
+  public Value call(Value w, Value x) {
+    return LBoxUBBuiltin.on(w, x, this);
   }
   
   public Value underW(Value o, Value a, Value w) {

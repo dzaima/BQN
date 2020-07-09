@@ -57,7 +57,7 @@ public class NotBuiltin extends Builtin {
     return bc.finish();
   }
   
-  public Value call(Value a, Value w) {
-    return numD(PlusBuiltin.DNF, numD(MinusBuiltin.DNF, a, w), Num.ONE);
+  public Value call(Value w, Value x) {
+    return numD(PlusBuiltin.DNF, numD(MinusBuiltin.DNF, w, x), Num.ONE);
   }
 }

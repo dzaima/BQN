@@ -68,8 +68,8 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
       return new Num(res);
     }
   };
-  public Value call(Value a0, Value w0) {
-    return numD(DNF, a0, w0);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   
   @Override public Value callInvW(Value a, Value w) {

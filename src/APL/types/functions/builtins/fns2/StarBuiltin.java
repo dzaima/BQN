@@ -50,8 +50,8 @@ public class StarBuiltin extends Builtin {
       return new BigValue(a.i.pow(w.i.intValue()));
     }
   };
-  public Value call(Value a, Value w) {
-    return numD(DNF, a, w);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   public Value callInvW(Value a, Value w) {
     return numD(LogBuiltin.DNF, a, w);

@@ -48,8 +48,8 @@ public class RootBuiltin extends Builtin {
       for (int i = 0; i < a.length; i++) res[i] = Math.pow(w[i], 1/a[i]);
     }
   };
-  public Value call(Value a0, Value w0) {
-    return numD(DNF, a0, w0);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   
   public Value callInvW(Value a, Value w) {

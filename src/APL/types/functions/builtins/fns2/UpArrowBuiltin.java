@@ -35,20 +35,20 @@ public class UpArrowBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    int[] gsh = a.asIntVec();
-    if (gsh.length == 0) return w;
-    int rank = Math.max(w.rank, gsh.length);
+  public Value call(Value w, Value x) {
+    int[] gsh = w.asIntVec();
+    if (gsh.length == 0) return x;
+    int rank = Math.max(x.rank, gsh.length);
     int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     int rem = rank - gsh.length;
-    if (rem > 0) System.arraycopy(w.shape, gsh.length, sh, gsh.length, rem);
-    int diff = rank - w.rank;
+    if (rem > 0) System.arraycopy(x.shape, gsh.length, sh, gsh.length, rem);
+    int diff = rank - x.rank;
     boolean proto = false;
     int[] off = new int[rank];
     for (int i = 0; i < gsh.length; i++) {
       int d = gsh[i];
-      int s = i < diff ? 1 : w.shape[i - diff];
+      int s = i < diff ? 1 : x.shape[i - diff];
       if (d > s) proto = true;
       if (d < 0) {
         sh[i] = -d;
@@ -58,7 +58,7 @@ public class UpArrowBuiltin extends Builtin {
     if (proto) {
       throw new NYIError("No overtake yet", this);
     }
-    return on(sh, off, w, this);
+    return on(sh, off, x, this);
   }
   
   public static Value on(int[] sh, int[] off, Value w, Callable blame) {

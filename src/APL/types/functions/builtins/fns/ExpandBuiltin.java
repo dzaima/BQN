@@ -4,34 +4,34 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
-public class ExpandBuiltin extends Builtin {
+public class  ExpandBuiltin extends Builtin {
   public String repr() {
     return "⍀";
   }
   
-  public Value call(Value a, Value w) {
-    if (a.rank != 1) throw new RankError("⍀: 𝕨 bust be of rank 1", this, a);
-    if (w.rank >= 2) throw new NYIError("⍀: rank 2 or more 𝕩", this, w);
+  public Value call(Value w, Value x) {
+    if (w.rank != 1) throw new RankError("⍀: 𝕨 bust be of rank 1", this, w);
+    if (x.rank >= 2) throw new NYIError("⍀: rank 2 or more 𝕩", this, x);
     Value pr = null;
-    int[] is = a.asIntArr(); // vectorness checked before
+    int[] is = w.asIntArr(); // vectorness checked before
     int ram = 0;
     int iam = 0;
     for (int v : is) {
       ram+= Math.max(1, Math.abs(v));
       iam+= v>0? 1 : 0;
     }
-    if (iam != w.ia) throw new DomainError("⍀: required input amount ("+iam+") not equal to given ("+w.ia+")", this);
+    if (iam != x.ia) throw new DomainError("⍀: required input amount ("+iam+") not equal to given ("+x.ia+")", this);
     Value[] res = new Value[ram];
     int rp = 0;
     int ip = 0;
     
     for (int v : is) {
       if (v <= 0) {
-        if (pr == null) pr = w.safePrototype();
+        if (pr == null) pr = x.safePrototype();
         v = Math.max(1, -v);
         for (int i = 0; i < v; i++) res[rp++] = pr;
       } else {
-        Value c = w.get(ip);
+        Value c = x.get(ip);
         for (int i = 0; i < v; i++) {
           res[rp++] = c;
         }

@@ -31,11 +31,11 @@ public class RBoxUBBuiltin extends Builtin {
     return new DoubleArr(res);
   }
   
-  public Value call(Value a, Value w) {
-    if (w.rank!=1 || a.rank!=1) throw new NYIError("⊒ on rank≠1", this, a);
+  public Value call(Value w, Value x) {
+    if (x.rank!=1 || w.rank!=1) throw new NYIError("⊒ on rank≠1", this, w);
     HashMap<Value, MutIA> vs = new HashMap<>();
     int i = 0;
-    for (Value v : a) {
+    for (Value v : w) {
       MutIA c = vs.get(v);
       if (c==null) {
         c = new MutIA();
@@ -44,11 +44,11 @@ public class RBoxUBBuiltin extends Builtin {
       c.add(i);
       i++;
     }
-    double[] res = new double[w.ia];
+    double[] res = new double[x.ia];
     i=0;
-    for (Value v : w) {
+    for (Value v : x) {
       MutIA c = vs.get(v);
-      if (c==null || c.pos >= c.sz) res[i] = a.ia;
+      if (c==null || c.pos >= c.sz) res[i] = w.ia;
       else res[i] = c.is[c.pos++];
       i++;
     }

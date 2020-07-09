@@ -35,24 +35,24 @@ public class DownArrowBuiltin extends Builtin {
     return new HArr(res);
   }
   
-  public Value call(Value a, Value w) {
-    int[] gsh = a.asIntVec();
-    if (gsh.length == 0) return w;
-    int rank = Math.max(w.rank, gsh.length);
+  public Value call(Value w, Value x) {
+    int[] gsh = w.asIntVec();
+    if (gsh.length == 0) return x;
+    int rank = Math.max(x.rank, gsh.length);
     int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     int rem = rank - gsh.length;
-    if (rem > 0) System.arraycopy(w.shape, gsh.length, sh, gsh.length, rem);
-    int diff = rank - w.rank;
+    if (rem > 0) System.arraycopy(x.shape, gsh.length, sh, gsh.length, rem);
+    int diff = rank - x.rank;
     int[] off = new int[sh.length];
     for (int i = 0; i < gsh.length; i++) {
       int am = gsh[i];
-      int s = i < diff ? 1 : w.shape[i - diff];
+      int s = i < diff ? 1 : x.shape[i - diff];
       sh[i] = s - Math.abs(am);
       if (sh[i] < 0) sh[i] = 0;
       else if (am > 0) off[i] = am;
     }
-    return UpArrowBuiltin.on(sh, off, w, this);
+    return UpArrowBuiltin.on(sh, off, x, this);
   }
   
   public Value underW(Value o, Value a, Value w) {

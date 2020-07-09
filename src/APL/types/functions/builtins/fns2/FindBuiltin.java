@@ -13,15 +13,15 @@ public class FindBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    if (a.rank != w.rank) throw new RankError("⍷: argument ranks should be equal ("+a.rank+" ≠ "+w.rank+")", this, w);
-    BitArr.BC bc = new BitArr.BC(w.shape);
-    if (a.rank == 1) {
-      if (a instanceof BitArr && w instanceof BitArr) {
-        long[] ab = ((BitArr) a).arr;
-        long[] wb = ((BitArr) w).arr;
-        w: for (int ir = 0; ir < w.ia-a.ia+1; ir++) {
-          for (int ia = 0; ia < a.ia; ia++) {
+  public Value call(Value w, Value x) {
+    if (w.rank != x.rank) throw new RankError("⍷: argument ranks should be equal ("+w.rank+" ≠ "+x.rank+")", this, x);
+    BitArr.BC bc = new BitArr.BC(x.shape);
+    if (w.rank == 1) {
+      if (w instanceof BitArr && x instanceof BitArr) {
+        long[] ab = ((BitArr) w).arr;
+        long[] wb = ((BitArr) x).arr;
+        w: for (int ir = 0; ir < x.ia- w.ia+1; ir++) {
+          for (int ia = 0; ia < w.ia; ia++) {
             int iw = ia + ir;
             long la = ab[ia>>6] >> (ia & 63);
             long lw = wb[iw>>6] >> (iw & 63);
@@ -29,32 +29,32 @@ public class FindBuiltin extends Builtin {
           }
           bc.set(ir);
         }
-      } else if (a.quickDoubleArr() && w.quickDoubleArr()) {
-        double[] ad = a.asDoubleArr();
-        double[] wd = w.asDoubleArr();
-        w: for (int ir = 0; ir < w.ia-a.ia+1; ir++) {
-          for (int ia = 0; ia < a.ia; ia++) {
+      } else if (w.quickDoubleArr() && x.quickDoubleArr()) {
+        double[] ad = w.asDoubleArr();
+        double[] wd = x.asDoubleArr();
+        w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
+          for (int ia = 0; ia < w.ia; ia++) {
             if (ad[ia] != wd[ia + ir]) continue w;
           }
           bc.set(ir);
         }
       } else {
-        w: for (int ir = 0; ir < w.ia-a.ia+1; ir++) {
-          for (int ia = 0; ia < a.ia; ia++) {
-            if (!a.get(ia).equals(w.get(ia + ir))) continue w;
+        w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
+          for (int ia = 0; ia < w.ia; ia++) {
+            if (!w.get(ia).equals(x.get(ia + ir))) continue w;
           }
           bc.set(ir);
         }
       }
     } else {
-      Indexer ind = new Indexer(Indexer.add(Indexer.sub(w.shape, a.shape), 1));
+      Indexer ind = new Indexer(Indexer.add(Indexer.sub(x.shape, w.shape), 1));
       w: for (int[] inW : ind) {
-        for (int[] inA : new Indexer(a.shape)) {
-          Value vA = a.simpleAt(inA);
-          Value vW = w.simpleAt(Indexer.add(inA, inW));
+        for (int[] inA : new Indexer(w.shape)) {
+          Value vA = w.simpleAt(inA);
+          Value vW = x.simpleAt(Indexer.add(inA, inW));
           if (!vA.equals(vW)) continue w;
         }
-        bc.set(Indexer.fromShape(w.shape, inW));
+        bc.set(Indexer.fromShape(x.shape, inW));
       }
     }
     return bc.finish();

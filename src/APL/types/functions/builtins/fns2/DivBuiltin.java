@@ -43,8 +43,8 @@ public class DivBuiltin extends Builtin {
       return new BigValue(a.i.divide(w.i));
     }
   };
-  public Value call(Value a0, Value w0) {
-    return numD(DNF, a0, w0);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   
   public Value callInv(Value w) { return call(w); }

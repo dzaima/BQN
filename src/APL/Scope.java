@@ -154,15 +154,15 @@ public class Scope {
             return "•COMP";
           }
           
-          public Value call(Value a, Value w) {
-            if (w.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, w);
-            char type = a.ia==0?0: ((Char) a.get(0)).chr;
-            if (a.ia!=2 && type!='a') throw new DomainError("𝕨 of •COMP must be an array of type and immediateness, or 'a'");
-            boolean imm = type=='a' || Main.bool(a.get(1));
-            Value bc = w.get(0);
-            Value obj = w.get(1);
-            Value str = w.get(2);
-            Value dfn = w.get(3);
+          public Value call(Value w, Value x) {
+            if (x.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, x);
+            char type = w.ia==0?0: ((Char) w.get(0)).chr;
+            if (w.ia!=2 && type!='a') throw new DomainError("𝕨 of •COMP must be an array of type and immediateness, or 'a'");
+            boolean imm = type=='a' || Main.bool(w.get(1));
+            Value bc = x.get(0);
+            Value obj = x.get(1);
+            Value str = x.get(2);
+            Value dfn = x.get(3);
             
             byte[] bcp = new byte[bc.ia];
             for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bc.get(i).asInt();
@@ -289,14 +289,14 @@ public class Scope {
     public Value call(Value x) {
       return call(Num.ONE, x);
     }
-    public Value call(Value a, Value w) {
-      int[] options = a.asIntVec();
+    public Value call(Value w, Value x) {
+      int[] options = w.asIntVec();
       int n = options[0];
       
       boolean separate = false;
       if (options.length >= 2) separate = options[1]==1;
       
-      String test = w.asString();
+      String test = x.asString();
       
       Comp testCompiled = Comp.comp(Tokenizer.tokenize(test));
       
@@ -402,13 +402,13 @@ public class Scope {
       return map;
     }
     
-    public Value call(Value a, Value w) {
-      if (a.rank != 1) throw new RankError("rank of 𝕨 ≠ 1", this, a);
-      if (w.rank != 1) throw new RankError("rank of 𝕩 ≠ 1", this, w);
-      if (a.ia != w.ia) throw new LengthError("both sides lengths should match", this, w);
+    public Value call(Value w, Value x) {
+      if (w.rank != 1) throw new RankError("rank of 𝕨 ≠ 1", this, w);
+      if (x.rank != 1) throw new RankError("rank of 𝕩 ≠ 1", this, x);
+      if (w.ia != x.ia) throw new LengthError("both sides lengths should match", this, x);
       StrMap map = new StrMap();
-      for (int i = 0; i < a.ia; i++) {
-        map.set(a.get(i), w.get(i));
+      for (int i = 0; i < w.ia; i++) {
+        map.set(w.get(i), x.get(i));
       }
       return map;
     }
@@ -446,10 +446,10 @@ public class Scope {
       return call(EmptyArr.SHAPE0S, x);
     }
   
-    public Value call(Value a, Value w) {
-      String path = w.asString();
-      if (a.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(a.shape)+")");
-      return Scope.this.sys.execFile(path, a.values());
+    public Value call(Value w, Value x) {
+      String path = x.asString();
+      if (w.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
+      return Scope.this.sys.execFile(path, w.values());
     }
   }
   private static class Lns extends Builtin {
@@ -473,12 +473,12 @@ public class Scope {
       return def;
     }
     
-    public Value call(Value a, Value w) {
-      if (a instanceof APLMap) {
+    public Value call(Value w, Value x) {
+      if (w instanceof APLMap) {
         try {
-          URL url = new URL(w.asString());
+          URL url = new URL(x.asString());
           HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-          APLMap m = (APLMap) a;
+          APLMap m = (APLMap) w;
           String content = get(m, "content", "");
           conn.setRequestMethod(get(m, "method", "POST"));
           
@@ -521,14 +521,14 @@ public class Scope {
           throw new DomainError("IOException: "+e.getMessage(), this);
         }
       } else {
-        String p = a.asString();
-        String s = w.asString();
+        String p = w.asString();
+        String s = x.asString();
         try (PrintWriter pw = new PrintWriter(p)) {
           pw.write(s);
         } catch (FileNotFoundException e) {
           throw new DomainError("File "+p+" not found: "+e.getMessage(), this);
         }
-        return w;
+        return x;
       }
     }
   }
@@ -543,8 +543,8 @@ public class Scope {
       return exec(x, null, null, false);
     }
     
-    public Value call(Value a, Value w) {
-      APLMap m = (APLMap) a;
+    public Value call(Value w, Value x) {
+      APLMap m = (APLMap) w;
       
       File dir = null;
       Value diro = m.getRaw("dir");
@@ -567,7 +567,7 @@ public class Scope {
       Value rawo = m.getRaw("raw");
       if (rawo != Null.NULL) raw = Main.bool(rawo);
       
-      return exec(w, dir, inp, raw);
+      return exec(x, dir, inp, raw);
     }
     
     public Value exec(Value w, File f, byte[] inp, boolean raw) {
@@ -700,8 +700,8 @@ public class Scope {
       return p;
     }
   
-    public Value call(Value a, Value w) {
-      Pr p = pr(a, w); p.start();
+    public Value call(Value w, Value x) {
+      Pr p = pr(w, x); p.start();
       long sns = System.nanoTime();
       Value res = p.c.exec(sc);
       long ens = System.nanoTime();

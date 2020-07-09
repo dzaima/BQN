@@ -19,7 +19,7 @@ public class CommaBarBuiltin extends Builtin {
     return x.ofShape(nsh);
   }
   
-  public Value call(Value a, Value w) {
-    return JoinBuiltin.cat(a, w, 0, this);
+  public Value call(Value w, Value x) {
+    return JoinBuiltin.cat(w, x, 0, this);
   }
 }

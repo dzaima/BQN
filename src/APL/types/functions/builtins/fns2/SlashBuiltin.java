@@ -95,8 +95,8 @@ public class SlashBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    return replicate(a, w, this);
+  public Value call(Value w, Value x) {
+    return replicate(w, x, this);
   }
   
   

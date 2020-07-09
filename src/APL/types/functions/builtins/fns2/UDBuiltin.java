@@ -63,7 +63,7 @@ public class UDBuiltin extends Builtin {
     }
   }
   
-  public Value call(Value a, Value w) {
-    throw new NYIError("dyadic ↕", this, a);
+  public Value call(Value w, Value x) {
+    throw new NYIError("dyadic ↕", this, w);
   }
 }

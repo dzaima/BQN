@@ -18,9 +18,9 @@ public class DShoeBuiltin extends Builtin {
     return Arr.create(res.toArray(new Value[0]));
   }
   
-  public Value call(Value a, Value w) {
-    var m = new LinkedHashSet<Value>(Arrays.asList(a.values()));
-    m.addAll(Arrays.asList(w.values()));
+  public Value call(Value w, Value x) {
+    var m = new LinkedHashSet<Value>(Arrays.asList(w.values()));
+    m.addAll(Arrays.asList(x.values()));
     return Arr.create(m.toArray(new Value[0]));
   }
 }

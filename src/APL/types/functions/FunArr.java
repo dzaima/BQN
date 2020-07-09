@@ -29,10 +29,10 @@ public class FunArr extends Fun {
     return Arr.create(vs);
   }
   
-  @Override public Value call(Value a, Value w) {
+  @Override public Value call(Value w, Value x) {
     Value[] vs = new Value[os.length];
     for (int i = 0; i < os.length; i++) {
-      vs[i] = ((Fun) os[i]).call(a, w);
+      vs[i] = ((Fun) os[i]).call(w, x);
     }
     return Arr.create(vs);
   }

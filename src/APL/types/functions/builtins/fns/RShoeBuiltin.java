@@ -16,22 +16,22 @@ public class RShoeBuiltin extends Builtin {
     else return x.first();
   }
   
-  public Value call(Value a, Value w) {
-    if (w instanceof APLMap) {
-      APLMap map = (APLMap) w;
-      return map.getRaw(a);
+  public Value call(Value w, Value x) {
+    if (x instanceof APLMap) {
+      APLMap map = (APLMap) x;
+      return map.getRaw(w);
     }
-    if (a instanceof Num) {
-      if (w.rank != 1) throw new RankError("array rank was "+w.rank+", tried to get item at rank 0", this, w);
-      if (w.ia == 0) throw new LengthError("⊃ on array with 0 elements", this, w);
-      int p = a.asInt();
-      if (p >= w.ia) throw new DomainError("Tried to access item at position "+a+" while shape was "+ Main.formatAPL(w.shape), this);
-      return w.get(p);
+    if (w instanceof Num) {
+      if (x.rank != 1) throw new RankError("array rank was "+x.rank+", tried to get item at rank 0", this, x);
+      if (x.ia == 0) throw new LengthError("⊃ on array with 0 elements", this, x);
+      int p = w.asInt();
+      if (p >= x.ia) throw new DomainError("Tried to access item at position "+w+" while shape was "+ Main.formatAPL(x.shape), this);
+      return x.get(p);
     }
-    for (Value v : a) {
-      w = w.at(v.asIntVec());
+    for (Value v : w) {
+      x = x.at(v.asIntVec());
     }
-    return w;
+    return x;
   }
   
   public Value under(Value o, Value w) {

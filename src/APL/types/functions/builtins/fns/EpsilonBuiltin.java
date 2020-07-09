@@ -39,21 +39,21 @@ public class EpsilonBuiltin extends Builtin {
     }
   }
   
-  public Value call(Value a, Value w) {
-    if (a.scalar()) {
-      Value a1 = a.first();
-      for (Value v : w) {
+  public Value call(Value w, Value x) {
+    if (w.scalar()) {
+      Value a1 = w.first();
+      for (Value v : x) {
         if (v.equals(a1)) {
           return Num.ONE;
         }
       }
       return Num.ZERO;
     }
-    BitArr.BA ba = new BitArr.BA(a.shape);
-    for (int i = 0; i < a.ia; i++) {
-      Value av = a.get(i);
+    BitArr.BA ba = new BitArr.BA(w.shape);
+    for (int i = 0; i < w.ia; i++) {
+      Value av = w.get(i);
       boolean b = false;
-      for (Value v : w) {
+      for (Value v : x) {
         if (v.equals(av)) {
           b = true;
           break;

@@ -14,7 +14,7 @@ public class TallyBuiltin extends Builtin {
     return Main.toAPL(x.shape);
   }
   
-  public Value call(Value a, Value w) {
-    return a.equals(w)? Num.ZERO : Num.ONE;
+  public Value call(Value w, Value x) {
+    return w.equals(x)? Num.ZERO : Num.ONE;
   }
 }

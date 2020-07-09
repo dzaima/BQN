@@ -68,8 +68,8 @@ public class TrigBuiltin extends Builtin {
       throw new DomainError("○: 𝕨 is out of bounds");
     }
   };
-  public Value call(Value a, Value w) {
-    return numD(DNF, a, w);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   
   

@@ -58,10 +58,10 @@ public class RandBuiltin extends Builtin {
     return new RandBuiltin(sc).call(w);
   }
   
-  public Value call(Value a, Value w) {
-    ArrayList<Integer> vs = new ArrayList<>(w.ia);
-    int wi = w.asInt();
-    int ai = a.asInt();
+  public Value call(Value w, Value x) {
+    ArrayList<Integer> vs = new ArrayList<>(x.ia);
+    int wi = x.asInt();
+    int ai = w.asInt();
     for (int i = 0; i < wi; i++) {
       vs.add(i);
     }

@@ -31,10 +31,11 @@ public class OldGTBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value a, Value w) {
+  public Value call(Value w, Value x) {
     return numChrD(DNF, (ca, cw) -> ca>cw? Num.ONE : Num.ZERO,
       (ca, cw) -> { throw new DomainError("comparing "+ ca.humanType(true)+" and "+cw.humanType(true), this); },
-      a, w);
+      w, x
+    );
   }
   
 }

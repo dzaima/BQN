@@ -38,8 +38,8 @@ public class InvBuiltin extends Mop {
   public static Fun invertW(Fun f) {
     return new Fun() {
       public String repr() { return f.repr()+"⁼"; }
-      public Value call(Value a, Value w) {
-        return f.callInvW(a, w);
+      public Value call(Value w, Value x) {
+        return f.callInvW(w, x);
       }
       
       public Value callInvW(Value a, Value w) {
@@ -51,8 +51,8 @@ public class InvBuiltin extends Mop {
   public static Fun invertA(Fun f) {
     return new Fun() {
       public String repr() { return f.repr()+"˜⁼˜"; }
-      public Value call(Value a, Value w) {
-        return f.callInvA(a, w);
+      public Value call(Value w, Value x) {
+        return f.callInvA(w, x);
       }
       
       public Value callInvA(Value a, Value w) {

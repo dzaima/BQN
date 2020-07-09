@@ -14,13 +14,13 @@ public class EllipsisBuiltin extends Builtin {
   
   
   
-  public Value call(Value a, Value w) {
-    if (a instanceof BigValue || w instanceof BigValue) {
-      BigInteger al = BigValue.bigint(a);
-      BigInteger wl = BigValue.bigint(w);
+  public Value call(Value w, Value x) {
+    if (w instanceof BigValue || x instanceof BigValue) {
+      BigInteger al = BigValue.bigint(w);
+      BigInteger wl = BigValue.bigint(x);
       BigInteger size = al.subtract(wl).abs().add(BigInteger.ONE);
       int isize = BigValue.safeInt(size);
-      if (isize==Integer.MAX_VALUE) throw new DomainError("…: expected range too large ("+a+"…"+w+")", this, w);
+      if (isize==Integer.MAX_VALUE) throw new DomainError("…: expected range too large ("+w+"…"+x+")", this, x);
       
       Value[] arr = new Value[isize];
       BigInteger c = al;
@@ -31,8 +31,8 @@ public class EllipsisBuiltin extends Builtin {
       }
       return new HArr(arr);
     }
-    int ai = a.asInt();
-    int wi = w.asInt();
+    int ai = w.asInt();
+    int wi = x.asInt();
     double[] arr = new double[Math.abs(ai-wi)+1];
     if (ai>wi) {
       for (int i = 0; i < arr.length; i++) {

@@ -25,12 +25,12 @@ public class Dfn extends Fun {
     return code.comp.exec(nsc, s);
   }
   
-  public Value call(Value a, Value w) {
-    Main.printdbg("dfn call", a, w);
+  public Value call(Value w, Value x) {
+    Main.printdbg("dfn call", w, x);
     Scope nsc = new Scope(sc);
-    int s = code.start(nsc, a, null, null, w, this);
-    nsc.set("𝕨", a);
-    nsc.set("𝕩", w);
+    int s = code.start(nsc, w, null, null, x, this);
+    nsc.set("𝕨", w);
+    nsc.set("𝕩", x);
     nsc.set("𝕤", this);
     return code.comp.exec(nsc, s);
   }

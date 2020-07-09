@@ -43,7 +43,7 @@ public class CeilingBuiltin extends Builtin {
       return a.compareTo(w)>0? a : w;
     }
   };
-  public Value call(Value a0, Value w0) {
-    return numD(DNF, a0, w0);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
 }

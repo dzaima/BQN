@@ -60,7 +60,7 @@ public class OrBuiltin extends Builtin {
       return bc.finish();
     }
   };
-  public Value call(Value a0, Value w0) {
-    return bitD(DNF, DBF, a0, w0);
+  public Value call(Value w, Value x) {
+    return bitD(DNF, DBF, w, x);
   }
 }

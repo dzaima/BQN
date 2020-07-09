@@ -20,9 +20,9 @@ public class OldCatBuiltin extends Builtin {
     }
     return x.ofShape(new int[]{x.ia});
   }
-  public Value call(Value a, Value w) {
-    int dim = Math.max(a.rank, w.rank) - 1;
-    return JoinBuiltin.cat(a, w, dim, this);
+  public Value call(Value w, Value x) {
+    int dim = Math.max(w.rank, x.rank) - 1;
+    return JoinBuiltin.cat(w, x, dim, this);
   }
   // public Value call(Value a, Value w, DervDimFn dims) {
   //   int dim = dims.singleDim();

@@ -15,7 +15,7 @@ public class SquadBuiltin extends Builtin {
     throw new DomainError("⌷: 𝕩 not array nor map", this, x);
   }
   
-  public Value call(Value a, Value w) {
-    return w.at(a.asIntVec());
+  public Value call(Value w, Value x) {
+    return x.at(w.asIntVec());
   }
 }

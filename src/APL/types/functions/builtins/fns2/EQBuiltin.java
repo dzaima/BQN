@@ -45,7 +45,7 @@ public class EQBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value a, Value w) {
-    return ncbaD(DNF, DBF, (ca, cw) -> ca==cw? Num.ONE : Num.ZERO, (ca, cw) -> ca.equals(cw)? Num.ONE : Num.ZERO, a, w);
+  public Value call(Value w, Value x) {
+    return ncbaD(DNF, DBF, (ca, cw) -> ca==cw? Num.ONE : Num.ZERO, (ca, cw) -> ca.equals(cw)? Num.ONE : Num.ZERO, w, x);
   }
 }

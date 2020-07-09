@@ -16,8 +16,8 @@ public abstract class Fun extends Callable {
   public Value call(Value x) {
     throw new IncorrectArgsError("function "+toString()+" called monadically", this, x);
   }
-  public Value call(Value a, Value w) {
-    throw new IncorrectArgsError("function "+toString()+" called dyadically", this, a);
+  public Value call(Value w, Value x) {
+    throw new IncorrectArgsError("function "+toString()+" called dyadically", this, w);
   }
   
   public Value callInv(Value w) {

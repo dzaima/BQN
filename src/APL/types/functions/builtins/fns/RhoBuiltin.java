@@ -18,19 +18,19 @@ public class RhoBuiltin extends Builtin {
   public Value call(Value x) {
     return Main.toAPL(x.shape);
   }
-  public Value call(Value a, Value w) {
-    if (a.rank > 1) throw new DomainError("⍴: multidimensional shape (⍴𝕨 is "+Main.formatAPL(a.shape)+")", this, a);
+  public Value call(Value w, Value x) {
+    if (w.rank > 1) throw new DomainError("⍴: multidimensional shape (⍴𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
     int[] sh;
     int ia;
     Integer emptyPos = null;
-    if (a.quickDoubleArr()) {
-      sh = a.asIntVec();
+    if (w.quickDoubleArr()) {
+      sh = w.asIntVec();
       ia = Arr.prod(sh);
     } else {
-      sh = new int[a.ia];
+      sh = new int[w.ia];
       ia = 1;
       for (int i = 0; i < sh.length; i++) {
-        Value v = a.get(i);
+        Value v = w.get(i);
         if (v instanceof Num) {
           int c = v.asInt();
           sh[i] = c;
@@ -43,59 +43,59 @@ public class RhoBuiltin extends Builtin {
     }
     
     if (emptyPos != null) {
-      if (w.ia % ia != 0) {
+      if (x.ia % ia != 0) {
         StringBuilder b = new StringBuilder();
-        for (Value v : a) b.append(v).append(' ');
+        for (Value v : w) b.append(v).append(' ');
         b.deleteCharAt(b.length()-1);
-        throw new LengthError("⍴: empty dimension not perfect (𝕨 ≡ "+b+"; "+(w.ia)+" = ≢𝕩)", this, w);
+        throw new LengthError("⍴: empty dimension not perfect (𝕨 ≡ "+b+"; "+(x.ia)+" = ≢𝕩)", this, x);
       }
-      sh[emptyPos] = w.ia/ia;
-      return w.ofShape(sh);
-    } else if (ia == w.ia) return w.ofShape(sh);
+      sh[emptyPos] = x.ia/ia;
+      return x.ofShape(sh);
+    } else if (ia == x.ia) return x.ofShape(sh);
     
-    if (w.ia == 0) {
-      return new SingleItemArr(w.prototype(), sh);
+    if (x.ia == 0) {
+      return new SingleItemArr(x.prototype(), sh);
       
-    } else if (w.scalar()) {
-      return new SingleItemArr(w.first(), sh);
+    } else if (x.scalar()) {
+      return new SingleItemArr(x.first(), sh);
       
-    } else if (w instanceof BitArr) {
-      if (sh.length == 0 && !Main.enclosePrimitives) return w.get(0);
-      BitArr wb = (BitArr) w;
+    } else if (x instanceof BitArr) {
+      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
+      BitArr wb = (BitArr) x;
       BitArr.BA res = new BitArr.BA(sh);
       int full = ia/wb.ia;
       int frac = ia%wb.ia;
       for (int i = 0; i < full; i++) res.add(wb);
       res.add(wb, 0, frac);
       return res.finish();
-    } else if (w.quickDoubleArr()) {
-      assert !(w instanceof Primitive);
-      if (sh.length == 0 && !Main.enclosePrimitives) return w.get(0);
-      double[] inp = w.asDoubleArr();
+    } else if (x.quickDoubleArr()) {
+      assert !(x instanceof Primitive);
+      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
+      double[] inp = x.asDoubleArr();
       double[] res = new double[ia];
       int p = 0;
       for (int i = 0; i < ia; i++) {
         res[i] = inp[p++];
-        if (p == w.ia) p = 0;
+        if (p == x.ia) p = 0;
       }
       return new DoubleArr(res, sh);
-    } else if (w instanceof ChrArr) {
-      if (sh.length == 0 && !Main.enclosePrimitives) return w.get(0);
-      String inp = ((ChrArr) w).s;
+    } else if (x instanceof ChrArr) {
+      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
+      String inp = ((ChrArr) x).s;
       char[] res = new char[ia];
       int p = 0;
       for (int i = 0; i < ia; i++) {
         res[i] = inp.charAt(p++);
-        if (p == w.ia) p = 0;
+        if (p == x.ia) p = 0;
       }
       return new ChrArr(res, sh);
     } else {
-      if (sh.length == 0 && w.first() instanceof Primitive && !Main.enclosePrimitives) return w.get(0);
+      if (sh.length == 0 && x.first() instanceof Primitive && !Main.enclosePrimitives) return x.get(0);
       Value[] arr = new Value[ia];
       int index = 0;
       for (int i = 0; i < ia; i++) {
-        arr[i] = w.get(index++);
-        if (index == w.ia) index = 0;
+        arr[i] = x.get(index++);
+        if (index == x.ia) index = 0;
       }
       return Arr.create(arr, sh);
     }

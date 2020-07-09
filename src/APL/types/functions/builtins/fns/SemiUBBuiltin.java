@@ -17,14 +17,14 @@ public class SemiUBBuiltin extends Builtin {
     return new Shape1Arr(x);
   }
   
-  public Value call(Value a, Value w) {
-    if (a instanceof Num && w instanceof Num) {
-      return new DoubleArr(new double[]{((Num) a).num, ((Num) w).num});
+  public Value call(Value w, Value x) {
+    if (w instanceof Num && x instanceof Num) {
+      return new DoubleArr(new double[]{((Num) w).num, ((Num) x).num});
     }
-    if (a instanceof Char && w instanceof Char) {
-      return new ChrArr(((Char) a).chr +""+ ((Char) w).chr);
+    if (w instanceof Char && x instanceof Char) {
+      return new ChrArr(((Char) w).chr +""+ ((Char) x).chr);
     }
-    return Arr.create(new Value[]{a, w});
+    return Arr.create(new Value[]{w, x});
   }
   
   public Value callInv(Value w) {

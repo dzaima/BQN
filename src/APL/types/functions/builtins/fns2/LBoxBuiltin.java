@@ -27,30 +27,30 @@ public class LBoxBuiltin extends Builtin {
     return Arr.create(res, nsh);
   }
   
-  public Value call(Value a, Value w) {
-    if (w.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, w);
-    if (a instanceof Num) return getCell(a.asInt(), w, this);
+  public Value call(Value w, Value x) {
+    if (x.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
+    if (w instanceof Num) return getCell(w.asInt(), x, this);
   
-    int ar = a.shape.length;
-    int wr = w.shape.length;
-    if (a.ia==0) {
+    int ar = w.shape.length;
+    int wr = x.shape.length;
+    if (w.ia==0) {
       int[] sh = new int[ar+wr-1];
-      System.arraycopy(a.shape, 0, sh, 0, ar);
-      System.arraycopy(w.shape, 1, sh, ar, wr -1);
+      System.arraycopy(w.shape, 0, sh, 0, ar);
+      System.arraycopy(x.shape, 1, sh, ar, wr-1);
       return Arr.create(new Value[0], sh);
-    } else if (a.get(0) instanceof Num) {
-      double[] ds = a.asDoubleArr();
+    } else if (w.get(0) instanceof Num) {
+      double[] ds = w.asDoubleArr();
       Value[] res = new Value[ds.length];
-      for (int i = 0; i < ds.length; i++) res[i] = getCell(Num.toInt(ds[i]), w, this);
-      return GTBuiltin.merge(res, a.shape, this);
+      for (int i = 0; i < ds.length; i++) res[i] = getCell(Num.toInt(ds[i]), x, this);
+      return GTBuiltin.merge(res, w.shape, this);
     } else {
-      if (ar > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(a.shape)+")", this, a);
+      if (ar > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
       
       int shl = 0;
-      Value[] av = a.values();
+      Value[] av = w.values();
       for (Value c : av) shl+= c.rank;
-      int[] sh = new int[shl + wr-a.ia];
-      System.arraycopy(w.shape, a.ia, sh, shl, wr-a.ia);
+      int[] sh = new int[shl + wr-w.ia];
+      System.arraycopy(x.shape, w.ia, sh, shl, wr-w.ia);
       
       int cp = 0;
       for (Value c : av) {
@@ -58,10 +58,10 @@ public class LBoxBuiltin extends Builtin {
         cp+= c.rank;
       }
       Value[] res = new Value[Arr.prod(sh)];
-      int[] c = new int[a.ia];
+      int[] c = new int[w.ia];
       int csz =1;
       for (int i = shl; i < sh.length; i++) csz*= sh[i];
-      cellRec(res, c, 0, a, w, csz, 0);
+      cellRec(res, c, 0, w, x, csz, 0);
       return Arr.create(res, sh);
     }
   }

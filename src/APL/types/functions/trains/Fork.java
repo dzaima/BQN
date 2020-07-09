@@ -27,9 +27,9 @@ public class Fork extends Fun {
     if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.callInv(g.callInvW(f, w));
   }
-  public Value call(Value a, Value w) {
-    Value r = h.call(a, w);
-    Value l = f.asFun().call(a, w);
+  public Value call(Value w, Value x) {
+    Value r = h.call(w, x);
+    Value l = f.asFun().call(w, x);
     return g.call(l, r);
   }
   

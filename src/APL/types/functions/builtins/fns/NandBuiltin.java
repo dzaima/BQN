@@ -42,8 +42,8 @@ public class NandBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value a, Value w) {
-    return bitD(DNF, DBF, a, w);
+  public Value call(Value w, Value x) {
+    return bitD(DNF, DBF, w, x);
   }
   public Value call(Value x) {
     if (x instanceof BitArr) {

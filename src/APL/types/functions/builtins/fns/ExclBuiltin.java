@@ -46,7 +46,7 @@ public class ExclBuiltin extends Builtin {
     return numM(NF, x);
   }
   
-  public Value call(Value a0, Value w0) {
+  public Value call(Value a0, Value x) {
     return allD((a, w) -> {
       if (a instanceof BigValue || w instanceof BigValue) {
         
@@ -69,6 +69,6 @@ public class ExclBuiltin extends Builtin {
         return new BigValue(res);
       }
       return ((Num) w).binomial((Num) a);
-    }, a0, w0);
+    }, a0, x);
   }
 }

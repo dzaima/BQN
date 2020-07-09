@@ -67,8 +67,8 @@ public class StileBuiltin extends Builtin {
       return new BigValue(r);
     }
   };
-  public Value call(Value a0, Value w0) {
-    return numD(DNF, a0, w0);
+  public Value call(Value w, Value x) {
+    return numD(DNF, w, x);
   }
   
   

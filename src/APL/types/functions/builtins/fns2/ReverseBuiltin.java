@@ -23,9 +23,9 @@ public class ReverseBuiltin extends Builtin {
   }
   
   
-  public Value call(Value a, Value w) { // valuecopy
-    if (a instanceof Primitive) return on(a.asInt(), w);
-    throw new DomainError("⌽: 𝕨 must be a scalar number", this, w);
+  public Value call(Value w, Value x) { // valuecopy
+    if (w instanceof Primitive) return on(w.asInt(), x);
+    throw new DomainError("⌽: 𝕨 must be a scalar number", this, x);
   }
   
   @Override public Value callInvW(Value a, Value w) {

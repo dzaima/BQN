@@ -12,7 +12,7 @@ public class RTackBuiltin extends Builtin {
   
   
   public Value call(Value x) { return x; }
-  public Value call(Value a, Value w) { return w; }
+  public Value call(Value w, Value x) { return x; }
   
   public Value callInv(Value w) {
     return w;

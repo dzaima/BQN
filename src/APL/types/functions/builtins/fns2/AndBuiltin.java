@@ -26,7 +26,7 @@ public class AndBuiltin extends Builtin {
     return Arr.create(res, x.shape);
   }
   
-  public Value call(Value a, Value w) {
-    return bitD(MulBuiltin.DNF, MulBuiltin.DBF, a, w);
+  public Value call(Value w, Value x) {
+    return bitD(MulBuiltin.DNF, MulBuiltin.DBF, w, x);
   }
 }

@@ -10,13 +10,13 @@ import java.util.Arrays;
 
 public class MergeBuiltin extends Builtin {
   
-  @Override public Value call(Value a, Value w) {
-    if (w.rank != 1) throw new DomainError("%: 𝕩 must be a vector", this, w);
-    int[] sh = a.shape;
+  @Override public Value call(Value w, Value x) {
+    if (x.rank != 1) throw new DomainError("%: 𝕩 must be a vector", this, x);
+    int[] sh = w.shape;
     int i1 = 0;
     boolean allds = true;
-    for (Value v : w) {
-      if (!Arrays.equals(v.shape, sh)) throw new DomainError("%: shape of item "+i1+" in 𝕩 didn't match 𝕨 ("+Main.formatAPL(sh)+" vs "+Main.formatAPL(v.shape)+")", this, w);
+    for (Value v : x) {
+      if (!Arrays.equals(v.shape, sh)) throw new DomainError("%: shape of item "+i1+" in 𝕩 didn't match 𝕨 ("+Main.formatAPL(sh)+" vs "+Main.formatAPL(v.shape)+")", this, x);
       i1++;
       if (!v.quickDoubleArr()) allds = false;
     }
@@ -24,22 +24,22 @@ public class MergeBuiltin extends Builtin {
     //   
     // }
     if (allds) {
-      double[] ds = new double[a.ia];
-      double[][] wds = new double[w.ia][];
-      for (int i = 0; i < w.ia; i++) wds[i] = w.get(i).asDoubleArr();
-      double[] idx = a.asDoubleArr();
+      double[] ds = new double[w.ia];
+      double[][] wds = new double[x.ia][];
+      for (int i = 0; i < x.ia; i++) wds[i] = x.get(i).asDoubleArr();
+      double[] idx = w.asDoubleArr();
       for (int i = 0; i < idx.length; i++) {
         ds[i] = wds[(int) idx[i]][i];
       }
-      if (a.rank == 0) return new Num(ds[0]);
-      return new DoubleArr(ds, a.shape);
+      if (w.rank == 0) return new Num(ds[0]);
+      return new DoubleArr(ds, w.shape);
     }
-    Value[] vs = new Value[a.ia];
-    double[] idx = a.asDoubleArr();
+    Value[] vs = new Value[w.ia];
+    double[] idx = w.asDoubleArr();
     for (int i = 0; i < idx.length; i++) {
-      vs[i] = w.get((int) idx[i]).get(i);
+      vs[i] = x.get((int) idx[i]).get(i);
     }
-    return Arr.create(vs, a.shape);
+    return Arr.create(vs, w.shape);
   }
   
   @Override public String repr() {
