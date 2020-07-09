@@ -9,16 +9,16 @@ public class EachLeft extends Mop {
     return "ᐵ";
   }
   
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
-    Value[] n = new Value[a.ia];
+    Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = ff.call(a.get(i), w).squeeze();
+      n[i] = ff.call(w.get(i), x).squeeze();
     }
-    return Arr.create(n, a.shape);
+    return Arr.create(n, w.shape);
   }
   
-  public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    return EachBuiltin.underW(aa.asFun(), o, a, new Rank0Arr(w), this);
+  public Value underW(Value aa, Value o, Value w, Value x, DerivedMop derv) {
+    return EachBuiltin.underW(aa.asFun(), o, w, new Rank0Arr(x), this);
   }
 }

@@ -10,29 +10,29 @@ public class ScanBuiltin extends Mop {
     return "`";
   }
   
-  public Value call(Value aa, Value w, DerivedMop derv) {
+  public Value call(Value aa, Value x, DerivedMop derv) {
     Fun f = aa.asFun();
-    if (w.ia == 0) return w;
-    if (w.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, w);
-    int l = w.ia / w.shape[0];
-    Value c = w.get(0);
-    Value[] res = new Value[w.ia];
+    if (x.ia == 0) return x;
+    if (x.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, x);
+    int l = x.ia / x.shape[0];
+    Value c = x.get(0);
+    Value[] res = new Value[x.ia];
     int i = 0;
-    for (; i < l; i++) res[i] = w.get(i);
-    for (; i < w.ia; i++) res[i] = f.call(res[i-l], w.get(i));
-    return Arr.create(res, w.shape);
+    for (; i < l; i++) res[i] = x.get(i);
+    for (; i < x.ia; i++) res[i] = f.call(res[i-l], x.get(i));
+    return Arr.create(res, x.shape);
   }
   
-  public Value call(Value aa, Value a, Value w, DerivedMop derv) {
+  public Value call(Value aa, Value w, Value x, DerivedMop derv) {
     Fun aaf = aa.asFun();
-    int n = a.asInt();
-    int len = w.ia;
+    int n = w.asInt();
+    int len = x.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);
-    if (w.rank > 1) throw new RankError("`: rank of 𝕩 should be less than 2 (was "+w.rank+")", this);
+    if (x.rank > 1) throw new RankError("`: rank of 𝕩 should be less than 2 (was "+x.rank+")", this);
     
-    if (w.quickDoubleArr()) {
+    if (x.quickDoubleArr()) {
       Value[] res = new Value[len-n+1];
-      double[] wa = w.asDoubleArr();
+      double[] wa = x.asDoubleArr();
       for (int i = 0; i < res.length; i++) {
         double[] curr = new double[n];
         System.arraycopy(wa, i, curr, 0, n);
@@ -42,7 +42,7 @@ public class ScanBuiltin extends Mop {
     }
     
     Value[] res = new Value[len-n+1];
-    Value[] wa = w.values();
+    Value[] wa = x.values();
     for (int i = 0; i < res.length; i++) {
       Value[] curr = new Value[n];
       // for (int j = 0; j < n; j++) curr[j] = wa[i + j];

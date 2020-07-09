@@ -14,28 +14,28 @@ public class CellBuiltin extends Mop {
     return "˘";
   }
   
-  public Value call(Value f, Value w, DerivedMop derv) {
+  public Value call(Value f, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
-    if (w.rank == 0) return ff.call(w);
+    if (x.rank == 0) return ff.call(x);
     //if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     
-    Value[] cells = cells(w);
+    Value[] cells = cells(x);
     if (f instanceof LTBuiltin) return Arr.create(cells);
     
     for (int i = 0; i < cells.length; i++) cells[i] = ff.call(cells[i]);
     return GTBuiltin.merge(cells, new int[]{cells.length}, this);
   }
   
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
     // if (a.rank == 0) throw new RankError(f+"˘: scalar 𝕨 isn't allowed", this, w);
     // if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     // Value[] ac = cells(a);
     // Value[] wc = cells(w);
-    if (a.rank==0 && w.rank==0) return ff.call(a, w);
-    Value[] ac = a.rank==0? ext(a, w.shape[0]) : cells(a);
-    Value[] wc = w.rank==0? ext(w, a.shape[0]) : cells(w);
-    if (ac.length != wc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", this);
+    if (w.rank==0 && x.rank==0) return ff.call(w, x);
+    Value[] ac = w.rank==0? ext(w, x.shape[0]) : cells(w);
+    Value[] wc = x.rank==0? ext(x, w.shape[0]) : cells(x);
+    if (ac.length != wc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
     
     Value[] res = new Value[ac.length];
     for (int i = 0; i < res.length; i++) res[i] = ff.call(ac[i], wc[i]);

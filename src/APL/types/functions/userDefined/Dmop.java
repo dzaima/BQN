@@ -16,34 +16,34 @@ public class Dmop extends Mop {
     code = t;
   }
   
-  public Fun derive(Value aa) {
-    if (!code.immediate) return super.derive(aa);
-    Main.printdbg("dmop immediate call", aa);
+  public Fun derive(Value f) {
+    if (!code.immediate) return super.derive(f);
+    Main.printdbg("dmop immediate call", f);
     Scope nsc = new Scope(sc);
-    int s = code.start(nsc, null, aa, null, null, this);
-    nsc.set("𝕗", aa);
+    int s = code.start(nsc, null, f, null, null, this);
+    nsc.set("𝕗", f);
     return code.comp.exec(nsc, s).asFun();
   }
   
-  public Value call(Value f, Value w, DerivedMop derv) {
-    Main.printdbg("dmop call", w);
+  public Value call(Value f, Value x, DerivedMop derv) {
+    Main.printdbg("dmop call", x);
     Scope nsc = new Scope(sc);
-    int s = code.start(nsc, null, f, null, w, this);
+    int s = code.start(nsc, null, f, null, x, this);
     nsc.set("𝕗", f);
     nsc.set("𝕨", Nothing.inst);
-    nsc.set("𝕩", w);
+    nsc.set("𝕩", x);
     nsc.set("𝕤", derv);
     nsc.set("𝕣", this);
     return code.comp.exec(nsc, s);
   }
   
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    Main.printdbg("dmop call", a, w);
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    Main.printdbg("dmop call", w, x);
     Scope nsc = new Scope(sc);
-    int s = code.start(nsc, a, f, null, w, this);
+    int s = code.start(nsc, w, f, null, x, this);
     nsc.set("𝕗", f);
-    nsc.set("𝕨", a);
-    nsc.set("𝕩", w);
+    nsc.set("𝕨", w);
+    nsc.set("𝕩", x);
     nsc.set("𝕤", derv);
     nsc.set("𝕣", this);
     return code.comp.exec(nsc, s);

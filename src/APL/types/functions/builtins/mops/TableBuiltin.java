@@ -10,27 +10,27 @@ public final class TableBuiltin extends Mop {
   }
   
   
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    int[] shape = new int[a.rank+w.rank];
-    System.arraycopy(a.shape, 0, shape, 0, a.rank);
-    System.arraycopy(w.shape, 0, shape, a.rank, w.rank);
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    int[] shape = new int[w.rank+x.rank];
+    System.arraycopy(w.shape, 0, shape, 0, w.rank);
+    System.arraycopy(x.shape, 0, shape, w.rank, x.rank);
     
-    if (a.ia==0 || w.ia==0) return new EmptyArr(shape, a.safePrototype());
+    if (w.ia==0 || x.ia==0) return new EmptyArr(shape, w.safePrototype());
     
     Fun ff = (Fun) f;
     
     
     int i = 0;
-    Value first = ff.call(a.first(), w.first());
+    Value first = ff.call(w.first(), x.first());
     
     if (first instanceof Num) {
-      double[] dres = new double[a.ia * w.ia];
+      double[] dres = new double[w.ia*x.ia];
       boolean allNums = true;
       boolean firstSkipped = false;
       Value failure = null;
       
-      numatt: for (Value na : a) {
-        for (Value nw : w) {
+      numatt: for (Value na : w) {
+        for (Value nw : x) {
           Value r;
           if (firstSkipped) r = ff.call(na, nw);
           else {
@@ -49,20 +49,20 @@ public final class TableBuiltin extends Mop {
         if (shape.length == 0) return new Num(dres[0]);
         return new DoubleArr(dres, shape);
       } else { // i points to the place the failure should be
-        Value[] res = new Value[a.ia*w.ia];
+        Value[] res = new Value[w.ia*x.ia];
         for (int n = 0; n < i; n++) { // slowly copy the data back..
           res[n] = new Num(dres[n]);
         }
         res[i++] = failure; // insert that horrible thing that broke everything
-        if (i%w.ia != 0) { // finish the damn row..
-          Value va = a.get(i / w.ia);
-          for (int wi = i % w.ia; wi < w.ia; wi++) {
-            res[i++] = ff.call(va, w.get(wi));
+        if (i%x.ia != 0) { // finish the damn row..
+          Value va = w.get(i / x.ia);
+          for (int wi = i % x.ia; wi < x.ia; wi++) {
+            res[i++] = ff.call(va, x.get(wi));
           }
         }
-        for (int ai = (i+w.ia-1)/w.ia; ai < a.ia; ai++) { // and do the rest, slowly and horribly
-          Value va = a.get(ai);
-          for (Value vw : w) {
+        for (int ai = (i+x.ia-1) / x.ia; ai < w.ia; ai++) { // and do the rest, slowly and horribly
+          Value va = w.get(ai);
+          for (Value vw : x) {
             res[i++] = ff.call(va, vw);
           }
         }
@@ -71,9 +71,9 @@ public final class TableBuiltin extends Mop {
       }
     }
     boolean firstSkipped = false;
-    Value[] arr = new Value[a.ia*w.ia];
-    for (Value na : a) {
-      for (Value nw : w) {
+    Value[] arr = new Value[w.ia*x.ia];
+    for (Value na : w) {
+      for (Value nw : x) {
         if (firstSkipped) arr[i++] = ff.call(na, nw);
         else {
           firstSkipped = true;

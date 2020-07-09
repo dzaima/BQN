@@ -725,19 +725,19 @@ public class Scope {
         return p;
       }
       
-      public Value call(Value f, Value w, DerivedMop derv) {
+      public Value call(Value f, Value x, DerivedMop derv) {
         Pr p = pr(f); p.start();
         long sns = System.nanoTime();
-        Value r = p.fn.call(w);
+        Value r = p.fn.call(x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return r;
       }
       
-      public Value call(Value f, Value a, Value w, DerivedMop derv) {
+      public Value call(Value f, Value w, Value x, DerivedMop derv) {
         Pr p = pr(f); p.start();
         long sns = System.nanoTime();
-        Value r = p.fn.call(a, w);
+        Value r = p.fn.call(w, x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return r;

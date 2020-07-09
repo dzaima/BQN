@@ -6,16 +6,16 @@ import APL.types.functions.*;
 
 public class InvBuiltin extends Mop {
   
-  public Value call(Value f, Value w, DerivedMop derv) {
-    return f.asFun().callInv(w);
+  public Value call(Value f, Value x, DerivedMop derv) {
+    return f.asFun().callInv(x);
   }
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    return f.asFun().callInvW(a, w);
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    return f.asFun().callInvW(w, x);
   }
-  public Value callInvW(Value f, Value a, Value w) {
-    return f.asFun().call(a, w);
+  public Value callInvW(Value f, Value w, Value x) {
+    return f.asFun().call(w, x);
   }
-  public Value callInvA(Value f, Value a, Value w) {
+  public Value callInvA(Value f, Value w, Value x) {
     throw new NYIError("⁼ inverting 𝕨", this);
   }
   

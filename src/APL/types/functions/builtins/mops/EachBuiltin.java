@@ -15,14 +15,14 @@ public class EachBuiltin extends Mop {
   
   
   
-  public Value call(Value f, Value w, DerivedMop derv) {
-    if (w.scalar()) return new Rank0Arr(f.asFun().call(w.first()));
+  public Value call(Value f, Value x, DerivedMop derv) {
+    if (x.scalar()) return new Rank0Arr(f.asFun().call(x.first()));
     Fun ff = f.asFun();
-    Value[] n = new Value[w.ia];
+    Value[] n = new Value[x.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = ff.call(w.get(i));
+      n[i] = ff.call(x.get(i));
     }
-    return Arr.create(n, w.shape);
+    return Arr.create(n, x.shape);
   }
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
@@ -60,21 +60,21 @@ public class EachBuiltin extends Mop {
     return Arr.create(n, we? x.shape : w.shape);
   }
   
-  public Value callInv(Value f, Value w) {
+  public Value callInv(Value f, Value x) {
     if (!(f instanceof Fun)) throw new DomainError("can't invert A¨", this);
-    Value[] n = new Value[w.ia];
+    Value[] n = new Value[x.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = ((Fun) f).callInv(w.get(i)).squeeze();
+      n[i] = ((Fun) f).callInv(x.get(i)).squeeze();
     }
-    if (w.rank == 0 && n[0] instanceof Primitive) return n[0];
-    return Arr.create(n, w.shape);
+    if (x.rank == 0 && n[0] instanceof Primitive) return n[0];
+    return Arr.create(n, x.shape);
   }
   
-  public Value under(Value aa, Value o, Value w, DerivedMop derv) {
+  public Value under(Value aa, Value o, Value x, DerivedMop derv) {
     Fun aaf = aa.asFun();
-    Value[] res2 = new Value[w.ia];
-    rec(aaf, o, w, 0, new Value[w.ia], new Value[1], res2);
-    return Arr.create(res2, w.shape);
+    Value[] res2 = new Value[x.ia];
+    rec(aaf, o, x, 0, new Value[x.ia], new Value[1], res2);
+    return Arr.create(res2, x.shape);
   }
   
   private static void rec(Fun aa, Obj o, Value w, int i, Value[] args, Value[] resPre, Value[] res) {
@@ -93,8 +93,8 @@ public class EachBuiltin extends Mop {
   }
   
   
-  public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    return underW(aa.asFun(), o, a, w, this);
+  public Value underW(Value aa, Value o, Value w, Value x, DerivedMop derv) {
+    return underW(aa.asFun(), o, w, x, this);
   }
   
   public static Value underW(Fun aa, Obj o, Value a, Value w, Callable blame) {

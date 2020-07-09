@@ -13,36 +13,36 @@ public abstract class Mop extends Callable {
     return Type.mop;
   }
   
-  public Fun derive(Value aa) {
-    return new DerivedMop(aa, this);
+  public Fun derive(Value f) {
+    return new DerivedMop(f, this);
   }
-  public Value call(Value f, Value w, DerivedMop derv) {
-    throw new IncorrectArgsError(repr()+" can't be called monadically", derv, w);
+  public Value call(Value f, Value x, DerivedMop derv) {
+    throw new IncorrectArgsError(repr()+" can't be called monadically", derv, x);
   }
-  public Value call(Value f, Value a, Value w, DerivedMop derv) {
-    throw new IncorrectArgsError(repr()+" can't be called dyadically", derv, a);
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    throw new IncorrectArgsError(repr()+" can't be called dyadically", derv, w);
   }
   
-  public Value callInv(Value f, Value w) {
-    throw new DomainError(this+" doesn't support monadic inverting", this, w);
+  public Value callInv(Value f, Value x) {
+    throw new DomainError(this+" doesn't support monadic inverting", this, x);
   }
-  public Value callInvW(Value f, Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, w);
+  public Value callInvW(Value f, Value w, Value x) {
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x);
   }
-  public Value callInvA(Value f, Value a, Value w) {
-    throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, w);
+  public Value callInvA(Value f, Value w, Value x) {
+    throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
-  public Value under(Value aa, Value o, Value w, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, derv)) : o;
+  public Value under(Value aa, Value o, Value x, DerivedMop derv) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, x, derv)) : o;
     return callInv(aa, v);
   }
-  public Value underW(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : o;
-    return callInvW(aa, a, v);
+  public Value underW(Value aa, Value o, Value w, Value x, DerivedMop derv) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, x, derv)) : o;
+    return callInvW(aa, w, v);
   }
-  public Value underA(Value aa, Value o, Value a, Value w, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(aa, a, w, derv)) : o;
-    return callInvA(aa, v, w);
+  public Value underA(Value aa, Value o, Value w, Value x, DerivedMop derv) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(aa, w, x, derv)) : o;
+    return callInvA(aa, v, x);
   }
   
   public String toString() {
