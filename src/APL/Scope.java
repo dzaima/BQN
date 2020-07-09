@@ -368,8 +368,8 @@ public class Scope {
       }, c->Num.of(c.chr), x);
     }
     
-    public Value callInv(Value w) {
-      return call(w);
+    public Value callInv(Value x) {
+      return call(x);
     }
   }
   
@@ -812,8 +812,8 @@ public class Scope {
       return HArr.create(va, w.shape);
     }
     
-    public Value callInv(Value w) {
-      return recN(w);
+    public Value callInv(Value x) {
+      return recN(x);
     }
     private Value recN(Value w) {
       if (w instanceof BigValue) return ((BigValue) w).num();

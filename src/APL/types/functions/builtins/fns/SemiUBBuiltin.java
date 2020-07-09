@@ -27,9 +27,9 @@ public class SemiUBBuiltin extends Builtin {
     return Arr.create(new Value[]{w, x});
   }
   
-  public Value callInv(Value w) {
-    if (w.rank!=1 || w.shape[0]!=1) throw new DomainError("⍮⁼: argument must be a length 1 vector", this, w);
-    return w.first();
+  public Value callInv(Value x) {
+    if (x.rank!=1 || x.shape[0]!=1) throw new DomainError("⍮⁼: argument must be a length 1 vector", this, x);
+    return x.first();
   }
   
   public Value callInvW(Value a, Value w) {

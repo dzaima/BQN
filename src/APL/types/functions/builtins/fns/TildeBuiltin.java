@@ -14,8 +14,8 @@ public class TildeBuiltin extends Builtin {
     return rec(x);
   }
   
-  public Value callInv(Value w) {
-    return rec(w);
+  public Value callInv(Value x) {
+    return rec(x);
   }
   
   private Value rec(Value w) {

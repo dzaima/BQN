@@ -47,7 +47,7 @@ public class MinusBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     return numD(DNF, w, x);
   }
-  public Value callInv(Value w) { return call(w); }
+  public Value callInv(Value x) { return call(x); }
   public Value callInvW(Value a, Value w) { return call(a, w); }
   public Value callInvA(Value a, Value w) {
     return numD(PlusBuiltin.DNF, a, w);

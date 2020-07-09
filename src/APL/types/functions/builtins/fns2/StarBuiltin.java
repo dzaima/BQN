@@ -24,8 +24,8 @@ public class StarBuiltin extends Builtin {
   public Value call(Value x) {
     return numM(NF, x);
   }
-  public Value callInv(Value w) {
-    return numM(LogBuiltin.NF, w);
+  public Value callInv(Value x) {
+    return numM(LogBuiltin.NF, x);
   }
   
   public static final D_NNeN DNF = new D_NNeN() {

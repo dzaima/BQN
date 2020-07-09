@@ -34,8 +34,8 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
   public Value call(Value x) {
     return numM(NF, x);
   }
-  public Value callInv(Value w) {
-    return numM(StarBuiltin.NF, w);
+  public Value callInv(Value x) {
+    return numM(StarBuiltin.NF, x);
   }
   
   public static final D_NNeN DNF = new D_NNeN() {

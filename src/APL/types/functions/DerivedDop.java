@@ -18,8 +18,8 @@ public class DerivedDop extends Fun {
   public Value call(Value w, Value x) {
     return op.call(aa, ww, w, x, this);
   }
-  public Value callInv(Value w) {
-    return op.callInv(aa, ww, w);
+  public Value callInv(Value x) {
+    return op.callInv(aa, ww, x);
   }
   public Value callInvW(Value a, Value w) {
     return op.callInvW(aa, ww, a, w);

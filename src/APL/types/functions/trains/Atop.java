@@ -14,8 +14,8 @@ public class Atop extends Fun {
   public Value call(Value x) {
     return g.call(h.call(x));
   }
-  public Value callInv(Value w) {
-    return h.callInv(g.callInv(w));
+  public Value callInv(Value x) {
+    return h.callInv(g.callInv(x));
   }
   public Value call(Value w, Value x) {
     return g.call(h.call(w, x));

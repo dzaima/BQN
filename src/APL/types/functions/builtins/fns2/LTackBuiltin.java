@@ -14,8 +14,8 @@ public class LTackBuiltin extends Builtin {
   public Value call(Value x) { return x; }
   public Value call(Value w, Value x) { return w; }
   
-  public Value callInv(Value w) {
-    return w;
+  public Value callInv(Value x) {
+    return x;
   }
   public Value callInvW(Value a, Value w) {
     throw new DomainError("⊣⁼ is impossible", this);

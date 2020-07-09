@@ -47,7 +47,7 @@ public class DivBuiltin extends Builtin {
     return numD(DNF, w, x);
   }
   
-  public Value callInv(Value w) { return call(w); }
+  public Value callInv(Value x) { return call(x); }
   public Value callInvW(Value a, Value w) { return call(a, w); }
   
   @Override public Value callInvA(Value a, Value w) {

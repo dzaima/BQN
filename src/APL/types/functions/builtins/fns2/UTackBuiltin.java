@@ -18,8 +18,8 @@ public class UTackBuiltin extends Builtin {
     return call(Num.NUMS[2], x);
   }
   
-  public Value callInv(Value w) {
-    return DTackBuiltin.on(Num.NUMS[2], w, this);
+  public Value callInv(Value x) {
+    return DTackBuiltin.on(Num.NUMS[2], x, this);
   }
   public Value callInvW(Value a, Value w) {
     return DTackBuiltin.on(a, w, this);

@@ -18,8 +18,8 @@ public class ReverseBuiltin extends Builtin {
     if (w instanceof Primitive) return w;
     return ((Arr) w).reverseOn(w.rank-1);
   }
-  public Value callInv(Value w) {
-    return call(w);
+  public Value callInv(Value x) {
+    return call(x);
   }
   
   

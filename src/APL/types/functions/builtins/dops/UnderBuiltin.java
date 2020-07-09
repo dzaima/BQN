@@ -54,8 +54,8 @@ public class UnderBuiltin extends Dop {
     public Value call(Value x) {
       return f.call(a, x);
     }
-    public Value callInv(Value w) {
-      return f.callInvW(a, w);
+    public Value callInv(Value x) {
+      return f.callInvW(a, x);
     }
     
     public String repr() {

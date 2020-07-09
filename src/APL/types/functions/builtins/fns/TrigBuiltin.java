@@ -31,8 +31,8 @@ public class TrigBuiltin extends Builtin {
   public Value call(Value x) {
     return numM(NF, x);
   }
-  public Value callInv(Value w) {
-    return numM(NFi, w);
+  public Value callInv(Value x) {
+    return numM(NFi, x);
   }
   
   static final D_NNeN DNF = new D_NNeN() {

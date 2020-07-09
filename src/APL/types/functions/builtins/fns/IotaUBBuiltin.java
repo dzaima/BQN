@@ -75,15 +75,15 @@ public class IotaUBBuiltin extends Builtin {
       }
     }
   }
-  public Value callInv(Value w) {
-    int[] sh = fn.call(w).asIntVec();
+  public Value callInv(Value x) {
+    int[] sh = fn.call(x).asIntVec();
     int ia = 1;
     for (int i = 0; i < sh.length; i++) {
       sh[i]+= 1;
       ia*= sh[i];
     }
     double[] arr = new double[ia];
-    for (Value v : w) {
+    for (Value v : x) {
       int[] c = v.asIntVec();
       arr[Indexer.fromShape(sh, c)]++;
     }

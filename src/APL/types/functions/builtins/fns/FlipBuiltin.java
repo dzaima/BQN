@@ -14,8 +14,8 @@ public class FlipBuiltin extends Builtin {
     if (x instanceof Primitive) return x;
     return ((Arr) x).reverseOn(0);
   }
-  @Override public Value callInv(Value w) {
-    return call(w);
+  @Override public Value callInv(Value x) {
+    return call(x);
   }
   
   @Override public Value call(Value w, Value x) {
