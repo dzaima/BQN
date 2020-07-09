@@ -3,41 +3,41 @@ package APL.types.functions;
 import APL.types.*;
 
 public class DerivedMop extends Fun {
-  public final Value aa;
+  public final Value f;
   public final Mop op;
-  DerivedMop(Value aa, Mop op) {
-    this.aa = aa;
+  DerivedMop(Value f, Mop op) {
+    this.f = f;
     this.op = op;
     token = op.token;
   }
   
   public Value call(Value x) {
-    return op.call(aa, x, this);
+    return op.call(f, x, this);
   }
   public Value call(Value w, Value x) {
-    return op.call(aa, w, x, this);
+    return op.call(f, w, x, this);
   }
   public Value callInv(Value x) {
-    return op.callInv(aa, x);
+    return op.callInv(f, x);
   }
   public Value callInvW(Value w, Value x) {
-    return op.callInvW(aa, w, x);
+    return op.callInvW(f, w, x);
   }
   public Value callInvA(Value w, Value x) {
-    return op.callInvA(aa, w, x);
+    return op.callInvA(f, w, x);
   }
   
   @Override public String repr() {
-    return aa.toString()+op.repr();
+    return f.toString()+op.repr();
   }
   
   public Value under(Value o, Value x) {
-    return op.under(aa, o, x, this);
+    return op.under(f, o, x, this);
   }
   public Value underW(Value o, Value w, Value x) {
-    return op.underW(aa, o, w, x, this);
+    return op.underW(f, o, w, x, this);
   }
   public Value underA(Value o, Value w, Value x) {
-    return op.underA(aa, o, w, x, this);
+    return op.underA(f, o, w, x, this);
   }
 }

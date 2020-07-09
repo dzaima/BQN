@@ -11,10 +11,10 @@ public class DepthBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun aaf = f.asFun();
+    Fun ff = f.asFun();
     int d = g.asInt();
     if (d < 0) throw new NYIError("negative 𝕘 for ⚇", this, g);
-    return on(aaf, d, x, derv);
+    return on(ff, d, x, derv);
   } 
   
   public static Value on(Fun f, int d, Value w, Fun blame) {

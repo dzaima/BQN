@@ -749,19 +749,19 @@ public class Scope {
     }
     public static class ProfilerDop extends Dop {
       
-      public Value call(Value aa, Value g, Value w, Value x, DerivedDop derv) {
-        Pr p = pr(g, null); Fun f = aa.asFun(); p.start();
+      public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+        Pr p = pr(g, null); Fun ff = f.asFun(); p.start();
         long sns = System.nanoTime();
-        Value res = f.call(w, x);
+        Value res = ff.call(w, x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;
       }
   
-      public Value call(Value aa, Value g, Value x, DerivedDop derv) {
-        Pr p = pr(g, null); Fun f = aa.asFun(); p.start();
+      public Value call(Value f, Value g, Value x, DerivedDop derv) {
+        Pr p = pr(g, null); Fun ff = f.asFun(); p.start();
         long sns = System.nanoTime();
-        Value res = f.call(x);
+        Value res = ff.call(x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;

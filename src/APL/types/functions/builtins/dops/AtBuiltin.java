@@ -15,52 +15,52 @@ public class AtBuiltin extends Dop {
     return at(f, g, x, this);
   }
   
-  public static Value at(Value aa, Value ww, Value w, Callable blame) {
-    int ia = w.ia;
-    if (ww instanceof Fun) {
-      Value vba = ((Fun) ww).call(w);
+  public static Value at(Value f, Value g, Value x, Callable blame) {
+    int ia = x.ia;
+    if (g instanceof Fun) {
+      Value vba = ((Fun) g).call(x);
       boolean[] ba = new boolean[ia];
       int matchingCount = 0;
       for (int i = 0; i < ia; i++) {
         ba[i] = Main.bool(vba.get(i));
         if (ba[i]) matchingCount++;
       }
-      Value aaa;
-      if (aa instanceof Fun) {
+      Value fa;
+      if (f instanceof Fun) {
         Value[] matching = new Value[matchingCount];
         int ptr = 0;
         for (int i = 0; i < ia; i++) {
-          if (ba[i]) matching[ptr++] = w.get(i);
+          if (ba[i]) matching[ptr++] = x.get(i);
         }
-        aaa = ((Fun) aa).call(Arr.create(matching));
-      } else aaa = aa;
+        fa = ((Fun) f).call(Arr.create(matching));
+      } else fa = f;
       Value[] ra = new Value[ia];
-      if (aaa.rank == 0) {
-        Value inner = aaa.get(0);
+      if (fa.rank == 0) {
+        Value inner = fa.get(0);
         for (int i = 0; i < ia; i++) {
           if (ba[i]) ra[i] = inner;
-          else ra[i] = w.get(i);
+          else ra[i] = x.get(i);
         }
       } else {
         int ptr = 0;
         for (int i = 0; i < ia; i++) {
-          if (ba[i]) ra[i] = aaa.get(ptr++);
-          else ra[i] = w.get(i);
+          if (ba[i]) ra[i] = fa.get(ptr++);
+          else ra[i] = x.get(i);
         }
       }
-      return Arr.create(ra, w.shape);
+      return Arr.create(ra, x.shape);
     } else {
   
-      Indexer.PosSh poss = Indexer.poss(ww, w.shape, blame);
+      Indexer.PosSh poss = Indexer.poss(g, x.shape, blame);
       Value repl;
-      if (aa instanceof Fun) {
-        Fun aaf = ((Fun) aa);
-        Value arg = LBoxUBBuiltin.on(poss, w);
-        repl = aaf.call(arg);
+      if (f instanceof Fun) {
+        Fun ff = ((Fun) f);
+        Value arg = LBoxUBBuiltin.on(poss, x);
+        repl = ff.call(arg);
       } else {
-        repl = aa;
+        repl = f;
       }
-      return with(w, poss, repl, blame);
+      return with(x, poss, repl, blame);
     }
   }
   
@@ -69,9 +69,9 @@ public class AtBuiltin extends Dop {
       double[] res = o.asDoubleArrClone();
       int[] is = poss.vals;
       if (n.rank == 0) {
-        double aafst = n.first().asDouble();
+        double f0 = n.first().asDouble();
         // noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < is.length; i++) res[is[i]] = aafst;
+        for (int i = 0; i < is.length; i++) res[is[i]] = f0;
       } else {
         double[] nd = n.asDoubleArr();
         Arr.eqShapes(n.shape, poss.sh, blame);
@@ -82,9 +82,9 @@ public class AtBuiltin extends Dop {
     Value[] res = o.valuesCopy();
     int[] is = poss.vals;
     if (n.rank == 0) {
-      Value aafst = n.first();
+      Value f0 = n.first();
       // noinspection ForLoopReplaceableByForEach
-      for (int i = 0; i < is.length; i++) res[is[i]] = aafst;
+      for (int i = 0; i < is.length; i++) res[is[i]] = f0;
     } else {
       Arr.eqShapes(n.shape, poss.sh, blame);
       for (int i = 0; i < is.length; i++) res[is[i]] = n.get(i);

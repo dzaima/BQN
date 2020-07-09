@@ -3,43 +3,43 @@ package APL.types.functions;
 import APL.types.*;
 
 public class DerivedDop extends Fun {
-  public final Value aa, ww;
+  public final Value f, g;
   public final Dop op;
-  DerivedDop(Value aa, Value ww, Dop op) {
-    this.aa = aa;
-    this.ww = ww;
+  DerivedDop(Value f, Value g, Dop op) {
+    this.f = f;
+    this.g = g;
     this.op = op;
     token = op.token;
   }
   
   public Value call(Value x) {
-    return op.call(aa, ww, x, this);
+    return op.call(f, g, x, this);
   }
   public Value call(Value w, Value x) {
-    return op.call(aa, ww, w, x, this);
+    return op.call(f, g, w, x, this);
   }
   public Value callInv(Value x) {
-    return op.callInv(aa, ww, x);
+    return op.callInv(f, g, x);
   }
   public Value callInvW(Value w, Value x) {
-    return op.callInvW(aa, ww, w, x);
+    return op.callInvW(f, g, w, x);
   }
   public Value callInvA(Value w, Value x) {
-    return op.callInvA(aa, ww, w, x);
+    return op.callInvA(f, g, w, x);
   }
   @Override public String repr() {
-    String wws = ww.toString();
-    if (!(ww instanceof Arr) && wws.length() != 1) wws = "("+wws+")";
-    return aa.toString()+op.repr()+wws;
+    String wws = g.toString();
+    if (!(g instanceof Arr) && wws.length() != 1) wws = "("+wws+")";
+    return f.toString()+op.repr()+wws;
   }
   
   public Value under(Value o, Value x) {
-    return op.under(aa, ww, o, x, this);
+    return op.under(f, g, o, x, this);
   }
   public Value underW(Value o, Value w, Value x) {
-    return op.underW(aa, ww, o, w, x, this);
+    return op.underW(f, g, o, w, x, this);
   }
   public Value underA(Value o, Value w, Value x) {
-    return op.underA(aa, ww, o, w, x, this);
+    return op.underA(f, g, o, w, x, this);
   }
 }

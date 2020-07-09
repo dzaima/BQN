@@ -44,9 +44,9 @@ public class MutArr extends Settable { // old version of SettableArr
   public static Obj of(ArrayList<Obj> vs) {
     int sz = vs.size();
     if (sz == 0) return EmptyArr.SHAPE0Q;
-    Obj fst = vs.get(0);
-    if (fst instanceof Num) {
-      if (((Num) fst).num == 0 || ((Num) fst).num == 1) {
+    Obj o0 = vs.get(0);
+    if (o0 instanceof Num) {
+      if (((Num) o0).num == 0 || ((Num) o0).num == 1) {
         BitArr.BA bc = new BitArr.BA(sz);
         for (Obj c : vs) {
           if (c instanceof Num) {
@@ -71,7 +71,7 @@ public class MutArr extends Settable { // old version of SettableArr
         }
       }
       if (a != null) return new DoubleArr(a);
-    } else if (fst instanceof Char) {
+    } else if (o0 instanceof Char) {
       String s = "";
       for (Obj c : vs) {
         if (c instanceof Char) {

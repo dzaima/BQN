@@ -10,8 +10,8 @@ public class ScanBuiltin extends Mop {
     return "`";
   }
   
-  public Value call(Value aa, Value x, DerivedMop derv) {
-    Fun f = aa.asFun();
+  public Value call(Value f, Value x, DerivedMop derv) {
+    Fun ff = f.asFun();
     if (x.ia == 0) return x;
     if (x.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, x);
     int l = x.ia / x.shape[0];
@@ -19,12 +19,12 @@ public class ScanBuiltin extends Mop {
     Value[] res = new Value[x.ia];
     int i = 0;
     for (; i < l; i++) res[i] = x.get(i);
-    for (; i < x.ia; i++) res[i] = f.call(res[i-l], x.get(i));
+    for (; i < x.ia; i++) res[i] = ff.call(res[i-l], x.get(i));
     return Arr.create(res, x.shape);
   }
   
-  public Value call(Value aa, Value w, Value x, DerivedMop derv) {
-    Fun aaf = aa.asFun();
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    Fun ff = f.asFun();
     int n = w.asInt();
     int len = x.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);
@@ -36,7 +36,7 @@ public class ScanBuiltin extends Mop {
       for (int i = 0; i < res.length; i++) {
         double[] curr = new double[n];
         System.arraycopy(wa, i, curr, 0, n);
-        res[i] = aaf.call(new DoubleArr(curr));
+        res[i] = ff.call(new DoubleArr(curr));
       }
       return Arr.create(res);
     }
@@ -47,7 +47,7 @@ public class ScanBuiltin extends Mop {
       Value[] curr = new Value[n];
       // for (int j = 0; j < n; j++) curr[j] = wa[i + j];
       System.arraycopy(wa, i, curr, 0, n);
-      res[i] = aaf.call(Arr.create(curr));
+      res[i] = ff.call(Arr.create(curr));
     }
     return Arr.create(res);
   }

@@ -45,31 +45,31 @@ public class JotBuiltin extends Dop {
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return wwf.callInv(aaf.callInvW(w, x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return gf.callInv(ff.callInvW(w, x));
   }
   
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return aaf.callInvA(w, wwf.call(x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return ff.callInvA(w, gf.call(x));
   }
   
-  public Value under(Value f, Value g, Value o, Value w, DerivedDop derv) {
+  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
     if (g instanceof Fun) {
-      Fun wwf = (Fun) g;
+      Fun gf = (Fun) g;
       if (f instanceof Fun) {
-        Fun gf = (Fun) f;
-        return wwf.under(new Fun() { public String repr() { return gf.repr(); }
+        Fun ff = (Fun) f;
+        return gf.under(new Fun() { public String repr() { return ff.repr(); }
           public Value call(Value x) {
-            return gf.under(o, x);
+            return ff.under(o, x);
           }
-        }, w);
+        }, x);
       } else {
-        return wwf.underW(o, f, w);
+        return gf.underW(o, f, x);
       }
     } else {
       if (f instanceof Fun) {
-        return ((Fun) f).underA(o, w, g);
+        return ((Fun) f).underA(o, x, g);
       } else {
         throw new SyntaxError("arr∘arr makes no sense", this);
       }

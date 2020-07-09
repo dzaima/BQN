@@ -14,7 +14,7 @@ public class NCellBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun aaf = f.asFun();
+    Fun ff = f.asFun();
     Value ra = g.asFun().call(x);
     if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
@@ -22,8 +22,8 @@ public class NCellBuiltin extends Dop {
     int[] rsh = Arrays.copyOf(x.shape, rx);
     
     Value[] cs = cells(x, rx);
-    if (aaf instanceof LTBuiltin) return Arr.create(cs, rsh);
-    for (int i = 0; i < cs.length; i++) cs[i] = aaf.call(cs[i]);
+    if (ff instanceof LTBuiltin) return Arr.create(cs, rsh);
+    for (int i = 0; i < cs.length; i++) cs[i] = ff.call(cs[i]);
     return GTBuiltin.merge(cs, rsh, this);
   }
   

@@ -18,7 +18,7 @@ public class EachLeft extends Mop {
     return Arr.create(n, w.shape);
   }
   
-  public Value underW(Value aa, Value o, Value w, Value x, DerivedMop derv) {
-    return EachBuiltin.underW(aa.asFun(), o, w, new Rank0Arr(x), this);
+  public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
+    return EachBuiltin.underW(f.asFun(), o, w, new Rank0Arr(x), this);
   }
 }

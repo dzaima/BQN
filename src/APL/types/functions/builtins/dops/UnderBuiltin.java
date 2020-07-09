@@ -13,28 +13,28 @@ public class UnderBuiltin extends Dop {
   
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun wwf = g.asFun();
-    return wwf.under(f, x);
+    Fun gf = g.asFun();
+    return gf.under(f, x);
   }
   public Value callInv(Value f, Value g, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return wwf.under(InvBuiltin.invertM(aaf), x);
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return gf.under(InvBuiltin.invertM(ff), x);
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return wwf.under(new BindA(wwf.call(w), aaf), x);
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return gf.under(new BindA(gf.call(w), ff), x);
   }
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun wwf = g.asFun();
-    return wwf.under(new BindA(wwf.call(w), InvBuiltin.invertW(f.asFun())), x);
+    Fun gf = g.asFun();
+    return gf.under(new BindA(gf.call(w), InvBuiltin.invertW(f.asFun())), x);
   }
   public Value callInvA(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
-    Fun wwf = g.asFun();
-    Value a1 = wwf.call(w);
-    Value w1 = wwf.call(x);
+    Fun gf = g.asFun();
+    Value w1 = gf.call(w);
+    Value x1 = gf.call(x);
     try {
-      return wwf.callInv(f.asFun().callInvA(a1, w1));
+      return gf.callInv(f.asFun().callInvA(w1, x1));
     } catch (DomainError e) { // but add a nice warning about it if a plausible error was received (todo better error management to not require parsing the message?)
       String msg = e.getMessage();
       if (msg.contains("doesn't support") && msg.contains("inverting")) {

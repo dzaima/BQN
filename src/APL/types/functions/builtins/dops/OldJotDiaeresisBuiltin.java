@@ -12,27 +12,27 @@ public class OldJotDiaeresisBuiltin extends Dop {
   
   @Override
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return aaf.call(wwf.call(w, x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return ff.call(gf.call(w, x));
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return aaf.call(wwf.call(x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return ff.call(gf.call(x));
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return aaf.call(wwf.call(x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return ff.call(gf.call(x));
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return wwf.callInvW(w, aaf.callInv(x));
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return gf.callInvW(w, ff.callInv(x));
   }
   
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun aaf = f.asFun(); Fun wwf = g.asFun();
-    return wwf.callInvA(aaf.callInv(w), x);
+    Fun ff = f.asFun(); Fun gf = g.asFun();
+    return gf.callInvA(ff.callInv(w), x);
   }
 }

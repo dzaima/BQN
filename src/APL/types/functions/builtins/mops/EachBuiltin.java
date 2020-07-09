@@ -70,52 +70,52 @@ public class EachBuiltin extends Mop {
     return Arr.create(n, x.shape);
   }
   
-  public Value under(Value aa, Value o, Value x, DerivedMop derv) {
-    Fun aaf = aa.asFun();
+  public Value under(Value f, Value o, Value x, DerivedMop derv) {
+    Fun ff = f.asFun();
     Value[] res2 = new Value[x.ia];
-    rec(aaf, o, x, 0, new Value[x.ia], new Value[1], res2);
+    rec(ff, o, x, 0, new Value[x.ia], new Value[1], res2);
     return Arr.create(res2, x.shape);
   }
   
-  private static void rec(Fun aa, Obj o, Value w, int i, Value[] args, Value[] resPre, Value[] res) {
+  private static void rec(Fun f, Obj o, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
     if (i == args.length) {
-      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, w.shape)) : (Value) o;
+      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : (Value) o;
       resPre[0] = v;
     } else {
-      res[i] = aa.under(new Fun() { public String repr() { return aa.repr()+"¨"; }
+      res[i] = f.under(new Fun() { public String repr() { return f.repr()+"¨"; }
         public Value call(Value x) {
           args[i] = x;
-          rec(aa, o, w, i+1, args, resPre, res);
+          rec(f, o, x, i+1, args, resPre, res);
           return resPre[0].get(i);
         }
-      }, w.get(i));
+      }, x.get(i));
     }
   }
   
   
-  public Value underW(Value aa, Value o, Value w, Value x, DerivedMop derv) {
-    return underW(aa.asFun(), o, w, x, this);
+  public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
+    return underW(f.asFun(), o, w, x, this);
   }
   
-  public static Value underW(Fun aa, Obj o, Value a, Value w, Callable blame) {
+  public static Value underW(Fun f, Obj o, Value a, Value w, Callable blame) {
     if (a.rank!=0 && w.rank!=0 && !Arrays.equals(a.shape, w.shape)) throw new LengthError("shapes not equal ("+ Main.formatAPL(a.shape)+" vs "+Main.formatAPL(w.shape)+")", blame, w);
     int ia = Math.max(a.ia, w.ia);
     Value[] res2 = new Value[ia];
     if (a.rank==0 && !(a instanceof Primitive)) a = new Rank0Arr(a.first()); // abuse that get doesn't check indexes for simple scalar extension
     if (w.rank==0 && !(w instanceof Primitive)) w = new Rank0Arr(a.first());
-    rec(aa, o, a, w, 0, new Value[ia], new Value[1], res2);
+    rec(f, o, a, w, 0, new Value[ia], new Value[1], res2);
     return Arr.create(res2, w.shape);
   }
   
-  private static void rec(Fun aa, Obj o, Value a, Value w, int i, Value[] args, Value[] resPre, Value[] res) {
+  private static void rec(Fun f, Obj o, Value a, Value w, int i, Value[] args, Value[] resPre, Value[] res) {
     if (i == args.length) {
       Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, w.shape)) : (Value) o;
       resPre[0] = v;
     } else {
-      res[i] = aa.underW(new Fun() { public String repr() { return aa.repr()+"¨"; }
+      res[i] = f.underW(new Fun() { public String repr() { return f.repr()+"¨"; }
         public Value call(Value x) {
           args[i] = x;
-          rec(aa, o, a, w, i+1, args, resPre, res);
+          rec(f, o, a, w, i+1, args, resPre, res);
           return resPre[0].get(i);
         }
       }, a.get(i), w.get(i));

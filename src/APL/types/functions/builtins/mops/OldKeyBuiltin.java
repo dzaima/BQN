@@ -49,13 +49,13 @@ public class OldKeyBuiltin extends Mop {
     throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv, f);
   }
   
-  public Value call(Value aa, Value w, Value x, DerivedMop derv) {
-    if (aa instanceof APLMap) {
-      ((APLMap)aa).set(w, x);
+  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+    if (f instanceof APLMap) {
+      ((APLMap) f).set(w, x);
       return x;
     }
-    if (aa instanceof Fun) {
-      Fun aaf = (Fun) aa;
+    if (f instanceof Fun) {
+      Fun ff = (Fun) f;
       if (!Arrays.equals(w.shape, x.shape)) {
         if (w.rank != x.rank) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.rank+" vs "+x.rank+")", derv, x);
         throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+ Main.formatAPL(x.shape)+")", derv, x);
@@ -78,10 +78,10 @@ public class OldKeyBuiltin extends Mop {
       for (int i = 0; i < order.size(); i++) {
         Value k = order.get(i);
         Value vs = Arr.create(vals.get(k));
-        res[i] = aaf.call(k, vs);
+        res[i] = ff.call(k, vs);
       }
       return Arr.create(res);
     }
-    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+aa.humanType(true), derv, aa);
+    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv, f);
   }
 }
