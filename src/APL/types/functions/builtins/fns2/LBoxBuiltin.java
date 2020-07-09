@@ -14,15 +14,15 @@ public class LBoxBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    if (w.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, w);
+  public Value call(Value x) {
+    if (x.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
     int ia = 1;
-    int[] nsh = new int[w.rank-1];
-    System.arraycopy(w.shape, 1, nsh, 0, nsh.length);
-    for (int i = 1; i < w.shape.length; i++) ia*= w.shape[i];
+    int[] nsh = new int[x.rank-1];
+    System.arraycopy(x.shape, 1, nsh, 0, nsh.length);
+    for (int i = 1; i < x.shape.length; i++) ia*= x.shape[i];
     Value[] res = new Value[ia];
     for (int i = 0; i < ia; i++) { // valuecopy
-      res[i] = w.get(i);
+      res[i] = x.get(i);
     }
     return Arr.create(res, nsh);
   }

@@ -9,8 +9,8 @@ public class GradeUpBuiltin extends Builtin {
     return "⍋";
   }
   
-  public Value call(Value w) {
-    Integer[] na = w.gradeUp();
+  public Value call(Value x) {
+    Integer[] na = x.gradeUp();
     double[] res = new double[na.length];
     for (int i = 0; i < na.length; i++) res[i] = na[i];
     return new DoubleArr(res);

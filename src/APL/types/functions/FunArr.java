@@ -21,10 +21,10 @@ public class FunArr extends Fun {
     return res.toString();
   }
   
-  @Override public Value call(Value w) {
+  @Override public Value call(Value x) {
     Value[] vs = new Value[os.length];
     for (int i = 0; i < os.length; i++) {
-      vs[i] = ((Fun) os[i]).call(w);
+      vs[i] = ((Fun) os[i]).call(x);
     }
     return Arr.create(vs);
   }

@@ -101,8 +101,8 @@ public class RepeatBuiltin extends Dop {
     }
     
     return repeat(aa, n-1, new Fun() { public String repr() { return aa.repr(); }
-      public Value call(Value w) {
-        return aa.under(o, w);
+      public Value call(Value x) {
+        return aa.under(o, x);
       }
     }, w);
   }

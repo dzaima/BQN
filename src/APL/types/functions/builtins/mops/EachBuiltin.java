@@ -83,8 +83,8 @@ public class EachBuiltin extends Mop {
       resPre[0] = v;
     } else {
       res[i] = aa.under(new Fun() { public String repr() { return aa.repr()+"¨"; }
-        public Value call(Value w1) {
-          args[i] = w1;
+        public Value call(Value x) {
+          args[i] = x;
           rec(aa, o, w, i+1, args, resPre, res);
           return resPre[0].get(i);
         }
@@ -113,8 +113,8 @@ public class EachBuiltin extends Mop {
       resPre[0] = v;
     } else {
       res[i] = aa.underW(new Fun() { public String repr() { return aa.repr()+"¨"; }
-        public Value call(Value w1) {
-          args[i] = w1;
+        public Value call(Value x) {
+          args[i] = x;
           rec(aa, o, a, w, i+1, args, resPre, res);
           return resPre[0].get(i);
         }

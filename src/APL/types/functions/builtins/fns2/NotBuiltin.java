@@ -10,8 +10,8 @@ public class NotBuiltin extends Builtin {
     return "¬";
   }
 
-  public Value call(Value w) {
-    return rec(w);
+  public Value call(Value x) {
+    return rec(x);
   }
   
   public Value callInv(Value w) {

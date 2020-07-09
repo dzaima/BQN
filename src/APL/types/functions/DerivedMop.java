@@ -11,8 +11,8 @@ public class DerivedMop extends Fun {
     token = op.token;
   }
   
-  public Value call(Value w) {
-    return op.call(aa, w, this);
+  public Value call(Value x) {
+    return op.call(aa, x, this);
   }
   public Value call(Value a, Value w) {
     return op.call(aa, a, w, this);

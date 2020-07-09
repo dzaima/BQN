@@ -10,10 +10,10 @@ public class RShoeBuiltin extends Builtin {
     return "⊃";
   }
   
-  public Value call(Value w) {
-    if (w instanceof Primitive) return w;
-    else if (w.ia == 0) return w.prototype();
-    else return w.first();
+  public Value call(Value x) {
+    if (x instanceof Primitive) return x;
+    else if (x.ia == 0) return x.prototype();
+    else return x.first();
   }
   
   public Value call(Value a, Value w) {

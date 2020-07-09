@@ -12,12 +12,12 @@ public class OldUpArrowBuiltin extends Builtin {
     return "↑";
   }
   
-  public Value call(Value w) {
-    if (w instanceof Arr) {
-      if (w instanceof DoubleArr || w instanceof ChrArr || w instanceof BitArr) return w;
-      Value[] subs = w.values();
-      return GTBuiltin.merge(subs, w.shape, this);
-    } else return w;
+  public Value call(Value x) {
+    if (x instanceof Arr) {
+      if (x instanceof DoubleArr || x instanceof ChrArr || x instanceof BitArr) return x;
+      Value[] subs = x.values();
+      return GTBuiltin.merge(subs, x.shape, this);
+    } else return x;
   }
   
   

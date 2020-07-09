@@ -13,8 +13,8 @@ public class SemiUBBuiltin extends Builtin {
   
   
   @Override
-  public Value call(Value w) {
-    return new Shape1Arr(w);
+  public Value call(Value x) {
+    return new Shape1Arr(x);
   }
   
   public Value call(Value a, Value w) {

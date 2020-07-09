@@ -11,14 +11,14 @@ public class UDBuiltin extends Builtin {
     return "↕";
   }
   
-  public Value call(Value w) {
-    if (w instanceof Primitive) {
-      if (w instanceof Num) {
-        double[] res = new double[w.asInt()];
+  public Value call(Value x) {
+    if (x instanceof Primitive) {
+      if (x instanceof Num) {
+        double[] res = new double[x.asInt()];
         for (int i = 0; i < res.length; i++) res[i] = i;
         return new DoubleArr(res);
-      } else if (w instanceof BigValue) {
-        Value[] res = new Value[w.asInt()];
+      } else if (x instanceof BigValue) {
+        Value[] res = new Value[x.asInt()];
         for (int i = 0; i < res.length; i++) {
           res[i] = new BigValue(i);
         }
@@ -26,9 +26,9 @@ public class UDBuiltin extends Builtin {
       }
     }
     if (Main.vind) { // •VI←1
-      if (w.rank != 1) throw new DomainError("↕: 𝕩 must be a vector ("+ Main.formatAPL(w.shape)+" ≡ ≢𝕩)", this, w);
-      int dim = w.ia;
-      int[] shape = w.asIntVec();
+      if (x.rank != 1) throw new DomainError("↕: 𝕩 must be a vector ("+ Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, x);
+      int dim = x.ia;
+      int[] shape = x.asIntVec();
       int prod = Arr.prod(shape);
       Value[] res = new Value[dim];
       int blockSize = 1;
@@ -51,7 +51,7 @@ public class UDBuiltin extends Builtin {
       }
       return new HArr(res);
     } else { // •VI←0
-      int[] shape = w.asIntVec();
+      int[] shape = x.asIntVec();
       int ia = Arr.prod(shape);
       Value[] arr = new Value[ia];
       int i = 0;

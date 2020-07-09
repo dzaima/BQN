@@ -25,11 +25,11 @@ public class LShoeStileBuiltin extends Builtin {
     return new DoubleArr(res, a.shape);
   }
   
-  @Override public Value call(Value w) {
-    if (w.rank != 1) throw new RankError("⍧: rank of argument must be 1", this, w);
+  @Override public Value call(Value x) {
+    if (x.rank != 1) throw new RankError("⍧: rank of argument must be 1", this, x);
     HashSet<Value> encountered = new HashSet<>();
-    BitArr.BA res = new BitArr.BA(w.shape);
-    for (Value cv : w) {
+    BitArr.BA res = new BitArr.BA(x.shape);
+    for (Value cv : x) {
       if (encountered.contains(cv)) res.add(false);
       else {
         encountered.add(cv);

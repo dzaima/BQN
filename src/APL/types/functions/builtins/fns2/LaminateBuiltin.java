@@ -13,10 +13,10 @@ public class LaminateBuiltin extends Builtin {
     return GTBuiltin.merge(new Value[]{a, w}, MSH, this);
   }
   
-  public Value call(Value w) {
-    int[] nsh = new int[w.rank+1];
+  public Value call(Value x) {
+    int[] nsh = new int[x.rank+1];
     nsh[0] = 1;
-    System.arraycopy(w.shape, 0, nsh, 1, w.shape.length);
-    return w.ofShape(nsh);
+    System.arraycopy(x.shape, 0, nsh, 1, x.shape.length);
+    return x.ofShape(nsh);
   }
 }

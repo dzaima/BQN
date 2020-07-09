@@ -14,12 +14,12 @@ public class JoinBuiltin extends Builtin {
     return "∾";
   }
   
-  public Value call(Value w) {
-    if (w.rank == 1) {
-      Value joined = JoinBuiltin.joinVec(w);
+  public Value call(Value x) {
+    if (x.rank == 1) {
+      Value joined = JoinBuiltin.joinVec(x);
       if (joined != null) return joined;
     }
-    throw new NYIError("monadic ∾ on rank>1", this, w);
+    throw new NYIError("monadic ∾ on rank>1", this, x);
   }
   
   public static Value joinVec(Value x) { // returns null if contents weren't rank 1

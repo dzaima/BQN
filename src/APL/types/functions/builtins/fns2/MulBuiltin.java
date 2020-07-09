@@ -31,8 +31,8 @@ public class MulBuiltin extends Builtin {
       return Num.of(w.i.signum());
     }
   };
-  public Value call(Value w) {
-    return numChrMapM(NF, c -> Num.of(c.getCase()), c -> c.size()>0? Num.ONE : Num.ZERO, w);
+  public Value call(Value x) {
+    return numChrMapM(NF, c -> Num.of(c.getCase()), c -> c.size()>0? Num.ONE : Num.ZERO, x);
   }
   
   public static final D_NNeN DNF = new D_NNeN() {

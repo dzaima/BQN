@@ -22,8 +22,8 @@ public class MinusBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w) {
-    return numChrM(NF, Char::swap, w);
+  public Value call(Value x) {
+    return numChrM(NF, Char::swap, x);
   }
   
   public static final D_NNeN DNF = new D_NNeN() {

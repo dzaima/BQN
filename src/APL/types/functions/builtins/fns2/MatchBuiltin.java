@@ -28,8 +28,8 @@ public class MatchBuiltin extends Builtin {
     return depth + 1;
   }
   
-  public Value call(Value w) {
-    return Num.of(full(w));
+  public Value call(Value x) {
+    return Num.of(full(x));
   }
   public Value call(Value a, Value w) {
     return a.equals(w)? Num.ONE : Num.ZERO;

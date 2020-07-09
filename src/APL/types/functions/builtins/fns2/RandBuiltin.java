@@ -40,18 +40,18 @@ public class RandBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w) {
-    if (w instanceof SingleItemArr) {
-      Value f = w.first();
+  public Value call(Value x) {
+    if (x instanceof SingleItemArr) {
+      Value f = x.first();
       if (f instanceof Num && ((Num) f).num==2) {
-        long[] ls = new long[BitArr.sizeof(w.ia)];
+        long[] ls = new long[BitArr.sizeof(x.ia)];
         for (int i = 0; i < ls.length; i++) {
           ls[i] = sc.randLong();
         }
-        return new BitArr(ls, w.shape);
+        return new BitArr(ls, x.shape);
       }
     }
-    return numM(nf, w);
+    return numM(nf, x);
   }
   
   public static Value on(Value w, Scope sc) {

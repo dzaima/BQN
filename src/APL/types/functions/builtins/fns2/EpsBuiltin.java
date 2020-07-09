@@ -12,11 +12,11 @@ public class EpsBuiltin extends Builtin {
     return "∊";
   }
   
-  public Value call(Value w) {
-    if (w.rank != 1) throw new NYIError("∊: rank of argument must be 1", this, w); // TODO
+  public Value call(Value x) {
+    if (x.rank != 1) throw new NYIError("∊: rank of argument must be 1", this, x); // TODO
     HashSet<Value> encountered = new HashSet<>();
-    BitArr.BA res = new BitArr.BA(w.shape);
-    for (Value cv : w) {
+    BitArr.BA res = new BitArr.BA(x.shape);
+    for (Value cv : x) {
       if (encountered.contains(cv)) res.add(false);
       else {
         encountered.add(cv);

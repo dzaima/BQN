@@ -13,23 +13,23 @@ public class UpArrowBuiltin extends Builtin {
     return "↑";
   }
   
-  public Value call(Value w) { // TODO scalars? opt for nums?
-    if (w.rank==0) throw new RankError("↑: argument cannot be scalar", this, w);
-    Value[] vs = w.values();
-    int cells = w.shape[0];
-    int csz = CellBuiltin.csz(w);
+  public Value call(Value x) { // TODO scalars? opt for nums?
+    if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
+    Value[] vs = x.values();
+    int cells = x.shape[0];
+    int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
-    int[] sh0 = w.shape.clone();
+    int[] sh0 = x.shape.clone();
     sh0[0] = 0;
     res[0] = new EmptyArr(sh0, null);
     for (int i = 1; i < cells; i++) {
       Value[] c = new Value[i*csz];
       System.arraycopy(vs, 0, c, 0, c.length);
-      int[] sh = w.shape.clone();
+      int[] sh = x.shape.clone();
       sh[0] = i;
       res[i] = Arr.create(c, sh);
     }
-    res[cells] = w;
+    res[cells] = x;
     return new HArr(res);
   }
   

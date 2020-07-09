@@ -16,14 +16,14 @@ public class AndBuiltin extends Builtin {
     return Num.ONE;
   }
   
-  public Value call(Value w) { // valuecopy
-    if (w.rank==0) throw new RankError("∧: argument cannot be scalar", this, w);
-    Integer[] order = w.gradeUp();
-    Value[] vs = w.values();
-    Value[] res = new Value[w.ia];
-    int csz = CellBuiltin.csz(w);
+  public Value call(Value x) { // valuecopy
+    if (x.rank==0) throw new RankError("∧: argument cannot be scalar", this, x);
+    Integer[] order = x.gradeUp();
+    Value[] vs = x.values();
+    Value[] res = new Value[x.ia];
+    int csz = CellBuiltin.csz(x);
     for (int i = 0; i < order.length; i++) System.arraycopy(vs, order[i]*csz, res, i*csz, csz);
-    return Arr.create(res, w.shape);
+    return Arr.create(res, x.shape);
   }
   
   public Value call(Value a, Value w) {

@@ -240,7 +240,7 @@ public abstract class Value extends Obj implements Iterable<Value> {
         return Value.this.toString();
       }
   
-      public Value call(Value w) {
+      public Value call(Value x) {
         return Value.this;
       }
   

@@ -28,8 +28,8 @@ public class TrigBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w) {
-    return numM(NF, w);
+  public Value call(Value x) {
+    return numM(NF, x);
   }
   public Value callInv(Value w) {
     return numM(NFi, w);

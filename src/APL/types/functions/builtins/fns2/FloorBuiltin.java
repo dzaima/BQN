@@ -22,8 +22,8 @@ public class FloorBuiltin extends Builtin {
       for (int i = 0; i < a.length; i++) res[i] = Math.floor(a[i]);
     }
   };
-  public Value call(Value w) {
-    return numChrM(NF, Char::lower, w);
+  public Value call(Value x) {
+    return numChrM(NF, Char::lower, x);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

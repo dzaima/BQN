@@ -18,9 +18,9 @@ public class Fork extends Fun {
     return Type.fn;
   }
   
-  public Value call(Value w) {
-    Value r = h.call(w);
-    Value l = f.asFun().call(w);
+  public Value call(Value x) {
+    Value r = h.call(x);
+    Value l = f.asFun().call(x);
     return g.call(l, r);
   }
   public Value callInv(Value w) {
@@ -50,8 +50,8 @@ public class Fork extends Fun {
   public Value under(Value o, Value w) {
     if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.under(new Fun() { public String repr() { return g.repr(); }
-      public Value call(Value w) {
-        return g.underW(o, f, w);
+      public Value call(Value x) {
+        return g.underW(o, f, x);
       }
     }, w);
   }

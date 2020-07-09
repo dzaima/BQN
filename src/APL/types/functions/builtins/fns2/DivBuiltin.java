@@ -22,8 +22,8 @@ public class DivBuiltin extends Builtin {
       throw new DomainError("reciprocal of biginteger", w);
     }
   };
-  public Value call(Value w) {
-    return numM(NF, w);
+  public Value call(Value x) {
+    return numM(NF, x);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

@@ -11,7 +11,7 @@ public class FormatBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    return Main.toAPL(w.toString());
+  public Value call(Value x) {
+    return Main.toAPL(x.toString());
   }
 }

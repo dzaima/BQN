@@ -14,25 +14,25 @@ public class IotaUBBuiltin extends Builtin {
     return "⍸";
   }
   
-  public Value call(Value w) {
-    int sum = (int)w.sum();
-    if (w.rank == 1) {
+  public Value call(Value x) {
+    int sum = (int) x.sum();
+    if (x.rank == 1) {
       if (sum<0) {
-        for (Value v : w) if (v.asDouble() < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, w);
+        for (Value v : x) if (v.asDouble() < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, x);
       }
       var sub = new double[sum];
       int p = 0;
       
-      if (w instanceof BitArr) {
-        BitArr.BR r = ((BitArr) w).read();
-        for (int i = 0; i < w.ia; i++) {
+      if (x instanceof BitArr) {
+        BitArr.BR r = ((BitArr) x).read();
+        for (int i = 0; i < x.ia; i++) {
           if (r.read()) sub[p++] = i;
         }
       } else {
-        var da = w.asDoubleArr();
-        for (int i = 0; i < w.ia; i++) {
+        var da = x.asDoubleArr();
+        for (int i = 0; i < x.ia; i++) {
           int v = (int) da[i];
-          if (v < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, w);
+          if (v < 0) throw new DomainError("⍸: 𝕩 contained "+v, this, x);
           for (int j = 0; j < v; j++) {
             sub[p++] = i;
           }
@@ -40,13 +40,13 @@ public class IotaUBBuiltin extends Builtin {
       }
       return new DoubleArr(sub);
     } else {
-      double[] wd = w.asDoubleArr();
+      double[] wd = x.asDoubleArr();
       if (Main.vind) { // •VI←1
-        double[][] res = new double[w.rank][sum];
+        double[][] res = new double[x.rank][sum];
         int ri = 0;
-        Indexer idx = new Indexer(w.shape);
+        Indexer idx = new Indexer(x.shape);
         int rank = res.length;
-        for (int i = 0; i < w.ia; i++) {
+        for (int i = 0; i < x.ia; i++) {
           int[] p = idx.next();
           int n = Num.toInt(wd[idx.pos()]);
           if (n > 0) {
@@ -54,7 +54,7 @@ public class IotaUBBuiltin extends Builtin {
               for (int j = 0; j < n; j++) res[k][ri+j] = p[k];
             }
             ri+= n;
-          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, w);
+          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, x);
         }
         Value[] resv = new Value[rank];
         for (int i = 0; i < rank; i++) resv[i] = new DoubleArr(res[i]);
@@ -62,14 +62,14 @@ public class IotaUBBuiltin extends Builtin {
       } else { // •VI←0
         Value[] res = new Value[sum];
         int ri = 0;
-        Indexer idx = new Indexer(w.shape);
-        for (int i = 0; i < w.ia; i++) {
+        Indexer idx = new Indexer(x.shape);
+        for (int i = 0; i < x.ia; i++) {
           int[] p = idx.next();
           int n = Num.toInt(wd[idx.pos()]);
           if (n > 0) {
             DoubleArr pos = Main.toAPL(p);
             for (int j = 0; j < n; j++) res[ri++] = pos;
-          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, w);
+          } else if (n != 0) throw new DomainError("⍸: 𝕩 contained "+n, this, x);
         }
         return new HArr(res);
       }

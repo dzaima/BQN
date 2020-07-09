@@ -45,22 +45,22 @@ public class NorBuiltin extends Builtin {
   public Value call(Value a, Value w) {
     return bitD(DNF, DBF, a, w);
   }
-  public Value call(Value w) {
-    if (w instanceof BitArr) {
-      BitArr wb = (BitArr) w;
+  public Value call(Value x) {
+    if (x instanceof BitArr) {
+      BitArr wb = (BitArr) x;
       wb.setEnd(false);
       for (long l : wb.arr) if (l != 0L) return Num.ZERO;
       return Num.ONE;
     }
-    if (w instanceof DoubleArr) {
-      double[] da = w.asDoubleArr();
-      for (int i = 0; i < w.ia; i++) {
+    if (x instanceof DoubleArr) {
+      double[] da = x.asDoubleArr();
+      for (int i = 0; i < x.ia; i++) {
         if (Main.bool(da[i])) return Num.ZERO;
       }
       return Num.ONE;
     }
-    for (int i = 0; i < w.ia; i++) {
-      if (Main.bool(w.get(i))) return Num.ZERO;
+    for (int i = 0; i < x.ia; i++) {
+      if (Main.bool(x.get(i))) return Num.ZERO;
     }
     return Num.ONE;
   }

@@ -12,13 +12,13 @@ public class RBoxUBBuiltin extends Builtin {
     return "⊒";
   }
   
-  public Value call(Value w) {
-    if (w.rank==0) throw new DomainError("⊒: rank=0", this, w);
-    if (w.rank!=1) throw new NYIError("⊒ on rank≠1", this, w);
+  public Value call(Value x) {
+    if (x.rank==0) throw new DomainError("⊒: rank=0", this, x);
+    if (x.rank!=1) throw new NYIError("⊒ on rank≠1", this, x);
     HashMap<Value, Integer> vs = new HashMap<>();
-    double[] res = new double[w.ia];
+    double[] res = new double[x.ia];
     int i = 0;
-    for (Value v : w) {
+    for (Value v : x) {
       Integer c = vs.get(v);
       if (c==null) {
         vs.put(v, 1);

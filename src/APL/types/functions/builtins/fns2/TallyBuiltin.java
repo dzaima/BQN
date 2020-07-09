@@ -10,8 +10,8 @@ public class TallyBuiltin extends Builtin {
     return "≢";
   }
   
-  public Value call(Value w) {
-    return Main.toAPL(w.shape);
+  public Value call(Value x) {
+    return Main.toAPL(x.shape);
   }
   
   public Value call(Value a, Value w) {

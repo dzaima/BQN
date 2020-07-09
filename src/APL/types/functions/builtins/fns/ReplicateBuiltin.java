@@ -17,7 +17,7 @@ public class ReplicateBuiltin extends Builtin {
     Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
     return AtBuiltin.at(v, new Fun() { // lazy version
       public String repr() { return "{⌿.𝕨}"; }
-      public Value call(Value w) { return a; }
+      public Value call(Value x) { return a; }
     }, w, this);
   }
 }

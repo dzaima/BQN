@@ -13,8 +13,8 @@ public abstract class Fun extends Callable {
   }
   
   protected Fun() { }
-  public Value call(Value w) {
-    throw new IncorrectArgsError("function "+toString()+" called monadically", this, w);
+  public Value call(Value x) {
+    throw new IncorrectArgsError("function "+toString()+" called monadically", this, x);
   }
   public Value call(Value a, Value w) {
     throw new IncorrectArgsError("function "+toString()+" called dyadically", this, a);

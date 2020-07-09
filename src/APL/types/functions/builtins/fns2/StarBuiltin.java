@@ -21,8 +21,8 @@ public class StarBuiltin extends Builtin {
       for (int i = 0; i < a.length; i++) res[i] = Math.exp(a[i]);
     }
   };
-  public Value call(Value w) {
-    return numM(NF, w);
+  public Value call(Value x) {
+    return numM(NF, x);
   }
   public Value callInv(Value w) {
     return numM(LogBuiltin.NF, w);

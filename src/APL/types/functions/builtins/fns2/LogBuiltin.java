@@ -31,8 +31,8 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
       return new Num(Math.log(d) + LN2*shift);
     }
   };
-  public Value call(Value w) {
-    return numM(NF, w);
+  public Value call(Value x) {
+    return numM(NF, x);
   }
   public Value callInv(Value w) {
     return numM(StarBuiltin.NF, w);

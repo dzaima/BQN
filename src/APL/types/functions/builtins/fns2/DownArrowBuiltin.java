@@ -11,25 +11,25 @@ public class DownArrowBuiltin extends Builtin {
     return "↓";
   }
   
-  public Value call(Value w) { // TODO scalars? opt for nums?
-    if (w.rank==0) throw new RankError("↑: argument cannot be scalar", this, w);
-    Value[] vs = w.values();
-    int cells = w.shape[0];
-    int csz = CellBuiltin.csz(w);
+  public Value call(Value x) { // TODO scalars? opt for nums?
+    if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
+    Value[] vs = x.values();
+    int cells = x.shape[0];
+    int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
   
-    res[0] = w;
+    res[0] = x;
     
     for (int i = 1; i < cells; i++) {
       int am = cells-i;
       Value[] c = new Value[am*csz];
       System.arraycopy(vs, i*csz, c, 0, c.length);
-      int[] sh = w.shape.clone();
+      int[] sh = x.shape.clone();
       sh[0] = am;
       res[i] = Arr.create(c, sh);
     }
   
-    int[] sh0 = w.shape.clone();
+    int[] sh0 = x.shape.clone();
     sh0[0] = 0;
     res[cells] = new EmptyArr(sh0, null);
     return new HArr(res);

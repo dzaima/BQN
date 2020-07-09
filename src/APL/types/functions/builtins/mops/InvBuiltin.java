@@ -29,8 +29,8 @@ public class InvBuiltin extends Mop {
   public static Fun invertM(Fun f) {
     return new Fun() {
       public String repr() { return f.repr()+"⁼"; }
-      public Value call(Value w) {
-        return f.callInv(w);
+      public Value call(Value x) {
+        return f.callInv(x);
       }
     };
   }

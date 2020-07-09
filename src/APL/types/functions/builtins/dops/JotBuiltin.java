@@ -60,8 +60,8 @@ public class JotBuiltin extends Dop {
       if (aa instanceof Fun) {
         Fun gf = (Fun) aa;
         return wwf.under(new Fun() { public String repr() { return gf.repr(); }
-          public Value call(Value w) {
-            return gf.under(o, w);
+          public Value call(Value x) {
+            return gf.under(o, x);
           }
         }, w);
       } else {

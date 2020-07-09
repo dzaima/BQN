@@ -38,8 +38,8 @@ public class LTBuiltin extends Builtin {
       a, w);
   }
   
-  public Value call(Value w) {
-    if (!Main.enclosePrimitives && w instanceof Primitive) return w;
-    return new Rank0Arr(w);
+  public Value call(Value x) {
+    if (!Main.enclosePrimitives && x instanceof Primitive) return x;
+    return new Rank0Arr(x);
   }
 }

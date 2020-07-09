@@ -22,8 +22,8 @@ public class CeilingBuiltin extends Builtin {
       for (int i = 0; i < a.length; i++) res[i] = Math.ceil(a[i]);
     }
   };
-  public Value call(Value w) {
-    return numChrM(NF, Char::upper, w);
+  public Value call(Value x) {
+    return numChrM(NF, Char::upper, x);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

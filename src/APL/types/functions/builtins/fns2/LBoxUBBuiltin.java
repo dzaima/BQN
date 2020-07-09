@@ -15,8 +15,8 @@ public class LBoxUBBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    return w.first();
+  public Value call(Value x) {
+    return x.first();
   }
   
   public Value under(Value o, Value w) {

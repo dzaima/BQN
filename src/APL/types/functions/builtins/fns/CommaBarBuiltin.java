@@ -12,11 +12,11 @@ public class CommaBarBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    if (w.rank==1 && w.shape[0]==0) return new EmptyArr(new int[]{0, 1}, w.safePrototype());
-    if (w.rank==0) return w.ofShape(new int[]{1, 1});
-    int[] nsh = new int[]{w.shape[0], w.ia/w.shape[0]};
-    return w.ofShape(nsh);
+  public Value call(Value x) {
+    if (x.rank==1 && x.shape[0]==0) return new EmptyArr(new int[]{0, 1}, x.safePrototype());
+    if (x.rank==0) return x.ofShape(new int[]{1, 1});
+    int[] nsh = new int[]{x.shape[0], x.ia/x.shape[0]};
+    return x.ofShape(nsh);
   }
   
   public Value call(Value a, Value w) {

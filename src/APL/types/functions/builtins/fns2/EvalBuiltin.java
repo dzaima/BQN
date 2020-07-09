@@ -13,7 +13,7 @@ public class EvalBuiltin extends Builtin {
     this.sc = sc;
   }
   
-  public Value call(Value w) {
-    return Main.exec(w.asString(), sc);
+  public Value call(Value x) {
+    return Main.exec(x.asString(), sc);
   }
 }

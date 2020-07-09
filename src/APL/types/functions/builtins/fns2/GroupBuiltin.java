@@ -25,9 +25,9 @@ public class GroupBuiltin extends Builtin {
     }
   }
   
-  public Value call(Value w) {
-    if (w.rank != 1) throw new DomainError("⊔: rank of \uD835\uDD69 should be 1 (was "+w.rank+")", this, w);
-    int[] wi = w.asIntVec();
+  public Value call(Value x) {
+    if (x.rank != 1) throw new DomainError("⊔: rank of 𝕩 should be 1 (was "+ x.rank+")", this, x);
+    int[] wi = x.asIntVec();
     int sz = 0;
     for (int d : wi) sz = Math.max(sz, d);
     sz++;
@@ -37,7 +37,7 @@ public class GroupBuiltin extends Builtin {
     for (int i = 0; i < wi.length; i++) {
       int c = wi[i];
       if (c>=0) ds[c].add(i);
-      else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in \uD835\uDD68", this, w);
+      else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, x);
     }
     Value[] res = new Value[sz];
     for (int i = 0; i < sz; i++) {
@@ -62,7 +62,7 @@ public class GroupBuiltin extends Builtin {
       int c = poss[i];
       if (c>=0) {
         vs[c].add(w.get(i));
-      } else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in \uD835\uDD68", this, a);
+      } else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, a);
     }
     Value[] res = new Value[sz];
     for (int i = 0; i < sz; i++) {

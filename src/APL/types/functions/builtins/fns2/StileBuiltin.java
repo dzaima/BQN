@@ -26,8 +26,8 @@ public class StileBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w) {
-    return numChrMapM(NF, c->{ throw new DomainError("|char", this, w); }, c -> Num.of(c.size()), w);
+  public Value call(Value x) {
+    return numChrMapM(NF, c->{ throw new DomainError("|char", this, x); }, c -> Num.of(c.size()), x);
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

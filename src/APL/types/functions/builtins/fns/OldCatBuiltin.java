@@ -12,13 +12,13 @@ public class OldCatBuiltin extends Builtin {
   }
   
   
-  public Value call(Value w) {
-    if (w instanceof Primitive) {
-      if (w instanceof Num) return new DoubleArr(new double[]{((Num) w).num});
-      if (w instanceof Char) return new ChrArr(String.valueOf(((Char) w).chr));
-      return new Shape1Arr(w);
+  public Value call(Value x) {
+    if (x instanceof Primitive) {
+      if (x instanceof Num) return new DoubleArr(new double[]{((Num) x).num});
+      if (x instanceof Char) return new ChrArr(String.valueOf(((Char) x).chr));
+      return new Shape1Arr(x);
     }
-    return w.ofShape(new int[]{w.ia});
+    return x.ofShape(new int[]{x.ia});
   }
   public Value call(Value a, Value w) {
     int dim = Math.max(a.rank, w.rank) - 1;

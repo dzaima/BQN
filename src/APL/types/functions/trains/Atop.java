@@ -11,8 +11,8 @@ public class Atop extends Fun {
     this.h = h;
   }
   
-  public Value call(Value w) {
-    return g.call(h.call(w));
+  public Value call(Value x) {
+    return g.call(h.call(x));
   }
   public Value callInv(Value w) {
     return h.callInv(g.callInv(w));
@@ -31,8 +31,8 @@ public class Atop extends Fun {
   
   public Value under(Value o, Value w) {
     return h.under(new Fun() { public String repr() { return g.repr(); }
-      public Value call(Value w) {
-        return g.under(o, w);
+      public Value call(Value x) {
+        return g.under(o, x);
       }
     }, w);
   }

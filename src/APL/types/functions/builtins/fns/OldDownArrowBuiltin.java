@@ -15,13 +15,13 @@ public class OldDownArrowBuiltin extends Builtin {
   }
   
   
-  public Value call(Value w) {
-    if (w instanceof Primitive) return w;
-    if (w.rank <= 1) return new Rank0Arr(w);
-    if (w.quickDoubleArr()) {
-      double[] dw = w.asDoubleArr();
-      int csz = w.shape[w.rank-1]; // chunk size
-      int cam = w.ia/csz; // chunk amount
+  public Value call(Value x) {
+    if (x instanceof Primitive) return x;
+    if (x.rank <= 1) return new Rank0Arr(x);
+    if (x.quickDoubleArr()) {
+      double[] dw = x.asDoubleArr();
+      int csz = x.shape[x.rank-1]; // chunk size
+      int cam = x.ia/csz; // chunk amount
       Value[] res = new Value[cam];
       for (int i = 0; i < cam; i++) {
         double[] c = new double[csz];
@@ -29,22 +29,22 @@ public class OldDownArrowBuiltin extends Builtin {
         // ↑ ≡ for (int j = 0; j < csz; j++) c[j] = dw[i * csz + j];
         res[i] = new DoubleArr(c);
       }
-      int[] nsh = new int[w.rank-1];
-      System.arraycopy(w.shape, 0, nsh, 0, nsh.length);
+      int[] nsh = new int[x.rank-1];
+      System.arraycopy(x.shape, 0, nsh, 0, nsh.length);
       return new HArr(res, nsh);
     }
-    int csz = w.shape[w.rank-1]; // chunk size
-    int cam = w.ia/csz; // chunk amount
+    int csz = x.shape[x.rank-1]; // chunk size
+    int cam = x.ia/csz; // chunk amount
     Value[] res = new Value[cam];
     for (int i = 0; i < cam; i++) {
       Value[] c = new Value[csz];
       for (int j = 0; j < csz; j++) {
-        c[j] = w.get(i*csz + j);
+        c[j] = x.get(i*csz + j);
       }
       res[i] = Arr.create(c);
     }
-    int[] nsh = new int[w.rank-1];
-    System.arraycopy(w.shape, 0, nsh, 0, nsh.length);
+    int[] nsh = new int[x.rank-1];
+    System.arraycopy(x.shape, 0, nsh, 0, nsh.length);
     return new HArr(res, nsh);
   }
   

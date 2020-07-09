@@ -11,8 +11,8 @@ public class ReverseBuiltin extends Builtin {
   }
   
   
-  public Value call(Value w) {
-    return on(w);
+  public Value call(Value x) {
+    return on(x);
   }
   public static Value on(Value w) {
     if (w instanceof Primitive) return w;

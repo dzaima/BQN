@@ -125,8 +125,8 @@ public class Scope {
         case "•stdin": return new Stdin();
         case "•big": return new Big();
         case "•rand": return new Builtin() {
-          public Value call(Value w) {
-            return RandBuiltin.on(w, Scope.this);
+          public Value call(Value x) {
+            return RandBuiltin.on(x, Scope.this);
           }
   
           public String repr() {
@@ -143,8 +143,8 @@ public class Scope {
         case "•u": return new Builtin() {
           @Override public String repr() { return "•U"; }
   
-          @Override public Value call(Value w) {
-            sys.ucmd(w.asString());
+          @Override public Value call(Value x) {
+            sys.ucmd(x.asString());
             return null;
           }
         };
@@ -197,10 +197,10 @@ public class Scope {
             return "•BC";
           }
           
-          public Value call(Value w) {
-            DfnTok s = w instanceof Dfn? ((Dfn) w).code : w instanceof Ddop? ((Ddop) w).code : w instanceof Dmop? ((Dmop) w).code : null;
+          public Value call(Value x) {
+            DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Ddop? ((Ddop) x).code : x instanceof Dmop? ((Dmop) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt());
-            return call(Scope.this.get("•comp").asFun().call(new HArr(new Value[]{Char.of('f'), Num.ZERO}  ), w));
+            return call(Scope.this.get("•comp").asFun().call(new HArr(new Value[]{Char.of('f'), Num.ZERO}  ), x));
           }
           
         };
@@ -251,8 +251,8 @@ public class Scope {
     }
     
     @Override
-    public Value call(Value w) {
-      return new Logger(sc, w.toString());
+    public Value call(Value x) {
+      return new Logger(sc, x.toString());
     }
     static class Logger extends Primitive {
       private final Scope sc;
@@ -286,8 +286,8 @@ public class Scope {
     Timer(boolean raw) {
       this.raw = raw;
     }
-    public Value call(Value w) {
-      return call(Num.ONE, w);
+    public Value call(Value x) {
+      return call(Num.ONE, x);
     }
     public Value call(Value a, Value w) {
       int[] options = a.asIntVec();
@@ -331,9 +331,9 @@ public class Scope {
       return "•ERASE";
     }
     
-    public Value call(Value w) {
-      Scope.this.set(w.asString(), null);
-      return w;
+    public Value call(Value x) {
+      Scope.this.set(x.asString(), null);
+      return x;
     }
   }
   static class Delay extends Builtin {
@@ -341,9 +341,9 @@ public class Scope {
       return "•DL";
     }
     
-    public Value call(Value w) {
+    public Value call(Value x) {
       long nsS = System.nanoTime();
-      double ms = w.asDouble() * 1000;
+      double ms = x.asDouble() * 1000;
       int ns = (int) ((ms%1)*1000000);
       try {
         Thread.sleep((int) ms, ns);
@@ -356,7 +356,7 @@ public class Scope {
       return "•UCS";
     }
     
-    public Value call(Value w) {
+    public Value call(Value x) {
       return numChrM(new NumMV() {
         public Value call(Num c) {
           return Char.of((char) c.asInt());
@@ -365,7 +365,7 @@ public class Scope {
         public boolean retNum() {
           return false;
         }
-      }, c->Num.of(c.chr), w);
+      }, c->Num.of(c.chr), x);
     }
     
     public Value callInv(Value w) {
@@ -378,9 +378,9 @@ public class Scope {
       return "•MAP";
     }
     
-    public Value call(Value w) {
-      if (w instanceof StrMap) {
-        StrMap wm = (StrMap) w;
+    public Value call(Value x) {
+      if (x instanceof StrMap) {
+        StrMap wm = (StrMap) x;
         // Scope sc;
         // HashMap<String, Obj> vals;
         // if (wm.sc == null) {
@@ -395,7 +395,7 @@ public class Scope {
         return new StrMap(new HashMap<>(wm.vals));
       }
       StrMap map = new StrMap();
-      for (Value v : w) {
+      for (Value v : x) {
         if (v.rank != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
         map.set(v.get(0), v.get(1));
       }
@@ -419,8 +419,8 @@ public class Scope {
       return "•OPT";
     }
     
-    public Value call(Value w) {
-      String name = w.asString();
+    public Value call(Value x) {
+      String name = x.asString();
       Value v = Scope.this.get(name);
       Value optimized = v.squeeze();
       if (v == optimized) return Num.ZERO;
@@ -432,8 +432,8 @@ public class Scope {
     public String repr() {
       return "•CLASS";
     }
-    public Value call(Value w) {
-      return new ChrArr(w.getClass().getCanonicalName());
+    public Value call(Value x) {
+      return new ChrArr(x.getClass().getCanonicalName());
     }
   }
   
@@ -442,8 +442,8 @@ public class Scope {
       return "•EX";
     }
     
-    public Value call(Value w) {
-      return call(EmptyArr.SHAPE0S, w);
+    public Value call(Value x) {
+      return call(EmptyArr.SHAPE0S, x);
     }
   
     public Value call(Value a, Value w) {
@@ -457,8 +457,8 @@ public class Scope {
       return "•LNS";
     }
     
-    public Value call(Value w) {
-      String path = w.asString();
+    public Value call(Value x) {
+      String path = x.asString();
       String[] a = Main.readFile(path).split("\n");
       Value[] o = new Value[a.length];
       for (int i = 0; i < a.length; i++) {
@@ -539,8 +539,8 @@ public class Scope {
       return "•SH";
     }
     
-    public Value call(Value w) {
-      return exec(w, null, null, false);
+    public Value call(Value x) {
+      return exec(x, null, null, false);
     }
     
     public Value call(Value a, Value w) {
@@ -620,8 +620,8 @@ public class Scope {
       return "•NC";
     }
     
-    public Value call(Value w) {
-      Obj obj = Scope.this.get(w.asString());
+    public Value call(Value x) {
+      Obj obj = Scope.this.get(x.asString());
       if (obj == null) return Num.ZERO;
       if (obj instanceof Fun  ) return Num.NUMS[3];
       if (obj instanceof Dop  ) return Num.NUMS[4];
@@ -636,22 +636,22 @@ public class Scope {
     public String repr() {
       return "•HASH";
     }
-    public Value call(Value w) {
-      return Num.of(w.hashCode());
+    public Value call(Value x) {
+      return Num.of(x.hashCode());
     }
   }
   private static class Stdin extends Builtin {
     public String repr() {
       return "•STDIN";
     }
-    public Value call(Value w) {
-      if (w instanceof Num) {
-        int n = w.asInt();
+    public Value call(Value x) {
+      if (x instanceof Num) {
+        int n = x.asInt();
         ArrayList<Value> res = new ArrayList<>(n);
         for (int i = 0; i < n; i++) res.add(Main.toAPL(Main.console.nextLine()));
         return new HArr(res);
       }
-      if (w.ia == 0) {
+      if (x.ia == 0) {
         ArrayList<Value> res = new ArrayList<>();
         while (Main.console.hasNext()) res.add(Main.toAPL(Main.console.nextLine()));
         return new HArr(res);
@@ -690,8 +690,8 @@ public class Scope {
     public String repr() {
       return "•PFX";
     }
-    public Value call(Value w) {
-      return call(w, w);
+    public Value call(Value x) {
+      return call(x, x);
     }
     private static Pr pr(Value ko, Value vo) {
       String k = ko.asString();
@@ -798,8 +798,8 @@ public class Scope {
   }
   
   private static class Big extends Builtin {
-    public Value call(Value w) {
-      return rec(w);
+    public Value call(Value x) {
+      return rec(x);
     }
     private Value rec(Value w) {
       if (w instanceof Num) return new BigValue(((Num) w).num);
@@ -844,17 +844,17 @@ public class Scope {
       0=÷∘100 - primitive
       1=÷∘100 - array
     */
-    public Value call(Value w) {
-      if (w instanceof    BitArr) return Num.of(101);
-      if (w instanceof      Char) return Num.of(  2);
-      if (w instanceof    ChrArr) return Num.of(102);
-      if (w instanceof       Num) return Num.of(  3);
-      if (w instanceof DoubleArr) return Num.of(103);
-      if (w instanceof    APLMap) return Num.of(  4);
-      if (w instanceof  BigValue) return Num.of(  5);
-      if (w instanceof      Null) return Num.of(  9);
-      if (w instanceof       Arr) return Num.of(100);
-      if (w instanceof Primitive) return Num.of(  0);
+    public Value call(Value x) {
+      if (x instanceof    BitArr) return Num.of(101);
+      if (x instanceof      Char) return Num.of(  2);
+      if (x instanceof    ChrArr) return Num.of(102);
+      if (x instanceof       Num) return Num.of(  3);
+      if (x instanceof DoubleArr) return Num.of(103);
+      if (x instanceof    APLMap) return Num.of(  4);
+      if (x instanceof  BigValue) return Num.of(  5);
+      if (x instanceof      Null) return Num.of(  9);
+      if (x instanceof       Arr) return Num.of(100);
+      if (x instanceof Primitive) return Num.of(  0);
       return Num.of(200); // idk ¯\_(ツ)_/¯
     }
     public Value call(Value a, Value w) {
@@ -870,27 +870,27 @@ public class Scope {
         if (t==3) {
           if (f==1) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
-            public Value call(Value w) {
-              return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, w, DR.this)).longValue()));
+            public Value call(Value x) {
+              return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
             }
           }, 1, w, this);
           if (f==5) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
-            public Value call(Value w) {
-              return new Num(Double.longBitsToDouble(((BigValue) w).longValue()));
+            public Value call(Value x) {
+              return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
             }
           }, 0, w, this);
         } else {
           if (t==1) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
-            public Value call(Value w) {
-              return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(w.asDouble()))}, new int[]{64});
+            public Value call(Value x) {
+              return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
             }
           }, 0, w, this);
           if (t==5) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
-            public Value call(Value w) {
-              return new BigValue(Double.doubleToRawLongBits(w.asDouble()));
+            public Value call(Value x) {
+              return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
             }
           }, 0, w, this);
         }

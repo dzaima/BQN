@@ -11,7 +11,7 @@ public class LTackBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) { return w; }
+  public Value call(Value x) { return x; }
   public Value call(Value a, Value w) { return a; }
   
   public Value callInv(Value w) {

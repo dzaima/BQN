@@ -15,8 +15,8 @@ public class DTackBuiltin extends Builtin {
   
   
   
-  public Value call(Value w) {
-    return call(Num.NUMS[2], w);
+  public Value call(Value x) {
+    return call(Num.NUMS[2], x);
   }
   
   public Value callInv(Value w) {

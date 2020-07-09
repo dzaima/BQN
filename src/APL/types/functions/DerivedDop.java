@@ -12,8 +12,8 @@ public class DerivedDop extends Fun {
     token = op.token;
   }
   
-  public Value call(Value w) {
-    return op.call(aa, ww, w, this);
+  public Value call(Value x) {
+    return op.call(aa, ww, x, this);
   }
   public Value call(Value a, Value w) {
     return op.call(aa, ww, a, w, this);

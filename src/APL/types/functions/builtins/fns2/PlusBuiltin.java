@@ -16,11 +16,11 @@ public class PlusBuiltin extends Builtin {
     return Num.ZERO;
   }
   
-  public Value call(Value w) {
+  public Value call(Value x) {
     return allM(v -> {
-      if (!(v instanceof Num)) throw new DomainError("Conjugating a non-number", this, w); // TODO decide whether this should exist
+      if (!(v instanceof Num)) throw new DomainError("Conjugating a non-number", this, x); // TODO decide whether this should exist
       return ((Num)v).conjugate();
-    }, w);
+    }, x);
   }
   
   public static final D_NNeN DNF = new D_NNeN() {

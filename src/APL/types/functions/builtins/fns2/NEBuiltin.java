@@ -11,9 +11,9 @@ public class NEBuiltin extends Builtin {
   }
   
   
-  public Value call(Value w) {
-    if (w.rank==0) return Num.ONE;
-    return Num.of(w.shape[0]);
+  public Value call(Value x) {
+    if (x.rank==0) return Num.ONE;
+    return Num.of(x.shape[0]);
   }
   
   private static final D_NNeB DNF = new D_NNeB() {

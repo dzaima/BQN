@@ -42,8 +42,8 @@ public class ExclBuiltin extends Builtin {
     }
   };
   
-  public Value call(Value w) {
-    return numM(NF, w);
+  public Value call(Value x) {
+    return numM(NF, x);
   }
   
   public Value call(Value a0, Value w0) {
