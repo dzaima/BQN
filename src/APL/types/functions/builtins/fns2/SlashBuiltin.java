@@ -169,20 +169,20 @@ public class SlashBuiltin extends Builtin {
   //  
   // }
   
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    if (MatchBuiltin.full(a)!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector", this, a);
-    if (a.rank!=1 || w.rank!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, a.rank!=1?a:w);
-    double asum = a.sum();
-    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, w);
-    Value[] res = new Value[w.ia];
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    if (MatchBuiltin.full(w)!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector", this, w);
+    if (w.rank!=1 || x.rank!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, w.rank!=1? w : x);
+    double asum = w.sum();
+    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, x);
+    Value[] res = new Value[x.ia];
     int ipos = 0;
-    double[] values = a.asDoubleArr();
+    double[] values = w.asDoubleArr();
     for (int i = 0; i < values.length; i++) {
       double d = values[i];
       if (d!=0 && d!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector, contained "+Num.format(d));
       if (d == 1) res[i] = v.get(ipos++);
-      else res[i] = w.get(i);
+      else res[i] = x.get(i);
     }
     return Arr.create(res);
   }

@@ -33,13 +33,13 @@ public class DerivedDop extends Fun {
     return aa.toString()+op.repr()+wws;
   }
   
-  public Value under(Value o, Value w) {
-    return op.under(aa, ww, o, w, this);
+  public Value under(Value o, Value x) {
+    return op.under(aa, ww, o, x, this);
   }
-  public Value underW(Value o, Value a, Value w) {
-    return op.underW(aa, ww, o, a, w, this);
+  public Value underW(Value o, Value w, Value x) {
+    return op.underW(aa, ww, o, w, x, this);
   }
-  public Value underA(Value o, Value a, Value w) {
-    return op.underA(aa, ww, o, a, w, this);
+  public Value underA(Value o, Value w, Value x) {
+    return op.underA(aa, ww, o, w, x, this);
   }
 }

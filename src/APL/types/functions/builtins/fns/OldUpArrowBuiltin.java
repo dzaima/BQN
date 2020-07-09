@@ -58,8 +58,8 @@ public class OldUpArrowBuiltin extends Builtin {
   // }
   
   
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    return UpArrowBuiltin.undo(a.asIntVec(), v, w, this);
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    return UpArrowBuiltin.undo(w.asIntVec(), v, x, this);
   }
 }

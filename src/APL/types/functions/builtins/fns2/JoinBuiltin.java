@@ -183,21 +183,21 @@ public class JoinBuiltin extends Builtin {
     }
   }
   
-  public Value under(Value o, Value w) {
-    if (w.rank != 1) throw new NYIError("⌾∾ for rank>1", this, w); // doesn't work 
-    Value joined = call(w);
+  public Value under(Value o, Value x) {
+    if (x.rank != 1) throw new NYIError("⌾∾ for rank>1", this, x); // doesn't work 
+    Value joined = call(x);
     Value v = o instanceof Fun? ((Fun) o).call(joined) : o;
     Arr.eqShapes(joined.shape, v.shape, this);
-    Value[] res = new Value[w.ia];
+    Value[] res = new Value[x.ia];
     Value[] vv = v.values();
     int oi = 0;
     int ii = 0;
-    for (Value c : w) {
+    for (Value c : x) {
       Value[] cr = new Value[c.ia];
       System.arraycopy(vv, ii, cr, 0, cr.length);
       res[oi] = Arr.create(cr, c.shape);
       oi++; ii+= cr.length;
     }
-    return new HArr(res, w.shape);
+    return new HArr(res, x.shape);
   }
 }

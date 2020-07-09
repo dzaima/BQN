@@ -14,12 +14,12 @@ public class RShoeUBBuiltin extends Builtin {
     return LBoxUBBuiltin.on(w, x, this);
   }
   
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    Value[] vs = w.valuesCopy();
-    for (int i = 0; i < a.ia; i++) {
-      vs[Indexer.fromShape(w.shape, a.get(i).asIntVec())] = v.get(i);
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value[] vs = x.valuesCopy();
+    for (int i = 0; i < w.ia; i++) {
+      vs[Indexer.fromShape(x.shape, w.get(i).asIntVec())] = v.get(i);
     }
-    return Arr.create(vs, w.shape);
+    return Arr.create(vs, x.shape);
   }
 }

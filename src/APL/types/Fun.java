@@ -31,17 +31,17 @@ public abstract class Fun extends Callable {
   }
   
   
-  public Value under(Value o, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
+  public Value under(Value o, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
     return callInv(v);
   }
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    return callInvW(a, v);
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    return callInvW(w, v);
   }
-  public Value underA(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    return callInvA(v, w);
+  public Value underA(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    return callInvA(v, x);
   }
   
   public interface NumMV {

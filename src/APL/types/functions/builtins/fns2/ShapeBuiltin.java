@@ -109,31 +109,31 @@ public class ShapeBuiltin extends Builtin {
     }
   }
   
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    for (int i = 0; i < a.ia; i++) {
-      Value c = a.get(i);
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    for (int i = 0; i < w.ia; i++) {
+      Value c = w.get(i);
       if (!(c instanceof Num)) { // a‿⟨⟩‿b ⥊ w - must use all items
-        if (w.rank == 0 && v.first() instanceof Primitive) return v.first();
-        if (v.ia != w.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
-        return v.ofShape(w.shape);
+        if (x.rank == 0 && v.first() instanceof Primitive) return v.first();
+        if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
+        return v.ofShape(x.shape);
       }
     }
-    int[] sh = a.asIntVec();
+    int[] sh = w.asIntVec();
     int am = Arr.prod(sh);
-    if (am > w.ia) throw new DomainError("⌾("+Main.formatAPL(sh)+"⥊) applied on array with "+w.ia+" items", this);
+    if (am > x.ia) throw new DomainError("⌾("+Main.formatAPL(sh)+"⥊) applied on array with "+x.ia+" items", this);
     if (!Arrays.equals(sh, v.shape)) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
-    Value[] vs = new Value[w.ia];
+    Value[] vs = new Value[x.ia];
     System.arraycopy(v.values(), 0, vs, 0, am);
-    System.arraycopy(w.values(), am, vs, am, vs.length-am);
-    return Arr.create(vs, w.shape);
+    System.arraycopy(x.values(), am, vs, am, vs.length-am);
+    return Arr.create(vs, x.shape);
   }
   
   
-  public Value under(Value o, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
-    if (v.ia != w.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
-    return v.ofShape(w.shape);
+  public Value under(Value o, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
+    return v.ofShape(x.shape);
   }
   
 }

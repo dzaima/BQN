@@ -87,17 +87,17 @@ public class LBoxBuiltin extends Builtin {
     return rp;
   }
   
-  public Value underW(Value o, Value a, Value w) {
-    Value res = call(a, w);
+  public Value underW(Value o, Value w, Value x) {
+    Value res = call(w, x);
     Value v = o instanceof Fun? ((Fun) o).call(res) : o;
-    if (MatchBuiltin.full(a) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this, a);
+    if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this, w);
     if (!Arrays.equals(res.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(res.shape)+", got "+Main.formatAPL(v.shape)+")");
-    int[] is = a.asIntArr();
-    Value[] vs = w.valuesCopy();
+    int[] is = w.asIntArr();
+    Value[] vs = x.valuesCopy();
     for (int i = 0; i < is.length; i++) {
       vs[is[i]] = v.get(i);
     }
-    return Arr.create(vs, w.shape);
+    return Arr.create(vs, x.shape);
   }
   
   public static Value getCell(int a, Value x, Callable blame) { // expects non-scalar x

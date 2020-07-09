@@ -31,13 +31,13 @@ public class DerivedMop extends Fun {
     return aa.toString()+op.repr();
   }
   
-  public Value under(Value o, Value w) {
-    return op.under(aa, o, w, this);
+  public Value under(Value o, Value x) {
+    return op.under(aa, o, x, this);
   }
-  public Value underW(Value o, Value a, Value w) {
-    return op.underW(aa, o, a, w, this);
+  public Value underW(Value o, Value w, Value x) {
+    return op.underW(aa, o, w, x, this);
   }
-  public Value underA(Value o, Value a, Value w) {
-    return op.underA(aa, o, a, w, this);
+  public Value underA(Value o, Value w, Value x) {
+    return op.underA(aa, o, w, x, this);
   }
 }

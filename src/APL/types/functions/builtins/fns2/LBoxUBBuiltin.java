@@ -19,12 +19,12 @@ public class LBoxUBBuiltin extends Builtin {
     return x.first();
   }
   
-  public Value under(Value o, Value w) {
-    if (w.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, w);
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
-    Value[] vs = w.valuesCopy();
+  public Value under(Value o, Value x) {
+    if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, x);
+    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value[] vs = x.valuesCopy();
     vs[0] = v;
-    return HArr.create(vs, w.shape);
+    return HArr.create(vs, x.shape);
   }
   
   
@@ -80,16 +80,16 @@ public class LBoxUBBuiltin extends Builtin {
   }
   
   
-  public Value underW(Value o, Value a, Value w) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(a, w)) : o;
-    Value[] vs = w.valuesCopy();
-    if (a instanceof Primitive) {
-      vs[Indexer.scal(a.asInt(), w.shape, this)] = v;
+  public Value underW(Value o, Value w, Value x) {
+    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value[] vs = x.valuesCopy();
+    if (w instanceof Primitive) {
+      vs[Indexer.scal(w.asInt(), x.shape, this)] = v;
     } else {
-      underWSub(v, a, vs, w.shape);
+      underWSub(v, w, vs, x.shape);
     }
 
-    return Arr.create(vs, w.shape);
+    return Arr.create(vs, x.shape);
   }
 
   void underWSub(Value v, Value a, Value[] vs, int[] shape) {

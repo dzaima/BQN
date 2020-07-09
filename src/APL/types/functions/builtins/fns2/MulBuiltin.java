@@ -128,9 +128,9 @@ public class MulBuiltin extends Builtin {
       else throw new DomainError("⌾×: cannot set sign to " + ni);
     }
   };
-  public Value under(Value o, Value w) {
+  public Value under(Value o, Value x) {
     Main.faulty = this;
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
-    return numD(SET_SGN, w, v);
+    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    return numD(SET_SGN, x, v);
   }
 }

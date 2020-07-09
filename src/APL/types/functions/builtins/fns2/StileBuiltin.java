@@ -107,9 +107,9 @@ public class StileBuiltin extends Builtin {
       return oi.signum()<0? new BigValue(ni.negate()) : n;
     }
   };
-  public Value under(Value o, Value w) {
+  public Value under(Value o, Value x) {
     Main.faulty = this;
-    Value v = o instanceof Fun? ((Fun) o).call(call(w)) : o;
-    return numD(CPY_SGN, w, v);
+    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    return numD(CPY_SGN, x, v);
   }
 }
