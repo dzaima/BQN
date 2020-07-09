@@ -20,8 +20,9 @@ public class FlipBuiltin extends Builtin {
   }
   
   @Override public Value call(Value a, Value w) {
-    if (a instanceof Primitive) return ReverseBuiltin.on(a.asInt(), 0, w);
-    throw new DomainError("A⊖B not implemented for non-scalar A", this);
+    // if (a instanceof Primitive) return ReverseBuiltin.on(a.asInt(), 0, w);
+    // throw new DomainError("A⊖B not implemented for non-scalar A", this);
+    throw new AssertionError();
   }
   
   @Override public Value callInvW(Value a, Value w) {

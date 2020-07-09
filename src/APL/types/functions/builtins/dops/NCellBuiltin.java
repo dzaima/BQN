@@ -37,7 +37,7 @@ public class NCellBuiltin extends Dop {
     
     int min = Math.min(rw, rx);
     int max = Math.max(rw, rx);
-    if (!Arrays.equals(x.shape, 0, min, w.shape, 0, min)) throw new LengthError("Array prefixes don't match (first "+min+" of "+Main.formatAPL(x.shape)+" vs "+Main.formatAPL(w.shape)+")", this);
+    if (!Arr.eqPrefix(x.shape, w.shape, min)) throw new LengthError("Array prefixes don't match (first "+min+" of "+Main.formatAPL(x.shape)+" vs "+Main.formatAPL(w.shape)+")", this);
     Value[] wv = cells(w, rw);
     Value[] xv = cells(x, rx);
     boolean we = rw<rx; // w is expanded

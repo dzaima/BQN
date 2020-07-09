@@ -351,6 +351,12 @@ public abstract class Arr extends Value {
     return r;
   }
   
+  public static boolean eqPrefix(int[] w, int[] x, int prefix) {
+    assert prefix <= w.length && prefix <= x.length;
+    for (int i = 0; i < prefix; i++) if (w[i] != x[i]) return false;
+    return true;
+  }
+  
   public static void eqShapes(Value a, Value w) {
     int[] as = a.shape;
     int[] ws = w.shape;

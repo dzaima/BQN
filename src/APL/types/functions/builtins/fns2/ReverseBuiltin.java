@@ -23,40 +23,9 @@ public class ReverseBuiltin extends Builtin {
   }
   
   
-  public Value call(Value a, Value w) {
-    if (a instanceof Primitive) return on(a.asInt(), w.rank-1, w);
-    if (a.rank+1 != w.rank) throw new RankError("(1 + ⍴⍴⍺) ≠ ⍴⍴⍵", this);
-    int[] as = a.shape;
-    int[] ws = w.shape;
-    for (int i = 0; i < as.length; i++) {
-      if (as[i] != ws[i]) throw new LengthError("expected shape prefixes to match", this);
-    }
-    int[] rots = a.ofShape(new int[]{a.ia}).asIntVec();
-    int block = w.shape[w.rank-1];
-    int cb = 0;
-    if (w.quickDoubleArr()) {
-      double[] vs = w.asDoubleArr();
-      double[] res = new double[w.ia];
-      for (int i = 0; i < rots.length; i++, cb += block) {
-        int pA = rots[i];
-        pA = Math.floorMod(pA, block);
-        int pB = block - pA;
-        System.arraycopy(vs, cb, res, cb + pB, pA);
-        System.arraycopy(vs, cb + pA, res, cb, pB);
-      }
-      return new DoubleArr(res, w.shape);
-    } else {
-      Value[] vs = w.values();
-      Value[] res = new Value[w.ia];
-      for (int i = 0; i < rots.length; i++, cb += block) {
-        int pA = rots[i];
-        pA = Math.floorMod(pA, block);
-        int pB = block - pA;
-        System.arraycopy(vs, cb, res, cb + pB, pA);
-        System.arraycopy(vs, cb + pA, res, cb, pB);
-      }
-      return Arr.create(res, w.shape);
-    }
+  public Value call(Value a, Value w) { // valuecopy
+    if (a instanceof Primitive) return on(a.asInt(), w);
+    throw new DomainError("⌽: 𝕨 must be a scalar number", this, w);
   }
   
   @Override public Value callInvW(Value a, Value w) {
@@ -65,20 +34,14 @@ public class ReverseBuiltin extends Builtin {
   
   
   
-  public static Value on(int a, int dim, Value w) {
+  public static Value on(int a, Value w) {
     if (w.ia==0) return w;
     if (a == 0) return w;
-    int rowsz = w.shape[dim];
-    a = Math.floorMod(a, rowsz);
-    int block = w.ia; // parts to rotate; each takes 2 arraycopy calls
-    for (int i = 0; i < dim; i++) {
-      block/= w.shape[i];
-    }
-    int sub = block/rowsz; // individual rotatable items
-    int pA = sub*a; // first part
-    int pB = block - pA; // second part
-    // System.out.println(block+" "+rowsz+" "+bam+" "+sub+" "+pA+" "+pB);
-    if (w instanceof BitArr && w.rank == 1) {
+    a = Math.floorMod(a, w.shape[0]);
+    int csz = Arr.prod(w.shape, 1, w.shape.length);
+    int pA = csz*a; // first part
+    int pB = w.ia - pA; // second part
+    if (w instanceof BitArr) {
       BitArr wb = (BitArr) w;
       BitArr.BA c = new BitArr.BA(wb.shape);
       c.add(wb, a, wb.ia);
@@ -87,18 +50,14 @@ public class ReverseBuiltin extends Builtin {
     } else if (w.quickDoubleArr()) {
       double[] vs = w.asDoubleArr();
       double[] res = new double[w.ia];
-      for (int cb = 0; cb < w.ia; cb += block) {
-        System.arraycopy(vs, cb, res, cb + pB, pA);
-        System.arraycopy(vs, cb + pA, res, cb, pB);
-      }
+      System.arraycopy(vs,  0, res, pB, pA);
+      System.arraycopy(vs, pA, res,  0, pB);
       return new DoubleArr(res, w.shape);
     } else {
       Value[] vs = w.values();
       Value[] res = new Value[w.ia];
-      for (int cb = 0; cb < w.ia; cb += block) {
-        System.arraycopy(vs, cb, res, cb + pB, pA);
-        System.arraycopy(vs, cb + pA, res, cb, pB);
-      }
+      System.arraycopy(vs,  0, res, pB, pA);
+      System.arraycopy(vs, pA, res,  0, pB);
       return Arr.create(res, w.shape);
     }
   }
