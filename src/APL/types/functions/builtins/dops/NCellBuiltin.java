@@ -53,19 +53,15 @@ public class NCellBuiltin extends Dop {
   
   
   private int dim(Value v, int rank) {
-    return rank-dim0(v, rank);
-  }
-  
-  private int dim0(Value v, int rank) {
-    int k;
     if (!(v instanceof Num)) throw new DomainError("Expected number, got "+v.humanType(false), this, v);
     double d = ((Num) v).num;
-    if (d >=  rank) return rank;
-    if (d <= -rank) return 0;
+    if (d==0 && Double.doubleToRawLongBits(d)!=0) return 0;
+    if (d >=  rank) return 0;
+    if (d <= -rank) return rank;
     if (d%1 != 0) throw new DomainError("Expected integer, got "+d, this, v);
-    k = (int) d;
-    if (k<0) return Math.max(k+rank, 0);
-    else return Math.min(k, rank);
+    int k = (int) d;
+    if (k<0) return Math.min(-k, rank);
+    else return Math.max(rank-k, 0);
   }
   
   
