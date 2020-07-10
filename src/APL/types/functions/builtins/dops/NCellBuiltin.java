@@ -66,7 +66,6 @@ public class NCellBuiltin extends Dop {
   
   
   public static Value[] cells(Value x, int k) {
-    assert x.rank != 0;
     int cam = Arr.prod(x.shape, 0, k);
     int csz = Arr.prod(x.shape, k, x.shape.length);
     int[] csh = Arrays.copyOfRange(x.shape, k, x.shape.length);
