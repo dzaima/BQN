@@ -90,8 +90,8 @@ public class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "•time": return new Timer(true);
-        case "•htime": return new Timer(false);
+        case "•time": return new Timer();
+        case "•ctime": return new CompTimer();
         case "•ex": return new Ex();
         case "•lns": return new Lns();
         case "•sh": return new Shell();
@@ -279,12 +279,8 @@ public class Scope {
     }
   }
   class Timer extends Builtin {
-    public final boolean raw;
     @Override public String repr() {
       return "•TIME";
-    }
-    Timer(boolean raw) {
-      this.raw = raw;
     }
     public Value call(Value x) {
       return call(Num.ONE, x);
@@ -292,15 +288,14 @@ public class Scope {
     public Value call(Value w, Value x) {
       int[] options = w.asIntVec();
       int n = options[0];
-      
-      boolean separate = false;
-      if (options.length >= 2) separate = options[1]==1;
+  
+      int mode = options.length>=2? options[1] : 0;
       
       String test = x.asString();
       
       Comp testCompiled = Comp.comp(Tokenizer.tokenize(test));
       
-      if (separate) {
+      if (mode==2) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
@@ -313,7 +308,46 @@ public class Scope {
         long start = System.nanoTime();
         for (int i = 0; i < n; i++) testCompiled.exec(Scope.this);
         long end = System.nanoTime();
-        if (raw) {
+        if (mode==1) {
+          return new Num((end-start)/(double)n);
+        } else {
+          double t = end-start;
+          t/= n;
+          if (t < 1000) return Main.toAPL(new Num(t)+" nanos");
+          t/= 1e6;
+          if (t > 500) return Main.toAPL(new Num(t/1000d)+" seconds");
+          return Main.toAPL(new Num(t)+" millis");
+        }
+      }
+    }
+  }
+  static class CompTimer extends Builtin {
+    public String repr() {
+      return "•CTIME";
+    }
+    public Value call(Value w, Value x) {
+      int[] options = w.asIntVec();
+      int n = options[0];
+  
+      int mode = options.length>=2? options[1] : 0;
+      
+      String str = x.asString();
+      
+      
+      if (mode==2) {
+        double[] r = new double[n];
+        for (int i = 0; i < n; i++) {
+          long start = System.nanoTime();
+          Comp.comp(Tokenizer.tokenize(str));
+          long end = System.nanoTime();
+          r[i] = end-start;
+        }
+        return new DoubleArr(r);
+      } else {
+        long start = System.nanoTime();
+        for (int i = 0; i < n; i++) Comp.comp(Tokenizer.tokenize(str));
+        long end = System.nanoTime();
+        if (mode==0) {
           return new Num((end-start)/(double)n);
         } else {
           double t = end-start;
