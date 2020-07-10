@@ -60,9 +60,6 @@ public class Scope {
         case "•io":
           if (!val.equals(Num.ZERO)) throw new DomainError("Cannot set •io to "+val);
           break;
-        case "•boxsimple":
-          Main.enclosePrimitives = val.asInt() == 1;
-          break;
         case "•vi":
           Main.vind = Main.bool(val);
           break;
@@ -115,7 +112,6 @@ public class Scope {
         case "•hash": return new Hasher();
         case "•io": return Num.ZERO;
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
-        case "•boxsimple": return Main.enclosePrimitives? Num.ONE : Num.ZERO;
         case "•class": return new ClassGetter();
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•pfx": return new Profiler(this);
@@ -272,7 +268,6 @@ public class Scope {
       
       @Override
       public Value ofShape(int[] sh) {
-        if (sh.length == 0 && !Main.enclosePrimitives) return this;
         assert Arr.prod(sh) == 1;
         return new SingleItemArr(this, sh);
       }
@@ -709,7 +704,7 @@ public class Scope {
       arr[3] = new ChrArr("avg ms");
       final int[] p = {4};
       ArrayList<String> ks = new ArrayList<>(pfRes.keySet());
-      Collections.sort(ks);
+      ks.sort(Comparator.comparingDouble(a -> pfRes.get(a).ms));
       for (String k : ks) {
         Pr pr = pfRes.get(k);
         arr[p[0]++] = Main.toAPL(k);
@@ -727,7 +722,7 @@ public class Scope {
     public Value call(Value x) {
       return call(x, x);
     }
-    private static Pr pr(Value ko, Value vo) {
+    public static Pr pr(Value ko, Value vo) {
       String k = ko.asString();
       Pr p = pfRes.get(k);
       if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString())));
@@ -808,7 +803,7 @@ public class Scope {
     }
   }
   
-  private static class Pr {
+  public static class Pr {
     private final Comp c;
     private int am;
     private double ms;

@@ -1,6 +1,5 @@
 package APL.types.arrs;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
 
@@ -85,7 +84,6 @@ public class DoubleArr extends Arr {
   @Override
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);
-    if (sh.length == 0 && !Main.enclosePrimitives) return new Num(arr[0]);
     return new DoubleArr(arr, sh);
   }
   

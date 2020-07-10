@@ -1,6 +1,5 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -40,7 +39,6 @@ public class LTBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    if (!Main.enclosePrimitives && x instanceof Primitive) return x;
     return new Rank0Arr(x);
   }
 }

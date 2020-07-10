@@ -1,6 +1,5 @@
 package APL.types;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.types.arrs.SingleItemArr;
 
@@ -316,7 +315,6 @@ public class Num extends Primitive {
   
   @Override
   public Value ofShape(int[] sh) {
-    if (sh.length == 0 && !Main.enclosePrimitives) return this;
     assert Arr.prod(sh) == 1;
     return new SingleItemArr(this, sh);
   }

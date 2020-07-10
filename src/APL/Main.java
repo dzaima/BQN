@@ -18,7 +18,6 @@ public class Main {
   public static boolean debug = false;
   public static boolean vind = false; // vector indexing
   public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
-  public static boolean enclosePrimitives = true;
   public static boolean colorful = true;
   static final ChrArr uAlphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   static final ChrArr lAlphabet = toAPL("abcdefghijklmnopqrstuvwxyz");

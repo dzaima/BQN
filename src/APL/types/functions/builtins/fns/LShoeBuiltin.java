@@ -16,7 +16,6 @@ public class LShoeBuiltin extends Builtin {
   
   
   public Value call(Value x) {
-    if (!Main.enclosePrimitives && x instanceof Primitive) return x;
     return new Rank0Arr(x);
   }
   

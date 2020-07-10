@@ -68,7 +68,6 @@ public class ShapeBuiltin extends Builtin {
       return new SingleItemArr(x.first(), sh);
       
     } else if (x instanceof BitArr) {
-      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
       BitArr wb = (BitArr) x;
       BitArr.BA res = new BitArr.BA(sh);
       int full = ia/wb.ia;
@@ -78,7 +77,6 @@ public class ShapeBuiltin extends Builtin {
       return res.finish();
     } else if (x.quickDoubleArr()) {
       assert !(x instanceof Primitive);
-      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
       double[] inp = x.asDoubleArr();
       double[] res = new double[ia];
       int p = 0;
@@ -88,7 +86,6 @@ public class ShapeBuiltin extends Builtin {
       }
       return new DoubleArr(res, sh);
     } else if (x instanceof ChrArr) {
-      if (sh.length == 0 && !Main.enclosePrimitives) return x.get(0);
       String inp = ((ChrArr) x).s;
       char[] res = new char[ia];
       int p = 0;
@@ -98,7 +95,6 @@ public class ShapeBuiltin extends Builtin {
       }
       return new ChrArr(res, sh);
     } else {
-      if (sh.length == 0 && x.first() instanceof Primitive && !Main.enclosePrimitives) return x.get(0);
       Value[] arr = new Value[ia];
       int index = 0;
       for (int i = 0; i < ia; i++) {

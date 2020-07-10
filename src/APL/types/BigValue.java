@@ -1,6 +1,5 @@
 package APL.types;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.types.arrs.SingleItemArr;
 
@@ -41,7 +40,6 @@ public class BigValue extends Primitive {
   
   @Override
   public Value ofShape(int[] sh) {
-    if (sh.length == 0 && Main.enclosePrimitives) return this;
     assert ia == Arr.prod(sh);
     return new SingleItemArr(this, sh);
   }

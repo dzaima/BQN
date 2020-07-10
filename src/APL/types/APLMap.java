@@ -50,7 +50,6 @@ public abstract class APLMap extends Primitive {
   
   @Override
   public Value ofShape(int[] sh) {
-    if (sh.length == 0 && Main.enclosePrimitives) return this;
     assert ia == Arr.prod(sh);
     return new SingleItemArr(this, sh);
   }
