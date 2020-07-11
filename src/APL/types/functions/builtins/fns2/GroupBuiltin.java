@@ -97,7 +97,7 @@ public class GroupBuiltin extends Builtin {
     int sz = Arr.prod(rsh);
     int[][] rshs = new int[sz][rank];
     int repl = 1;
-    for (int i = rank-1; i>=0; i--) {
+    for (int i = rank-1; i >= 0; i--) {
       int[] ca = new int[rsh[i]];
       for (int c : wa[i]) {
         if (c>=0) ca[c]++;

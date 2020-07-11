@@ -16,14 +16,14 @@ public class ReverseBuiltin extends Builtin {
   }
   public static Value on(Value x) {
     if (x instanceof Primitive) return x;
-    return ((Arr) x).reverseOn(x.rank-1);
+    return ((Arr) x).reverseOn(0);
   }
   public Value callInv(Value x) {
     return call(x);
   }
   
   
-  public Value call(Value w, Value x) { // valuecopy
+  public Value call(Value w, Value x) {
     if (w instanceof Primitive) return on(w.asInt(), x);
     throw new DomainError("⌽: 𝕨 must be a scalar number", this, x);
   }

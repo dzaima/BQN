@@ -6,6 +6,8 @@ import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
+import java.util.Arrays;
+
 public class OrBuiltin extends Builtin {
   @Override public String repr() {
     return "∨";
@@ -17,14 +19,11 @@ public class OrBuiltin extends Builtin {
     return Num.ZERO;
   }
   
-  public Value call(Value x) {
+  public Value call(Value x) { // TODO this isn't stable
     if (x.rank==0) throw new RankError("∨: argument cannot be scalar", this, x);
-    Integer[] order = x.gradeDown();
-    Value[] vs = x.values();
-    Value[] res = new Value[x.ia];
-    int csz = CellBuiltin.csz(x);
-    for (int i = 0; i < order.length; i++) System.arraycopy(vs, order[i]*csz, res, i*csz, csz);
-    return Arr.create(res, x.shape);
+    Value[] cells = x.rank==1? x.valuesCopy() : CellBuiltin.cells(x);
+    Arrays.sort(cells);
+    return ReverseBuiltin.on(x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
   }
   
   private static final D_NNeN DNF = new D_NNeN() {

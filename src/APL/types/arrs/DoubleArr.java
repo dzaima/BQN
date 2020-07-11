@@ -164,7 +164,7 @@ public class DoubleArr extends Arr {
   @Override public int hashCode() {
     if (hash == 0) {
       for (double d : arr) {
-        hash = hash*31;
+        hash*= 31;
         if (d != 0d) hash+= Double.hashCode(d); // ¯0 == 0
       }
       hash = shapeHash(hash);

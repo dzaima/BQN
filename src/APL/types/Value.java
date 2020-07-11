@@ -8,7 +8,7 @@ import APL.types.functions.builtins.mops.CellBuiltin;
 import java.util.*;
 
 
-public abstract class Value extends Obj implements Iterable<Value> {
+public abstract class Value extends Obj implements Iterable<Value>, Comparable<Value> {
   public final int[] shape;
   public final int rank;
   public final int ia; // item amount
@@ -47,11 +47,11 @@ public abstract class Value extends Obj implements Iterable<Value> {
     boolean rA = r instanceof Arr;
     boolean lA = l instanceof Arr;
     
-    if (l instanceof  Num         && r instanceof Num         ) return ((Num) l).compareTo((Num) r);
-    if (l instanceof Char         && r instanceof Char        ) return ((Char) l).compareTo((Char) r);
-    if (l instanceof  Num         && (r instanceof Char || rA)) return -1;
-    if ((l instanceof Char || lA) && r instanceof Num         ) return 1;
-    if (l instanceof BigValue     && r instanceof BigValue    ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
+    if ( l instanceof Num         &&  r instanceof Num        ) return ((Num) l).compareTo((Num) r);
+    if ( l instanceof Char        &&  r instanceof Char       ) return ((Char) l).compareTo((Char) r);
+    if ( l instanceof Num         && (r instanceof Char || rA)) return -1;
+    if ((l instanceof Char || lA) &&  r instanceof Num        ) return  1;
+    if ( l instanceof BigValue    &&  r instanceof BigValue   ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
     if (!lA && !rA) {
       throw new DomainError("Failed to compare "+l+" and "+r, r);
     }
