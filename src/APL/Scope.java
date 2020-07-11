@@ -300,21 +300,20 @@ public class Scope {
         }
         return new DoubleArr(r);
       } else {
-        long start = System.nanoTime();
+        long sns = System.nanoTime();
         for (int i = 0; i < n; i++) testCompiled.exec(Scope.this);
-        long end = System.nanoTime();
-        if (mode==1) {
-          return new Num((end-start)/(double)n);
-        } else {
-          double t = end-start;
-          t/= n;
-          if (t < 1000) return Main.toAPL(new Num(t)+" nanos");
-          t/= 1e6;
-          if (t > 500) return Main.toAPL(new Num(t/1000d)+" seconds");
-          return Main.toAPL(new Num(t)+" millis");
-        }
+        long ens = System.nanoTime();
+        double ns = (ens-sns) / (double)n;
+        if (mode==1) return new Num(ns);
+        else return formatTime(ns);
       }
     }
+  }
+  public static Value formatTime(double ns) {
+    if (ns < 1000) return Main.toAPL(ns+" nanos");
+    double ms = ns/1e6;
+    if (ms > 500) return Main.toAPL(new Num(ms/1000d)+" seconds");
+    return Main.toAPL(new Num(ms)+" millis");
   }
   static class CompTimer extends Builtin {
     public String repr() {
@@ -339,19 +338,12 @@ public class Scope {
         }
         return new DoubleArr(r);
       } else {
-        long start = System.nanoTime();
+        long sns = System.nanoTime();
         for (int i = 0; i < n; i++) Comp.comp(Tokenizer.tokenize(str));
-        long end = System.nanoTime();
-        if (mode==0) {
-          return new Num((end-start)/(double)n);
-        } else {
-          double t = end-start;
-          t/= n;
-          if (t < 1000) return Main.toAPL(new Num(t)+" nanos");
-          t/= 1e6;
-          if (t > 500) return Main.toAPL(new Num(t/1000d)+" seconds");
-          return Main.toAPL(new Num(t)+" millis");
-        }
+        long ens = System.nanoTime();
+        double ns = (ens-sns) / (double)n;
+        if (mode==1) return new Num(ns);
+        else return formatTime(ns);
       }
     }
   }

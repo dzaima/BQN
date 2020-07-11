@@ -13,12 +13,15 @@ public class Num extends Primitive {
   
   
   public static int pp;
-  public static int sEr, eEr; // ↑ but raw
+  public static int sEr, eEr;
   static {
     setPrecision(14, -10, 10);
   }
   private static final char[] buf = new char[400];
   public static String format(double d) {
+    return format(d, pp, sEr, eEr);
+  }
+  public static String format(double d, int pp, int sEr, int eEr) {
     double a = Math.abs(d);
     if (d == 0) {
       if (Double.doubleToRawLongBits(d) == 0) return "0";

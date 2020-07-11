@@ -12,6 +12,9 @@ public class UDBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
+    return on(x, this);
+  }
+  public static Value on(Value x, Callable blame) {
     if (x instanceof Primitive) {
       if (x instanceof Num) {
         double[] res = new double[x.asInt()];
@@ -26,7 +29,7 @@ public class UDBuiltin extends Builtin {
       }
     }
     if (Main.vind) { // •VI←1
-      if (x.rank != 1) throw new DomainError("↕: 𝕩 must be a vector ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, x);
+      if (x.rank != 1) throw new DomainError(blame+": 𝕩 must be a vector ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame, x);
       int dim = x.ia;
       int[] shape = x.asIntVec();
       int prod = Arr.prod(shape);
