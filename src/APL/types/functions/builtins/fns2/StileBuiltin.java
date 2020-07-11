@@ -16,7 +16,7 @@ public class StileBuiltin extends Builtin {
   
   private static final NumMV NF = new NumMV() {
     public Value call(Num x) {
-      return x.abs();
+      return x.num<0? Num.of(-x.num) : x;
     }
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = Math.abs(x[i]);

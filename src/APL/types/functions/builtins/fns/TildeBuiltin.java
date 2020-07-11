@@ -22,7 +22,7 @@ public class TildeBuiltin extends Builtin {
     if (x instanceof Arr) {
       if (x instanceof BitArr) {
         BitArr wb = (BitArr) x;
-        long[] res = new long[wb.llen()];
+        long[] res = new long[wb.arr.length];
         for (int i = 0; i < res.length; i++) res[i] = ~wb.arr[i];
         return new BitArr(res, x.shape);
       }

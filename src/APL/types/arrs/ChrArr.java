@@ -23,26 +23,14 @@ public class ChrArr extends Arr {
   }
   
   
-  @Override
-  public int[] asIntArrClone() {
-    throw new DomainError("Using character array as integer array", this);
-  }
-  
-  @Override
-  public int asInt() {
-    throw new DomainError("Using character array as integer", this);
-  }
-  
-  @Override
   public Value get(int i) {
     return Char.of(s.charAt(i));
   }
   
-  @Override public Value first() {
+  public Value first() {
     if (ia > 0) return Char.of(s.charAt(0));
     return Char.SPACE;
   }
-  @Override
   public String asString() {
     if (rank > 1) throw new DomainError("Using rank "+rank+" character array as string", this);
     return s;
@@ -55,17 +43,14 @@ public class ChrArr extends Arr {
     return Char.SPACE;
   }
   
-  @Override
   public Value ofShape(int[] sh) {
     return new ChrArr(s, sh);
   }
   
-  @Override
   public Value squeeze() {
     return this;
   }
   
-  @Override
   public int hashCode() {
     if (hash == 0) {
       for (char c : s.toCharArray()) {

@@ -22,7 +22,7 @@ public class LBoxUBBuiltin extends Builtin {
   public Value under(Value o, Value x) {
     if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, x);
     Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
-    Value[] vs = x.valuesCopy();
+    Value[] vs = x.valuesClone();
     vs[0] = v;
     return HArr.create(vs, x.shape);
   }
@@ -82,7 +82,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
-    Value[] vs = x.valuesCopy();
+    Value[] vs = x.valuesClone();
     if (w instanceof Primitive) {
       vs[Indexer.scal(w.asInt(), x.shape, this)] = v;
     } else {

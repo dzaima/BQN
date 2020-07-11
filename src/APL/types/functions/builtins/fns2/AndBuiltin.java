@@ -20,7 +20,7 @@ public class AndBuiltin extends Builtin {
   
   public Value call(Value x) { // valuecopy
     if (x.rank==0) throw new RankError("∧: argument cannot be scalar", this, x);
-    Value[] cells = x.rank==1? x.valuesCopy() : CellBuiltin.cells(x);
+    Value[] cells = x.rank==1? x.valuesClone() : CellBuiltin.cells(x);
     Arrays.sort(cells);
     return x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this);
   }

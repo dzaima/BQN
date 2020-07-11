@@ -12,22 +12,14 @@ public class Rank0Arr extends Arr {
     this.item = item;
   }
   
-  @Override
   public int[] asIntArrClone() {
     return new int[]{item.asInt()};
   }
   
-  @Override
-  public int asInt() {
-    throw new DomainError("Using a shape 1 array as integer", this);
-  }
-  
-  @Override
   public Value get(int i) {
     return item;
   }
   
-  @Override
   public String asString() {
     if (item instanceof Char) return String.valueOf(((Char) item).chr);
     throw new DomainError("Using array containing "+item.humanType(true)+" as string", this);
@@ -41,14 +33,12 @@ public class Rank0Arr extends Arr {
     return item.safePrototype();
   }
   
-  @Override
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);
     return new SingleItemArr(item, sh);
   }
   
-  @Override
-  public Value[] valuesCopy() {
+  public Value[] valuesClone() {
     return new Value[]{item};
   }
 }

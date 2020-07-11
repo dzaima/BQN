@@ -93,7 +93,7 @@ public class LBoxBuiltin extends Builtin {
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this, w);
     if (!Arrays.equals(res.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(res.shape)+", got "+Main.formatAPL(v.shape)+")");
     int[] is = w.asIntArr();
-    Value[] vs = x.valuesCopy();
+    Value[] vs = x.valuesClone();
     for (int i = 0; i < is.length; i++) {
       vs[is[i]] = v.get(i);
     }

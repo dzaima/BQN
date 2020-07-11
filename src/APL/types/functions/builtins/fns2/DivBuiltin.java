@@ -13,7 +13,7 @@ public class DivBuiltin extends Builtin {
   
   private static final NumMV NF = new NumMV() {
     public Value call(Num x) {
-      return Num.ONE.divide(x);
+      return new Num(1/x.num);
     }
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = 1/x[i];

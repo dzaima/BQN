@@ -14,29 +14,11 @@ public class SingleItemArr extends Arr {
     this.item = item;
   }
   
-  @Override
-  public int[] asIntArrClone() {
-    int vi = item.asInt();
-    int[] a = new int[ia];
-    for (int i = 0; i < ia; i++) a[i] = vi;
-    return a;
-  }
+  public Value get(int i) { return item; }
+  public Value first() { return item; }
   
-  @Override
-  public int asInt() {
-    throw new DomainError("Using array as integer", this);
-  }
   
-  @Override
-  public Value get(int i) {
-    return item;
-  }
   
-  public Value first() {
-    return item;
-  }
-  
-  @Override
   public String asString() {
     if (rank >= 2) throw new DomainError("Using rank≥2 array as string", this);
     if (! (item instanceof Char)) throw new DomainError("Using non-char array as string", this);
@@ -52,17 +34,15 @@ public class SingleItemArr extends Arr {
   public Value safePrototype() {
     return item.safePrototype();
   }
-  @Override
+  
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);
     return new SingleItemArr(item, sh);
   }
   
-  @Override
-  public boolean quickDoubleArr() {
-    return item instanceof Num;
-  }
-  public Value[] valuesCopy() {
+  public boolean quickDoubleArr() { return item instanceof Num; }
+  public boolean quickIntArr() { return item instanceof Num && Num.isInt(((Num) item).num); }
+  public Value[] valuesClone() {
     Value[] vs = new Value[ia];
     for (int i = 0; i < ia; i++) vs[i] = item;
     return vs;
@@ -72,20 +52,20 @@ public class SingleItemArr extends Arr {
     return item.asDouble() * ia;
   }
   
-  @Override
-  public double[] asDoubleArr() {
+  
+  public int[] asIntArrClone() {
+    int vi = item.asInt();
+    int[] a = new int[ia];
+    for (int i = 0; i < ia; i++) a[i] = vi;
+    return a;
+  }
+  public double[] asDoubleArrClone() {
     double[] res = new double[ia];
     double n = item.asDouble();
     for (int i = 0; i < ia; i++) res[i] = n;
     return res;
   }
   
-  @Override
-  public double[] asDoubleArrClone() {
-    return asDoubleArr();
-  }
-  
-  @Override
   public Value squeeze() {
     Value ov = item.squeeze();
     if (ov == item) return this;
@@ -98,18 +78,13 @@ public class SingleItemArr extends Arr {
     return r + item.oneliner();
   }
   
-  @Override public Iterator<Value> iterator() {
+  public Iterator<Value> iterator() {
     //noinspection Convert2Diamond java 8
-    return new Iterator<Value>() {
-      int i = 0;
-      @Override public boolean hasNext() {
-        return i < ia;
+    return new Iterator<Value>() { int c = 0;
+      public boolean hasNext() {
+        return c < ia;
       }
-      
-      @Override public Value next() {
-        i++;
-        return item;
-      }
+      public Value next() { c++; return item; }
     };
   }
 }

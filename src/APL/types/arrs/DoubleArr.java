@@ -43,7 +43,8 @@ public class DoubleArr extends Arr {
     }
   }
   
-  @Override
+  
+  
   public int[] asIntArrClone() {
     int[] r = new int[ia];
     for (int i = 0; i < ia; i++) {
@@ -54,24 +55,17 @@ public class DoubleArr extends Arr {
     return r;
   }
   
-  @Override
-  public int asInt() {
-    throw new DomainError("Using a number array as integer", this);
-  }
-  
-  @Override
   public Value get(int i) {
     return Num.of(arr[i]);
   }
   
-  @Override public Value first() {
+  public Value first() {
     if (ia > 0) return new Num(arr[0]);
     return Num.ZERO;
   }
   
-  @Override
   public String asString() {
-    throw new DomainError("Using number array as string", this);
+    throw new DomainError("Using a number array as string", this);
   }
   
   public Value prototype() {
@@ -81,40 +75,33 @@ public class DoubleArr extends Arr {
     return Num.ZERO;
   }
   
-  @Override
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);
     return new DoubleArr(arr, sh);
   }
   
-  @Override
   public double sum() {
     double r = 0;
     for (double val : arr) r+= val;
     return r;
   }
   
-  @Override
   public double[] asDoubleArr() {
     return arr;
   }
-  @Override
   public double[] asDoubleArrClone() {
     return arr.clone();
   }
   
-  @Override
   public boolean quickDoubleArr() {
     return true;
   }
   
-  @Override
   public Value squeeze() {
     return this;
   }
   
-  @Override
-  public Value[] valuesCopy() {
+  public Value[] valuesClone() {
     Value[] vs = new Value[ia];
     for (int i = 0; i < ia; i++) vs[i] = new Num(arr[i]);
     return vs;
@@ -149,7 +136,6 @@ public class DoubleArr extends Arr {
     return new DoubleArr(res, shape);
   }
   
-  @Override
   public boolean equals(Obj o) {
     if (o instanceof DoubleArr) {
       DoubleArr da = (DoubleArr) o;
@@ -161,7 +147,7 @@ public class DoubleArr extends Arr {
     }
     return super.equals(o);
   }
-  @Override public int hashCode() {
+  public int hashCode() {
     if (hash == 0) {
       for (double d : arr) {
         hash*= 31;

@@ -47,10 +47,4 @@ public abstract class APLMap extends Primitive {
       return v == null? "map@"+k : v.toString();
     }
   }
-  
-  @Override
-  public Value ofShape(int[] sh) {
-    assert ia == Arr.prod(sh);
-    return new SingleItemArr(this, sh);
-  }
 }

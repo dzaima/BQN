@@ -265,12 +265,6 @@ public class Scope {
       public String toString() {
         return "•GCLOG["+msg+"]";
       }
-      
-      @Override
-      public Value ofShape(int[] sh) {
-        assert Arr.prod(sh) == 1;
-        return new SingleItemArr(this, sh);
-      }
     }
   }
   class Timer extends Builtin {

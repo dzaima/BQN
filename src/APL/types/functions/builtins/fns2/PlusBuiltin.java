@@ -19,7 +19,7 @@ public class PlusBuiltin extends Builtin {
   public Value call(Value x) {
     return allM(v -> {
       if (!(v instanceof Num)) throw new DomainError("Conjugating a non-number", this, x); // TODO decide whether this should exist
-      return ((Num)v).conjugate();
+      return v;
     }, x);
   }
   

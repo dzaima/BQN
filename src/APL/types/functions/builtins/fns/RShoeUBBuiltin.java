@@ -16,7 +16,7 @@ public class RShoeUBBuiltin extends Builtin {
   
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
-    Value[] vs = x.valuesCopy();
+    Value[] vs = x.valuesClone();
     for (int i = 0; i < w.ia; i++) {
       vs[Indexer.fromShape(x.shape, w.get(i).asIntVec())] = v.get(i);
     }

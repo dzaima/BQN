@@ -79,7 +79,7 @@ public class AtBuiltin extends Dop {
       }
       return o.rank==0? Num.of(res[0]) : new DoubleArr(res, o.shape);
     }
-    Value[] res = o.valuesCopy();
+    Value[] res = o.valuesClone();
     int[] is = poss.vals;
     if (n.rank == 0) {
       Value f0 = n.first();

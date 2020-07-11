@@ -109,10 +109,12 @@ public abstract class Fun extends Callable {
   
   protected Value numChrM(NumMV nf, ChrMV cf, Value x) {
     if (x instanceof Arr) {
-      if (x instanceof DoubleArr && nf.retNum()) {
-        double[] res = new double[x.ia];
-        nf.call(res, x.asDoubleArr());
-        return new DoubleArr(res, x.shape);
+      if (x.quickDoubleArr()) {
+        if (nf.retNum()) {
+          double[] res = new double[x.ia];
+          nf.call(res, x.asDoubleArr());
+          return new DoubleArr(res, x.shape);
+        }
       }
       if (x instanceof ChrArr) return cf.call((ChrArr) x);
       Arr o = (Arr) x;
@@ -202,7 +204,7 @@ public abstract class Fun extends Callable {
   public interface D_AA {
     Value call(Value w, Value x);
   }
-  public abstract static class D_NNeN implements D_NN { // dyadic number-number equals number
+  public static abstract class D_NNeN extends D_NN { // dyadic number-number equals number
     public abstract double on(double w, double x);
     public void on(double[] res, double w, double[] x) {
       for (int i = 0; i < x.length; i++) {
@@ -243,10 +245,10 @@ public abstract class Fun extends Callable {
     }
   }
   
-  public abstract static class D_NNeB implements D_NN { // dyadic number-number equals boolean
+  public static abstract class D_NNeB extends D_NN { // dyadic number-number equals boolean
     public abstract boolean on(double w, double x);
-    public abstract void on(BitArr.BA res, double w, double[] x);
-    public abstract void on(BitArr.BA res, double[] w, double x);
+    public abstract void on(BitArr.BA res, double   w, double[] x);
+    public abstract void on(BitArr.BA res, double[] w, double   x);
     public abstract void on(BitArr.BA res, double[] w, double[] x);
     
     public Value call(double w, double x) {
@@ -273,23 +275,23 @@ public abstract class Fun extends Callable {
   }
   
   
-  public interface D_NN {
-    Value call(double   w, double   x);
-    Value call(double[] w, double[] x, int[] sh);
-    Value call(double   w, double[] x, int[] sh);
-    Value call(double[] w, double   x, int[] sh);
-    Value call(BigValue w, BigValue x);
-    default Value call(double w, BigValue x) { // special requirement for log; only needs to be handled in numD
+  public static abstract class D_NN {
+    public abstract Value call(double   w, double   x);
+    public abstract Value call(double[] w, double[] x, int[] sh);
+    public abstract Value call(double   w, double[] x, int[] sh);
+    public abstract Value call(double[] w, double   x, int[] sh);
+    public abstract Value call(BigValue w, BigValue x);
+    public Value call(double w, BigValue x) { // special requirement for log; only needs to be handled in numD
       return call(new BigValue(w), x);
     }
   }
-  public interface D_BB {
-    Value call(BitArr  w, BitArr  x);
-    Value call(boolean w, BitArr  x);
-    Value call(BitArr  w, boolean x);
+  public static abstract class D_BB {
+    public abstract Value call(BitArr  w, BitArr  x);
+    public abstract Value call(boolean w, BitArr  x);
+    public abstract Value call(BitArr  w, boolean x);
   }
   public interface D_CC {
-    Value call(char w, char x);
+    public abstract Value call(char w, char x);
   }
   
   

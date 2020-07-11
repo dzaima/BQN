@@ -22,124 +22,89 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     this.ia = ia;
     this.rank = rank;
   }
-  public int[] asIntVec() { // succeeds on rank ≤ 1
-    if (rank > 1) throw new DomainError("Using rank "+rank+" array as an integer vector", this);
-    return asIntArr();
-  }
-  public abstract int[] asIntArrClone();
-  public int[] asIntArr() {
-    return asIntArrClone();
-  }
-  public abstract int asInt();
-  public boolean scalar() {
-    return rank == 0;
-  }
-  public Value first() {
-    return get(0);
-  }
+  
+  
+  
+  
   public abstract Value get(int i); // WARNING: UNSAFE; doesn't need to throw for out-of-bounds
+  public Value first() { return get(0); }
   
   
   
-  public int compareTo(Value r) {
-    Value l = this;
-    
-    boolean rA = r instanceof Arr;
-    boolean lA = l instanceof Arr;
-    
-    if ( l instanceof Num         &&  r instanceof Num        ) return ((Num) l).compareTo((Num) r);
-    if ( l instanceof Char        &&  r instanceof Char       ) return ((Char) l).compareTo((Char) r);
-    if ( l instanceof Num         && (r instanceof Char || rA)) return -1;
-    if ((l instanceof Char || lA) &&  r instanceof Num        ) return  1;
-    if ( l instanceof BigValue    &&  r instanceof BigValue   ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
-    if (!lA && !rA) {
-      throw new DomainError("Failed to compare "+l+" and "+r, r);
-    }
-    if (!lA) return -1;
-    if (!rA) return  1;
-    
-    if (l.rank != r.rank) throw new RankError("Expected ranks to be equal for compared elements", r);
-    
-    if (l.rank > 1) throw new DomainError("Expected rank of compared array to be ≤ 2", l);
-    
-    int min = Math.min(l.ia, r.ia);
-    for (int i = 0; i < min; i++) {
-      int cr = l.get(i).compareTo(r.get(i));
-      if (cr != 0) return cr;
-    }
-    return Integer.compare(l.ia, r.ia);
+  // methods for interpreting this as other types
+  
+  public /*open*/ double asDouble() { throw new DomainError("Using "+this.humanType(true)+" as a number", this); }
+  public /*open*/ int asInt() { throw new DomainError("Using "+humanType(true)+" as integer"); }
+  public /*open*/ String asString() {
+    char[] cs = new char[ia];
+    for (int i = 0; i < ia; i++) cs[i] = ((Char) get(i)).chr;
+    return new String(cs);
   }
   
-  
-  public abstract String asString();
-  
-  
-  public Integer[] gradeUp() {
-    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
-    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeUp();
-    Integer[] na = new Integer[ia];
-    for (int i = 0; i < na.length; i++) na[i] = i;
-    Arrays.sort(na, (a, b) -> get(a).compareTo(get(b)));
-    
-    return na;
-  }
-  public Integer[] gradeDown() {
-    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
-    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeDown();
-    
-    Integer[] na = new Integer[ia];
-    for (int i = 0; i < na.length; i++) na[i] = i;
-    
-    Arrays.sort(na, (a, b) -> get(b).compareTo(get(a)));
-    return na;
-  }
-  
-  public int[] eraseDim(int place) {
-    int[] res = new int[rank-1];
-    System.arraycopy(shape, 0, res, 0, place);
-    System.arraycopy(shape, place+1, res, place, rank-1-place);
+  public /*open*/ int[] asIntArr() { return asIntArrClone(); }
+  public /*open*/ int[] asIntArrClone() {
+    int[] res = new int[ia];
+    for (int i = 0; i < ia; i++) res[i] = get(i).asInt();
     return res;
   }
-  @Override
-  public Type type() {
-    return Type.array;
-  }
-  
-  public abstract Value prototype(); // what to append to this array
-  public abstract Value safePrototype();
-  
-  public String oneliner() {
-    return toString();
-  }
   
   
-  public Value[] values() {
-    return valuesCopy();
-  }
-  public Value[] valuesCopy() {
+  public /*open*/ Value[] values() { return valuesClone(); }
+  public /*open*/ Value[] valuesClone() {
     Value[] vs = new Value[ia];
     for (int i = 0; i < ia; i++) vs[i] = get(i);
     return vs;
   }
   
-  @Override
-  public Iterator<Value> iterator() {
-    return new ValueIterator();
+  
+  public /*open*/ double[] asDoubleArr() { return asDoubleArrClone(); }
+  public /*open*/ double[] asDoubleArrClone() {
+    double[] res = new double[ia];
+    for (int i = 0; i < ia; i++) res[i] = get(i).asDouble();
+    return res;
+  }
+  public /*open*/ double sum() {
+    double res = 0;
+    for (Value v : this) res+= v.asDouble();
+    return res;
+  }
+  public /*open*/ int[] asIntVec() { // also works on rank≡0; immutable
+    if (rank > 1) throw new DomainError("Using rank "+rank+" array as an integer vector", this);
+    return asIntArr();
   }
   
-  class ValueIterator implements Iterator<Value> {
-    int c = 0;
-    @Override
-    public boolean hasNext() {
-      return c < ia;
-    }
-    
-    @Override
-    public Value next() {
-      return get(c++);
-    }
+  
+  
+  
+  
+  public /*open*/ boolean quickDoubleArr() { return false; } // if true, asDoubleArr must succeed; warning: also true for a primitive number
+  public /*open*/ boolean quickIntArr() { return false; }
+  public /*open*/ boolean notIdentity() { return false; } // whether asFun().call(…) != this
+  public boolean scalar() { return rank == 0; }
+  public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
+  public abstract Value safePrototype(); // what to append to this array
+  public Value prototype() {
+    Value v = safePrototype();
+    if (v==null) throw new DomainError("Getting prototype of "+this, this);
+    return v;
   }
   
+  public /*open*/ String oneliner() {
+    return toString();
+  }
+  
+  
+  
+  public /*open*/ Iterator<Value> iterator() {
+    //noinspection Convert2Diamond java 8
+    return new Iterator<Value>() { int c = 0;
+      public boolean hasNext() { return c < ia; }
+      public Value next() { return get(c++); }
+    };
+  }
+  
+  
+  // outdated bad item getting methods; TODO don't use
   public Value at(int[] pos) {
     if (pos.length != rank) throw new RankError("array rank was "+rank+", tried to get item at rank "+pos.length, this);
     int x = 0;
@@ -169,32 +134,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return get(x);
   }
   
-  public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape! ()
   
-  public double sum() {
-    double res = 0;
-    for (Value v : this) {
-      res+= v.asDouble();
-    }
-    return res;
-  }
-  public double[] asDoubleArr() { // warning: also succeeds on a primitive number; don't modify
-    double[] res = new double[ia];
-    int i = 0;
-    for (Value c : values()) {
-      res[i++] = c.asDouble();
-    }
-    return res;
-  }
-  public double[] asDoubleArrClone() {
-    return asDoubleArr().clone();
-  }
-  public double asDouble() {
-    throw new DomainError("Using "+this.humanType(true)+" as a number", this);
-  }
-  public boolean quickDoubleArr() { // if true, asDoubleArr must succeed; warning: also true for a primitive number
-    return false;
-  }
   public Value squeeze() {
     if (ia == 0) return this;
     Value f = get(0);
@@ -234,6 +174,55 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   }
   
   
+  public int compareTo(Value r) {
+    Value l = this;
+    
+    boolean rA = r instanceof Arr;
+    boolean lA = l instanceof Arr;
+    
+    if ( l instanceof Num         &&  r instanceof Num        ) return ((Num) l).compareTo((Num) r);
+    if ( l instanceof Char        &&  r instanceof Char       ) return ((Char) l).compareTo((Char) r);
+    if ( l instanceof Num         && (r instanceof Char || rA)) return -1;
+    if ((l instanceof Char || lA) &&  r instanceof Num        ) return  1;
+    if ( l instanceof BigValue    &&  r instanceof BigValue   ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
+    if (!lA && !rA) {
+      throw new DomainError("Failed to compare "+l+" and "+r, r);
+    }
+    if (!lA) return -1;
+    if (!rA) return  1;
+    
+    if (l.rank != r.rank) throw new RankError("Expected ranks to be equal for compared elements", r);
+    
+    if (l.rank > 1) throw new DomainError("Expected rank of compared array to be ≤ 2", l);
+    
+    int min = Math.min(l.ia, r.ia);
+    for (int i = 0; i < min; i++) {
+      int cr = l.get(i).compareTo(r.get(i));
+      if (cr != 0) return cr;
+    }
+    return Integer.compare(l.ia, r.ia);
+  }
+  public Integer[] gradeUp() {
+    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
+    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeUp();
+    Integer[] na = new Integer[ia];
+    for (int i = 0; i < na.length; i++) na[i] = i;
+    Arrays.sort(na, (a, b) -> get(a).compareTo(get(b)));
+    
+    return na;
+  }
+  public Integer[] gradeDown() {
+    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
+    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeDown();
+    
+    Integer[] na = new Integer[ia];
+    for (int i = 0; i < na.length; i++) na[i] = i;
+    
+    Arrays.sort(na, (a, b) -> get(b).compareTo(get(a)));
+    return na;
+  }
+  
+  
   public /*open*/ Fun asFun() {
     return new Fun() {
       public String repr() {
@@ -249,7 +238,8 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
       }
     };
   }
-  public /*open*/ boolean notIdentity() {
-    return false;
+  
+  public Type type() { // TODO remove
+    return Type.array;
   }
 }

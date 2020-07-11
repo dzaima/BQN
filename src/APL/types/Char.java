@@ -19,63 +19,47 @@ public class Char extends Primitive {
   public Char(char c) {
     chr = c;
   }
-  
   public static Char of(char c) {
     if (c < 128) return ASCII[c];
     return new Char(c);
   }
   
-  public Char upper() {
-    return Char.of(Character.toUpperCase(chr));
-  }
   
-  public Char lower() {
-    return Char.of(Character.toLowerCase(chr));
-  }
-  
+  public Char upper() { return Char.of(Character.toUpperCase(chr)); }
+  public Char lower() { return Char.of(Character.toLowerCase(chr)); }
   public Char swap() {
     if (Character.isUpperCase(chr)) return lower();
     if (Character.isLowerCase(chr)) return upper();
-    return Char.of(chr);
+    return this;
   }
-  
   public int getCase() {
     return Character.isUpperCase(chr)? 1 : Character.isLowerCase(chr)? -1 : 0;
   }
   
+  
+  
+  public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
+    return new ChrArr(String.valueOf(chr), sh);
+  }
+  public Value safePrototype() { return SPACE; }
+  public String asString() { return String.valueOf(chr); }
+  
+  
+  
+  public String oneliner() {
+    return "'"+chr+"'";
+  }
   public String toString() {
     if (Main.quotestrings) return "'"+chr+"'";
     else return String.valueOf(chr);
   }
-  public String oneliner() {
-    return "'"+chr+"'";
+  public boolean equals(Obj c) {
+    return c instanceof Char && chr == ((Char) c).chr;
   }
-  
-  @Override
-  public Value ofShape(int[] sh) {
-    assert ia == Arr.prod(sh);
-    return new ChrArr(String.valueOf(chr), sh);
-  }
-  
   public int compareTo(Char v) {
     return Character.compare(chr, v.chr);
   }
-  
-  
-  @Override public boolean equals(Obj c) {
-    return c instanceof Char && chr == ((Char) c).chr;
-  }
-  
-  public String asString() {
-    return String.valueOf(chr);
-  }
-  
-  @Override
   public int hashCode() {
     return chr;
-  }
-  
-  public Value safePrototype() {
-    return SPACE;
   }
 }

@@ -15,7 +15,7 @@ public class StarBuiltin extends Builtin {
   
   public static final NumMV NF = new NumMV() {
     public Value call(Num x) {
-      return Num.E.pow(x);
+      return new Num(Math.exp(x.num));
     }
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = Math.exp(x[i]);

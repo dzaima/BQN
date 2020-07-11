@@ -11,7 +11,6 @@ public class HArr extends Arr {
     super(sh, v.length, sh.length);
     arr = v;
   }
-  
   public HArr(ArrayList<Value> v) { // 1D
     super(new int[]{v.size()});
     arr = v.toArray(new Value[0]);
@@ -26,27 +25,32 @@ public class HArr extends Arr {
     arr = v.toArray(new Value[0]);
   }
   
-  @Override
-  public int[] asIntArrClone() {
-    int[] res = new int[ia];
-    for (int i = 0; i < arr.length; i++) {
-      res[i] = arr[i].asInt();
-    }
-    return res;
+  
+  
+  
+  public Value get(int i) { return arr[i]; }
+  
+  
+  
+  public Value[] values     () { return arr        ; }
+  public Value[] valuesClone() { return arr.clone(); }
+  
+  
+  public Value prototype() {
+    if (ia == 0) throw new DomainError("failed to get prototype", this);
+    return arr[0].prototype();
+  }
+  public Value safePrototype() {
+    if (ia == 0) return null;
+    return arr[0].safePrototype();
+  }
+  public Value ofShape(int[] sh) {
+    assert ia == Arr.prod(sh);
+    return new HArr(arr, sh);
   }
   
-  @Override
-  public int asInt() {
-    if (rank == 0) return arr[0].asInt();
-    throw new DomainError("Using array as integer", this);
-  }
   
-  @Override
-  public Value get(int i) {
-    return arr[i];
-  }
   
-  @Override
   public boolean equals(Obj o) {
     if (!(o instanceof Value)) return false;
     Value v = (Value) o;
@@ -57,7 +61,6 @@ public class HArr extends Arr {
     }
     return true;
   }
-  
   public String asString() {
     StringBuilder r = new StringBuilder(ia);
     for (Value v : arr) {
@@ -66,24 +69,4 @@ public class HArr extends Arr {
     }
     return r.toString();
   }
-  
-  public Value prototype() {
-    if (ia == 0) throw new DomainError("failed to get prototype", this);
-    return arr[0].prototype();
-  }
-  public Value safePrototype() {
-    if (ia == 0) return null;
-    return arr[0].safePrototype();
-  }
-  public Value[] values() {
-    return arr;
-  }
-  public Value[] valuesCopy() {
-    return arr.clone();
-  }
-  public Value ofShape(int[] sh) {
-    assert ia == Arr.prod(sh);
-    return new HArr(arr, sh);
-  }
-  
 }

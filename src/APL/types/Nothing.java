@@ -10,13 +10,7 @@ public class Nothing extends Primitive {
     return new SyntaxError("Using ·", this);
   }
   
-  public int[] asIntArrClone() {
-    throw gotten();
-  }
   
-  public int asInt() {
-    throw gotten();
-  }
   
   public String asString() {
     throw gotten();

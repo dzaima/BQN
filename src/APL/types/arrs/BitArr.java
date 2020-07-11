@@ -34,17 +34,16 @@ public final class BitArr extends Arr {
     int p = 0;
     for(Value v : a) {
       int n = Main.bool(v)? 1 : 0;
-      arr[p>>6] = arr[p>>6]  |  n << (p&63);
+      arr[p>>6]|=  n << (p&63);
     }
     return new BitArr(arr, a.shape);
   }
-  
   public static long[] convert(double[] arr) {
     long[] res = new long[arr.length+63 >> 6];
     for (int i = 0; i < arr.length; i++) {
       double d = arr[i];
       if (d != 0 && d != 1) throw new DomainError("Converting " + d + " to boolean");
-      res[i>>6] = res[i>>6]  |  (int)d << (i&63);
+      res[i>>6]|= (long) d << (i&63);
     }
     return res;
   }
@@ -52,87 +51,20 @@ public final class BitArr extends Arr {
   public static int sizeof(Value x) {
     return x.ia+63 >> 6;
   }
-  
+  public static int sizeof(int am) {
+    return am+63 >> 6;
+  }
   public static int sizeof(int[] sh) {
     int m = 1;
     for (int i : sh) m*= i;
     return sizeof(m);
   }
-  public static int sizeof(int am) {
-    return am+63 >> 6;
-  }
-  
   public static Value fill(Value v, boolean b) {
     long[] arr = new long[sizeof(v)];
-    if (!b) return new BitArr(arr, v.shape, v.ia);
-    Arrays.fill(arr, -1L);
+    if (b) Arrays.fill(arr, -1L);
     return new BitArr(arr, v.shape, v.ia);
   }
   
-  @Override public int[] asIntArrClone() {
-    int[] res = new int[ia];
-    int ctr = 0;
-    for (int i = 0; i < arr.length-1; i++) {
-      long cl = arr[i];
-      for (int j = 0; j < 64; j++) {
-        res[ctr++] = (int) (cl&1);
-        cl>>= 1;
-      }
-    }
-    int over = ia & 63; // aka ia % 64
-    for (int i = 0; i < over; i++) {
-      res[ctr++] = (int) ((arr[ctr / 64]>>i) & 1);
-    }
-    return res;
-  }
-  
-  @Override public double[] asDoubleArr() {
-    double[] res = new double[ia];
-    int ctr = 0;
-    for (int i = 0; i < ia/64; i++) {
-      long cl = arr[i];
-      for (int j = 0; j < 64; j++) {
-        res[ctr++] = cl&1;
-        cl>>= 1;
-      }
-    }
-    int over = ia & 63; // aka ia % 64
-    for (int i = 0; i < over; i++) {
-      res[ctr++] = (int) ((arr[ctr / 64]>>i) & 1);
-    }
-    return res;
-  }
-  
-  @Override public int asInt() {
-    throw new DomainError("Using bit array as integer", this);
-  }
-  
-  @Override public Value get(int i) {
-    return Num.NUMS[(int) ((arr[i>>6] >> (i&63)) & 1)]; // no branching!
-  }
-  
-  @Override public String asString() {
-    throw new DomainError("Using bit array as string", this);
-  }
-  
-  public Value prototype() {
-    return Num.ZERO;
-  }
-  public Value safePrototype() {
-    return Num.ZERO;
-  }
-  
-  @Override public Value ofShape(int[] sh) {
-    return new BitArr(arr, sh);
-  }
-  
-  @Override public boolean quickDoubleArr() {
-    return true;
-  }
-  
-  public int llen() { // long length
-    return arr.length;
-  }
   
   public void setEnd(boolean on) {
     if ((ia&63) != 0) {
@@ -144,10 +76,69 @@ public final class BitArr extends Arr {
     }
   }
   
+  
+  
+  public Value get(int i) {
+    return Num.NUMS[(int) ((arr[i>>6] >> (i&63)) & 1)]; // no branching!
+  }
+  
+  
+  
+  public int[] asIntArrClone() {
+    int[] res = new int[ia];
+    int rp = 0;
+    for (int i = 0; i < ia>>6; i++) {
+      long cl = arr[i];
+      for (int j = 0; j < 64; j++) {
+        res[rp++] = (int) (cl&1);
+        cl>>= 1;
+      }
+    }
+    int over = ia & 63;
+    for (int i = 0; i < over; i++) {
+      res[rp++] = (int) ((arr[rp / 64]>>i) & 1);
+    }
+    return res;
+  }
+  
+  public double[] asDoubleArr() {
+    double[] res = new double[ia];
+    int ctr = 0;
+    for (int i = 0; i < ia>>6; i++) {
+      long cl = arr[i];
+      for (int j = 0; j < 64; j++) {
+        res[ctr++] = cl&1;
+        cl>>= 1;
+      }
+    }
+    int over = ia & 63;
+    for (int i = 0; i < over; i++) {
+      res[ctr++] = (int) ((arr[ctr / 64]>>i) & 1);
+    }
+    return res;
+  }
+  
+  public double[] asDoubleArrClone() {
+    return asDoubleArr();
+  }
+  
+  
+  public String asString() {
+    throw new DomainError("Using bit array as string", this);
+  }
+  
+  public boolean quickDoubleArr() { return true; }
+  public boolean quickIntArr() { return true; }
+  public Value ofShape(int[] sh) { return new BitArr(arr, sh); }
+  public Value prototype() { return Num.ZERO; }
+  public Value safePrototype() { return Num.ZERO; }
+  
+  
+  
+  
   public double sum() {
     return isum();
   }
-  
   public int isum() {
     int r = 0;
     setEnd(false);
@@ -361,15 +352,13 @@ public final class BitArr extends Arr {
     }
   }
   
-  @Override public Value squeeze() {
-    return this; // we don't need no squeezing!
-  }
+  public Value squeeze() { return this; } // we don't need no squeezing!
   
   public BR read() {
     return new BR();
   }
   
-  public Value[] valuesCopy() {
+  public Value[] valuesClone() {
     Value[] vs = new Value[ia];
     int o = 0;
     for (int i = 0; i < ia/64; i++) {

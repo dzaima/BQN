@@ -68,7 +68,25 @@ public class ExclBuiltin extends Builtin {
         }
         return new BigValue(res);
       }
-      return ((Num) x).binomial((Num) w);
+      return binomial((Num) w, (Num) x);
     }, w0, x0);
+  }
+  
+  
+  public Num binomial(Num w, Num x) {
+    if (x.num % 1 != 0) throw new DomainError("binomial of non-integer 𝕨", this);
+    if (w.num % 1 != 0) throw new DomainError("binomial of non-integer 𝕩", w);
+    if (w.num > x.num) return Num.ZERO;
+    
+    double res = 1;
+    double a = x.num;
+    double b = w.num;
+    
+    if (b > a-b) b = a-b;
+    
+    for (int i = 0; i < b; i++) {
+      res = res * (a-i) / (i+1);
+    }
+    return new Num(res);
   }
 }

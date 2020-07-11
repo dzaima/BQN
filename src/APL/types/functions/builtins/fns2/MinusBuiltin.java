@@ -12,7 +12,7 @@ public class MinusBuiltin extends Builtin {
   
   public static final NumMV NF = new NumMV() {
     public Value call(Num x) {
-      return x.negate();
+      return Num.of(-x.num);
     }
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = -x[i];

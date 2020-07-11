@@ -14,7 +14,7 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
   
   public static final NumMV NF = new NumMV() {
     public Value call(Num x) {
-      return x.log(Num.E);
+      return new Num(Math.log(x.num));
     }
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = Math.log(x[i]);
