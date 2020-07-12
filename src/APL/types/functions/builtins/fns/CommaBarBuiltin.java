@@ -20,6 +20,6 @@ public class CommaBarBuiltin extends Builtin {
   }
   
   public Value call(Value w, Value x) {
-    return JoinBuiltin.cat(w, x, 0, this);
+    return JoinBuiltin.on(w, x, this);
   }
 }

@@ -20,6 +20,16 @@ public class NotBuiltin extends Builtin {
   
   private Value rec(Value x) {
     if (x instanceof Arr) {
+      ia: if (x.quickIntArr()) {
+        int[] xi = x.asIntArr();
+        int[] res = new int[xi.length];
+        for (int i = 0; i < xi.length; i++) {
+          int c = xi[i];
+          if (c <= -2147483647) break ia; // bck: {x←•IA 𝕩 ⋄ x ≡○¬ 0+x}¨ bounds
+          res[i] = 1-c;
+        }
+        return new IntArr(res, x.shape);
+      }
       if (x instanceof BitArr) {
         BitArr wb = (BitArr) x;
         long[] res = new long[wb.arr.length];
@@ -58,6 +68,6 @@ public class NotBuiltin extends Builtin {
   }
   
   public Value call(Value w, Value x) {
-    return numD(PlusBuiltin.DNF, numD(MinusBuiltin.DNF, w, x), Num.ONE);
+    return PlusBuiltin.DF.call(MinusBuiltin.DF.call(w, x), Num.ONE);
   }
 }

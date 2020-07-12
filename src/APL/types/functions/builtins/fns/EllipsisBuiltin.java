@@ -33,12 +33,12 @@ public class EllipsisBuiltin extends Builtin {
     }
     int wi = w.asInt();
     int xi = x.asInt();
-    double[] arr = new double[Math.abs(wi-xi)+1];
+    int[] arr = new int[Math.abs(wi-xi)+1];
     if (wi>xi) {
       for (int i = 0; i < arr.length; i++) arr[i] = wi - i;
     } else {
       for (int i = 0; i < arr.length; i++) arr[i] = wi + i;
     }
-    return new DoubleArr(arr);
+    return new IntArr(arr);
   }
 }

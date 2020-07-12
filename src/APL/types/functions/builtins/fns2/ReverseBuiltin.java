@@ -53,6 +53,12 @@ public class ReverseBuiltin extends Builtin {
       System.arraycopy(vs,  0, res, pB, pA);
       System.arraycopy(vs, pA, res,  0, pB);
       return new DoubleArr(res, x.shape);
+    } else if (x.quickIntArr()) {
+      int[] vs = x.asIntArr();
+      int[] res = new int[x.ia];
+      System.arraycopy(vs,  0, res, pB, pA);
+      System.arraycopy(vs, pA, res,  0, pB);
+      return new IntArr(res, x.shape);
     } else {
       Value[] vs = x.values();
       Value[] res = new Value[x.ia];

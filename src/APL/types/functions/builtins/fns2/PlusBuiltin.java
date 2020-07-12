@@ -1,6 +1,5 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
@@ -17,35 +16,30 @@ public class PlusBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    return allM(v -> {
-      if (!(v instanceof Num)) throw new DomainError("Conjugating a non-number", this, x); // TODO decide whether this should exist
-      return v;
-    }, x);
+    return x; // TODO
   }
   
-  public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      return w + x;
-    }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = w + x[i];
-    }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] + x;
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] + x[i];
-    }
-    public Value call(BigValue w, BigValue x) {
-      return new BigValue(w.i.add(x.i));
-    }
+  public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
+    public Value on(BigValue w, BigValue x) { return new BigValue(w.i.add(x.i)); }
+    public double on(double w, double x) { return w + x; }
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) res[i] = w    + x[i]; }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] + x   ; }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] + x[i]; }
+    
+    public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.addExact(w   ,x[i]);}return res;}catch(ArithmeticException e){return null;}}
+    public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {res[i]=Math.addExact(w[i],x   );}return res;}catch(ArithmeticException e){return null;}}
+    public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.addExact(w[i],x[i]);}return res;}catch(ArithmeticException e){return null;}}
+    // public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}
+    // public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}
+    // public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x[i],r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}
+    // private boolean u(int w, int x, int r) { return ((w^r) & (x^r)) < 0; }
   };
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   public Value callInv(Value x) { return call(x); }
   public Value callInvW(Value w, Value x) {
-    return numD(MinusBuiltin.DNF, x, w);
+    return MinusBuiltin.DF.call(x, w);
   }
   
   @Override public Value callInvA(Value w, Value x) {

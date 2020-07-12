@@ -53,6 +53,17 @@ public class GTBuiltin extends Builtin {
     
     if (eqShapes) {
       if (allNums) {
+        ia: {
+          for (Value v : vals) if (!v.quickIntArr()) break ia;
+          int[] res = new int[totalIA];
+          int i = 0;
+          for (Value v : vals) {
+            int[] ia = v.asIntArr();
+            System.arraycopy(ia, 0, res, i, ia.length);
+            i+= subIA;
+          }
+          return new IntArr(res, resShape);
+        }
         double[] res = new double[totalIA];
         
         int i = 0;
@@ -103,29 +114,9 @@ public class GTBuiltin extends Builtin {
     return Arr.create(res, resShape);
   }
   
-  private static final D_NNeB DNF = new D_NNeB() {
-    public boolean on(double w, double x) {
-      return w > x;
-    }
-    public void on(BitArr.BA res, double w, double[] x) {
-      for (double cw : x) res.add(w > cw);
-    }
-    public void on(BitArr.BA res, double[] w, double x) {
-      for (double ca : w) res.add(ca > x);
-    }
-    public void on(BitArr.BA res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res.add(w[i] > x[i]);
-    }
-    public Value call(BigValue w, BigValue x) {
-      return w.i.compareTo(x.i) > 0? Num.ONE : Num.ZERO;
-    }
-  };
   
-  public Value call(Value w0, Value x0) {
-    return numChrD(DNF, (w, x) -> w>x? Num.ONE : Num.ZERO,
-      (w, x) -> { throw new DomainError("comparing "+w.humanType(true)+" and "+x.humanType(true), this); },
-      w0, x0
-    );
+  public Value call(Value w, Value x) {
+    return LTBuiltin.DF.call(x, w);
   }
   
 }

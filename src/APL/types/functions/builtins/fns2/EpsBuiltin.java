@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.errors.*;
+import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;

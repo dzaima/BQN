@@ -23,30 +23,6 @@ public final class BitArr extends Arr {
     this.arr = arr;
   }
   
-  public static BitArr of(Arr a) {
-    if (a instanceof BitArr) return (BitArr) a;
-    if (a.quickDoubleArr()) {
-      double[] ds = a.asDoubleArr();
-      long[] arr = convert(ds);
-      return new BitArr(arr, a.shape);
-    }
-    long[] arr = new long[(a.ia+63 >> 6)];
-    int p = 0;
-    for(Value v : a) {
-      int n = Main.bool(v)? 1 : 0;
-      arr[p>>6]|=  n << (p&63);
-    }
-    return new BitArr(arr, a.shape);
-  }
-  public static long[] convert(double[] arr) {
-    long[] res = new long[arr.length+63 >> 6];
-    for (int i = 0; i < arr.length; i++) {
-      double d = arr[i];
-      if (d != 0 && d != 1) throw new DomainError("Converting " + d + " to boolean");
-      res[i>>6]|= (long) d << (i&63);
-    }
-    return res;
-  }
   
   public static int sizeof(Value x) {
     return x.ia+63 >> 6;

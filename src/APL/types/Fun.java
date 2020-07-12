@@ -44,19 +44,27 @@ public abstract class Fun extends Callable {
     return callInvA(v, x);
   }
   
-  public interface NumMV {
-    Value call(Num x);
-    default boolean retNum() {
+  public static abstract class NumMV {
+    public abstract Value call(Num x);
+    public boolean retNum() { // overriding this with false means call(int[], int[]) must be overridden too
       return true;
     }
-    default double call(double x) {
+    public double call(double x) {
       return call(new Num(x)).asDouble();
     }
-    default void call(double[] res, double[] x) {
+    public void call(double[] res, double[] x) {
       for (int i = 0; i < res.length; i++) res[i] = call(x[i]);
     }
-    default Value call(BigValue x) {
+    public Value call(BigValue x) {
       throw new DomainError("bigintegers not allowed here", x);
+    }
+  
+    public Value call(int[] x, int[] sh) {
+      double[] res = new double[x.length];
+      double[] d = new double[x.length];
+      for (int i = 0; i < x.length; i++) d[i] = x[i];
+      call(res, d);
+      return new DoubleArr(res, sh);
     }
   }
   public interface ChrMV {
@@ -71,23 +79,8 @@ public abstract class Fun extends Callable {
     Value call(APLMap x);
   }
   
-  public interface AllMV {
-    Value call(Value x);
-  }
   
   
-  protected Value allM(AllMV f, Value x) {
-    if (x instanceof Primitive) {
-      return f.call(x);
-    } else {
-      Arr o = (Arr) x;
-      Value[] arr = new Value[o.ia];
-      for (int i = 0; i < o.ia; i++) {
-        arr[i] = allM(f, o.get(i));
-      }
-      return new HArr(arr, o.shape);
-    }
-  }
   protected Value numM(NumMV nf, Value x) {
     if (x instanceof Arr) {
       if (x.quickDoubleArr()) {
@@ -110,6 +103,9 @@ public abstract class Fun extends Callable {
   protected Value numChrM(NumMV nf, ChrMV cf, Value x) {
     if (x instanceof Arr) {
       if (x.quickDoubleArr()) {
+        if (x.quickIntArr()) {
+          return nf.call(x.asIntArr(), x.shape);
+        }
         if (nf.retNum()) {
           double[] res = new double[x.ia];
           nf.call(res, x.asDoubleArr());
@@ -577,7 +573,7 @@ public abstract class Fun extends Callable {
   }
   public boolean notIdentity() { return true; }
   
-  // functions are equal per-object basis
+  // functions are equal on a per-object basis
   @Override public int hashCode() {
     return actualHashCode();
   }

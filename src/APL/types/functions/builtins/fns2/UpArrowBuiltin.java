@@ -13,7 +13,7 @@ public class UpArrowBuiltin extends Builtin {
     return "↑";
   }
   
-  public Value call(Value x) { // TODO scalars? opt for nums?
+  public Value call(Value x) { // TODO scalars? valuecopy
     if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
     Value[] vs = x.values();
     int cells = x.shape[0];
@@ -61,80 +61,96 @@ public class UpArrowBuiltin extends Builtin {
     return on(sh, off, x, this);
   }
   
-  public static Value on(int[] sh, int[] off, Value w, Callable blame) {
+  public static Value on(int[] sh, int[] off, Value x, Callable blame) { // valuecopy
     int rank = sh.length;
-    assert rank==off.length && rank>=w.rank;
-    if (rank > w.rank) {
+    assert rank==off.length && rank>=x.rank;
+    if (rank > x.rank) {
       boolean empty = false; // has to be empty or all leading 1s
-      int d = rank - w.rank;
+      int d = rank - x.rank;
       for (int i = 0; i < d; i++) {
         if (sh[i] == 0) { empty = true; break; }
       }
       if (empty) {
-        return new EmptyArr(sh, w.safePrototype());
+        return new EmptyArr(sh, x.safePrototype());
       } else {
-        int[] ssh  = new int[w.rank]; System.arraycopy(sh , d, ssh , 0, w.rank);
-        int[] soff = new int[w.rank]; System.arraycopy(off, d, soff, 0, w.rank);
-        return on(ssh, soff, w, blame).ofShape(sh);
+        int[] ssh  = new int[x.rank]; System.arraycopy(sh , d, ssh , 0, x.rank);
+        int[] soff = new int[x.rank]; System.arraycopy(off, d, soff, 0, x.rank);
+        return on(ssh, soff, x, blame).ofShape(sh);
       }
     }
     if (rank == 1) {
       int s = off[0];
       int l = sh[0];
-      if (w instanceof BitArr) {
-        BitArr wb = (BitArr) w;
+      if (x instanceof BitArr) {
+        BitArr wb = (BitArr) x;
         if (s == 0) {
           long[] ls = new long[BitArr.sizeof(l)];
           System.arraycopy(wb.arr, 0, ls, 0, ls.length);
           return new BitArr(ls, new int[]{l});
         } else {
           BitArr.BA res = new BitArr.BA(l);
-          res.add(wb, s, w.ia);
+          res.add(wb, s, x.ia);
           return res.finish();
         }
       }
-      if (w instanceof ChrArr) {
+      if (x instanceof ChrArr) {
         char[] res = new char[l];
-        String ws = ((ChrArr) w).s;
+        String ws = ((ChrArr) x).s;
         ws.getChars(s, s+l, res, 0); // ≡ for (int i = 0; i < l; i++) res[i] = ws.charAt(s+i);
         return new ChrArr(res);
       }
-      if (w.quickDoubleArr()) {
+      if (x.quickIntArr()) {
+        int[] res = new int[l];
+        int[] wd = x.asIntArr();
+        System.arraycopy(wd, s, res, 0, l);
+        return new IntArr(res);
+      }
+      if (x.quickDoubleArr()) {
         double[] res = new double[l];
-        double[] wd = w.asDoubleArr();
+        double[] wd = x.asDoubleArr();
         System.arraycopy(wd, s, res, 0, l); // ≡ for (int i = 0; i < l; i++) res[i] = wd[s+i];
         return new DoubleArr(res);
       }
       
       Value[] res = new Value[l];
-      for (int i = 0; i < l; i++) res[i] = w.get(s+i);
+      for (int i = 0; i < l; i++) res[i] = x.get(s+i);
       return Arr.create(res);
     }
     int ia = Arr.prod(sh);
-    if (w instanceof ChrArr) {
+    if (x instanceof ChrArr) {
       char[] arr = new char[ia];
-      String s = ((ChrArr) w).s;
+      String s = ((ChrArr) x).s;
       int i = 0;
       for (int[] index : new Indexer(sh, off)) {
-        arr[i] = s.charAt(Indexer.fromShape(w.shape, index));
+        arr[i] = s.charAt(Indexer.fromShape(x.shape, index));
         i++;
       }
       return new ChrArr(arr, sh);
     }
-    if (w.quickDoubleArr()) {
+    if (x.quickDoubleArr()) {
       double[] arr = new double[ia];
-      double[] wd = w.asDoubleArr();
+      double[] wd = x.asDoubleArr();
       int i = 0;
       for (int[] index : new Indexer(sh, off)) {
-        arr[i] = wd[Indexer.fromShape(w.shape, index)];
+        arr[i] = wd[Indexer.fromShape(x.shape, index)];
         i++;
       }
       return new DoubleArr(arr, sh);
     }
+    if (x.quickIntArr()) {
+      int[] arr = new int[ia];
+      int[] wd = x.asIntArr();
+      int i = 0;
+      for (int[] index : new Indexer(sh, off)) {
+        arr[i] = wd[Indexer.fromShape(x.shape, index)];
+        i++;
+      }
+      return new IntArr(arr, sh);
+    }
     Value[] arr = new Value[ia];
     int i = 0;
     for (int[] index : new Indexer(sh, off)) {
-      arr[i] = w.at(index);
+      arr[i] = x.at(index);
       i++;
     }
     return Arr.create(arr, sh);
@@ -152,8 +168,8 @@ public class UpArrowBuiltin extends Builtin {
   public static Value undo(int[] e, Value w, Value origW, Callable blame) {
     if (e.length==1 && w.rank==1) {
       int am = e[0];
-      if (am > 0) return JoinBuiltin.cat(w, on(new int[]{origW.ia-am}, e, origW, blame), 0, blame);
-      else return JoinBuiltin.cat(on(new int[]{origW.ia+am}, new int[]{0}, origW, blame), w, 0, blame);
+      if (am > 0) return JoinBuiltin.on(w, on(new int[]{origW.ia-am}, e, origW, blame), blame);
+      else return JoinBuiltin.on(on(new int[]{origW.ia+am}, new int[]{0}, origW, blame), w, blame);
     }
     chk: {
       fail: if (w.rank == e.length) {

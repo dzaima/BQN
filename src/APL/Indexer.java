@@ -103,9 +103,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     if (pos.rank > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.formatAPL(pos.shape)+")", blame);
     if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
     int x = 0;
-    double[] ds = pos.asDoubleArr();
+    int[] ds = pos.asIntArr();
     for (int i = 0; i < sh.length; i++) {
-      int c = (int) ds[i];
+      int c = ds[i];
       c-= 0;
       x+= c;
       if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
@@ -156,9 +156,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
           if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
           for (int j = 0; j < res.length; j++) res[j]+= n;
         } else {
-          double[] ns = c.asDoubleArr();
+          int[] ns = c.asIntArr();
           for (int j = 0; j < ns.length; j++) {
-            int n = Num.toInt(ns[j]);
+            int n = ns[j];
             n-= 0;
             res[j]+= n;
             if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+n+")", blame);

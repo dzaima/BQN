@@ -11,7 +11,7 @@ public class DownArrowBuiltin extends Builtin {
     return "↓";
   }
   
-  public Value call(Value x) { // TODO scalars? opt for nums?
+  public Value call(Value x) { // TODO scalars? valuecopy
     if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
     Value[] vs = x.values();
     int cells = x.shape[0];

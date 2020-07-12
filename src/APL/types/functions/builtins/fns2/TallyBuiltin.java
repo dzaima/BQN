@@ -1,7 +1,7 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
 import APL.types.*;
+import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
 
 public class TallyBuiltin extends Builtin {
@@ -11,7 +11,7 @@ public class TallyBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    return Main.toAPL(x.shape);
+    return new IntArr(x.shape);
   }
   
   public Value call(Value w, Value x) {

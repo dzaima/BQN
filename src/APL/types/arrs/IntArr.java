@@ -5,77 +5,62 @@ import APL.types.*;
 
 import java.util.*;
 
-public class DoubleArr extends Arr {
-  public static final double[] EMPTY = new double[0];
-  final public double[] arr;
-  
-  public DoubleArr(double[] arr, int[] sh) {
-    super(sh, arr.length);
+public class IntArr extends Arr {
+  private final int[] arr;
+  public IntArr(int[] arr, int[] shape) {
+    super(shape, arr.length);
     this.arr = arr;
   }
-  public DoubleArr(double[] arr) { // 1D
+  public IntArr(int[] arr) {
     super(new int[]{arr.length}, arr.length);
     this.arr = arr;
   }
-  
-  public DoubleArr(ArrayList<Double> arrl) {
-    super(new int[]{arrl.size()}, arrl.size());
-    arr = new double[ia];
-    int j = 0;
-    for (double d : arrl) {
-      arr[j++] = d;
-    }
+  public IntArr(byte[] arr) {
+    super(new int[]{arr.length}, arr.length);
+    int[] a = new int[ia];
+    for (int i = 0; i < ia; i++) a[i] = arr[i]&0xff;
+    this.arr = a;
   }
-  
   
   public Value get(int i) { return Num.of(arr[i]); }
-  public Value first() { return Num.of(arr[0]); }
-  
-  
   
   public Value[] valuesClone() {
-    Value[] vs = new Value[ia];
-    for (int i = 0; i < ia; i++) vs[i] = new Num(arr[i]);
-    return vs;
+    Value[] res = new Value[ia];
+    for (int i = 0; i < arr.length; i++) res[i] = Num.of(arr[i]);
+    return res;
   }
   
   
-  public int[] asIntArrClone() {
-    int[] r = new int[ia];
-    for (int i = 0; i < ia; i++) {
-      int conv = (int) arr[i];
-      if (arr[i] != conv) throw new DomainError("Using a fractional number as integer", this);
-      r[i] = conv;
-    }
-    return r;
-  }
+  public int[] asIntArr     () { return arr        ; }
+  public int[] asIntArrClone() { return arr.clone(); }
   
   
   public double[] asDoubleArr() {
-    return arr;
+    return asDoubleArrClone();
   }
   public double[] asDoubleArrClone() {
-    return arr.clone();
-  }
-  public double sum() {
-    double r = 0;
-    for (double val : arr) r+= val;
+    double[] r = new double[arr.length];
+    for (int i = 0; i < r.length; i++) r[i] = arr[i];
     return r;
   }
-  
+  public double sum() {
+    long sum = 0;
+    for (int c : arr) sum+= c;
+    return sum;
+  }
   
   
   public boolean quickDoubleArr() { return true; }
-  public Value ofShape(int[] sh) { return new DoubleArr(arr, sh); }
+  public boolean quickIntArr() { return true; }
+  public Value ofShape(int[] sh) { return new IntArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }
-  public Value squeeze() { return this; }
-  
-  
-  
+  public Value squeeze() {
+    return this;
+  }
   public boolean equals(Obj o) {
-    if (o instanceof DoubleArr) {
-      DoubleArr da = (DoubleArr) o;
+    if (o instanceof IntArr) {
+      IntArr da = (IntArr) o;
       if ((hash!=0 && da.hash!=0 && hash != da.hash) || !Arrays.equals(shape, da.shape)) return false;
       for (int i = 0; i < ia; i++) {
         if (arr[i] != da.arr[i]) return false;
@@ -84,12 +69,10 @@ public class DoubleArr extends Arr {
     }
     return super.equals(o);
   }
+  
   public int hashCode() {
     if (hash == 0) {
-      for (double d : arr) {
-        hash*= 31;
-        if (d != 0d) hash+= Double.hashCode(d); // ¯0 == 0
-      }
+      for (int d : arr) hash = hash*31 + Double.hashCode(d);
       hash = shapeHash(hash);
     }
     return hash;
@@ -101,17 +84,13 @@ public class DoubleArr extends Arr {
       return this;
     }
     if (dim < 0) dim+= rank;
-    // 2×3×4:
-    // 0 - 3×4s for 2
-    // 1 - 4s for 3
-    // 2 - 1s for 4
     int chunkS = 1;
     int cPSec = shape[dim]; // chunks per section
     for (int i = rank-1; i > dim; i--) {
       chunkS*= shape[i];
     }
     int sec = chunkS * cPSec; // section length
-    double[] res = new double[ia];
+    int[] res = new int[ia];
     int c = 0;
     while (c < ia) {
       for (int i = 0; i < cPSec; i++) {
@@ -121,6 +100,6 @@ public class DoubleArr extends Arr {
       }
       c+= sec;
     }
-    return new DoubleArr(res, shape);
+    return new IntArr(res, shape);
   }
 }

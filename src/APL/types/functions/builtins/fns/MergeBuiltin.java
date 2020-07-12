@@ -27,17 +27,17 @@ public class MergeBuiltin extends Builtin {
       double[] ds = new double[w.ia];
       double[][] wds = new double[x.ia][];
       for (int i = 0; i < x.ia; i++) wds[i] = x.get(i).asDoubleArr();
-      double[] idx = w.asDoubleArr();
+      int[] idx = w.asIntArr();
       for (int i = 0; i < idx.length; i++) {
-        ds[i] = wds[(int) idx[i]][i];
+        ds[i] = wds[idx[i]][i];
       }
       if (w.rank == 0) return new Num(ds[0]);
       return new DoubleArr(ds, w.shape);
     }
     Value[] vs = new Value[w.ia];
-    double[] idx = w.asDoubleArr();
+    int[] idx = w.asIntArr();
     for (int i = 0; i < idx.length; i++) {
-      vs[i] = x.get((int) idx[i]).get(i);
+      vs[i] = x.get(idx[i]).get(i);
     }
     return Arr.create(vs, w.shape);
   }

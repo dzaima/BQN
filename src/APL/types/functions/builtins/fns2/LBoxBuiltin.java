@@ -39,9 +39,9 @@ public class LBoxBuiltin extends Builtin {
       System.arraycopy(x.shape, 1, sh, wr, xr-1);
       return Arr.create(new Value[0], sh);
     } else if (w.get(0) instanceof Num) {
-      double[] ds = w.asDoubleArr();
+      int[] ds = w.asIntArr();
       Value[] res = new Value[ds.length];
-      for (int i = 0; i < ds.length; i++) res[i] = getCell(Num.toInt(ds[i]), x, this);
+      for (int i = 0; i < ds.length; i++) res[i] = getCell(ds[i], x, this);
       return GTBuiltin.merge(res, w.shape, this);
     } else {
       if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
@@ -79,8 +79,8 @@ public class LBoxBuiltin extends Builtin {
       System.arraycopy(x.values(), p, res, rp, csz); // valuecopy, and a bad one at that
       rp+= csz;
     } else {
-      for (double d : w.get(i).asDoubleArr()) {
-        c[i] = Num.toInt(d);
+      for (int d : w.get(i).asIntArr()) {
+        c[i] = d;
         rp = cellRec(res, c, i+1, w, x, csz, rp);
       }
     }

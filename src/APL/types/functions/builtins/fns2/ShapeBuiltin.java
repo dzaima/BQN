@@ -17,7 +17,7 @@ public class ShapeBuiltin extends Builtin {
   
   public Value call(Value x) {
     if (x instanceof Primitive) {
-      if (x instanceof Num) return new DoubleArr(new double[]{((Num) x).num});
+      if (x instanceof Num) return x.ofShape(Shape1Arr.SHAPE);
       if (x instanceof Char) return new ChrArr(String.valueOf(((Char) x).chr));
       return new Shape1Arr(x);
     }
@@ -75,6 +75,16 @@ public class ShapeBuiltin extends Builtin {
       for (int i = 0; i < full; i++) res.add(wb);
       res.add(wb, 0, frac);
       return res.finish();
+    } else if (x.quickIntArr()) {
+      assert !(x instanceof Primitive);
+      int[] inp = x.asIntArr();
+      int[] res = new int[ia];
+      int p = 0;
+      for (int i = 0; i < ia; i++) {
+        res[i] = inp[p++];
+        if (p == x.ia) p = 0;
+      }
+      return new IntArr(res, sh);
     } else if (x.quickDoubleArr()) {
       assert !(x instanceof Primitive);
       double[] inp = x.asDoubleArr();

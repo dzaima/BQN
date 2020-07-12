@@ -16,7 +16,7 @@ public class RhoBuiltin extends Builtin {
   
   
   public Value call(Value x) {
-    return Main.toAPL(x.shape);
+    return new IntArr(x.shape);
   }
   public Value call(Value w, Value x) {
     if (w.rank > 1) throw new DomainError("⍴: multidimensional shape (⍴𝕨 is "+Main.formatAPL(w.shape)+")", this, w);

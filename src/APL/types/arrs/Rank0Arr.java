@@ -3,7 +3,7 @@ package APL.types.arrs;
 import APL.errors.DomainError;
 import APL.types.*;
 
-public class Rank0Arr extends Arr {
+public class Rank0Arr extends Arr { // TODO merge with SingleItemArr
   public final static int[] SHAPE = new int[0];
   public final Value item;
   
@@ -33,6 +33,12 @@ public class Rank0Arr extends Arr {
     return item.safePrototype();
   }
   
+  public boolean quickIntArr() {
+    return item instanceof Num && Num.isInt(((Num) item).num);
+  }
+  public boolean quickDoubleArr() {
+    return item instanceof Num;
+  }
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);
     return new SingleItemArr(item, sh);

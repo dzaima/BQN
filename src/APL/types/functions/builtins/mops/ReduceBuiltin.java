@@ -17,22 +17,43 @@ public class ReduceBuiltin extends Mop {
   public Value call(Value f, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
+    if (x.ia==0) {
+      Value id = ff.identity();
+      if (id == null) throw new DomainError("no identity defined for "+f.name(), this, f);
+      return id;
+    }
+    
     if (x.quickDoubleArr()) {
       if (f instanceof PlusBuiltin) return new Num(x.sum());
       if (f instanceof MulBuiltin) {
-        double p = 1;
-        for (double d : x.asDoubleArr()) p*= d;
-        return new Num(p);
+        if (x.quickIntArr()) {
+          double r = 1;
+          for (int c : x.asIntArr()) r*= c;
+          return new Num(r);
+        }
+        double r = 1;
+        for (double d : x.asDoubleArr()) r*= d;
+        return new Num(r);
       }
       if (f instanceof FloorBuiltin) {
-        double p = Double.POSITIVE_INFINITY;
-        for (double d : x.asDoubleArr()) p = Math.min(p, d);
-        return new Num(p);
+        if (x.quickIntArr()) {
+          int r = Integer.MAX_VALUE;
+          for (int c : x.asIntArr()) r = Math.min(r, c);
+          return new Num(r);
+        }
+        double r = Double.POSITIVE_INFINITY;
+        for (double d : x.asDoubleArr()) r = Math.min(r, d);
+        return new Num(r);
       }
       if (f instanceof CeilingBuiltin) {
-        double p = Double.NEGATIVE_INFINITY;
-        for (double d : x.asDoubleArr()) p = Math.max(p, d);
-        return new Num(p);
+        if (x.quickIntArr()) {
+          int r = Integer.MIN_VALUE;
+          for (int c : x.asIntArr()) r = Math.max(r, c);
+          return new Num(r);
+        }
+        double r = Double.NEGATIVE_INFINITY;
+        for (double d : x.asDoubleArr()) r = Math.max(r, d);
+        return new Num(r);
       }
     }
     if (f instanceof JoinBuiltin) {
@@ -41,11 +62,6 @@ public class ReduceBuiltin extends Mop {
     }
     
     Value[] a = x.values();
-    if (a.length == 0) {
-      Value id = ff.identity();
-      if (id == null) throw new DomainError("no identity defined for "+f.name(), this, f);
-      return id;
-    }
     return foldr(ff, a, a[a.length-1], 1);
   }
   

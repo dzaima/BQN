@@ -65,11 +65,12 @@ public class Num extends Primitive {
     if (i != d) throw new DomainError("Expected integer, got "+d);
     return i;
   }
+  @Deprecated public static int toInt(int i) { throw new AssertionError(); }
   
   
   
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
-    return new DoubleArr(new double[]{num}, sh);
+    return isInt(num)? new IntArr(new int[]{(int) num}) : new DoubleArr(new double[]{num}, sh);
   }
   
   
@@ -86,9 +87,8 @@ public class Num extends Primitive {
   public Value[] values     () { return new Value[]{this}; }
   
   
-  public /*open*/ boolean quickDoubleArr() { // if true, asDoubleArr must succeed; warning: also true for a primitive number
-    return true;
-  }
+  public boolean quickIntArr() { return isInt(num); }
+  public boolean quickDoubleArr() { return true; }
   public Value safePrototype() { return ZERO; }
   
   

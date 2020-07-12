@@ -250,16 +250,34 @@ public abstract class Arr extends Value {
   public static Arr create(Value[] v, int[] sh) { // note, doesn't attempt individual item squeezing
     assert Arr.prod(sh) == v.length : v.length+" ≢ ×´"+Main.formatAPL(sh);
     if (v.length == 0) return new EmptyArr(sh, null);
-    if (v[0] instanceof Num) {
+    da: if (v[0] instanceof Num) {
+      ia: if (Num.isInt(((Num) v[0]).num)) {
+        ba: if (Num.isBool(((Num) v[0]).num)) {
+          BitArr.BA ba = new BitArr.BA(sh);
+          for (Value c : v) {
+            if (!(c instanceof Num)) break da;
+            double d = ((Num) c).num;
+            if (d!=1 && Double.doubleToRawLongBits(d)!=0) break ba;
+            ba.add(d!=0);
+          }
+          return ba.finish();
+        }
+        int[] is = new int[v.length];
+        for (int i = 0; i < v.length; i++) {
+          if (!(v[i] instanceof Num)) break da;
+          double d = ((Num) v[i]).num;
+          int n = (int) d;
+          if (n != d || Double.doubleToRawLongBits(d)==Double.doubleToRawLongBits(-0.0d)) break ia;
+          is[i] = n;
+        }
+        return new IntArr(is, sh);
+      }
       double[] da = new double[v.length];
       for (int i = 0; i < v.length; i++) {
         if (v[i] instanceof Num) da[i] = ((Num)v[i]).num;
-        else {
-          da = null;
-          break;
-        }
+        else break da;
       }
-      if (da != null) return new DoubleArr(da, sh);
+      return new DoubleArr(da, sh);
     }
     if (v[0] instanceof Char) {
       StringBuilder s = new StringBuilder();
@@ -306,7 +324,6 @@ public abstract class Arr extends Value {
     return new HArr(v, sh);
   }
   
-  @Override
   public boolean equals(Obj o) {
     if (!(o instanceof Arr)) return false;
     Arr a = (Arr) o;
@@ -319,15 +336,15 @@ public abstract class Arr extends Value {
     }
     return true;
   }
+  
   protected int hash;
-  @Override
+  
   public int hashCode() {
     if (hash == 0) {
-      for (Value v : this) {
-        hash = hash*31 + v.hashCode();
-      }
+      for (Value v : this) hash = hash*31 + v.hashCode();
+      hash = shapeHash(hash);
     }
-    return shapeHash(hash);
+    return hash;
   }
   
   protected int shapeHash(int hash) {

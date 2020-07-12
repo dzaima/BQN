@@ -3,8 +3,8 @@ package APL.types.arrs;
 import APL.errors.DomainError;
 import APL.types.*;
 
-public class Shape1Arr extends Arr {
-  private static final int[] SHAPE = new int[]{1};
+public class Shape1Arr extends Arr { // TODO merge with SingleItemArr
+  public static final int[] SHAPE = new int[]{1};
   private final Value item;
   
   public Shape1Arr(Value item) {
@@ -23,7 +23,9 @@ public class Shape1Arr extends Arr {
   public int[] asIntArrClone() { return new int[]{item.asInt()}; }
   public Value[] valuesClone() { return new Value[]{item}; }
   
-  
+  public boolean quickIntArr() {
+    return item instanceof Num && Num.isInt(((Num) item).num); 
+  }
   public boolean quickDoubleArr() {
     return item instanceof Num;
   }

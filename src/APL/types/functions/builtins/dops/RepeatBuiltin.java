@@ -61,8 +61,7 @@ public class RepeatBuiltin extends Dop {
   
   private static void bounds(int[] res, Value v) {
     if (v.quickDoubleArr()) {
-      for (double d : v.asDoubleArr()) {
-        int n = Num.toInt(d);
+      for (int n : v.asIntArr()) {
         if (n < res[0]) res[0] = n;
         else if (n > res[1]) res[1] = n;
       }

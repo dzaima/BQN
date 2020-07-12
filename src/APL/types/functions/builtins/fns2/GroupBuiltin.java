@@ -14,10 +14,10 @@ public class GroupBuiltin extends Builtin {
   }
   
   
-  private static class MutDA {
-    double[] ds = new double[4];
+  private static class MutIA {
+    int[] ds = new int[4];
     int sz;
-    void add(double i) {
+    void add(int i) {
       if (sz >= ds.length) {
         ds = Arrays.copyOf(ds, ds.length*2);
       }
@@ -35,25 +35,25 @@ public class GroupBuiltin extends Builtin {
       for (int d : xi) sz = Math.max(sz, d);
       sz++;
       
-      MutDA[] ds = new MutDA[sz];
-      for (int i = 0; i < sz; i++) ds[i] = new MutDA();
+      MutIA[] ds = new MutIA[sz];
+      for (int i = 0; i < sz; i++) ds[i] = new MutIA();
       for (int i = 0; i < xi.length; i++) {
         int c = xi[i];
         if (c>=0) ds[c].add(i);
         else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in argument", this, x);
       }
       Value[] res = new Value[sz];
-      for (int i = 0; i < sz; i++) res[i] = new DoubleArr(Arrays.copyOf(ds[i].ds, ds[i].sz));
+      for (int i = 0; i < sz; i++) res[i] = new IntArr(Arrays.copyOf(ds[i].ds, ds[i].sz));
       return new HArr(res);
     }
     if (depth != 2) throw new DomainError("⊔: argument must be depth 1 or 2 (was "+depth+")", this, x);
-    double[] args = new double[x.ia];
+    int[] args = new int[x.ia];
     for (int i = 0; i < args.length; i++) {
       Value c = x.get(i);
       if (c.rank != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this, x);
       args[i] = c.ia;
     }
-    return call(x, UDBuiltin.on(new DoubleArr(args), null)); // gives strange errors but whatever
+    return call(x, UDBuiltin.on(new IntArr(args), null)); // gives strange errors but whatever
   }
   
   

@@ -41,19 +41,18 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return new String(cs);
   }
   
-  public /*open*/ int[] asIntArr() { return asIntArrClone(); }
-  public /*open*/ int[] asIntArrClone() {
-    int[] res = new int[ia];
-    for (int i = 0; i < ia; i++) res[i] = get(i).asInt();
-    return res;
-  }
-  
-  
   public /*open*/ Value[] values() { return valuesClone(); }
   public /*open*/ Value[] valuesClone() {
     Value[] vs = new Value[ia];
     for (int i = 0; i < ia; i++) vs[i] = get(i);
     return vs;
+  }
+  
+  public /*open*/ int[] asIntArr() { return asIntArrClone(); }
+  public /*open*/ int[] asIntArrClone() {
+    int[] res = new int[ia];
+    for (int i = 0; i < ia; i++) res[i] = get(i).asInt();
+    return res;
   }
   
   
@@ -173,10 +172,8 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return this;
   }
   
-  
   public int compareTo(Value r) {
     Value l = this;
-    
     boolean rA = r instanceof Arr;
     boolean lA = l instanceof Arr;
     

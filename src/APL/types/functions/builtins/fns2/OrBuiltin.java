@@ -26,40 +26,28 @@ public class OrBuiltin extends Builtin {
     return ReverseBuiltin.on(x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
   }
   
-  private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      return w+x - w*x;
-    }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = w+x[i] - w*x[i];
-    }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i]+x - w[i]*x;
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i]+x[i] - w[i]*x[i];
-    }
-    public Value call(BigValue w, BigValue x) {
+  public static final Pervasion.NN2N DF = new Pervasion.NN2NpB() {
+    public Value on(BigValue w, BigValue x) {
       return new BigValue(w.i.gcd(x.i));
     }
-  };
-  
-  private static final D_BB DBF = new D_BB() {
-    @Override public Value call(boolean w, BitArr x) {
-      if (w) return BitArr.fill(x, true);
-      return x;
-    }
-    @Override public Value call(BitArr w, boolean x) {
-      if (x) return BitArr.fill(w, true);
-      return w;
-    }
-    @Override public Value call(BitArr w, BitArr x) {
+    public double on(double w, double x) { return w+x - w*x; }
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) { double wc=w   ,xc=x[i]; res[i] = wc+xc - wc*xc; } }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) { double wc=w[i],xc=x   ; res[i] = wc+xc - wc*xc; } }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) { double wc=w[i],xc=x[i]; res[i] = wc+xc - wc*xc; } }
+    
+    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {long wc=w   ,xc=x[i];long l=wc+xc - wc*xc;int n=(int)l;if (l!=n)return null;res[i]=n; } return res;} // todo i _think_ there's a probability that this still overflows
+    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {long wc=w[i],xc=x   ;long l=wc+xc - wc*xc;int n=(int)l;if (l!=n)return null;res[i]=n; } return res;}
+    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {long wc=w[i],xc=x[i];long l=wc+xc - wc*xc;int n=(int)l;if (l!=n)return null;res[i]=n; } return res;}
+    
+    public Value on(boolean w, BitArr x) { return w? BitArr.fill(x, true) : x; }
+    public Value on(BitArr w, boolean x) { return x? BitArr.fill(w, true) : w; }
+    public Value on(BitArr w, BitArr x) {
       BitArr.BC bc = new BitArr.BC(w.shape);
       for (int i = 0; i < w.arr.length; i++) bc.arr[i] = w.arr[i] | x.arr[i];
       return bc.finish();
     }
   };
   public Value call(Value w, Value x) {
-    return bitD(DNF, DBF, w, x);
+    return DF.call(w, x);
   }
 }

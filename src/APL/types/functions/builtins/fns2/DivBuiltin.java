@@ -26,31 +26,26 @@ public class DivBuiltin extends Builtin {
     return numM(NF, x);
   }
   
-  private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      return w/x;
-    }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = w / x[i];
-    }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] / x;
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] / x[i];
-    }
-    public Value call(BigValue w, BigValue x) {
-      return new BigValue(w.i.divide(x.i));
-    }
+  public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
+    public Value on(BigValue w, BigValue x) { return new BigValue(w.i.divide(x.i)); }
+    public double on(double w, double x) { return w / x; }
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) res[i] = w    / x[i]; }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x   ; }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x[i]; }
+    
+    // public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=w   /x[i];}return res;}catch(ArithmeticException e){return null;}}
+    // public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {res[i]=w[i]/x   ;}return res;}catch(ArithmeticException e){return null;}}
+    // public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=w[i]/x[i];}return res;}catch(ArithmeticException e){return null;}}
   };
+  
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   
   public Value callInv(Value x) { return call(x); }
   public Value callInvW(Value w, Value x) { return call(w, x); }
   
-  @Override public Value callInvA(Value w, Value x) {
-    return numD(MulBuiltin.DNF, w, x);
+  public Value callInvA(Value w, Value x) {
+    return MulBuiltin.DF.call(w, x);
   }
 }

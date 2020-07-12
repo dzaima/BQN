@@ -53,9 +53,7 @@ public class ChrArr extends Arr {
   
   public int hashCode() {
     if (hash == 0) {
-      for (char c : s.toCharArray()) {
-        hash = hash*31 + c;
-      }
+      for (char c : s.toCharArray()) hash = hash*31 + c;
       hash = shapeHash(hash);
     }
     return hash;

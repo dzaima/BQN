@@ -16,6 +16,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   
   public Value call(Value x) {
+    if (x.ia == 0) return x.prototype();
     return x.first();
   }
   

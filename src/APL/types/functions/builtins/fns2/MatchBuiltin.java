@@ -20,7 +20,7 @@ public class MatchBuiltin extends Builtin {
   }
   public static int full(Value x) {
     if (x instanceof Primitive) return 0;
-    if (x instanceof DoubleArr || x instanceof ChrArr || x instanceof BitArr) return 1;
+    if (x instanceof DoubleArr || x instanceof ChrArr || x instanceof BitArr || x instanceof IntArr) return 1;
     int depth = 0;
     for (Value v : x) {
       depth = Math.max(depth, full(v));

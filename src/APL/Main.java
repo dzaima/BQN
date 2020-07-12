@@ -282,22 +282,6 @@ public class Main {
   }
   
   
-  public static DoubleArr toAPL(int[] arr) {
-    double[] da = new double[arr.length];
-    for (int i = 0; i < arr.length; i++) {
-      da[i] = arr[i];
-    }
-    return new DoubleArr(da);
-  }
-  
-  public static DoubleArr toAPL(int[] arr, int[] sh) {
-    double[] da = new double[arr.length];
-    for (int i = 0; i < arr.length; i++) {
-      da[i] = arr[i];
-    }
-    return new DoubleArr(da, sh);
-  }
-  
   private static Value norm(Obj o) {
     if (o instanceof MutArr) return ((MutArr) o).get();
     if (o instanceof Settable) return ((Settable) o).get();

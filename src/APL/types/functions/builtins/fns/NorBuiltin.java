@@ -52,7 +52,7 @@ public class NorBuiltin extends Builtin {
       for (long l : wb.arr) if (l != 0L) return Num.ZERO;
       return Num.ONE;
     }
-    if (x instanceof DoubleArr) {
+    if (x.quickDoubleArr()) {
       double[] da = x.asDoubleArr();
       for (int i = 0; i < x.ia; i++) {
         if (Main.bool(da[i])) return Num.ZERO;

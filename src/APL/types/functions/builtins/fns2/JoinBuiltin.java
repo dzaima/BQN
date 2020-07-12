@@ -22,7 +22,7 @@ public class JoinBuiltin extends Builtin {
     throw new NYIError("monadic ∾ on rank>1", this, x);
   }
   
-  public static Value joinVec(Value x) { // returns null if contents weren't rank 1
+  public static Value joinVec(Value x) { // returns null if contents weren't rank 1; valuecopy
     assert x.rank == 1;
     if (x.ia == 0) return x;
     Value first = x.first();
@@ -47,22 +47,41 @@ public class JoinBuiltin extends Builtin {
         return Main.toAPL(new String(cs));
         
         
-      } else if (first.quickDoubleArr()) {
-        for (Value v : x) {
-          if (v.rank != 1) return null;
-          if (!v.quickDoubleArr()) break typed;
-          am+= v.ia;
-          chki++;
+      } else {
+        if (first.quickIntArr()) {
+          for (Value v : x) {
+            if (v.rank != 1) return null;
+            if (!v.quickIntArr()) break typed;
+            am+= v.ia;
+            chki++;
+          }
+          int[] is = new int[am];
+    
+          int ri = 0;
+          for (int i = 0; i < x.ia; i++) {
+            Value v = x.get(i);
+            System.arraycopy(v.asIntArr(), 0, is, ri, v.ia);
+            ri+= v.ia;
+          }
+          return new IntArr(is);
         }
-        double[] ds = new double[am];
-        
-        int ri = 0;
-        for (int i = 0; i < x.ia; i++) {
-          Value v = x.get(i);
-          System.arraycopy(v.asDoubleArr(), 0, ds, ri, v.ia);
-          ri+= v.ia;
+        if (first.quickDoubleArr()) {
+          for (Value v : x) {
+            if (v.rank != 1) return null;
+            if (!v.quickDoubleArr()) break typed;
+            am+= v.ia;
+            chki++;
+          }
+          double[] ds = new double[am];
+    
+          int ri = 0;
+          for (int i = 0; i < x.ia; i++) {
+            Value v = x.get(i);
+            System.arraycopy(v.asDoubleArr(), 0, ds, ri, v.ia);
+            ri+= v.ia;
+          }
+          return new DoubleArr(ds);
         }
-        return new DoubleArr(ds);
       }
     }
     
@@ -82,14 +101,17 @@ public class JoinBuiltin extends Builtin {
   }
   
   public Value call(Value w, Value x) {
+    return on(w, x, this);
+  }
+  public static Value on(Value w, Value x, Callable blame) {
     int a = w.rank, b = x.rank;
     int c = Math.max(1,Math.max(a,b));
-    if (c-a > 1 || c-b > 1) throw new RankError("∾: argument ranks must differ by 1 or less (were "+a+" and "+b+")", this);
+    if (c-a > 1 || c-b > 1) throw new RankError("∾: argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
     
     int[] sh = new int[c];
     for (int i = 1; i < c; i++) {
       int s = x.shape[i+b-c];
-      if (w.shape[i+a-c] != s) throw new LengthError("∾: lengths not matchable ("+new DoubleArr(w.shape)+" vs "+new DoubleArr(x.shape)+")", this);
+      if (w.shape[i+a-c] != s) throw new LengthError("∾: lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
       sh[i] = s;
     }
     sh[0] = (a==c? w.shape[0] : 1) + (b==c? x.shape[0] : 1);
@@ -98,7 +120,21 @@ public class JoinBuiltin extends Builtin {
       && (x instanceof BitArr || Main.isBool(x))) {
       return catBit(w, x, sh);
     }
-    if (w instanceof DoubleArr && x instanceof DoubleArr) {
+    if (w.quickDoubleArr() && x.quickDoubleArr()) {
+      boolean wi = w.quickIntArr();
+      boolean xi = x.quickIntArr();
+      if (wi || xi) {
+        if (wi && xi) {
+          int[] r = new int[w.ia + x.ia];
+          System.arraycopy(w.asIntArr(), 0, r, 0, w.ia);
+          System.arraycopy(x.asIntArr(), 0, r, w.ia, x.ia);
+          return new IntArr(r, sh);
+        }
+        double[] r = new double[w.ia + x.ia];
+        if (wi) {int[]wa=w.asIntArr(); for(int i=0; i<wa.length; i++) r[     i]=wa[i]; } else System.arraycopy(w.asDoubleArr(), 0, r, 0   , w.ia);
+        if (xi) {int[]xa=x.asIntArr(); for(int i=0; i<xa.length; i++) r[w.ia+i]=xa[i]; } else System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
+        return new DoubleArr(r, sh);
+      }
       double[] r = new double[w.ia + x.ia];
       System.arraycopy(w.asDoubleArr(), 0, r, 0, w.ia);
       System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
@@ -135,7 +171,7 @@ public class JoinBuiltin extends Builtin {
     if (!wScalar && !xScalar) {
       if (w.rank != x.rank) throw new RankError("ranks not matchable", blame, x);
       for (int i = 0; i < w.rank; i++) {
-        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+new DoubleArr(w.shape)+" vs "+new DoubleArr(x.shape)+")", blame, x);
+        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
       }
     }
     int[] rs = !wScalar? w.shape.clone() : x.shape.clone(); // shape of the result

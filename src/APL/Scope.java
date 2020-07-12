@@ -120,6 +120,15 @@ public class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
+        case "•ia": return new Builtin() {
+          public String repr() { return "•IA"; }
+
+          public Value call(Value x) {
+            int[] is = new int[x.ia];
+            for (int i = 0; i < is.length; i++) is[i] = x.get(i).asInt();
+            return new IntArr(is, x.shape);
+          }
+        };
         case "•rand": return new Builtin() {
           public Value call(Value x) {
             return RandBuiltin.on(x, Scope.this);
@@ -373,12 +382,14 @@ public class Scope {
     
     public Value call(Value x) {
       return numChrM(new NumMV() {
+        public boolean retNum() { return false; }
         public Value call(Num x) {
           return Char.of((char) x.asInt());
         }
-  
-        public boolean retNum() {
-          return false;
+        public Value call(int[] x, int[] sh) {
+          char[] cs = new char[x.length];
+          for (int i = 0; i < cs.length; i++) cs[i] = (char) x[i];
+          return new ChrArr(cs, sh);
         }
       }, c->Num.of(c.chr), x);
     }
@@ -572,7 +583,7 @@ public class Scope {
           if (inpo.first() instanceof Char) inp = inpo.asString().getBytes(StandardCharsets.UTF_8);
           else {
             inp = new byte[inpo.ia];
-            double[] ds = inpo.asDoubleArr();
+            int[] ds = inpo.asIntArr();
             for (int i = 0; i < ds.length; i++) inp[i] = (byte) ds[i];
           }
         }
@@ -602,7 +613,7 @@ public class Scope {
         if (inp != null) p.getOutputStream().write(inp);
         byte[] out = readAllBytes(p.getInputStream());
         byte[] err = readAllBytes(p.getErrorStream());
-        if (raw) return new HArr(new Value[]{ret, new DoubleArr(out), new DoubleArr(err)});
+        if (raw) return new HArr(new Value[]{ret, new IntArr(out), new IntArr(err)});
         else return new HArr(new Value[]{ret, Main.toAPL(new String(out, StandardCharsets.UTF_8)),
                                               Main.toAPL(new String(err, StandardCharsets.UTF_8))});
       } catch (Throwable e) {

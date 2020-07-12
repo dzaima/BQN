@@ -3,6 +3,7 @@ package APL.types.functions.builtins.fns2;
 import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
+import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
 
 import java.math.BigInteger;
@@ -24,51 +25,45 @@ public class StileBuiltin extends Builtin {
     public Value call(BigValue x) {
       return new BigValue(x.i.abs());
     }
+  
+    public Value call(int[] x, int[] sh) {
+      int[] res = new int[x.length];
+      for (int i = 0; i < res.length; i++) {
+        int c = res[i];
+        if (c==Integer.MIN_VALUE) return super.call(x, sh);
+        res[i] = Math.abs(c);
+      }
+      return new IntArr(res, sh);
+    }
   };
   
   public Value call(Value x) {
     return numChrMapM(NF, c->{ throw new DomainError("|char", this, x); }, c -> Num.of(c.size()), x);
   }
   
-  private static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      double c = x % w;
-      if (c!=0  &  (w>=0 ^ x>=0)) c+= w;
-      return c;
-    }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) {
-        double xc = x[i];
-        double c = xc%w;
-        if (c!=0  &  (w>=0 ^ xc>=0)) c+= w;
-        res[i] = c;
-      }
-    }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) {
-        double wc = w[i];
-        double c = x%wc;
-        if (c!=0  &  (wc>=0 ^ x>=0)) c+= wc;
-        res[i] = c;
-      }
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) {
-        double wc = w[i];
-        double xc = x[i];
-        double c = xc%wc;
-        if (c!=0  &  (wc>=0 ^ xc>=0)) c+= wc;
-        res[i] = c;
-      }
-    }
-    public Value call(BigValue w, BigValue x) {
+  
+  
+  public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
+    public Value on(BigValue w, BigValue x) {
       BigInteger r = x.i.remainder(w.i);
-      if (r.signum()<0) r = r.add(w.i);
+      if (r.signum()!=0  &  (w.i.signum()>=0 ^ x.i.signum()>=0)) r = r.add(w.i);
       return new BigValue(r);
     }
+    public double on(double w, double x) {
+      double r=x%w;
+      if (r!=0  &  (w>=0 ^ x>=0)) r+= w;
+      return r;
+    }
+    public void on(double   w, double[] x, double[] res) { for(int i=0; i<x.length; i++) { double cw=w   ,cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r; } }
+    public void on(double[] w, double   x, double[] res) { for(int i=0; i<w.length; i++) { double cw=w[i],cx=x   ,r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r; } }
+    public void on(double[] w, double[] x, double[] res) { for(int i=0; i<w.length; i++) { double cw=w[i],cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r; } }
+    
+    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
+    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
+    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
   };
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   
   

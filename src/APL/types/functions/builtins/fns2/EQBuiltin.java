@@ -6,46 +6,33 @@ import APL.types.functions.Builtin;
 
 
 public class EQBuiltin extends Builtin {
-  @Override public String repr() {
+  public String repr() {
     return "=";
   }
   
   
   
-  private static final D_NNeB DNF = new D_NNeB() {
-    public boolean on(double w, double x) {
-      return w == x;
-    }
-    public void on(BitArr.BA res, double w, double[] x) {
-      for (double cw : x) res.add(w == cw);
-    }
-    public void on(BitArr.BA res, double[] w, double x) {
-      for (double ca : w) res.add(ca == x);
-    }
-    public void on(BitArr.BA res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res.add(w[i] == x[i]);
-    }
-    public Value call(BigValue w, BigValue x) {
-      return w.equals(x)? Num.ONE : Num.ZERO;
-    }
-  };
-  private static final D_BB DBF = new D_BB() {
-    @Override public Value call(boolean w, BitArr x) {
-      if (w) return x;
-      return NotBuiltin.call(x);
-    }
-    @Override public Value call(BitArr w, boolean x) {
-      if (x) return w;
-      return NotBuiltin.call(w);
-    }
-    @Override public Value call(BitArr w, BitArr x) {
-      BitArr.BC bc = BitArr.create(x.shape);
-      for (int i = 0; i < bc.arr.length; i++) bc.arr[i] = ~(w.arr[i] ^ x.arr[i]);
-      return bc.finish();
-    }
+  
+  public static final Pervasion.VV2B DF = new Pervasion.VV2B() {
+    public Value on(Primitive w, Primitive x) { return w.equals(x)? Num.ONE : Num.ZERO; }
+    public void on(double   w, double[] x, BitArr.BA res) { for (double cx : x) { res.add( w==cx); } }
+    public void on(double[] w, double   x, BitArr.BA res) { for (double cw : w) { res.add(cw== x); } }
+    public void on(double[] w, double[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i]==x[i]); } }
+  
+    public void on(int   w, int[] x, BitArr.BA res) { for (int cx : x) { res.add( w==cx); } }
+    public void on(int[] w, int   x, BitArr.BA res) { for (int cw : w) { res.add(cw== x); } }
+    public void on(int[] w, int[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i]==x[i]); } }
+  
+    public void on(char   w, char[] x, BitArr.BA res) { for (char cx : x) { res.add( w==cx); } }
+    public void on(char[] w, char   x, BitArr.BA res) { for (char cw : w) { res.add(cw== x); } }
+    public void on(char[] w, char[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i]==x[i]); } }
+  
+    public Value on(boolean w, BitArr  x) { if(w)return x; return NotBuiltin.call(x); }
+    public Value on(BitArr  w, boolean x) { if(x)return w; return NotBuiltin.call(w); }
+    public void  on(long[]  w, long[]  x, long[] res) { for (int i = 0; i < res.length; i++) res[i] = ~w[i]^x[i]; }
   };
   
-  public Value call(Value w0, Value x0) {
-    return ncbaD(DNF, DBF, (w, x) -> w==x? Num.ONE : Num.ZERO, (w, x) -> w.equals(x)? Num.ONE : Num.ZERO, w0, x0);
+  public Value call(Value w, Value x) {
+    return DF.call(w, x);
   }
 }

@@ -41,6 +41,7 @@ public class EmptyArr extends Arr {
   
   
   
+  public boolean quickIntArr() { return true; }
   public boolean quickDoubleArr() { return true; }
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);

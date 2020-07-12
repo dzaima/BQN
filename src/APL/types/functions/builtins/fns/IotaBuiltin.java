@@ -59,7 +59,7 @@ public class IotaBuiltin extends Builtin {
       Value[] arr = new Value[ia];
       int i = 0;
       for (int[] c : new Indexer(shape)) {
-        arr[i] = Main.toAPL(c);
+        arr[i] = new IntArr(c.clone());
         i++;
       }
       return new HArr(arr, shape);

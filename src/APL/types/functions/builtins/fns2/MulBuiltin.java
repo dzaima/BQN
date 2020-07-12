@@ -9,7 +9,7 @@ import APL.types.functions.Builtin;
 import java.math.BigInteger;
 
 public class MulBuiltin extends Builtin {
-  @Override public String repr() {
+  public String repr() {
     return "×";
   }
   
@@ -35,42 +35,29 @@ public class MulBuiltin extends Builtin {
     return numChrMapM(NF, c -> Num.of(c.getCase()), c -> c.size()>0? Num.ONE : Num.ZERO, x);
   }
   
-  public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      return w*x;
-    }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = w * x[i];
-    }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] * x;
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = w[i] * x[i];
-    }
-    public Value call(BigValue w, BigValue x) {
-      return new BigValue(w.i.multiply(x.i));
-    }
-  };
-  public static final D_BB DBF = new D_BB() {
-    public Value call(boolean w, BitArr x) {
-      if (w) return x;
-      return BitArr.fill(x, false);
-    }
-    public Value call(BitArr w, boolean x) {
-      if (x) return w;
-      return BitArr.fill(w, false);
-    }
-    public Value call(BitArr w, BitArr x) {
+  public static final Pervasion.NN2N DF = new Pervasion.NN2NpB() {
+    public Value on(BigValue w, BigValue x) { return new BigValue(w.i.multiply(x.i)); }
+    public double on(double w, double x) { return w * x; }
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) res[i] = w    * x[i]; }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] * x   ; }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] * x[i]; }
+    
+    public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i];res[i]=Math.multiplyExact(cw,cx);}return res;}catch(ArithmeticException e){return null;}}
+    public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ;res[i]=Math.multiplyExact(cw,cx);}return res;}catch(ArithmeticException e){return null;}}
+    public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i];res[i]=Math.multiplyExact(cw,cx);}return res;}catch(ArithmeticException e){return null;}}
+    
+    public Value on(boolean w, BitArr x) { return w? x : BitArr.fill(x, false); }
+    public Value on(BitArr w, boolean x) { return x? w : BitArr.fill(w, false); }
+    public Value on(BitArr w, BitArr x) {
       BitArr.BC bc = new BitArr.BC(w.shape);
       for (int i = 0; i < w.arr.length; i++) bc.arr[i] = w.arr[i] & x.arr[i];
       return bc.finish();
     }
   };
-  public Value call(Value w, Value x) {
-    return bitD(DNF, DBF, w, x);
-  }
   
+  public Value call(Value w, Value x) {
+    return DF.call(w, x);
+  }
   public Value callInvW(Value w, Value x) {
     try {
       return new DivBuiltin().call(x, w);
@@ -78,8 +65,7 @@ public class MulBuiltin extends Builtin {
       throw new DomainError(e.getMessage(), this, e.cause);
     }
   }
-  
-  @Override public Value callInvA(Value w, Value x) {
+  public Value callInvA(Value w, Value x) {
     return callInvW(x, w);
   }
   

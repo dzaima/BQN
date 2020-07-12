@@ -26,6 +26,6 @@ public class AndBuiltin extends Builtin {
   }
   
   public Value call(Value w, Value x) {
-    return bitD(MulBuiltin.DNF, MulBuiltin.DBF, w, x);
+    return MulBuiltin.DF.call(w, x);
   }
 }
