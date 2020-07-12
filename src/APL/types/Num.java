@@ -70,7 +70,7 @@ public class Num extends Primitive {
   
   
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
-    return isInt(num)? new IntArr(new int[]{(int) num}) : new DoubleArr(new double[]{num}, sh);
+    return isInt(num)? new IntArr(new int[]{(int) num}, sh) : new DoubleArr(new double[]{num}, sh);
   }
   
   
