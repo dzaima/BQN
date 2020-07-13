@@ -11,14 +11,27 @@ public final class TableBuiltin extends Mop {
   
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
-    int[] shape = new int[w.rank+x.rank];
-    System.arraycopy(w.shape, 0, shape, 0, w.rank);
-    System.arraycopy(x.shape, 0, shape, w.rank, x.rank);
+    int[] sh = new int[w.rank+x.rank];
+    System.arraycopy(w.shape, 0, sh, 0, w.rank);
+    System.arraycopy(x.shape, 0, sh, w.rank, x.rank);
     
-    if (w.ia==0 || x.ia==0) return new EmptyArr(shape, w.safePrototype());
+    if (w.ia==0 || x.ia==0) return new EmptyArr(sh, w.safePrototype());
     
     Fun ff = (Fun) f;
     
+    if (w.quickDoubleArr() && x.quickDoubleArr()) {
+      Pervasion.NN2N fd = ff.dyNum();
+      if (fd != null) {
+        double[] arr = new double[w.ia*x.ia];
+        int i = 0;
+        for (double na : w.asDoubleArr()) {
+          for (double nw : x.asDoubleArr()) {
+            arr[i++] = fd.on(na, nw);
+          }
+        }
+        return new DoubleArr(arr, sh);
+      }
+    }
     
     int i = 0;
     Value first = ff.call(w.first(), x.first());
@@ -46,8 +59,8 @@ public final class TableBuiltin extends Mop {
         }
       }
       if (allNums) {
-        if (shape.length == 0) return new Num(dres[0]);
-        return new DoubleArr(dres, shape);
+        if (sh.length == 0) return new Num(dres[0]);
+        return new DoubleArr(dres, sh);
       } else { // i points to the place the failure should be
         Value[] res = new Value[w.ia*x.ia];
         for (int n = 0; n < i; n++) { // slowly copy the data back..
@@ -66,8 +79,7 @@ public final class TableBuiltin extends Mop {
             res[i++] = ff.call(va, vw);
           }
         }
-        if (shape.length == 0 && res[0] instanceof Primitive) return res[0];
-        return Arr.create(res, shape);
+        return Arr.create(res, sh);
       }
     }
     boolean firstSkipped = false;
@@ -81,7 +93,6 @@ public final class TableBuiltin extends Mop {
         }
       }
     }
-    if (shape.length == 0 && arr[0] instanceof Primitive) return arr[0];
-    return Arr.create(arr, shape);
+    return Arr.create(arr, sh);
   }
 }
