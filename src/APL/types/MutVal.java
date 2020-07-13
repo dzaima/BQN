@@ -172,6 +172,7 @@ public class MutVal { // inserts can be in any order, but must not override prev
       case 1:
         if (x instanceof BitArr) {
           BitArr.copy(((BitArr) x).arr, xS, ls, rS, len); // todo special-case small insertions?
+          return;
         } else if (x.quickDoubleArr()) {
           if (x instanceof IntArr) {
             int rSc = rS;
