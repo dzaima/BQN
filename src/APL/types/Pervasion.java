@@ -179,7 +179,7 @@ public class Pervasion {
           return new BitArr(res, x.shape);
         }
         BitArr.BA res = new BitArr.BA(x.shape);
-        if (w.quickIntArr() && x.quickDoubleArr()) on(w.asIntArr(), x.asIntArr(), res);
+        if (w.quickIntArr() && x.quickIntArr()) on(w.asIntArr(), x.asIntArr(), res);
         else on(w.asDoubleArr(), x.asDoubleArr(), res);
         return res.finish();
       }
