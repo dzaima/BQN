@@ -177,8 +177,8 @@ public class MutVal { // inserts can be in any order, but must not override prev
           if (x instanceof IntArr) {
             int rSc = rS;
             for (int i = 0; i < len; i++) {
-              int[] xd = ((IntArr) x).arr;
-              int d = xd[xS+i];
+              int[] xi = ((IntArr) x).arr;
+              int d = xi[xS+i];
               if (d!=1 & d!=0) { move(4); copy(x, xS+i, rSc, len-i); return; }
               if (d==1) ls[rSc>>6]|= 1L<<(rSc&63);
               rSc++;
