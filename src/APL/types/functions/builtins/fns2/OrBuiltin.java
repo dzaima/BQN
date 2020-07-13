@@ -2,7 +2,7 @@ package APL.types.functions.builtins.fns2;
 
 import APL.errors.RankError;
 import APL.types.*;
-import APL.types.arrs.BitArr;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
@@ -21,11 +21,17 @@ public class OrBuiltin extends Builtin {
   
   public Value call(Value x) { // TODO this isn't stable
     if (x.rank==0) throw new RankError("∨: argument cannot be scalar", this, x);
+    if (x instanceof IntArr && x.rank==1) {
+      int[] is = x.asIntArrClone();
+      Arrays.sort(is); for (int i = 0; i < is.length>>1; i++) { int t = is[i]; is[i] = is[is.length-i-1]; is[is.length-i-1] = t; }
+      return new IntArr(is, x.shape);
+    }
     Value[] cells = x.rank==1? x.valuesClone() : CellBuiltin.cells(x);
     Arrays.sort(cells);
     return ReverseBuiltin.on(x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
   }
   
+  public Pervasion.NN2N dyNum() { return DF; };
   public static final Pervasion.NN2N DF = new Pervasion.NN2NpB() {
     public Value on(BigValue w, BigValue x) {
       return new BigValue(w.i.gcd(x.i));
@@ -49,5 +55,12 @@ public class OrBuiltin extends Builtin {
   };
   public Value call(Value w, Value x) {
     return DF.call(w, x);
+  }
+  
+  
+  public static Num reduce(BitArr x) {
+    x.setEnd(false);
+    for (long l : x.arr) if (l != 0) return Num.ONE;
+    return Num.ZERO;
   }
 }

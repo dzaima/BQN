@@ -20,6 +20,12 @@ public class NotBuiltin extends Builtin {
   
   private Value rec(Value x) {
     if (x instanceof Arr) {
+      if (x instanceof BitArr) {
+        BitArr wb = (BitArr) x;
+        long[] res = new long[wb.arr.length];
+        for (int i = 0; i < res.length; i++) res[i] = ~wb.arr[i];
+        return new BitArr(res, x.shape);
+      }
       ia: if (x.quickIntArr()) {
         int[] xi = x.asIntArr();
         int[] res = new int[xi.length];
@@ -29,12 +35,6 @@ public class NotBuiltin extends Builtin {
           res[i] = 1-c;
         }
         return new IntArr(res, x.shape);
-      }
-      if (x instanceof BitArr) {
-        BitArr wb = (BitArr) x;
-        long[] res = new long[wb.arr.length];
-        for (int i = 0; i < res.length; i++) res[i] = ~wb.arr[i];
-        return new BitArr(res, x.shape);
       }
       
       if (x.quickDoubleArr()) {

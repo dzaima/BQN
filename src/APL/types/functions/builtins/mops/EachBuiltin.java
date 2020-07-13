@@ -18,11 +18,11 @@ public class EachBuiltin extends Mop {
   public Value call(Value f, Value x, DerivedMop derv) {
     if (x.scalar()) return new Rank0Arr(f.asFun().call(x.first()));
     Fun ff = f.asFun();
-    Value[] n = new Value[x.ia];
-    for (int i = 0; i < n.length; i++) {
-      n[i] = ff.call(x.get(i));
+    MutVal res = new MutVal(x.shape);
+    for (int i = 0; i < x.ia; i++) {
+      res.set(i, ff.call(x.get(i)));
     }
-    return Arr.create(n, x.shape);
+    return res.get();
   }
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
@@ -42,11 +42,11 @@ public class EachBuiltin extends Mop {
     if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
     
     if (w.shape.length == x.shape.length) {
-      Value[] n = new Value[x.ia];
-      for (int i = 0; i < n.length; i++) {
-        n[i] = ff.call(w.get(i), x.get(i));
+      MutVal res = new MutVal(x.shape);
+      for (int i = 0; i < x.ia; i++) {
+        res.set(i, ff.call(w.get(i), x.get(i)));
       }
-      return Arr.create(n, x.shape);
+      return res.get();
     }
     
     boolean we = w.rank < x.rank; // w is expanded

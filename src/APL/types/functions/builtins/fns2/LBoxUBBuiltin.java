@@ -23,9 +23,10 @@ public class LBoxUBBuiltin extends Builtin {
   public Value under(Value o, Value x) {
     if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, x);
     Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
-    Value[] vs = x.valuesClone();
-    vs[0] = v;
-    return HArr.create(vs, x.shape);
+    MutVal m = new MutVal(x.shape);
+    m.copy(x, 1, 1, x.ia-1);
+    m.set(0, v);
+    return m.get();
   }
   
   
@@ -53,7 +54,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   static Value onArr(Value w, Value x, Callable blame) {
     if (w instanceof Primitive) throw new DomainError(blame+": indices must all be vectors when nesting (found "+w+")", blame);
-    if (w.ia>=1 && !(w.get(0) instanceof Primitive)) {
+    if (w.ia>=1 && !(w.first() instanceof Primitive)) {
       Value[] vs = new Value[w.ia];
       for (int i = 0; i < w.ia; i++) vs[i] = onArr(w.get(i), x, blame);
       return Arr.create(vs, w.shape);

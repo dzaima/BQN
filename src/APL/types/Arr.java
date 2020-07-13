@@ -279,16 +279,13 @@ public abstract class Arr extends Value {
       }
       return new DoubleArr(da, sh);
     }
-    if (v[0] instanceof Char) {
+    ca: if (v[0] instanceof Char) {
       StringBuilder s = new StringBuilder();
       for (Value cv : v) {
         if (cv instanceof Char) s.append(((Char) cv).chr);
-        else {
-          s = null;
-          break;
-        }
+        else break ca;
       }
-      if (s != null) return new ChrArr(s.toString(), sh);
+      return new ChrArr(s.toString(), sh);
     }
     return new HArr(v, sh);
   }

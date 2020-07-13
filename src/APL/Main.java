@@ -230,9 +230,6 @@ public class Main {
   public static Value exec(LineTok ln, Scope sc) {
     return Comp.comp(ln).exec(sc);
   }
-  public static Value execLines(TokArr<LineTok> lns, Scope sc) {
-    return Comp.comp(lns).exec(sc);
-  }
   public static Comp comp(String s) {
     return Comp.comp(Tokenizer.tokenize(s));
   }
@@ -279,14 +276,6 @@ public class Main {
       if (num == 0) return false;
     }
     throw new DomainError("Expected boolean, got "+v, v);
-  }
-  
-  
-  private static Value norm(Obj o) {
-    if (o instanceof MutArr) return ((MutArr) o).get();
-    if (o instanceof Settable) return ((Settable) o).get();
-    if (!(o instanceof Value)) throw new DomainError("Trying to use "+o.humanType(true)+" as array", o);
-    return (Value) o;
   }
   
   public static ChrArr toAPL(String s) {

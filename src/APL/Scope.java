@@ -133,7 +133,7 @@ public class Scope {
           public Value call(Value x) {
             return RandBuiltin.on(x, Scope.this);
           }
-  
+          
           public String repr() {
             return "•RAND";
           }

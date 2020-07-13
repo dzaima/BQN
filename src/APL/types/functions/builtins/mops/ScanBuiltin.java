@@ -2,8 +2,9 @@ package APL.types.functions.builtins.mops;
 
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.DoubleArr;
+import APL.types.arrs.*;
 import APL.types.functions.*;
+import APL.types.functions.builtins.fns2.*;
 
 public class ScanBuiltin extends Mop {
   @Override public String repr() {
@@ -14,8 +15,63 @@ public class ScanBuiltin extends Mop {
     Fun ff = f.asFun();
     if (x.ia == 0) return x;
     if (x.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, x);
-    int l = x.ia / x.shape[0];
-    Value c = x.get(0);
+    int l = Arr.prod(x.shape, 1, x.shape.length);
+    if (x.quickDoubleArr()) {
+      Pervasion.NN2N fd = ff.dyNum();
+      if (fd != null) {
+        final double[] rd;
+        int i = l;
+        ia: if (x.quickIntArr()) {
+          if (x.rank==1 && x instanceof BitArr && f instanceof OrBuiltin) {
+            long[] arr = ((BitArr) x).arr;
+            for (int j = 0; j < arr.length; j++) {
+              long c = arr[j];
+              if (c!=0) {
+                long[] res = new long[arr.length];
+                int sh = Long.numberOfTrailingZeros(c);
+                res[j++] = -(1L << (sh));
+                while (j < arr.length) res[j++] = ~0L;
+                return new BitArr(res, x.shape);
+              }
+            }
+            return new SingleItemArr(Num.ZERO, x.shape);
+          }
+          int[] ri = new int[x.ia];
+          int[] xd = x.asIntArr();
+          System.arraycopy(xd, 0, ri, 0, l);
+          while (i < x.ia) {
+            double n = fd.on(ri[i-l], xd[i]);
+            if ((int)n != n) {
+              rd = new double[x.ia]; for (int j = 0; j < rd.length; j++) rd[j] = ri[j];
+              rd[i++] = n;
+              break ia;
+            }
+            ri[i++] = (int) n;
+          }
+          return new IntArr(ri, x.shape);
+        } else rd = new double[x.ia];
+        double[] xd = x.asDoubleArr();
+        System.arraycopy(xd, 0, rd, 0, l);
+        while (i < x.ia) {
+          rd[i] = fd.on(rd[i-l], xd[i]);
+          i++;
+        }
+        return new DoubleArr(rd, x.shape);
+      } else if (x instanceof BitArr && ff instanceof NEBuiltin && x.rank==1) {
+        long[] arr = ((BitArr) x).arr;
+        long[] res = new long[arr.length];
+        long xor = 0;
+        for (int i = 0; i < arr.length; i++) {
+          long c = arr[i];
+          long r = c ^ (c<<1);
+          r^= r<< 2; r^= r<< 4; r^= r<<8;
+          r^= r<<16; r^= r<<32; r^=  xor;
+          res[i] = r;
+          xor = r>>63; // copies sign bit
+        }
+        return new BitArr(res, x.shape);
+      }
+    }
     Value[] res = new Value[x.ia];
     int i = 0;
     for (; i < l; i++) res[i] = x.get(i);

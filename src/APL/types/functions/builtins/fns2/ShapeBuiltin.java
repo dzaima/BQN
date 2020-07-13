@@ -26,7 +26,7 @@ public class ShapeBuiltin extends Builtin {
   
   
   
-  public Value call(Value w, Value x) {
+  public Value call(Value w, Value x) { // valuecopy
     if (w.rank > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
     int[] sh;
     int ia;

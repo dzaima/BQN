@@ -6,7 +6,7 @@ import APL.types.*;
 import java.util.*;
 
 public class IntArr extends Arr {
-  private final int[] arr;
+  public final int[] arr;
   public IntArr(int[] arr, int[] shape) {
     super(shape, arr.length);
     this.arr = arr;

@@ -26,6 +26,7 @@ public class DivBuiltin extends Builtin {
     return numM(NF, x);
   }
   
+  public Pervasion.NN2N dyNum() { return DF; };
   public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public Value on(BigValue w, BigValue x) { return new BigValue(w.i.divide(x.i)); }
     public double on(double w, double x) { return w / x; }

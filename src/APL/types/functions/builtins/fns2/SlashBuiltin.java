@@ -5,11 +5,10 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.dops.BeforeBuiltin;
 import APL.types.functions.builtins.mops.ReduceBuiltin;
 
 public class SlashBuiltin extends Builtin {
-  private static final Fun fn = new BeforeBuiltin().derive(Num.ZERO, new ReduceBuiltin().derive(new CeilingBuiltin()));
+  private static final Fun fn = new ReduceBuiltin().derive(new CeilingBuiltin());
   
   public String repr() {
     return "/";
@@ -78,16 +77,14 @@ public class SlashBuiltin extends Builtin {
   }
   
   public Value callInv(Value x) {
-    int[] sh = fn.call(x).asIntVec();
+    int[] sh = fn.call(Num.ZERO, x).asIntVec();
     int ia = 1;
-    for (int i = 0; i < sh.length; i++) {
-      sh[i]+= 1;
-      ia*= sh[i];
-    }
+    for (int i = 0; i < sh.length; i++) { sh[i]+= 1; ia*= sh[i]; }
     int[] arr = new int[ia];
-    for (Value v : x) {
-      int[] c = v.asIntVec();
-      arr[Indexer.fromShape(sh, c)]++;
+    if (x.quickDoubleArr()) {
+      for (int c : x.asIntArr()) arr[c]++;
+    } else {
+      for (Value v : x) arr[Indexer.fromShape(sh, v.asIntVec())]++;
     }
     return new IntArr(arr, sh);
   }
@@ -146,16 +143,16 @@ public class SlashBuiltin extends Builtin {
     
     int csz = 1; // cell size to replicate
     for (int i = am.length; i < x.shape.length; i++) csz*= x.shape[i];
-    Value[] res = new Value[rcam*csz];
-    Value[] xv = x.values();
+    MutVal res = new MutVal(rsh, x);
     
-    recReplicate(res, 0, 0, 0, x.ia, xv, x.shape, am);
-    return Arr.create(res, rsh);
+    recReplicate(res, 0, 0, 0, x.ia, x, x.shape, am);
+    return res.get();
   }
   
-  private static int recReplicate(Value[] res, int rpos, int ipos, int d, int rsz, Value[] x, int[] xsh, int[][] am) {
+  private static int recReplicate(MutVal res, int rpos, int ipos, int d, int rsz, Value x, int[] xsh, int[][] am) {
     if (d==am.length) {
-      System.arraycopy(x, ipos, res, rpos, rsz);
+      // System.arraycopy(x, ipos, res, rpos, rsz);
+      res.copy(x, ipos, rpos, rsz);
       return rpos+rsz;
     } else {
       int[] c = am[d];
@@ -187,12 +184,25 @@ public class SlashBuiltin extends Builtin {
     if (w.rank!=1 || x.rank!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, w.rank!=1? w : x);
     double asum = w.sum();
     if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, x);
-    Value[] res = new Value[x.ia];
     int ipos = 0;
     int[] wi = w.asIntArr();
+    
+    if (x.quickIntArr() && v.quickIntArr()) {
+      int[] vi = v.asIntArr();
+      int[] xi = x.asIntArr();
+      int[] res = new int[x.ia];
+      for (int i = 0; i < wi.length; i++) {
+        int d = wi[i];
+        if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.format(d));
+        if (d == 1) res[i] = vi[ipos++];
+        else res[i] = xi[i];
+      }
+      return new IntArr(res);
+    }
+    Value[] res = new Value[x.ia];
     for (int i = 0; i < wi.length; i++) {
       int d = wi[i];
-      if (d!=0 && d!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector, contained "+Num.format(d));
+      if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.format(d));
       if (d == 1) res[i] = v.get(ipos++);
       else res[i] = x.get(i);
     }

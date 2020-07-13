@@ -191,12 +191,11 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     if (ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
     if (v.rank != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
     int ind = 0;
+    int[] vi = v.asIntArr();
     for (int i = 0; i < v.ia; i++) {
-      Value c = v.get(i);
-      if (!(c instanceof Primitive)) throw new DomainError(blame+": index must consist of integers", blame);
-      int n = c.asInt();
+      int n = vi[i];
       if (n<0) n+= ish[i];
-      if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
+      if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+n+")", blame);
       ind = ish[i]*ind + n;
     }
     return ind;

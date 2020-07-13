@@ -3,6 +3,7 @@ package APL.types.functions.builtins.mops;
 import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
+import APL.types.arrs.BitArr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
@@ -24,6 +25,10 @@ public class ReduceBuiltin extends Mop {
     }
     
     if (x.quickDoubleArr()) {
+      if (x instanceof BitArr) {
+        if (f instanceof AndBuiltin) return AndBuiltin.reduce((BitArr) x);
+        if (f instanceof OrBuiltin) return OrBuiltin.reduce((BitArr) x);
+      }
       if (f instanceof PlusBuiltin) return new Num(x.sum());
       if (f instanceof MulBuiltin) {
         if (x.quickIntArr()) {
@@ -61,13 +66,49 @@ public class ReduceBuiltin extends Mop {
       if (joined != null) return joined;
     }
     
+    if (x.quickDoubleArr()) {
+      Pervasion.NN2N fd = ff.dyNum();
+      if (fd != null) {
+        if (x.quickIntArr()) {
+          int[] xi = x.asIntArr();
+          double c = xi[xi.length-1];
+          for (int i = x.ia-2; i >= 0; i--) c = fd.on(xi[i], c);
+          return new Num(c);
+        }
+        double[] xd = x.asDoubleArr();
+        double c = xd[xd.length-1];
+        for (int i = x.ia-2; i >= 0; i--) c = fd.on(xd[i], c);
+        return new Num(c);
+      }
+    }
     Value[] a = x.values();
     return foldr(ff, a, a[a.length-1], 1);
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
-    return foldr(f.asFun(), x.values(), w, 0);
+    Fun ff = f.asFun();
+    
+    if (x.quickDoubleArr() && w instanceof Num) {
+      Pervasion.NN2N fd = ff.dyNum();
+      double c = w.asDouble();
+      if (fd != null) {
+        if (x.quickIntArr()) {
+          if (x instanceof BitArr && Num.isBool(c)) {
+            if (f instanceof AndBuiltin) { if(c==0)return Num.ZERO; return AndBuiltin.reduce((BitArr) x); }
+            if (f instanceof  OrBuiltin) { if(c==1)return  Num.ONE; return  OrBuiltin.reduce((BitArr) x); }
+          }
+          int[] xi = x.asIntArr();
+          for (int i = x.ia-1; i >= 0; i--) c = fd.on(xi[i], c);
+          return new Num(c);
+        }
+        double[] xd = x.asDoubleArr();
+        for (int i = x.ia-1; i >= 0; i--) c = fd.on(xd[i], c);
+        return new Num(c);
+      }
+    }
+  
+    return foldr(ff, x.values(), w, 0);
   }
   
   static Value foldr(Fun ff, Value[] a, Value init, int skip) {

@@ -30,6 +30,7 @@ public class FloorBuiltin extends Builtin {
     return numChrM(NF, Char::lower, x);
   }
   
+  public Pervasion.NN2N dyNum() { return DF; };
   public static final Pervasion.NN2NpB DF = new Pervasion.NN2NpB() {
     public Value on(BigValue w, BigValue x) { return w.i.compareTo(x.i)>0? x : w; }
     public double on(double w, double x) { return Math.min(w, x); }

@@ -58,7 +58,6 @@ public class GroupBuiltin extends Builtin {
   
   
   
-  @SuppressWarnings("unchecked") // no. bad java. bad.
   public Value call(Value w, Value x) {
     int depth = MatchBuiltin.full(w);
     if (depth > 2) throw new DomainError("⊔: depth of 𝕨 must be at most 2 (was "+depth+")", this, w);
@@ -66,22 +65,39 @@ public class GroupBuiltin extends Builtin {
     if (x.rank == 1) {
       int[] poss;
       if (depth == 2) {
-        if (w.rank!=1 || rank!=1) throw new RankError("⊔: expected a depth 2 𝕨 to be a 1-item vector (had shape "+Main.formatAPL(w.shape)+")", this, w);
+        if (w.rank!=1 || rank!=1) throw new RankError("⊔: expected a depth 2 𝕨 to be a 1-item vector if 𝕩 is a vector (had shape "+Main.formatAPL(w.shape)+")", this, w);
         poss = w.get(0).asIntVec();
       } else poss = w.asIntVec();
       int sz = -1;
       for (int i : poss) sz = Math.max(sz, i);
       sz++;
-      ArrayList<Value>[] vs = new ArrayList[sz];
-      for (int i = 0; i < sz; i++) vs[i] = new ArrayList<>();
+      int[] rshs = new int[sz];
+      for (int c : poss) {
+        if (c>=0) rshs[c]++;
+        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, w);
+      }
+      if (x.quickIntArr()) {
+        int[] xi = x.asIntArr();
+        int[] idxs = new int[sz];
+        int[][] vs = new int[sz][];
+        for (int i = 0; i < sz; i++) vs[i] = new int[rshs[i]];
+        for (int i = 0; i < x.ia; i++) {
+          int c = poss[i];
+          if (c>=0) vs[c][idxs[c]++] = xi[i];
+        }
+        Value[] res = new Value[sz];
+        for (int i = 0; i < sz; i++) res[i] = new IntArr(vs[i]);
+        return new HArr(res);
+      }
+      int[] idxs = new int[sz];
+      Value[][] vs = new Value[sz][];
+      for (int i = 0; i < sz; i++) vs[i] = new Value[rshs[i]];
       for (int i = 0; i < x.ia; i++) {
         int c = poss[i];
-        if (c>=0) {
-          vs[c].add(x.get(i));
-        } else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, w);
+        if (c>=0) vs[c][idxs[c]++] = x.get(i);
       }
       Value[] res = new Value[sz];
-      for (int i = 0; i < sz; i++) res[i] = Arr.create(vs[i].toArray(new Value[0]));
+      for (int i = 0; i < sz; i++) res[i] = Arr.create(vs[i]);
       return new HArr(res);
     }
     

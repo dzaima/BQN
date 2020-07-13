@@ -13,9 +13,12 @@ public abstract class Fun extends Callable {
   }
   
   protected Fun() { }
+  
   public Value call(Value x) {
     throw new IncorrectArgsError("function "+toString()+" called monadically", this, x);
   }
+  
+  
   public Value call(Value w, Value x) {
     throw new IncorrectArgsError("function "+toString()+" called dyadically", this, w);
   }
@@ -83,6 +86,7 @@ public abstract class Fun extends Callable {
   
   protected Value numM(NumMV nf, Value x) {
     if (x instanceof Arr) {
+      if (x.quickIntArr()) return nf.call(x.asIntArr(), x.shape);
       if (x.quickDoubleArr()) {
         double[] res = new double[x.ia];
         nf.call(res, x.asDoubleArr());
@@ -103,9 +107,7 @@ public abstract class Fun extends Callable {
   protected Value numChrM(NumMV nf, ChrMV cf, Value x) {
     if (x instanceof Arr) {
       if (x.quickDoubleArr()) {
-        if (x.quickIntArr()) {
-          return nf.call(x.asIntArr(), x.shape);
-        }
+        if (x.quickIntArr()) return nf.call(x.asIntArr(), x.shape);
         if (nf.retNum()) {
           double[] res = new double[x.ia];
           nf.call(res, x.asDoubleArr());
@@ -129,6 +131,7 @@ public abstract class Fun extends Callable {
   protected Value numChrMapM(NumMV nf, ChrMV cf, MapMV mf, Value x) {
     if (x instanceof Arr) {
       if (x.quickDoubleArr()) {
+        if (x.quickIntArr()) return nf.call(x.asIntArr(), x.shape);
         double[] res = new double[x.ia];
         nf.call(res, x.asDoubleArr());
         return new DoubleArr(res, x.shape);
@@ -241,6 +244,10 @@ public abstract class Fun extends Callable {
     }
   }
   
+  public /*open*/ Pervasion.NN2N dyNum() {
+    return null;
+  }
+  
   public static abstract class D_NNeB extends D_NN { // dyadic number-number equals boolean
     public abstract boolean on(double w, double x);
     public abstract void on(BitArr.BA res, double   w, double[] x);
@@ -277,7 +284,7 @@ public abstract class Fun extends Callable {
     public abstract Value call(double   w, double[] x, int[] sh);
     public abstract Value call(double[] w, double   x, int[] sh);
     public abstract Value call(BigValue w, BigValue x);
-    public Value call(double w, BigValue x) { // special requirement for log; only needs to be handled in numD
+    public /*open*/ Value call(double w, BigValue x) { // special requirement for log; only needs to be handled in numD
       return call(new BigValue(w), x);
     }
   }

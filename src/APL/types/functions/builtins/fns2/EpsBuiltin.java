@@ -18,27 +18,24 @@ public class EpsBuiltin extends Builtin {
     Value[] vs;
     BitArr.BA res;
     if (x.rank == 1) {
-      vs = x.values();
       res = new BitArr.BA(x.shape);
-    } else {
-      vs = CellBuiltin.cells(x);
-      res = new BitArr.BA(new int[]{x.shape[0]});
-    }
-    HashSet<Value> encountered = new HashSet<>();
-    
-    for (Value v : vs) {
-      if (encountered.contains(v)) {
-        res.add(false);
-      } else {
-        encountered.add(v);
-        res.add(true);
+      if (x.quickIntArr()) {
+        HashSet<Integer> seen = new HashSet<>();
+        for (int c : x.asIntArr()) res.add(seen.add(c));
+        return res.finish();
       }
+      vs = x.values();
+    } else {
+      res = new BitArr.BA(new int[]{x.shape[0]});
+      vs = CellBuiltin.cells(x);
     }
+    HashSet<Value> seen = new HashSet<>();
+    for (Value c : vs) res.add(seen.add(c));
     return res.finish();
   }
   
   public Value call(Value w, Value x) {
-    if (w.scalar()) {
+    if (w.scalar()) { // TODO this _might_ be wrong
       Value w0 = w.first();
       for (Value v : x) {
         if (v.equals(w0)) {
@@ -48,16 +45,23 @@ public class EpsBuiltin extends Builtin {
       return Num.ZERO;
     }
     BitArr.BA ba = new BitArr.BA(w.shape);
-    for (int i = 0; i < w.ia; i++) {
-      Value cw = w.get(i);
-      boolean b = false;
-      for (Value v : x) {
-        if (v.equals(cw)) {
-          b = true;
-          break;
+    if (w.ia>20 && x.ia>20) { // TODO these (and in ⊐) shouldn't be random numbers
+      HashSet<Value> vs = new HashSet<>();
+      for (Value c : x) vs.add(c);
+      for (Value c : w) ba.add(vs.contains(c));
+    } else {
+      Value[] xv = x.values();
+      for (int i = 0; i < w.ia; i++) {
+        Value cw = w.get(i);
+        boolean b = false;
+        for (Value v : xv) {
+          if (v.equals(cw)) {
+            b = true;
+            break;
+          }
         }
+        ba.add(b);
       }
-      ba.add(b);
     }
     return ba.finish();
   }

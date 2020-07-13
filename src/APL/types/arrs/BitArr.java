@@ -1,7 +1,6 @@
 package APL.types.arrs;
 
 import APL.Main;
-import APL.errors.DomainError;
 import APL.types.*;
 
 import java.util.Arrays;
@@ -77,7 +76,7 @@ public final class BitArr extends Arr {
     return res;
   }
   
-  public double[] asDoubleArr() {
+  public double[] asDoubleArrClone() {
     double[] res = new double[ia];
     int ctr = 0;
     for (int i = 0; i < ia>>6; i++) {
@@ -94,14 +93,6 @@ public final class BitArr extends Arr {
     return res;
   }
   
-  public double[] asDoubleArrClone() {
-    return asDoubleArr();
-  }
-  
-  
-  public String asString() {
-    throw new DomainError("Using bit array as string", this);
-  }
   
   public boolean quickDoubleArr() { return true; }
   public boolean quickIntArr() { return true; }
@@ -167,74 +158,8 @@ public final class BitArr extends Arr {
     }
     
     public void add(BitArr g, int s, int e) {
-      if (s==e) return;
-      
-      g.setEnd(false);
-      if (o == 0 && (s&63) == 0) {
-        int si = s>>6;
-        int li = (e-1)>>6; // incl
-        System.arraycopy(g.arr, si, a, i, li-si+1);
-        
-        i+= (e-s)>>6;
-        o = e&63;
-        return;
-      }
-      
-      long[] garr = g.arr;
-      
-      int  startI = i;
-      long start = a[i];
-      long startMask = (1L<<o) - 1; // mask of what's already written
-      
-      int Spos = i*64 + o; // start of where to insert
-      int Epos = Spos+e-s; // end of where to insert; excl
-      int Li = (Epos-1) >> 6; // incl
-      int shl = o-s;
-      int pG = s >> 6;
-      if (shl < 0) {
-        shl+= 64;
-        pG++;
-      }
-      int shr = 64-shl;
-      // System.out.println(i+"…"+Li+": s="+s+" o="+o+" e="+e+" pG="+pG+" shl="+shl);
-      
-      /* some unrolling of
-            for (int pT = i; pT <= Li; pT++) {
-              if (pG<garr.length) a[pT]|= garr[pG]<<shl;
-              if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
-              pG++;
-            }
-      */
-      {
-        int pT = i;
-        if (pG<garr.length) a[pT]|= garr[pG]<<shl;
-        if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
-        pG++;
-      }
-      for (int pT = i+1; pT < Li; pT++) {
-        a[pT]|= garr[pG]<<shl;
-        a[pT]|= garr[pG-1]>>>shr;
-        pG++;
-      }
-      if (i+1<=Li) {
-        int pT = Li;
-        if (pG<garr.length) a[pT]|= garr[pG]<<shl;
-        a[pT]|= garr[pG-1]>>>shr;
-        pG++;
-      }
-      
-      
-      a[startI]&= ~startMask; // clear out garbage
-      a[startI]|= start; // and fill with non-garbage
-      i = Epos>>6;
-      o = Epos&63;
-      
-      // TODO clear out end
-      // for (long l : a) {
-      //   String b = Long.toBinaryString(l);
-      //   while (b.length()<64)b="0"+b;
-      //   System.out.println(b);
-      // }
+      copy(g.arr, s, a, i*64+o, e-s);
+      skip(e-s);
     }
     
     @SuppressWarnings("ConstantExpression") // i _want_ ~0L :|
@@ -267,6 +192,85 @@ public final class BitArr extends Arr {
     public BitArr finish() {
       return new BitArr(a, sh);
     }
+  }
+  
+  
+  public static void copy(long[] src, int srcS, long[] dst, int dstS, int len) {
+    int s = srcS;
+    int e = srcS+len;
+    if (s==e) return;
+    int o = dstS&63;
+    
+    // System.out.println();
+    // System.out.println("copy "+s+"-"+e+"  to  "+dstS+"-"+(dstS+len));
+    // System.out.println("srclen = "+src.length+"; dstlen = "+dst.length);
+    
+    int sI = dstS>>6;                // first index of where to batch insert; included
+    long sV = dst[sI];               // first long
+    long sM = (1L<<o) - 1;           // mask of what's already written
+    
+    int eI = (dstS+len-1) >> 6;      // last index of where to batch insert; included
+    long eV = dst[eI];               // last long
+    long eM = -(1L << (o+len & 63)); // mask of what's already written
+    if (eM==~0L) eM=0;
+    // System.out.println("  masks:");
+    // System.out.println(str64(sM) + " of "+str64(sV)+" @ "+sI);
+    // System.out.println(str64(eM) + " of "+str64(eV)+" @ "+eI);
+    if (o == 0 && (s&63) == 0) {
+      int sp =  s   >>6; // incl
+      int ep = (e-1)>>6; // incl
+      System.arraycopy(src, sp, dst, sI, ep-sp+1);
+      dst[eI] = (eV&eM) | (dst[eI]&~eM);
+      return;
+    }
+    // System.out.println("  before:");
+    // for (long l : dst) System.out.print(str64(l)+"  ");
+    // System.out.println();
+    int shl = o-(s&63);
+    int pG = s >> 6;
+    if (shl < 0) {
+      shl+= 64;
+      pG++;
+    }
+    int shr = 64-shl;
+    // System.out.println(i+"…"+Li+": s="+s+" o="+o+" e="+e+" pG="+pG+" shl="+shl);
+      
+      /* some unrolling of
+            for (int pT = i; pT <= Li; pT++) {
+              if (pG<garr.length) a[pT]|= garr[pG]<<shl;
+              if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
+              pG++;
+            }
+      */
+    {
+      int pT = sI;
+      if (pG< src.length) dst[pT]|= src[pG]<<shl;
+      if (pG-1>=0) dst[pT]|= src[pG-1]>>>shr;
+      pG++;
+    }
+    for (int pT = sI+1; pT < eI; pT++) {
+      dst[pT]|= src[pG]<<shl;
+      dst[pT]|= src[pG-1]>>>shr;
+      pG++;
+    }
+    if (sI+1<=eI) {
+      int pT = eI;
+      if (pG< src.length) dst[pT]|= src[pG]<<shl;
+      dst[pT]|= src[pG-1]>>>shr;
+      pG++;
+    }
+    
+    if (sI == eI) {
+      long written = sM|eM;
+      dst[sI] = (sV&written) | (dst[sI] & ~written);
+    } else {
+      dst[sI] = (sV&sM) | (dst[sI]&~sM); 
+      dst[eI] = (eV&eM) | (dst[eI]&~eM); 
+    }
+  
+    // System.out.println("  after:");
+    // for (long l : dst) System.out.print(str64(l)+"  ");
+    // System.out.println();
   }
   
   public static String str64(long l) {
@@ -352,5 +356,19 @@ public final class BitArr extends Arr {
       }
     }
     return vs;
+  }
+  
+  public Arr reverseOn(int dim) {
+    if (dim!=0 || rank!=1) return super.reverseOn(dim);
+    long[] nl = new long[arr.length];
+    int off = (64-ia) & 63;
+    copy(arr, 0, nl, off, ia);
+    for (int i = 0; i < nl.length>>1; i++) { int r = nl.length-i-1;
+      long iv = nl[i]; long rv = nl[r];
+      nl[i] = Long.reverse(rv);
+      nl[r] = Long.reverse(iv);
+    }
+    if ((nl.length&1) != 0) nl[nl.length>>1] = Long.reverse(nl[nl.length>>1]);
+    return new BitArr(nl, shape);
   }
 }

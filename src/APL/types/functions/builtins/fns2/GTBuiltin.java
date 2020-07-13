@@ -52,37 +52,14 @@ public class GTBuiltin extends Builtin {
     System.arraycopy(def, 0, resShape, sh.length, def.length);
     
     if (eqShapes) {
-      if (allNums) {
-        ia: {
-          for (Value v : vals) if (!v.quickIntArr()) break ia;
-          int[] res = new int[totalIA];
-          int i = 0;
-          for (Value v : vals) {
-            int[] ia = v.asIntArr();
-            System.arraycopy(ia, 0, res, i, ia.length);
-            i+= subIA;
-          }
-          return new IntArr(res, resShape);
-        }
-        double[] res = new double[totalIA];
-        
-        int i = 0;
-        for (Value v : vals) {
-          double[] da = v.asDoubleArr();
-          System.arraycopy(da, 0, res, i, da.length);
-          i+= subIA;
-        }
-        return new DoubleArr(res, resShape);
-      }
-      Value[] res = new Value[totalIA];
+      MutVal res = new MutVal(resShape);
       
       int i = 0;
       for (Value v : vals) {
-        Value[] va = v.values();
-        System.arraycopy(va, 0, res, i, va.length);
+        res.copy(v, 0, i, v.ia);
         i+= subIA;
       }
-      return Arr.create(res, resShape);
+      return res.get();
     }
     
     if (allNums) {
@@ -103,7 +80,7 @@ public class GTBuiltin extends Builtin {
     }
     
     
-    Value[] res = new Value[totalIA];
+    Value[] res = new Value[totalIA]; // complicated valuecopy
     int i = 0;
     for (Value v : vals) {
       Value proto = v.prototype();

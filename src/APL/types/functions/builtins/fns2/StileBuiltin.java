@@ -43,6 +43,7 @@ public class StileBuiltin extends Builtin {
   
   
   
+  public Pervasion.NN2N dyNum() { return DF; };
   public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public Value on(BigValue w, BigValue x) {
       BigInteger r = x.i.remainder(w.i);

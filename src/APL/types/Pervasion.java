@@ -108,7 +108,7 @@ public class Pervasion {
     public abstract Value on(BitArr  w, BitArr  x);
     
     public Value scalarW(Value w, Value x) {
-      if (w instanceof Num && Num.isBool(((Num) w).num) && x instanceof BitArr) return on(((Num) w).num==1, (BitArr) x); 
+      if (w instanceof Num && Num.isBool(((Num) w).num) && x instanceof BitArr) return on(((Num) w).num==1, (BitArr) x);
       return super.scalarW(w, x);
     }
     public Value scalarX(Value w, Value x) {

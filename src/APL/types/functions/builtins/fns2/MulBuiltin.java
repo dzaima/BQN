@@ -35,6 +35,7 @@ public class MulBuiltin extends Builtin {
     return numChrMapM(NF, c -> Num.of(c.getCase()), c -> c.size()>0? Num.ONE : Num.ZERO, x);
   }
   
+  public Pervasion.NN2N dyNum() { return DF; };
   public static final Pervasion.NN2N DF = new Pervasion.NN2NpB() {
     public Value on(BigValue w, BigValue x) { return new BigValue(w.i.multiply(x.i)); }
     public double on(double w, double x) { return w * x; }

@@ -13,9 +13,8 @@ public class UpArrowBuiltin extends Builtin {
     return "↑";
   }
   
-  public Value call(Value x) { // TODO scalars? valuecopy
+  public Value call(Value x) {
     if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
-    Value[] vs = x.values();
     int cells = x.shape[0];
     int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
@@ -23,11 +22,9 @@ public class UpArrowBuiltin extends Builtin {
     sh0[0] = 0;
     res[0] = new EmptyArr(sh0, null);
     for (int i = 1; i < cells; i++) {
-      Value[] c = new Value[i*csz];
-      System.arraycopy(vs, 0, c, 0, c.length);
       int[] sh = x.shape.clone();
       sh[0] = i;
-      res[i] = Arr.create(c, sh);
+      res[i] = MutVal.cut(x, 0, i*csz, sh);
     }
     res[cells] = x;
     return new HArr(res);
@@ -81,40 +78,14 @@ public class UpArrowBuiltin extends Builtin {
     if (rank == 1) {
       int s = off[0];
       int l = sh[0];
-      if (x instanceof BitArr) {
+      if (x instanceof BitArr && s==0) { // todo this might be pointless later
         BitArr wb = (BitArr) x;
-        if (s == 0) {
-          long[] ls = new long[BitArr.sizeof(l)];
-          System.arraycopy(wb.arr, 0, ls, 0, ls.length);
-          return new BitArr(ls, new int[]{l});
-        } else {
-          BitArr.BA res = new BitArr.BA(l);
-          res.add(wb, s, x.ia);
-          return res.finish();
-        }
-      }
-      if (x instanceof ChrArr) {
-        char[] res = new char[l];
-        String ws = ((ChrArr) x).s;
-        ws.getChars(s, s+l, res, 0); // ≡ for (int i = 0; i < l; i++) res[i] = ws.charAt(s+i);
-        return new ChrArr(res);
-      }
-      if (x.quickIntArr()) {
-        int[] res = new int[l];
-        int[] wd = x.asIntArr();
-        System.arraycopy(wd, s, res, 0, l);
-        return new IntArr(res);
-      }
-      if (x.quickDoubleArr()) {
-        double[] res = new double[l];
-        double[] wd = x.asDoubleArr();
-        System.arraycopy(wd, s, res, 0, l); // ≡ for (int i = 0; i < l; i++) res[i] = wd[s+i];
-        return new DoubleArr(res);
+        long[] ls = new long[BitArr.sizeof(l)];
+        System.arraycopy(wb.arr, 0, ls, 0, ls.length);
+        return new BitArr(ls, new int[]{l});
       }
       
-      Value[] res = new Value[l];
-      for (int i = 0; i < l; i++) res[i] = x.get(s+i);
-      return Arr.create(res);
+      return MutVal.cut(x, s, l, new int[]{l});
     }
     int ia = Arr.prod(sh);
     if (x instanceof ChrArr) {

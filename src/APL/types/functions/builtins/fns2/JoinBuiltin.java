@@ -48,10 +48,10 @@ public class JoinBuiltin extends Builtin {
         
         
       } else {
-        if (first.quickIntArr()) {
+        ia: if (first.quickIntArr()) {
           for (Value v : x) {
             if (v.rank != 1) return null;
-            if (!v.quickIntArr()) break typed;
+            if (!v.quickIntArr()) if (v.quickDoubleArr()) break ia; else break typed;
             am+= v.ia;
             chki++;
           }
@@ -66,10 +66,11 @@ public class JoinBuiltin extends Builtin {
           return new IntArr(is);
         }
         if (first.quickDoubleArr()) {
-          for (Value v : x) {
+          for (int i = chki; i < x.ia; i++) {
+            Value v = x.get(i);
             if (v.rank != 1) return null;
             if (!v.quickDoubleArr()) break typed;
-            am+= v.ia;
+            am += v.ia;
             chki++;
           }
           double[] ds = new double[am];
@@ -115,35 +116,39 @@ public class JoinBuiltin extends Builtin {
       sh[i] = s;
     }
     sh[0] = (a==c? w.shape[0] : 1) + (b==c? x.shape[0] : 1);
+    MutVal v = new MutVal(sh);
+    v.copy(w, 0, 0, w.ia);
+    v.copy(x, 0, w.ia, x.ia);
+    return v.get();
     
-    if ((w instanceof BitArr || Main.isBool(w))
-      && (x instanceof BitArr || Main.isBool(x))) {
-      return catBit(w, x, sh);
-    }
-    if (w.quickDoubleArr() && x.quickDoubleArr()) {
-      boolean wi = w.quickIntArr();
-      boolean xi = x.quickIntArr();
-      if (wi || xi) {
-        if (wi && xi) {
-          int[] r = new int[w.ia + x.ia];
-          System.arraycopy(w.asIntArr(), 0, r, 0, w.ia);
-          System.arraycopy(x.asIntArr(), 0, r, w.ia, x.ia);
-          return new IntArr(r, sh);
-        }
-        double[] r = new double[w.ia + x.ia];
-        if (wi) {int[]wa=w.asIntArr(); for(int i=0; i<wa.length; i++) r[     i]=wa[i]; } else System.arraycopy(w.asDoubleArr(), 0, r, 0   , w.ia);
-        if (xi) {int[]xa=x.asIntArr(); for(int i=0; i<xa.length; i++) r[w.ia+i]=xa[i]; } else System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
-        return new DoubleArr(r, sh);
-      }
-      double[] r = new double[w.ia + x.ia];
-      System.arraycopy(w.asDoubleArr(), 0, r, 0, w.ia);
-      System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
-      return new DoubleArr(r, sh);
-    }
-    Value[] r = new Value[w.ia + x.ia];
-    System.arraycopy(w.values(), 0, r, 0, w.ia);
-    System.arraycopy(x.values(), 0, r, w.ia, x.ia);
-    return Arr.create(r, sh);
+    // if ((w instanceof BitArr || Main.isBool(w))
+    //   && (x instanceof BitArr || Main.isBool(x))) {
+    //   return catBit(w, x, sh);
+    // }
+    // if (w.quickDoubleArr() && x.quickDoubleArr()) {
+    //   boolean wi = w.quickIntArr();
+    //   boolean xi = x.quickIntArr();
+    //   if (wi || xi) {
+    //     if (wi && xi) {
+    //       int[] r = new int[w.ia + x.ia];
+    //       System.arraycopy(w.asIntArr(), 0, r, 0, w.ia);
+    //       System.arraycopy(x.asIntArr(), 0, r, w.ia, x.ia);
+    //       return new IntArr(r, sh);
+    //     }
+    //     double[] r = new double[w.ia + x.ia];
+    //     if (wi) {int[]wa=w.asIntArr(); for(int i=0; i<wa.length; i++) r[     i]=wa[i]; } else System.arraycopy(w.asDoubleArr(), 0, r, 0   , w.ia);
+    //     if (xi) {int[]xa=x.asIntArr(); for(int i=0; i<xa.length; i++) r[w.ia+i]=xa[i]; } else System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
+    //     return new DoubleArr(r, sh);
+    //   }
+    //   double[] r = new double[w.ia + x.ia];
+    //   System.arraycopy(w.asDoubleArr(), 0, r, 0, w.ia);
+    //   System.arraycopy(x.asDoubleArr(), 0, r, w.ia, x.ia);
+    //   return new DoubleArr(r, sh);
+    // }
+    // Value[] r = new Value[w.ia + x.ia];
+    // System.arraycopy(w.values(), 0, r, 0, w.ia);
+    // System.arraycopy(x.values(), 0, r, w.ia, x.ia);
+    // return Arr.create(r, sh);
   }
   
   

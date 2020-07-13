@@ -2,7 +2,6 @@ package APL.types.functions.builtins.fns2;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
 public class ReverseBuiltin extends Builtin {
@@ -36,35 +35,15 @@ public class ReverseBuiltin extends Builtin {
   
   public static Value on(int a, Value x) {
     if (x.ia==0) return x;
-    if (a == 0) return x;
     a = Math.floorMod(a, x.shape[0]);
+    if (a == 0) return x;
     int csz = Arr.prod(x.shape, 1, x.shape.length);
     int pA = csz*a; // first part
     int pB = x.ia - pA; // second part
-    if (x instanceof BitArr) {
-      BitArr wb = (BitArr) x;
-      BitArr.BA c = new BitArr.BA(wb.shape);
-      c.add(wb, a, wb.ia);
-      c.add(wb, 0, a);
-      return c.finish();
-    } else if (x.quickDoubleArr()) {
-      double[] vs = x.asDoubleArr();
-      double[] res = new double[x.ia];
-      System.arraycopy(vs,  0, res, pB, pA);
-      System.arraycopy(vs, pA, res,  0, pB);
-      return new DoubleArr(res, x.shape);
-    } else if (x.quickIntArr()) {
-      int[] vs = x.asIntArr();
-      int[] res = new int[x.ia];
-      System.arraycopy(vs,  0, res, pB, pA);
-      System.arraycopy(vs, pA, res,  0, pB);
-      return new IntArr(res, x.shape);
-    } else {
-      Value[] vs = x.values();
-      Value[] res = new Value[x.ia];
-      System.arraycopy(vs,  0, res, pB, pA);
-      System.arraycopy(vs, pA, res,  0, pB);
-      return Arr.create(res, x.shape);
-    }
+    
+    MutVal res = new MutVal(x.shape, x);
+    res.copy(x, pA,  0, pB);
+    res.copy(x,  0, pB, pA);
+    return res.get();
   }
 }

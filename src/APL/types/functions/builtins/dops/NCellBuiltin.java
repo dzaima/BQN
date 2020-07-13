@@ -67,16 +67,11 @@ public class NCellBuiltin extends Dop {
   
   public static Value[] cells(Value x, int k) {
     int cam = Arr.prod(x.shape, 0, k);
-    int csz = Arr.prod(x.shape, k, x.shape.length);
     int[] csh = Arrays.copyOfRange(x.shape, k, x.shape.length);
+    int csz = Arr.prod(csh, 0, csh.length);
     
-    Value[] xv = x.values();
     Value[] res = new Value[cam];
-    for (int i = 0; i < cam; i++) {
-      Value[] c = new Value[csz];
-      System.arraycopy(xv, i*csz, c, 0, csz); // valuecopy
-      res[i] = Arr.create(c, csh);
-    }
+    for (int i = 0; i < cam; i++) res[i] = MutVal.cut(x, i*csz, csz, csh);
     return res;
   }
   

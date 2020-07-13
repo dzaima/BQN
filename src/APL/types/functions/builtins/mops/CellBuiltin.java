@@ -54,13 +54,8 @@ public class CellBuiltin extends Mop {
     int csz = csz(x);
     int[] csh = Arrays.copyOfRange(x.shape, 1, x.shape.length);
     
-    Value[] xv = x.values();
     Value[] res = new Value[cam];
-    for (int i = 0; i < cam; i++) {
-      Value[] c = new Value[csz];
-      System.arraycopy(xv, i*csz, c, 0, csz); // valuecopy
-      res[i] = Arr.create(c, csh);
-    }
+    for (int i = 0; i < cam; i++) res[i] = MutVal.cut(x, i*csz, csz, csh);
     return res;
   }
   
