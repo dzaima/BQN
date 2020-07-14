@@ -39,11 +39,4 @@ public class OldLTBuiltin extends Builtin {
       w0, x0
     );
   }
-  
-  public Value call(Value x) {
-    var order = x.gradeUp();
-    Value[] res = new Value[order.length];
-    Arrays.setAll(res, i -> x.get(order[i]));
-    return Arr.create(res);
-  }
 }

@@ -201,25 +201,6 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return rc;
   }
-  public Integer[] gradeUp() {
-    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
-    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeUp();
-    Integer[] na = new Integer[ia];
-    for (int i = 0; i < na.length; i++) na[i] = i;
-    Arrays.sort(na, (a, b) -> get(a).compareTo(get(b)));
-    
-    return na;
-  }
-  public Integer[] gradeDown() {
-    if (rank == 0) throw new DomainError("cannot grade rank 0", this);
-    if (rank != 1) return new HArr(CellBuiltin.cells(this)).gradeDown();
-    
-    Integer[] na = new Integer[ia];
-    for (int i = 0; i < na.length; i++) na[i] = i;
-    
-    Arrays.sort(na, (a, b) -> get(b).compareTo(get(a)));
-    return na;
-  }
   
   
   public /*open*/ Fun asFun() {
