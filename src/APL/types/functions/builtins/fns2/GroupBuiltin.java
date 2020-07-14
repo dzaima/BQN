@@ -6,7 +6,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class GroupBuiltin extends Builtin {
   public String repr() {
@@ -61,11 +61,11 @@ public class GroupBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     int depth = MatchBuiltin.full(w);
     if (depth > 2) throw new DomainError("⊔: depth of 𝕨 must be at most 2 (was "+depth+")", this, w);
-    int rank = w.ia;
+    int wsz = w.ia;
     if (x.rank == 1) {
       int[] poss;
       if (depth == 2) {
-        if (w.rank!=1 || rank!=1) throw new RankError("⊔: expected a depth 2 𝕨 to be a 1-item vector if 𝕩 is a vector (had shape "+Main.formatAPL(w.shape)+")", this, w);
+        if (w.rank!=1 || wsz!=1) throw new RankError("⊔: expected a depth 2 𝕨 to be a 1-item vector if 𝕩 is a vector (had shape "+Main.formatAPL(w.shape)+")", this, w);
         poss = w.get(0).asIntVec();
       } else poss = w.asIntVec();
       int sz = -1;
@@ -101,19 +101,22 @@ public class GroupBuiltin extends Builtin {
       return new HArr(res);
     }
     
-    if (w.rank > 1) throw new RankError("⊔: 𝕨 must be vector or scalar, had rank "+w.rank, this, w);
-    int[][] wa = new int[rank][];
-    for (int i = 0; i < rank; i++) wa[i] = w.get(i).asIntVec();
-    int[] rsh = new int[rank];
-    for (int i = 0; i < rank; i++) {
+    int xsz = x.rank;
+    if (w.rank > 1) throw new RankError("⊔: 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
+    if (wsz > xsz) throw new RankError("⊔: length of 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
+    int csz = Arr.prod(x.shape, wsz, xsz);
+    int[][] wa = new int[wsz][];
+    for (int i = 0; i < wsz; i++) wa[i] = w.get(i).asIntVec();
+    int[] rsh = new int[wsz];
+    for (int i = 0; i < wsz; i++) {
       int max = -1;
       for (int c : wa[i]) max = Math.max(max, c);
       rsh[i] = max+1;
     }
     int sz = Arr.prod(rsh);
-    int[][] rshs = new int[sz][rank];
+    int[][] rshs = new int[sz][xsz];
     int repl = 1;
-    for (int i = rank-1; i >= 0; i--) {
+    for (int i = wsz-1; i >= 0; i--) {
       int[] ca = new int[rsh[i]];
       for (int c : wa[i]) {
         if (c>=0) ca[c]++;
@@ -127,25 +130,28 @@ public class GroupBuiltin extends Builtin {
       }
       repl*= rsh[i];
     }
+    for (int[] c : rshs) {
+      System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
+    }
   
-    Value[][] vs = new Value[sz][];
-    for (int i = 0; i < sz; i++) vs[i] = new Value[Arr.prod(rshs[i])];
-    recIns(vs, new int[sz], rsh, 0, 0, 0, wa, x);
+    MutVal[] vs = new MutVal[sz];
+    for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);
+    recIns(vs, new int[sz], rsh, 0, 0, 0, wa, x, csz);
     
     Value[] res = new Value[sz];
-    for (int i = 0; i < sz; i++) res[i] = Arr.create(vs[i], rshs[i]);
+    for (int i = 0; i < sz; i++) res[i] = vs[i].get();
     return new HArr(res, rsh);
   }
   
-  private void recIns(Value[][] vs, int[] ram, int[] rsh, int rp, int k, int ip, int[][] w, Value x) {
+  private void recIns(MutVal[] vs, int[] ram, int[] rsh, int rp, int k, int ip, int[][] w, Value x, int csz) {
     if (k == rsh.length) {
-      vs[rp][ram[rp]++] = x.get(ip);
+      vs[rp].copy(x, ip*csz, ram[rp]++, csz);
     } else {
       rp*= rsh[k];
       ip*= x.shape[k];
       int[] c = w[k];
       for (int i = 0; i < c.length; i++) {
-        if (c[i] >= 0) recIns(vs, ram, rsh, rp+c[i], k+1, ip+i, w, x);
+        if (c[i] >= 0) recIns(vs, ram, rsh, rp+c[i], k+1, ip+i, w, x, csz);
       }
     }
   }
