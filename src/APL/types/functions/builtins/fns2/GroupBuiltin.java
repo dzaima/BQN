@@ -62,13 +62,9 @@ public class GroupBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     int depth = MatchBuiltin.full(w);
     if (depth > 2) throw new DomainError("⊔: depth of 𝕨 must be at most 2 (was "+depth+")", this, w);
-    int wsz = w.ia;
-    if (x.rank == 1) {
+    if (x.rank==1 && depth <= 1) {
       int[] poss;
-      if (depth == 2) {
-        if (w.rank!=1 || wsz!=1) throw new RankError("⊔: expected a depth 2 𝕨 to be a 1-item vector if 𝕩 is a vector (had shape "+Main.formatAPL(w.shape)+")", this, w);
-        poss = w.get(0).asIntVec();
-      } else poss = w.asIntVec();
+      poss = w.asIntVec();
       int sz = -1;
       for (int i : poss) sz = Math.max(sz, i);
       sz++;
@@ -101,7 +97,8 @@ public class GroupBuiltin extends Builtin {
       for (int i = 0; i < sz; i++) res[i] = Arr.create(vs[i]);
       return new HArr(res);
     }
-    
+  
+    int wsz = w.ia;
     int xsz = x.rank;
     if (w.rank > 1) throw new RankError("⊔: 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
     if (wsz > xsz) throw new RankError("⊔: length of 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
@@ -146,7 +143,8 @@ public class GroupBuiltin extends Builtin {
   
   private void recIns(MutVal[] vs, int[] ram, int[] rsh, int rp, int k, int ip, int[][] w, Value x, int csz) {
     if (k == rsh.length) {
-      vs[rp].copy(x, ip*csz, ram[rp]++, csz);
+      vs[rp].copy(x, ip*csz, ram[rp], csz);
+      ram[rp]+= csz;
     } else {
       rp*= rsh[k];
       ip*= x.shape[k];

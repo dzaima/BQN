@@ -163,27 +163,6 @@ public final class BitArr extends Arr {
       skip(e-s);
     }
     
-    @SuppressWarnings("ConstantExpression") // i _want_ ~0L :|
-    public void fill(int n) {
-      int off = o+n;
-      if (off < 64) { // start & end being in the same cell is annoying
-        if (n==0) return;
-        a[i]|= ((1L<<n)-1) << o;
-        o = off;
-      } else {
-        a[i]|= (~0L) << o;
-        int li = i + ((off-1) >> 6);
-        for (int j = i+1; j <= li; j++) {
-          a[j] = ~0L;
-        }
-        i+= off>>6;
-        o = off&63;
-        
-        if (o != 0) {
-          a[i] = (1L<<o)-1;
-        }
-      }
-    }
     public void skip(int n) {
       int off = o+n;
       o = off&63;
@@ -204,7 +183,6 @@ public final class BitArr extends Arr {
     if (off < 64) { // start & end being in the same cell is annoying
       if (n==0) return;
       a[i]|= ((1L<<n)-1) << o;
-      o = off;
     } else {
       a[i]|= (~0L) << o;
       int li = i + ((off-1) >> 6);
@@ -214,9 +192,7 @@ public final class BitArr extends Arr {
       i+= off>>6;
       o = off&63;
       
-      if (o != 0) {
-        a[i] = (1L<<o)-1;
-      }
+      if (o != 0) a[i] = (1L<<o)-1;
     }
   }
   
