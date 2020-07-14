@@ -42,19 +42,42 @@ public class UpArrowBuiltin extends Builtin {
     int rem = rank - gsh.length;
     if (rem > 0) System.arraycopy(x.shape, gsh.length, sh, gsh.length, rem);
     int diff = rank - x.rank;
-    boolean proto = false;
+    boolean overtake = false;
     int[] off = new int[rank];
     for (int i = 0; i < gsh.length; i++) {
-      int d = gsh[i];
-      int s = i < diff? 1 : x.shape[i - diff];
-      if (d > s) proto = true;
+      int d = sh[i];
+      int s = i<diff? 1 : x.shape[i-diff];
       if (d < 0) {
+        off[i] = s+sh[i];
         sh[i] = -d;
-        off[i] = s-sh[i];
-      } else off[i] = 0;
+        if (-d > s) overtake = true;
+      } else {
+        off[i] = 0;
+        if (d > s) overtake = true;
+      }
     }
-    if (proto) {
-      throw new NYIError("No overtake yet", this);
+    if (overtake) {
+      Value proto = x.prototype();
+      if (x.rank == 1) {
+        MutVal res = new MutVal(sh);
+        if (off[0]==0) {
+          res.copy(x, 0, 0, x.ia);
+          res.fill(proto, x.ia, res.ia);
+        } else {
+          res.copy(x, 0, res.ia-x.ia, x.ia);
+          res.fill(proto, 0, res.ia);
+        }
+        return res.get();
+      }
+      MutVal res = new MutVal(sh);
+      int l = sh.length;
+      int[] tmp = new int[l];
+      int rp = 0;
+      for (int[] c : new Indexer(sh)) {
+        for (int i = 0; i < l; i++) tmp[i] = c[i]+off[i];
+        res.set(rp++, x.at(tmp, proto));
+      }
+      return res.get();
     }
     return on(sh, off, x, this);
   }

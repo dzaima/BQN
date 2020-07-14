@@ -196,6 +196,30 @@ public final class BitArr extends Arr {
   }
   
   
+  public static void fill(long[] a, int s, int e) {
+    int i = s>>6;
+    int o = s&63;
+    int n = e-s;
+    int off = o+n;
+    if (off < 64) { // start & end being in the same cell is annoying
+      if (n==0) return;
+      a[i]|= ((1L<<n)-1) << o;
+      o = off;
+    } else {
+      a[i]|= (~0L) << o;
+      int li = i + ((off-1) >> 6);
+      for (int j = i+1; j <= li; j++) {
+        a[j] = ~0L;
+      }
+      i+= off>>6;
+      o = off&63;
+      
+      if (o != 0) {
+        a[i] = (1L<<o)-1;
+      }
+    }
+  }
+  
   public static void copy(long[] src, int srcS, long[] dst, int dstS, int len) {
     int s = srcS;
     int e = srcS+len;

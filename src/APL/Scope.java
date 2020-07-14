@@ -313,10 +313,10 @@ public class Scope {
     }
   }
   public static Value formatTime(double ns) {
-    if (ns < 1000) return Main.toAPL(ns+" nanos");
+    if (ns < 1000) return Main.toAPL(ns+"ns");
     double ms = ns/1e6;
     if (ms > 500) return Main.toAPL(new Num(ms/1000d)+" seconds");
-    return Main.toAPL(new Num(ms)+" millis");
+    return Main.toAPL(new Num(ms)+"ms");
   }
   static class CompTimer extends Builtin {
     public String repr() {

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class MutVal { // inserts can be in any order, but must not override previous ones
   private final int[] sh;
-  private final int ia;
+  public final int ia;
   
   long  [] ls; // 1 
   double[] ds; // 2
@@ -33,130 +33,13 @@ public class MutVal { // inserts can be in any order, but must not override prev
     guess(base);
   }
   
-  void guess(Value base) {
-    assert mode == 0;
-    if (base.quickDoubleArr()) {
-      if (base instanceof BitArr) mode = 1;
-      else if (base instanceof Num || base instanceof SingleItemArr) {
-        double d = ((Num) (base instanceof Num? base : base.get(0))).num;
-        if (d==0 || d==1) mode = 1;
-        else mode = 2;
-      } else mode = 2;
-      if (mode==2 && base.quickIntArr()) mode = 4;
-    } else if (base instanceof ChrArr || base instanceof Char) {
-      mode = 3;
-    } else {
-      mode = 5;
-    }
-    init();
-  }
-  
-  private void init() {
-    switch (mode) { default: throw new IllegalStateException();
-      case 1: ls = new long[BitArr.sizeof(ia)]; break;
-      case 2: ds = new double[ia]; break;
-      case 3: cs = new char[ia]; break;
-      case 4: is = new int[ia]; break;
-      case 5: vs = new Value[ia]; break;
-    }
-  }
-  private void move(int nm) {
-    assert nm!=mode;
-    switch (nm) { default: throw new IllegalStateException();
-      case 2: ds = new double[ia]; break;
-      case 4: is = new int[ia]; break;
-      case 5: vs = new Value[ia]; break;
-    }
-    // System.out.println("to "+nm);
-    switch (mode) { default: throw new IllegalStateException();
-      case 1:
-        if (nm==2) {
-          int r = 0;
-          for (int i = 0; i < ia/64; i++) { long c = ls[i];
-            for (int j = 0; j < 64     ; j++) { ds[r++] = c&1; c>>= 1; }
-          }
-          if ((ia&63) != 0) { long c = ls[ls.length-1];
-            for (int i = 0; i < (ia&63); i++) { ds[r++] = c&1; c>>= 1; }
-          }
-        } else if (nm==4) {
-          int r = 0;
-          for (int i = 0; i < ia/64; i++) { long c = ls[i];
-            for (int j = 0; j < 64     ; j++) { is[r++] = (int) (c&1); c>>= 1; }
-          }
-          if ((ia&63) != 0) { long c = ls[ls.length-1];
-            for (int i = 0; i < (ia&63); i++) { is[r++] = (int) (c&1); c>>= 1; }
-          }
-        } else {
-          assert nm==5;
-          int r = 0;
-          for (int i = 0; i < ia/64; i++) {
-            long c = ls[i];
-            for (int j = 0; j < 64     ; j++) { vs[r++] = Num.NUMS[(int) (c&1)]; c>>= 1; }
-          }
-          if ((ia&63) != 0) { long c = ls[ls.length-1];
-            for (int i = 0; i < (ia&63); i++) { vs[r++] = Num.NUMS[(int) (c&1)]; c>>= 1; }
-          }
-        }
-        break;
-      case 2:
-        assert nm==5;
-        for (int i = 0; i < ia; i++) vs[i] = Num.of(ds[i]);
-        break;
-      case 3:
-        assert nm==5;
-        for (int i = 0; i < ia; i++) vs[i] = Char.of(cs[i]);
-        break;
-      case 4:
-        if (nm==2) {
-          for (int i = 0; i < is.length; i++) ds[i] = is[i];
-        } else {
-          assert nm==5;
-          for (int i = 0; i < is.length; i++) vs[i] = Num.of(is[i]);
-        }
-        break;
-    }
-    switch (mode) { default: throw new IllegalStateException();
-      case 1: ls=null; break;
-      case 2: ds=null; break;
-      case 3: cs=null; break;
-      case 4: is=null; break;
-      case 5: vs=null; break;
-    }
-    mode = nm;
-  }
-  
-  public void set(int p, Value x) {
-    switch (mode) { default: throw new IllegalStateException();
-      case 0:
-        guess(x);
-        set(p, x);
-        return;
-      case 1:
-        if (x instanceof Num) {
-          double d = ((Num) x).num;
-          if (d!=1 & d!=0) { move(Num.isInt(d)? 4 : 2); set(p, x); return; }
-          if (d==1) ls[p>>6]|= 1L<<(p&63);
-        } else { move(5); set(p, x); }
-        return;
-      case 2:
-        if (x instanceof Num) {
-          ds[p] = ((Num) x).num;
-        } else { move(5); set(p, x); }
-        return;
-      case 3:
-        if (x instanceof Char) {
-          cs[p] = ((Char) x).chr;
-        } else { move(5); set(p, x); }
-        return;
-      case 4:
-        if (x instanceof Num) {
-          double d = ((Num) x).num;
-          if (Num.isInt(d)) is[p] = (int) d;
-          else { move(2); set(p, x); }
-        } else { move(5); set(p, x); }
-        return;
-      case 5:
-        vs[p] = x;
+  public Value get() {
+    switch (mode) { default: assert ia==0; return new EmptyArr(sh, null);
+      case 1: return new BitArr(ls, sh);
+      case 2: return new DoubleArr(ds, sh);
+      case 3: return new ChrArr(cs, sh);
+      case 4: return new IntArr(is, sh);
+      case 5: return new HArr(vs, sh);
     }
   }
   
@@ -313,21 +196,44 @@ public class MutVal { // inserts can be in any order, but must not override prev
     }
   }
   
-  public Value get() {
-    switch (mode) { default: assert ia==0; return new EmptyArr(sh, null);
-      case 1: return new BitArr(ls, sh);
-      case 2: return new DoubleArr(ds, sh);
-      case 3: return new ChrArr(cs, sh);
-      case 4: return new IntArr(is, sh);
-      case 5: return new HArr(vs, sh);
+  
+  
+  public void set(int p, Value x) {
+    switch (mode) { default: throw new IllegalStateException();
+      case 0:
+        guess(x);
+        set(p, x);
+        return;
+      case 1:
+        if (x instanceof Num) {
+          double d = ((Num) x).num;
+          if (d!=1 & d!=0) { move(Num.isInt(d)? 4 : 2); set(p, x); return; }
+          if (d==1) ls[p>>6]|= 1L<<(p&63);
+        } else { move(5); set(p, x); }
+        return;
+      case 2:
+        if (x instanceof Num) {
+          ds[p] = ((Num) x).num;
+        } else { move(5); set(p, x); }
+        return;
+      case 3:
+        if (x instanceof Char) {
+          cs[p] = ((Char) x).chr;
+        } else { move(5); set(p, x); }
+        return;
+      case 4:
+        if (x instanceof Num) {
+          double d = ((Num) x).num;
+          if (Num.isInt(d)) is[p] = (int) d;
+          else { move(2); set(p, x); }
+        } else { move(5); set(p, x); }
+        return;
+      case 5:
+        vs[p] = x;
     }
   }
   
-  public static Value cut(Value src, int sP, int len, int[] sh) {
-    MutVal v = new MutVal(sh, src, len);
-    v.copy(src, sP, 0, len);
-    return v.get();
-  }
+  
   
   public Value get(int i) {
     switch (mode) { default: throw new IllegalStateException();
@@ -337,5 +243,148 @@ public class MutVal { // inserts can be in any order, but must not override prev
       case 4: return Num.of(is[i]);
       case 5: return vs[i];
     }
+  }
+  
+  
+  
+  public void fill(Value x, int s, int e) {
+    switch (mode) { default: throw new IllegalStateException();
+      case 0: guess(x); fill(x, s, e); return;
+      case 1: {
+        if (!(x instanceof Num)) { move(5); fill(x, s, e); return; }
+        double d = ((Num) x).num; if (d==0) return;
+        if (d==1) { BitArr.fill(ls, s, e); return; }
+        if (Num.isInt(d)) { move(4); fill(x, s, e); return; }
+        move(2); fill(x, s, e); return;
+      }
+      case 2: {
+        if (!(x instanceof Num)) { move(5); fill(x, s, e); return; }
+        double d = ((Num) x).num; if (d==0) return;
+        for (int i = s; i < e; i++) ds[i] = d;
+        break;
+      }
+      case 3: {
+        if (!(x instanceof Char)) { move(5); fill(x, s, e); return; }
+        char c = ((Char) x).chr;
+        for (int i = s; i < e; i++) cs[i] = c;
+        return;
+      }
+      case 4: {
+        if (!(x instanceof Num)) { move(5); fill(x, s, e); return; }
+        double d = ((Num) x).num; if (d==0) return;
+        if (!Num.isInt(d)) { move(2); fill(x, s, e); return; }
+        int xi = (int) d;
+        for (int i = s; i < e; i++) is[i] = xi;
+        return;
+      }
+      case 5:
+        for (int i = s; i < e; i++) vs[i] = x;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  private void init() {
+    switch (mode) { default: throw new IllegalStateException();
+      case 1: ls = new long[BitArr.sizeof(ia)]; break;
+      case 2: ds = new double[ia]; break;
+      case 3: cs = new char[ia]; break;
+      case 4: is = new int[ia]; break;
+      case 5: vs = new Value[ia]; break;
+    }
+  }
+  
+  void guess(Value base) {
+    assert mode == 0;
+    if (base.quickDoubleArr()) {
+      if (base instanceof BitArr) mode = 1;
+      else if (base instanceof Num || base instanceof SingleItemArr) {
+        double d = ((Num) (base instanceof Num? base : base.get(0))).num;
+        if (d==0 || d==1) mode = 1;
+        else mode = 2;
+      } else mode = 2;
+      if (mode==2 && base.quickIntArr()) mode = 4;
+    } else if (base instanceof ChrArr || base instanceof Char) {
+      mode = 3;
+    } else {
+      mode = 5;
+    }
+    init();
+  }
+  
+  private void move(int nm) {
+    assert nm!=mode;
+    switch (nm) { default: throw new IllegalStateException();
+      case 2: ds = new double[ia]; break;
+      case 4: is = new int[ia]; break;
+      case 5: vs = new Value[ia]; break;
+    }
+    // System.out.println("to "+nm);
+    switch (mode) { default: throw new IllegalStateException();
+      case 1:
+        if (nm==2) {
+          int r = 0;
+          for (int i = 0; i < ia/64; i++) { long c = ls[i];
+            for (int j = 0; j < 64     ; j++) { ds[r++] = c&1; c>>= 1; }
+          }
+          if ((ia&63) != 0) { long c = ls[ls.length-1];
+            for (int i = 0; i < (ia&63); i++) { ds[r++] = c&1; c>>= 1; }
+          }
+        } else if (nm==4) {
+          int r = 0;
+          for (int i = 0; i < ia/64; i++) { long c = ls[i];
+            for (int j = 0; j < 64     ; j++) { is[r++] = (int) (c&1); c>>= 1; }
+          }
+          if ((ia&63) != 0) { long c = ls[ls.length-1];
+            for (int i = 0; i < (ia&63); i++) { is[r++] = (int) (c&1); c>>= 1; }
+          }
+        } else {
+          assert nm==5;
+          int r = 0;
+          for (int i = 0; i < ia/64; i++) {
+            long c = ls[i];
+            for (int j = 0; j < 64     ; j++) { vs[r++] = Num.NUMS[(int) (c&1)]; c>>= 1; }
+          }
+          if ((ia&63) != 0) { long c = ls[ls.length-1];
+            for (int i = 0; i < (ia&63); i++) { vs[r++] = Num.NUMS[(int) (c&1)]; c>>= 1; }
+          }
+        }
+        break;
+      case 2:
+        assert nm==5;
+        for (int i = 0; i < ia; i++) vs[i] = Num.of(ds[i]);
+        break;
+      case 3:
+        assert nm==5;
+        for (int i = 0; i < ia; i++) vs[i] = Char.of(cs[i]);
+        break;
+      case 4:
+        if (nm==2) {
+          for (int i = 0; i < is.length; i++) ds[i] = is[i];
+        } else {
+          assert nm==5;
+          for (int i = 0; i < is.length; i++) vs[i] = Num.of(is[i]);
+        }
+        break;
+    }
+    switch (mode) { default: throw new IllegalStateException();
+      case 1: ls=null; break;
+      case 2: ds=null; break;
+      case 3: cs=null; break;
+      case 4: is=null; break;
+      case 5: vs=null; break;
+    }
+    mode = nm;
+  }
+  
+  public static Value cut(Value src, int sP, int len, int[] sh) {
+    MutVal v = new MutVal(sh, src, len);
+    v.copy(src, sP, 0, len);
+    return v.get();
   }
 }

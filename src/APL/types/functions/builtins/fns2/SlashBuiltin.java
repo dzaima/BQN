@@ -78,7 +78,7 @@ public class SlashBuiltin extends Builtin {
   }
   
   public Value callInv(Value x) {
-    int[] sh = fn.call(Num.ZERO, x).asIntVec();
+    int[] sh = fn.call(Num.MINUS_ONE, x).asIntVec();
     int ia = 1;
     for (int i = 0; i < sh.length; i++) { sh[i]+= 1; ia*= sh[i]; }
     int[] arr = new int[ia];
