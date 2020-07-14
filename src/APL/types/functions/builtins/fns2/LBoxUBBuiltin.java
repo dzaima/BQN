@@ -1,9 +1,10 @@
 package APL.types.functions.builtins.fns2;
 
 import APL.*;
+import APL.algs.MutVal;
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
 
 import java.util.Arrays;

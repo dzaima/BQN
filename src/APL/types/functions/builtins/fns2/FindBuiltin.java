@@ -1,10 +1,14 @@
 package APL.types.functions.builtins.fns2;
 
 import APL.Indexer;
+import APL.algs.MutIntArr;
 import APL.errors.RankError;
-import APL.types.Value;
-import APL.types.arrs.BitArr;
+import APL.types.*;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.mops.CellBuiltin;
+
+import java.util.*;
 
 public class FindBuiltin extends Builtin {
   @Override public String repr() {
@@ -12,6 +16,22 @@ public class FindBuiltin extends Builtin {
   }
   
   
+  public Value call(Value x) {
+    if (x.rank>1) {
+      Value[] rcs = call(new HArr(CellBuiltin.cells(x))).values();
+      return GTBuiltin.merge(rcs, new int[]{rcs.length}, this);
+    }
+    if (x instanceof IntArr) {
+      HashSet<Integer> vals = new HashSet<>();
+      MutIntArr res = new MutIntArr(10);
+      for (int c : x.asIntArr()) if (vals.add(c)) res.add(c);
+      return res.get();
+    }
+    HashSet<Value> vals = new HashSet<>();
+    ArrayList<Value> res = new ArrayList<>();
+    for (Value c : x) if (vals.add(c)) res.add(c);
+    return Arr.create(res);
+  }
   
   public Value call(Value w, Value x) {
     if (w.rank != x.rank) throw new RankError("⍷: argument ranks should be equal ("+w.rank+" ≠ "+x.rank+")", this, x);

@@ -1,5 +1,6 @@
-package APL.types;
+package APL.algs;
 
+import APL.types.*;
 import APL.types.arrs.*;
 
 import java.util.Arrays;

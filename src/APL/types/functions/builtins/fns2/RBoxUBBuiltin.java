@@ -1,11 +1,12 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.algs.MutIntArr;
 import APL.errors.*;
 import APL.types.Value;
-import APL.types.arrs.DoubleArr;
+import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class RBoxUBBuiltin extends Builtin {
   public String repr() {
@@ -16,7 +17,7 @@ public class RBoxUBBuiltin extends Builtin {
     if (x.rank==0) throw new DomainError("⊒: rank=0", this, x);
     if (x.rank!=1) throw new NYIError("⊒ on rank≠1", this, x);
     HashMap<Value, Integer> vs = new HashMap<>();
-    double[] res = new double[x.ia];
+    int[] res = new int[x.ia];
     int i = 0;
     for (Value v : x) {
       Integer c = vs.get(v);
@@ -28,43 +29,31 @@ public class RBoxUBBuiltin extends Builtin {
       }
       i++;
     }
-    return new DoubleArr(res);
+    return new IntArr(res);
   }
   
   public Value call(Value w, Value x) {
     if (x.rank!=1 || w.rank!=1) throw new NYIError("⊒ on rank≠1", this, w);
-    HashMap<Value, MutIA> vs = new HashMap<>();
+    HashMap<Value, MutIntArr> vs = new HashMap<>();
     int i = 0;
     for (Value v : w) {
-      MutIA c = vs.get(v);
+      MutIntArr c = vs.get(v);
       if (c==null) {
-        c = new MutIA();
+        c = new MutIntArr(2);
         vs.put(v, c);
       }
       c.add(i);
       i++;
     }
-    double[] res = new double[x.ia];
+    int[] res = new int[x.ia];
     i=0;
     for (Value v : x) {
-      MutIA c = vs.get(v);
+      MutIntArr c = vs.get(v);
       if (c==null || c.pos >= c.sz) res[i] = w.ia;
       else res[i] = c.is[c.pos++];
       i++;
     }
-    return new DoubleArr(res);
+    return new IntArr(res);
   }
   
-  private static class MutIA {
-    int[] is = new int[2];
-    int sz;
-    int pos;
-    void add(int i) {
-      if (sz>=is.length) {
-        is = Arrays.copyOf(is, is.length*2);
-      }
-      is[sz] = i;
-      sz++;
-    }
-  }
 }

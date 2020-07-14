@@ -2,9 +2,9 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.*;
-import APL.tokenizer.types.*;
+import APL.tokenizer.types.LineTok;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.ChrArr;
 import APL.types.functions.MutArr;
 
 import java.io.*;

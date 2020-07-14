@@ -1,6 +1,7 @@
 package APL.types;
 
 import APL.*;
+import APL.algs.Pervasion;
 import APL.errors.*;
 import APL.types.arrs.*;
 

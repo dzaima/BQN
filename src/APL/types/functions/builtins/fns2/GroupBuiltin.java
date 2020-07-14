@@ -1,6 +1,7 @@
 package APL.types.functions.builtins.fns2;
 
 import APL.Main;
+import APL.algs.MutVal;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;

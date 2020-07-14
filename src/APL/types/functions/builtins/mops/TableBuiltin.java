@@ -1,5 +1,6 @@
 package APL.types.functions.builtins.mops;
 
+import APL.algs.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
