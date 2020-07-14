@@ -22,9 +22,7 @@ public class DoubleArr extends Arr {
     super(new int[]{arrl.size()}, arrl.size());
     arr = new double[ia];
     int j = 0;
-    for (double d : arrl) {
-      arr[j++] = d;
-    }
+    for (double d : arrl) arr[j++] = d;
   }
   
   
@@ -66,6 +64,7 @@ public class DoubleArr extends Arr {
   
   
   public boolean quickDoubleArr() { return true; }
+  public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) { return new DoubleArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }

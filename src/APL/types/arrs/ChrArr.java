@@ -43,6 +43,8 @@ public class ChrArr extends Arr {
     return Char.SPACE;
   }
   
+  
+  public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) {
     return new ChrArr(s, sh);
   }

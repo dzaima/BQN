@@ -96,6 +96,7 @@ public final class BitArr extends Arr {
   
   public boolean quickDoubleArr() { return true; }
   public boolean quickIntArr() { return true; }
+  public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) { return new BitArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }

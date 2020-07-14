@@ -3,7 +3,6 @@ package APL.types;
 import APL.Type;
 import APL.errors.*;
 import APL.types.arrs.*;
-import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.*;
 
@@ -75,10 +74,10 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   
   
-  
-  public /*open*/ boolean quickDoubleArr() { return false; } // if true, asDoubleArr must succeed; warning: also true for a primitive number
-  public /*open*/ boolean quickIntArr() { return false; }
-  public /*open*/ boolean notIdentity() { return false; } // whether asFun().call(…) != this
+  public /*open*/ boolean quickDoubleArr() { return false; } // if true, asDoubleArr must succeed; also true for Num
+  public /*open*/ boolean quickIntArr   () { return false; } // if true, asIntArr must succeed; also true for integer Num
+  public /*open*/ boolean notIdentity   () { return false; } // whether asFun().call(…) != this
+  public /*open*/ boolean quickDepth1   () { return false; } // true if object is guaranteed to be depth 1 (returning false always is allowed)
   public boolean scalar() { return rank == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
   public abstract Value safePrototype(); // what to append to this array

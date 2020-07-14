@@ -35,7 +35,7 @@ public class TildeBuiltin extends Builtin {
       }
       
       Arr o = (Arr) x;
-      if (o.ia>0 && o.get(0) instanceof Num) {
+      if (o.ia>0 && o.first() instanceof Num) {
         BitArr.BA a = new BitArr.BA(x.ia); // it's probably worth going all-in on creating a bitarr
         for (int i = 0; i < o.ia; i++) {
           Value v = o.get(i);

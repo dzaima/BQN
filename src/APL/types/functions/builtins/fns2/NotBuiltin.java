@@ -38,7 +38,6 @@ public class NotBuiltin extends Builtin {
       }
       
       if (x.quickDoubleArr()) {
-        // for (int i = 0; i < w.length; i++) if (w[i] == 0) res[i>>6]|= 1L << (i&63);
         double[] ds = x.asDoubleArr();
         double[] res = new double[x.ia];
         for (int i = 0; i < ds.length; i++) {

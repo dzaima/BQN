@@ -701,7 +701,7 @@ public class Scope {
       arr[3] = new ChrArr("avg ms");
       final int[] p = {4};
       ArrayList<String> ks = new ArrayList<>(pfRes.keySet());
-      ks.sort(Comparator.comparingDouble(a -> pfRes.get(a).ms));
+      ks.sort(Comparator.comparingDouble(a -> -pfRes.get(a).ms));
       for (String k : ks) {
         Pr pr = pfRes.get(k);
         arr[p[0]++] = Main.toAPL(k);

@@ -5,8 +5,6 @@ import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
 
-import java.util.Arrays;
-
 
 public class OldLTBuiltin extends Builtin {
   @Override public String repr() {

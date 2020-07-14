@@ -3,7 +3,7 @@ package APL.types.functions.builtins.fns2;
 import APL.*;
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.IntArr;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
@@ -30,16 +30,33 @@ public class LBoxBuiltin extends Builtin {
     
     int wr = w.shape.length;
     int xr = x.shape.length;
-    if (w.ia==0) {
+    if (w.ia==0 || w.quickDepth1() || w.first() instanceof Num) {
       int[] sh = new int[wr+xr-1];
       System.arraycopy(w.shape, 0, sh, 0, wr);
       System.arraycopy(x.shape, 1, sh, wr, xr-1);
-      return Arr.create(new Value[0], sh);
-    } else if (w.first() instanceof Num) {
-      int[] ds = w.asIntArr();
-      Value[] res = new Value[ds.length];
-      for (int i = 0; i < ds.length; i++) res[i] = getCell(ds[i], x, this);
-      return GTBuiltin.merge(res, w.shape, this);
+      int[] wi = w.asIntArr();
+      if (w.rank==1 && x.rank==1) {
+        if (x.quickIntArr()) {
+          int[] xi = x.asIntArr();
+          int[] res = new int[w.ia];
+          for (int i = 0; i < wi.length; i++) {
+            res[i] = xi[wi[i]];
+          }
+          return new IntArr(res, sh);
+        }
+        if (x.quickDoubleArr()) {
+          double[] xd = x.asDoubleArr();
+          double[] res = new double[w.ia];
+          for (int i = 0; i < wi.length; i++) {
+            res[i] = xd[wi[i]];
+          }
+          return new DoubleArr(res, sh);
+        }
+      }
+      MutVal res = new MutVal(sh);
+      int csz = CellBuiltin.csz(x);
+      for (int i = 0; i < wi.length; i++) res.copy(getCell(wi[i], x, this), 0, csz*i, csz);
+      return res.get();
     } else {
       if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
       

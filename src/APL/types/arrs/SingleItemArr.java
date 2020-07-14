@@ -41,6 +41,7 @@ public class SingleItemArr extends Arr {
   
   public boolean quickDoubleArr() { return item instanceof Num; }
   public boolean quickIntArr() { return item instanceof Num && Num.isInt(((Num) item).num); }
+  public boolean quickDepth1() { return item instanceof Primitive; }
   public Value[] valuesClone() {
     Value[] vs = new Value[ia];
     for (int i = 0; i < ia; i++) vs[i] = item;
