@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.dops;
 
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 import APL.types.functions.builtins.mops.ReduceBuiltin;
 

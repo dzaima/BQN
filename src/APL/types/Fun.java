@@ -1,8 +1,8 @@
 package APL.types;
 
 import APL.*;
-import APL.algs.Pervasion;
 import APL.errors.*;
+import APL.tools.Pervasion;
 import APL.types.arrs.*;
 
 import java.util.Iterator;

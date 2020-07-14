@@ -1,8 +1,8 @@
 package APL.types.functions.builtins.mops;
 
 import APL.Main;
-import APL.algs.Pervasion;
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.functions.*;

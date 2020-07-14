@@ -1,4 +1,4 @@
-package APL.algs;
+package APL.tools;
 
 import APL.errors.*;
 import APL.types.*;

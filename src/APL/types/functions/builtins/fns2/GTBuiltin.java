@@ -1,8 +1,8 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.*;
-import APL.algs.MutVal;
+import APL.Main;
 import APL.errors.RankError;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;

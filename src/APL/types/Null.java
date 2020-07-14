@@ -1,7 +1,6 @@
 package APL.types;
 
 import APL.Type;
-import APL.types.arrs.SingleItemArr;
 
 public class Null extends Primitive {
   public static final Null NULL = new Null();

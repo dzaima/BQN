@@ -3,7 +3,7 @@ package APL.types.arrs;
 import APL.errors.DomainError;
 import APL.types.*;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class IntArr extends Arr {
   public final int[] arr;

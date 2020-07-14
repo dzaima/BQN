@@ -4,7 +4,7 @@ import APL.Type;
 import APL.errors.*;
 import APL.types.arrs.*;
 
-import java.util.*;
+import java.util.Iterator;
 
 
 public abstract class Value extends Obj implements Iterable<Value>, Comparable<Value> {

@@ -1,7 +1,8 @@
 package APL.types.functions.builtins.fns;
 
-import APL.*;
+import APL.Main;
 import APL.errors.*;
+import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;

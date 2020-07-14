@@ -2,10 +2,10 @@ package APL.types.functions.builtins.fns2;
 
 import APL.errors.RankError;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class RBoxBuiltin extends Builtin {
   public String repr() {

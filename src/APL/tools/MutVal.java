@@ -1,4 +1,4 @@
-package APL.algs;
+package APL.tools;
 
 import APL.types.*;
 import APL.types.arrs.*;

@@ -2,7 +2,7 @@ package APL.types.functions.builtins.fns;
 
 import APL.Main;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.BitArr;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.fns2.NotBuiltin;
 

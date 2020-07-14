@@ -1,6 +1,7 @@
 package APL.types.functions.builtins.dops;
 
-import APL.*;
+import APL.Main;
+import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.*;

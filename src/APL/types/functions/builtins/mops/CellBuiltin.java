@@ -1,8 +1,8 @@
 package APL.types.functions.builtins.mops;
 
 import APL.Main;
-import APL.algs.MutVal;
 import APL.errors.LengthError;
+import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;

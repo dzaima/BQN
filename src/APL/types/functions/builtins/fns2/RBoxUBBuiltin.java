@@ -1,7 +1,7 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.algs.MutIntArr;
 import APL.errors.*;
+import APL.tools.MutIntArr;
 import APL.types.Value;
 import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
