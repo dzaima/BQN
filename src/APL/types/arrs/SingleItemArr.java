@@ -21,11 +21,9 @@ public class SingleItemArr extends Arr {
   
   public String asString() {
     if (rank >= 2) throw new DomainError("Using rank≥2 array as string", this);
-    if (! (item instanceof Char)) throw new DomainError("Using non-char array as string", this);
+    if (!(item instanceof Char)) throw new DomainError("Using non-char array as string", this);
     char c = ((Char) item).chr;
-    StringBuilder s = new StringBuilder();
-    for (int i = 0; i < ia; i++) s.append(c);
-    return s.toString();
+    return Main.repeat(String.valueOf(c), ia);
   }
   
   public Value prototype() {
@@ -39,6 +37,7 @@ public class SingleItemArr extends Arr {
     assert ia == Arr.prod(sh);
     return new SingleItemArr(item, sh);
   }
+  public Arr reverseOn(int dim) { return this; }
   
   public boolean quickDoubleArr() { return item instanceof Num; }
   public boolean quickIntArr() { return item instanceof Num && Num.isInt(((Num) item).num); }

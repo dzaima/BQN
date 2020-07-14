@@ -266,19 +266,20 @@ public class MutVal { // inserts can be in any order, but must not override prev
             double d = ((Num) x.get(0)).num;
             Arrays.fill(is, rS, rS+len, (int) d);
             return;
-          } /*else if (x instanceof BitArr) {
-            // TODO
-          }*/
+          } else if (x instanceof BitArr) {
+            BitArr.BR xb = ((BitArr) x).read();
+            for (int i = 0; i < len; i++) is[rS + i] = xb.read()? 1 : 0;
+            return;
+          }
         }
         if (x.quickDoubleArr()) {
           if (x instanceof DoubleArr) {
-            double[] ds = x.asDoubleArr();
+            double[] xd = x.asDoubleArr();
             for (int i = 0; i < len; i++) {
-              double n = ds[i+xS];
+              double n = xd[i+xS];
               if ((int)n != n) { move(2); copy(x, xS+i, rS+i, len-i); return; }
               is[rS+i] = (int) n;
             }
-            
             return;
           } else if (x instanceof Num) {
             double n = ((Num) x).num;

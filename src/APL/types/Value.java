@@ -172,32 +172,34 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return this;
   }
   
-  public int compareTo(Value r) {
-    Value l = this;
-    boolean rA = r instanceof Arr;
-    boolean lA = l instanceof Arr;
+  public int compareTo(Value x) {
+    Value w = this;
     
-    if ( l instanceof Num         &&  r instanceof Num        ) return ((Num) l).compareTo((Num) r);
-    if ( l instanceof Char        &&  r instanceof Char       ) return ((Char) l).compareTo((Char) r);
-    if ( l instanceof Num         && (r instanceof Char || rA)) return -1;
-    if ((l instanceof Char || lA) &&  r instanceof Num        ) return  1;
-    if ( l instanceof BigValue    &&  r instanceof BigValue   ) return ((BigValue) l).i.compareTo(((BigValue) r).i);
-    if (!lA && !rA) {
-      throw new DomainError("Failed to compare "+l+" and "+r, r);
+    if (w instanceof Num       && x instanceof Num      ) return Double.compare(((Num) w).num, ((Num) x).num);
+    if (w instanceof Char      && x instanceof Char     ) return ((Char) w).compareTo((Char) x);
+    if (w instanceof Num       && x instanceof Char     ) return -1;
+    if (w instanceof Char      && x instanceof Num      ) return  1;
+    if (w instanceof BigValue  && x instanceof BigValue ) return ((BigValue) w).i.compareTo(((BigValue) x).i);
+    if (w instanceof Primitive && x instanceof Primitive) throw new DomainError("Cannot compare "+w+" and "+x);
+    if (Math.min(w.ia, x.ia) == 0) return Integer.compare(w.ia, x.ia);
+  
+    int rc = Integer.compare(w.rank+(w instanceof Primitive?0:1), x.rank+(x instanceof Primitive?0:1));
+    int rr = Math.min(w.rank, x.rank);
+    int ri = 0; // matching shape tail
+    while (ri<rr  &&  w.shape[w.shape.length-1-ri] == x.shape[x.shape.length-1-ri]) ri++;
+    int rm = Arr.prod(w.shape, w.shape.length-ri, w.shape.length);
+    if (ri<rr) {
+      int wm = w.shape[w.shape.length-1-ri];
+      int xm = x.shape[x.shape.length-1-ri];
+      rc = Integer.compare(wm, xm);
+      rm*= Math.min(wm, xm);
     }
-    if (!lA) return -1;
-    if (!rA) return  1;
-    
-    if (l.rank != r.rank) throw new RankError("Expected ranks to be equal for compared elements", r);
-    
-    if (l.rank > 1) throw new DomainError("Expected rank of compared array to be ≤ 2", l);
-    
-    int min = Math.min(l.ia, r.ia);
-    for (int i = 0; i < min; i++) {
-      int cr = l.get(i).compareTo(r.get(i));
-      if (cr != 0) return cr;
+  
+    for (int i = 0; i < rm; i++) {
+      int c = w.get(i).compareTo(x.get(i));
+      if (c!=0) return c;
     }
-    return Integer.compare(l.ia, r.ia);
+    return rc;
   }
   public Integer[] gradeUp() {
     if (rank == 0) throw new DomainError("cannot grade rank 0", this);

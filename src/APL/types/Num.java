@@ -107,9 +107,6 @@ public class Num extends Primitive {
   public boolean equals(Obj n) {
     return n instanceof Num && ((Num) n).num == num;
   }
-  public int compareTo(Num n) {
-    return Double.compare(num, n.num);
-  }
   public int hashCode() {
     if (num == 0d) return 0; // ¯0 == 0
     return Double.hashCode(num);
