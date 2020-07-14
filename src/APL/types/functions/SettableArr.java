@@ -24,13 +24,7 @@ public class SettableArr extends Settable {
     return Arr.create(res);
   }
   
-  @Override
-  public Type type() {
-    return Type.array;
-  }
   
-  
-  @Override
   public String toString() {
     if (Main.debug) return "vararr:"+Arrays.toString(arr);
     return get().toString();

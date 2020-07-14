@@ -6,7 +6,9 @@ import APL.tokenizer.types.*;
 import APL.types.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.Quad;
-import APL.types.functions.builtins.fns2.EvalBuiltin;
+import APL.types.functions.builtins.dops.*;
+import APL.types.functions.builtins.fns2.*;
+import APL.types.functions.builtins.mops.*;
 import APL.types.functions.trains.*;
 import APL.types.functions.userDefined.UserDefined;
 
@@ -817,7 +819,7 @@ public class Comp {
       return t.type = 'a';
     } else if (t instanceof OpTok) {
       OpTok op = (OpTok) t;
-      Value b = Exec.builtin(op, null);
+      Value b = builtin(op);
       if (b==null) {
         String s = op.op;
         switch (s) {
@@ -961,7 +963,7 @@ public class Comp {
     }
     if (tk instanceof OpTok) {
       OpTok op = (OpTok) tk;
-      Value b = Exec.builtin(op, null);
+      Value b = builtin(op);
       if (b != null) {
         b.token = tk;
         m.push(b);
@@ -1015,5 +1017,117 @@ public class Comp {
       return;
     }
     throw new ImplementationError("can't compile "+tk.getClass());
+  }
+  
+  public static Value builtin(OpTok t) {
+    switch (t.op.charAt(0)) {
+      // slashes: / - reduce; ⌿ - replicate; \ - reduce (r[3]←(r[2] ← (r[1]←a) f b) f c); ⍀ - extend
+      // in Dyalog but not at least partially implemented: ⊆⌹→  &⌶⌺
+      // fns
+      // case '⍲': return new NandBuiltin(sc);
+      // case '⍱': return new NorBuiltin(sc);
+      // case '⊥': return new UTackBuiltin();
+      // case '⊤': return new DTackBuiltin();
+      // case '!': return new ExclBuiltin();
+      
+      // case '?': return new RandBuiltin(sc);
+      // case '⍪': return new CommaBarBuiltin();
+      
+      // case '…': return new EllipsisBuiltin();
+      // case '⍮': return new SemiUBBuiltin();
+      // case '⍧': return new LShoeStileBuiltin();
+      // case '%': return new MergeBuiltin();
+  
+  
+  
+  
+      case '⍕': return new FormatBuiltin();
+      case '⌽': return new ReverseBuiltin();
+      case '+': return new PlusBuiltin();
+      case '-': return new MinusBuiltin();
+      case '×': return new MulBuiltin();
+      case '÷': return new DivBuiltin();
+      case '⋆':
+      case '*': return new StarBuiltin();
+      case '|': return new StileBuiltin();
+      case '∧': return new AndBuiltin();
+      case '∨': return new OrBuiltin();
+      case '⌈': return new CeilingBuiltin();
+      case '⌊': return new FloorBuiltin();
+      case '√': return new RootBuiltin();
+      case '¬': return new NotBuiltin();
+      
+      
+      case '⊢': return new RTackBuiltin();
+      case '⊣': return new LTackBuiltin();
+      
+      case '⥊': return new ShapeBuiltin();
+      case '↑': return new UpArrowBuiltin();
+      case '↓': return new DownArrowBuiltin();
+      case '∾': return new JoinBuiltin();
+      case '≍': return new LaminateBuiltin();
+      case '⍉': return new TransposeBuiltin();
+      
+      case '/': return new SlashBuiltin();
+      case '⊏': return new LBoxBuiltin();
+      case '⊔': return new GroupBuiltin();
+      case '⊑': return new LBoxUBBuiltin();
+      case '⊐': return new RBoxBuiltin();
+      case '⊒': return new RBoxUBBuiltin();
+      case '↕': return new UDBuiltin();
+      case '∊': return new EpsBuiltin();
+      case '⍷': return new FindBuiltin();
+      case '⍋': return new GradeUpBuiltin();
+      case '⍒': return new GradeDownBuiltin();
+      case '≢': return new TallyBuiltin();
+      case '≡': return new MatchBuiltin();
+      
+      
+      
+      // comparisons
+      case '<': return new LTBuiltin();
+      case '≤': return new LEBuiltin();
+      case '=': return new EQBuiltin();
+      case '≥': return new GEBuiltin();
+      case '>': return new GTBuiltin();
+      case '≠': return new NEBuiltin();
+      
+      // mops
+      case '´': return new ReduceBuiltin();
+      case '`': return new ScanBuiltin();
+      case '¨': return new EachBuiltin();
+      case '˜': return new SelfieBuiltin();
+      case '⌜': return new TableBuiltin();
+      case '⁼': return new InvBuiltin();
+      case '˘': return new CellBuiltin();
+      // case '⍩':
+      // case 'ᐵ': return new EachLeft();
+      // case 'ᑈ': return new EachRight();
+      
+      // dops
+      // case '.': return new DotBuiltin();
+      // case '⍡': return new CRepeatBuiltin(sc);
+      case '○': return new OverBuiltin();
+      case '∘': return new AtopBuiltin();
+      case '⊸': return new BeforeBuiltin();
+      case '⟜': return new AfterBuiltin();
+      case '⌾': return new UnderBuiltin();
+      case '⍟': return new RepeatBuiltin();
+      case '⚇': return new DepthBuiltin();
+      case '⊘': return new AmbivalentBuiltin();
+      case '◶': return new CondBuiltin();
+      case '⎉': return new NCellBuiltin();
+      
+      
+      // case '@': return new AtBuiltin(sc);
+      // case '⍬': return new DoubleArr(DoubleArr.EMPTY);
+  
+  
+      case '⍎': case '•': case 'ℝ': // the lone double-struck
+      case 55349: // double-struck surrogate pair
+        return null;
+  
+      default: throw new ImplementationError("no built-in " + t.op + " defined in exec", t);
+    }
   }
 }

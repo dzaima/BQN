@@ -1,6 +1,5 @@
 package APL.types;
 
-import APL.Type;
 import APL.errors.*;
 import APL.types.arrs.*;
 
@@ -218,7 +217,4 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     };
   }
   
-  public Type type() { // TODO remove
-    return Type.array;
-  }
 }

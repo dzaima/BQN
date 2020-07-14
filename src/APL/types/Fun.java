@@ -564,15 +564,11 @@ public abstract class Fun extends Callable {
   
   
   
-  @Override
-  public Type type() {
-    return Type.fn;
-  }
   
   
   public abstract String repr();
   
-  @Override public String toString() {
+  public String toString() {
     return repr();
   }
   
@@ -582,10 +578,10 @@ public abstract class Fun extends Callable {
   public boolean notIdentity() { return true; }
   
   // functions are equal on a per-object basis
-  @Override public int hashCode() {
+  public int hashCode() {
     return actualHashCode();
   }
-  @Override public boolean equals(Obj o) {
+  public boolean equals(Obj o) {
     return this == o;
   }
 }

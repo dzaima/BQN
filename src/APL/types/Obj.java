@@ -9,10 +9,6 @@ import APL.types.functions.*;
 public abstract class Obj implements Tokenable {
   public Token token;
   
-  public boolean isObj() {
-    return type()==Type.array || type() == Type.var;
-  }
-  abstract public Type type();
   public boolean equals (Obj o) {
     if (Main.debug) Main.printdbg("non-overridden equals called");
     return false;

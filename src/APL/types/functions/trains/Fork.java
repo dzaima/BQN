@@ -1,6 +1,5 @@
 package APL.types.functions.trains;
 
-import APL.Type;
 import APL.errors.DomainError;
 import APL.types.*;
 
@@ -11,11 +10,6 @@ public class Fork extends Fun {
     this.f = f;
     this.g = g;
     this.h = h;
-  }
-  
-  @Override
-  public Type type() {
-    return Type.fn;
   }
   
   public Value call(Value x) {

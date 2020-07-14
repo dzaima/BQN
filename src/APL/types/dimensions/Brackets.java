@@ -20,10 +20,6 @@ public class Brackets extends Callable {
     return val==null? null : val.asIntVec();
   }
   
-  @Override
-  public Type type() {
-    return Type.dim;
-  }
   
   @Override
   public String toString() {

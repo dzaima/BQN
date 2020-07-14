@@ -14,13 +14,8 @@ public class Quad extends Settable {
   public void set(Value v, boolean update, Callable blame) { // don't care about updating
     sc.sys.println((Main.debug? "[log] " : "")+v);
   }
-  
-  @Override
   public Value get() {
     return Main.toAPL(sc.sys.input());
-  }
-  public Type type() {
-    return Type.gettable;
   }
   
   public String toString() {

@@ -1,16 +1,11 @@
 package APL.types;
 
-import APL.Type;
 import APL.errors.ValueError;
 
 public abstract class Settable extends Obj {
   final Value v;
   protected Settable(Value v) {
     this.v = v;
-  }
-  @Override
-  public Type type() {
-    return v == null? Type.var : v.type();
   }
   public abstract void set(Value v, boolean update, Callable blame);
   public Value get() {

@@ -1,7 +1,5 @@
 package APL.types;
 
-import APL.Type;
-
 public class Null extends Primitive {
   public static final Null NULL = new Null();
   private Null() { }
@@ -14,7 +12,4 @@ public class Null extends Primitive {
     return 387678968; // random yay
   }
   
-  public Type type() {
-    return Type.nul;
-  }
 }

@@ -1,6 +1,5 @@
 package APL.types.functions;
 
-import APL.Type;
 import APL.errors.*;
 import APL.types.*;
 
@@ -8,10 +7,6 @@ public abstract class Mop extends Callable {
   
   protected Mop() { }
   
-  @Override
-  public Type type() {
-    return Type.mop;
-  }
   
   public Fun derive(Value f) {
     return new DerivedMop(f, this);
@@ -57,10 +52,10 @@ public abstract class Mop extends Callable {
   public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
-  @Override public int hashCode() {
+  public int hashCode() {
     return actualHashCode();
   }
-  @Override public boolean equals(Obj o) {
+  public boolean equals(Obj o) {
     return this == o;
   }
 }

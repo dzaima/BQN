@@ -1,17 +1,11 @@
 package APL.types.functions;
 
-import APL.Type;
 import APL.errors.*;
 import APL.types.*;
 
 public abstract class Dop extends Callable {
   
   protected Dop() { }
-  
-  @Override
-  public Type type() {
-    return Type.dop;
-  }
   
   public Fun derive(Value f, Value g) {
     return new DerivedDop(f, g, this);

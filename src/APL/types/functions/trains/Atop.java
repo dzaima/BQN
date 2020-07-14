@@ -1,6 +1,5 @@
 package APL.types.functions.trains;
 
-import APL.Type;
 import APL.types.*;
 
 public class Atop extends Fun {
@@ -37,11 +36,7 @@ public class Atop extends Fun {
     }, x);
   }
   
-  @Override public String repr() {
+  public String repr() {
     return "("+g+" "+h+")";
-  }
-  
-  @Override public Type type() {
-    return Type.fn;
   }
 }
