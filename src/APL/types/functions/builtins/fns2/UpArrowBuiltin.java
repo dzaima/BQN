@@ -51,14 +51,11 @@ public class UpArrowBuiltin extends Builtin {
         off[i] = s+sh[i];
         sh[i] = -d;
         if (-d > s) overtake = true;
-      } else {
-        off[i] = 0;
-        if (d > s) overtake = true;
-      }
+      } else if (d > s) overtake = true;
     }
     if (overtake) {
       Value proto = x.prototype();
-      if (x.rank == 1) {
+      if (x.rank<=1 && gsh.length==1) {
         MutVal res = new MutVal(sh);
         if (off[0]==0) {
           res.copy(x, 0, 0, x.ia);
@@ -71,11 +68,21 @@ public class UpArrowBuiltin extends Builtin {
       }
       MutVal res = new MutVal(sh);
       int l = sh.length;
-      int[] tmp = new int[l];
       int rp = 0;
-      for (int[] c : new Indexer(sh)) {
-        for (int i = 0; i < l; i++) tmp[i] = c[i]+off[i];
-        res.set(rp++, x.at(tmp, proto));
+      int[] xsh = x.shape;
+      idx: for (int[] c : new Indexer(sh)) {
+        int ip = 0;
+        for (int i = 0; i < l; i++) {
+          int ri = c.length-i-1;
+          int cp = c[i]+off[i];
+          int xl = ri<xsh.length? xsh[ri] : 1;
+          if (cp>=xl || cp<0) {
+            res.set(rp++, proto);
+            continue idx;
+          }
+          ip = ip*xl+cp;
+        }
+        res.set(rp++, x.get(ip));
       }
       return res.get();
     }
