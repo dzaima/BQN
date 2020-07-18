@@ -35,9 +35,12 @@ public class DivBuiltin extends Builtin {
     public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x   ; }
     public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x[i]; }
     
-    // public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=w   /x[i];}return res;}catch(ArithmeticException e){return null;}}
-    // public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {res[i]=w[i]/x   ;}return res;}catch(ArithmeticException e){return null;}}
-    // public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=w[i]/x[i];}return res;}catch(ArithmeticException e){return null;}}
+    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i];int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
+    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ;int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
+    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i];int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
+    // public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}
+    // public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}
+    // public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i],r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}
   };
   
   public Value call(Value w, Value x) {

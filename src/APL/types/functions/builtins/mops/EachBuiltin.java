@@ -4,7 +4,7 @@ import APL.Main;
 import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
-import APL.types.arrs.Rank0Arr;
+import APL.types.arrs.*;
 import APL.types.functions.*;
 
 import java.util.Arrays;
@@ -18,6 +18,14 @@ public class EachBuiltin extends Mop {
   
   public Value call(Value f, Value x, DerivedMop derv) {
     if (x.scalar()) return new Rank0Arr(f.asFun().call(x.first()));
+    if (!f.notIdentity()) {
+      if (f instanceof Num && Num.isBool(((Num) f).num)) { // bitarr code is very bad at respecting SingleItemArrs
+        long[] ls = new long[BitArr.sizeof(x.ia)];
+        if (((Num) f).num==1) Arrays.fill(ls, ~0L);
+        return new BitArr(ls, x.shape);
+      }
+      return new SingleItemArr(f, x.shape);
+    }
     Fun ff = f.asFun();
     MutVal res = new MutVal(x.shape);
     for (int i = 0; i < x.ia; i++) {

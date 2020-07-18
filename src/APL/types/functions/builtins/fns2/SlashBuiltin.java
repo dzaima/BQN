@@ -96,27 +96,199 @@ public class SlashBuiltin extends Builtin {
     return replicate(w, x, this);
   }
   
+  // static byte[] idxds = new byte[256*8];
+  // static {
+  //   for (int i = 0; i < 256; i++) {
+  //     int o = 0;
+  //     int rp = 0;
+  //     for (int j = 0; j < 8; j++) {
+  //       boolean c = (i>>j & 1) != 0;
+  //       if (c) {
+  //         idxds[i*8 + rp++] = (byte) o;
+  //         o = 1;
+  //       } else o++;
+  //     }
+  //   }
+  // }
+  //
+  // static byte[] idxs = new byte[256*8];
+  // static {
+  //   for (int i = 0; i < 256; i++) {
+  //     int rp = 0;
+  //     for (byte j = 0; j < 8; j++) {
+  //       boolean c = (i>>j & 1) != 0;
+  //       if (c) idxs[i*8 + rp++] = j;
+  //     }
+  //   }
+  // }
   
+  private static final byte[] sbuf = new byte[256];
+  private static byte[] indbuf = new byte[256];
   public static Value replicate(Value w, Value x, Callable blame) { // a lot of valuecopy
     if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame, x);
     int depth = MatchBuiltin.full(w);
     int[][] am; // scalars are represented as 1-item int[]s
-    if (w.ia == 0) {
+    if (w.ia == 0) { // TODO reduce empty dimensions as if it were replicated
       return x;
     } else if (depth <= 1) {
       if (w.rank==1 && w.ia!=x.shape[0]) throw new LengthError(blame+": wrong replicate length (length ≡ "+w.ia+", shape ≡ "+Main.formatAPL(x.shape)+")", blame);
       if (w instanceof BitArr && w.rank==1 && x.rank==1) {
-        BitArr.BR r = ((BitArr) w).read();
+        BitArr wb = (BitArr) w;
+        wb.setEnd(false);
+        long[] wl = ((BitArr) w).arr;
+  
+  
+  
+        // ========================= BRANCHING PER-BIT =========================
         int sum = ((BitArr) w).isum();
         if (x.quickIntArr()) {
-          int[] xi = x.asIntArr();
-          int[] res = new int[sum]; int rp = 0;
-          for (int i = 0; i < w.ia; i++) if (r.read()) res[rp++] = xi[i];
+          int[] res = new int[sum];
+          int[] xv = x.asIntArr();
+          int rp=0, ip=0;
+          for (long l : wl) {
+            for (int j = 0; j < 64; j++) {
+              if ((l&1)!=0) res[rp++] = xv[ip];
+              l>>= 1;
+              ip++;
+            }
+          }
           return new IntArr(res);
         }
-        Value[] res = new Value[sum]; int rp = 0;
-        for (int i = 0; i < w.ia; i++) if (r.read()) res[rp++] = x.get(i);
+        Value[] res = new Value[sum];
+        Value[] xv = x.values();
+        int rp=0, ip=0;
+        for (long l : wl) {
+          for (int j = 0; j < 64; j++) {
+            if ((l&1)!=0) res[rp++] = xv[ip];
+            l>>= 1;
+            ip++;
+          }
+        }
         return Arr.create(res);
+        
+        
+        
+        // ========================= BRANCHLESS PER-BIT =========================
+        // note: incomplete (doesn't handle long runs of trailing 0s)
+        // int sum = ((BitArr) w).isum();
+        // Value[] res = new Value[sum];
+        // int rp=0, ip=0;
+        // for (int i = 0; i < wl.length-1; i++) {
+        //   long l = wl[i];
+        //   for (int j = 0; j < 64; j++) {
+        //     res[rp] = xv[ip++];
+        //     rp+= l&1;
+        //     l>>= 1;
+        //   }
+        // }
+        // long last = wl[wl.length-1];
+        // int end = 64-Long.numberOfLeadingZeros(last);
+        // for (int j = 0; j < end; j++) { // wl is guaranteed to gave >=1 item due to if (w.ia ==0) earlier
+        //   res[rp] = xv[ip++];
+        //   rp+= last&1;
+        //   last>>= 1;
+        // }
+        // return new HArr(res);
+  
+  
+  
+  
+  
+  
+        // ========================= CUMULATIVE =========================
+        // note: incomplete (doesn't handle runs of 0s with length>255)
+        // if (indbuf.length<x.ia+1) indbuf = new byte[x.ia+1];
+        // byte[] buf = indbuf;
+        // buf[0] = 0;
+        // int bp = 0;
+        // for (long cl : wl) {
+        //   for (int j = 0; j < 64; j+= 8) {
+        //     int b = (int) (cl>>j & 0xff);
+        //     int pop = Integer.bitCount(b);
+        //     byte prev = buf[bp];
+        //     // for (int i = 0; i < 8; i++) buf[bp+i] = idxds[b*8 + i];
+        //     System.arraycopy(idxds, b*8, buf, bp, 8);
+        //     buf[bp+8] = 0;
+        //     buf[bp]+= prev;
+        //     bp+= pop;
+        //     buf[bp]+= Math.min(8, Integer.numberOfLeadingZeros(b)-23);
+        //   }
+        // }
+        // Value[] res = new Value[bp];
+        // int rp = 0;
+        // for (int i = 0; i < bp; i++) {
+        //   rp+= buf[i];
+        //   res[i] = xv[rp];
+        // }
+        // return new HArr(res);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // ========================= INDEX LOOKUP TABLE =========================
+        // int sum = 0;
+        // for (long l : wl) sum+= Long.bitCount(l);
+        // Value[] res = new Value[sum];
+        // int bp = 0;
+        // byte ip = 0;
+        // for (long cl : wl) {
+        //   for (int j = 0; j < 64; j+= 8) {
+        //     int b = (int) (cl>>j & 0xff);
+        //     int pop = Integer.bitCount(b);
+        //     for (int i = 0; i < 8; i++) sbuf[bp+i] = (byte) (ip + idxs[b*8 + i]);
+        //     ip+= 8;
+        //     bp+= pop;
+        //   }
+        // }
+        // Value[] res = new Value[bp];
+        // for (int i = 0; i < res.length; i++) res[i] = xv[sbuf[i] & 0xff];
+        // return new HArr(res);
+        
+        
+        
+        
+        // index lookup table, fixed, probably
+        // Value[] res = new Value[wb.isum()];
+        // int rp = 0;
+        // int ip = 0;
+        // for (long cl : wl) {
+        //   int bp = 0;
+        //   for (int j = 0; j < 64; j+= 8) {
+        //     int b = (int) (cl>>j & 0xff);
+        //     int pop = Integer.bitCount(b);
+        //     for (int i = 0; i < 8; i++) sbuf[bp+i] = (byte) (ip+idxs[b*8 + i]);
+        //     ip+= 8;
+        //     bp+= pop;
+        //   }
+        //   for (int i = 0; i < bp; i++) {
+        //     res[i+rp] = xv[sbuf[i]&0xff];
+        //   }
+        //   rp+= bp;
+        // }
+        // return new HArr(res);
+        
+        
+        
+        // original code
+        // BitArr.BR r = ((BitArr) w).read();
+        // int sum0 = ((BitArr) w).isum();
+        // if (x.quickIntArr()) {
+        //   int[] xi = x.asIntArr();
+        //   int[] res = new int[sum]; int rp = 0;
+        //   for (int i = 0; i < w.ia; i++) if (r.read()) res[rp++] = xi[i];
+        //   return new IntArr(res);
+        // }
+        // Value[] res0 = new Value[sum0]; int rp0 = 0;
+        // for (int i = 0; i < w.ia; i++) if (r.read()) res0[rp0++] = xv[i];
+        // return Arr.create(res0);
       }
       am = new int[1][];
       am[0] = w.asIntVec();

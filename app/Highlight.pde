@@ -175,6 +175,7 @@ static class SyntaxHighlight {
 }
 static class Theme {
   int def = #D2D2D2;
+  int lnn = #606060;
   int err = #FF0000;
   int com = #898989;
   int num = #ff6E6E;

@@ -257,6 +257,8 @@ abstract static class Editor extends Tab {
         } else println("unknown special " + s);
       }
     };
+    ta.lineNumbering = true;
+    ta.xoff = -1;
     ta.append(val);
     ta.setE(0, 0); ta.allE();
   }

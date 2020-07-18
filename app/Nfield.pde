@@ -4,9 +4,12 @@ static class Nfield extends Drawable implements TextReciever {
   float xoff, dyoff, yoff; // yoff is the target yoff, dyoff is what's actually used for drawing
   boolean textChanged = true; // implies moved
   boolean moved = true;
-  boolean bottom;
-  boolean editable = true;
-  boolean multiline = true;
+  
+  // flags
+  boolean bottom = false; // should be aligned to the bottom
+  boolean editable = true; // is the content editable
+  boolean multiline = true; // should multiple lines be allowed
+  boolean lineNumbering = false; // should line numbers be written on the left
   
   int tt; // caret flicker timer
   Nfield(int x, int y, int w, int h) {
@@ -33,15 +36,28 @@ static class Nfield extends Drawable implements TextReciever {
   
   int lnTapMode = 0; // 0 - none; 1 - tapped; 2 - dragged
   int lnTapTime = -100; // last millis() when a line was tapped
+  int prevDigam = 0;
   void tick() {
     //println(allText(), sx,sy,ex,ey,lns.size(),len(0));
     if (!visible) return;
     if (a.mousePressed && !pmousePressed && smouseIn() && a.mouseButton!=CENTER) textInput = this;
-    beginClip(d, x, y, w, h);
     d.textSize(chrH);
     if (a.mousePressed && smouseIn() && (MOBILE || a.mouseButton==CENTER)) {
       yoff+= a.mouseY-a.pmouseY; dyoff = yoff;
       xoff+= a.mouseX-a.pmouseX;
+    }
+    
+    int lnOff = 0;
+    if (lineNumbering) {
+      int max = lns.size();
+      int digam = 0;
+      while(max>0) { digam++; max/= 10; }
+      digam = Math.max(3, digam)+1;
+      lnOff = (int)(chrW*digam);
+      if (prevDigam != digam) {
+        if (xoff == (int)(chrW*prevDigam) || xoff==-1) xoff = lnOff;
+        prevDigam = digam;
+      }
     }
     
     if (textChanged) moved = true;
@@ -60,7 +76,26 @@ static class Nfield extends Drawable implements TextReciever {
       float right = left-w;
       if (right > -chrW*3) xoff-= right+chrW*3;
     }
-    // drag/tap screen
+    // limit position to reasonably on-screen
+    {
+      int max = 0;
+      for (Line l : lns) max = max(max, l.len);
+      float maxx = (max - 2)*chrW;
+      if (xoff < -maxx) xoff = (int) -maxx;
+      if (w > max*chrW*2) xoff = 0;
+      xoff = Math.min(xoff, lnOff);
+      
+      float maxy = chrH * (lns.size() - 2);
+      if (yoff < -maxy) yoff = dyoff = (int) -maxy;
+      
+      float lim = bottom? h-2*chrH : 0;
+      if (yoff>lim || dyoff>lim) yoff = dyoff = lim;
+      
+      dyoff = dyoff + (yoff-dyoff)*.6;
+      if (Math.abs(yoff-dyoff) < 1) dyoff = yoff;
+      if (!multiline) dyoff = yoff = 0;
+    }
+    // mouse/touch selection/moving
     if (smouseIn()) {
       int cy = constrain(floor((a.mouseY-y-dyoff)/chrH), 0, lns.size()-1);
       int cx = constrain(round((a.mouseX-x-xoff)/chrW), 0, len(cy));
@@ -76,25 +111,6 @@ static class Nfield extends Drawable implements TextReciever {
         if (sx!=ex || sy!=ey) lnTapMode = 2;
       }
     }
-    // correct offsets
-    {
-      int max = 0;
-      for (Line l : lns) max = max(max, l.len);
-      float maxx = (max - 2)*chrW;
-      if (xoff < -maxx) xoff = (int) -maxx;
-      if (w > max*chrW*2) xoff = 0;
-      xoff = Math.min(xoff, 0);
-      
-      float maxy = chrH * (lns.size() - 2);
-      if (yoff < -maxy) yoff = dyoff = (int) -maxy;
-      
-      float lim = bottom? h-2*chrH : 0;
-      if (yoff>lim || dyoff>lim) yoff = dyoff = lim;
-      
-      dyoff = dyoff + (yoff-dyoff)*.6;
-      if (Math.abs(yoff-dyoff) < 1) dyoff = yoff;
-      if (!multiline) dyoff = yoff = 0;
-    }
     
     
     if (lnTapMode!=0 && !a.mousePressed) {
@@ -104,10 +120,37 @@ static class Nfield extends Drawable implements TextReciever {
       lnTapMode = 0;
     }
     
-    d.fill(#101010);
-    d.noStroke();
-    d.rectMode(CORNER);
-    d.rect(x, y, w, h);
+    if (textChanged) {
+      modified();
+      hl = new SyntaxHighlight(allText(), th, d);
+      textChanged = false;
+    }
+    
+    // line number drawing
+    if (lineNumbering) {
+      beginClip(d, x, y, lnOff, h);
+      d.background(#101010);
+      
+      d.textAlign(RIGHT, TOP);
+      d.textSize(chrH);
+      d.fill(th.lnn);
+      
+      int cx = (int)(lnOff+x-chrW);
+      int cy = (int)(y+dyoff);
+      for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
+        textS(d, Integer.toString(ln+1), cx, cy + ln*chrH);
+      }
+      endClip(d);
+    }
+    
+    // main content drawing
+    beginClip(d, x+lnOff, y, w, h);
+    // selection
+    //d.fill(#101010);
+    //d.noStroke();
+    //d.rectMode(CORNER);
+    //d.rect(x, y, w, h);
+    d.background(#101010);
     d.textAlign(LEFT, TOP);
     d.rectMode(CORNERS);
     if (sel()) { // draw selection
@@ -121,19 +164,20 @@ static class Nfield extends Drawable implements TextReciever {
         d.rect(ps.x, ps.y, pe.x, pe.y+chrH);
       } else {
         float p0 = posx(0);
-        d.rect(ps.x, ps.y, posx(len(sy)), ps.y+chrH);
+        d.rect(ps.x, ps.y, posx(len(sy)+1), ps.y+chrH);
         d.rect(p0  , pe.y, pe.x         , pe.y+chrH);
-        for (int i = sy+1; i <= ey-1; i++) d.rect(p0, posy(i), posx(len(i)), posy(i)+chrH);
+        for (int i = sy+1; i <= ey-1; i++) d.rect(p0, posy(i), posx(len(i)+1), posy(i)+chrH);
+        d.textAlign(LEFT, TOP);
+        d.textSize(chrH);
+        d.fill(#101010);
+        int cx = (int)(x+ xoff);
+        int cy = (int)(y+dyoff);
+        for (int i = sy; i < ey; i++) textS(d, "⏎", cx + len(i)*chrW, cy + i*chrH);
       }
       if (swp) swap();
     }
-    
-    if (textChanged) {
-      modified();
-      hl = new SyntaxHighlight(allText(), th, d);
-      textChanged = false;
-    }
-    if (hl!=null && highlight()) { // main text drawing
+    // text
+    if (hl!=null && highlight()) {
       hl.draw(x+xoff, y+dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex));
     } else {
       d.textAlign(LEFT, TOP);
@@ -146,10 +190,8 @@ static class Nfield extends Drawable implements TextReciever {
         textS(d, s, cx, cy + ln*chrH);
       }
     }
-    
-    
-    tt--;
-    if (tt < 0) tt = 60;
+    // caret
+    tt--; if (tt < 0) tt = 60;
     if ((tt>28 || tt<2) && editable) { // draw caret
       int dtt = tt>30? 3 : Math.abs(15-tt)-14;
       d.strokeWeight(1);
@@ -157,7 +199,10 @@ static class Nfield extends Drawable implements TextReciever {
       PVector p = pos(ey, ex);
       d.line(p.x, p.y, p.x, p.y+chrH);
     }
+    
     endClip(d);
+    
+    
   }
   boolean highlight() {
     return true;

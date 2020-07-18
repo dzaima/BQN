@@ -287,13 +287,13 @@ public class Comp {
           // }
           tk = ref[j];
         }
-        if (tk == null) {
-          tk = new Token("INS "+bc[pi], 0, 1) {
-            public String toRepr() {
-              return source();
-            }
-          };
-        }
+        // if (tk == null) {
+        //   tk = new Token("INS "+bc[pi], 0, 1) {
+        //     public String toRepr() {
+        //       return source();
+        //     }
+        //   };
+        // }
         APLError.Mg.add(mgs, tk, '^');
       }
       e.trace.add(new APLError.Frame(sc, mgs));
