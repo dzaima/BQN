@@ -18,8 +18,8 @@ public class LBoxBuiltin extends Builtin {
   
   
   public Value call(Value x) {
-    if (x.rank==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);
-    if (x.ia==0) throw new LengthError("⊏: argument cannot be empty (had shape "+Main.formatAPL(x.shape)+")", this, x);
+    if (x.shape.length==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);
+    if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.formatAPL(x.shape)+")", this, x);
     int[] nsh = new int[x.rank-1];
     System.arraycopy(x.shape, 1, nsh, 0, nsh.length);
     return MutVal.cut(x, 0, Arr.prod(nsh), nsh);

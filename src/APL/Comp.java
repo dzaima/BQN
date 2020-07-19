@@ -781,11 +781,13 @@ public class Comp {
         ));
         continue;
       }
-      if (tps.size() >= 3) {
+      set: if (tps.size() >= (last? 3 : 4)) {
         char a = tps.get(tps.size()-2).type;
         if (a=='←' || a=='↩') {
           char k = tps.get(tps.size()-3).type;
           char v = tps.get(tps.size()-1).type;
+          char p = tps.size()>=4? tps.get(tps.size()-4).type : 0;
+          if (p=='d') break set;
           char ov = v;
           if (v=='A') v = 'a';
           if (k=='A') k = 'a'; // 𝕨↩ is a possibility
