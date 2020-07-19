@@ -31,27 +31,18 @@ public class Num extends Primitive {
     } else num = Double.parseDouble(val);
   }
   
-  public Num(int n) {
-    num = n;
-  }
-  public Num(long n) {
-    num = n;
-  }
-  public Num(double val) {
-    num = val;
-  }
+  public Num(int    n) { num = n; }
+  public Num(long   n) { num = n; }
+  public Num(double n) { num = n; }
   
   public static Num of(int n) {
-    if (n>=0 && n<256) {
-      return NUMS[n];
-    }
-    // if (n==-1) return MINUS_ONE;
+    if (n>=0 && n<256) return NUMS[n];
     return new Num(n);
   }
   
   public static Num of(double n) {
     if (n == 0) return Double.doubleToRawLongBits(n)==0? NUMS[0] : NEG_ZERO;
-    if (n>0 && n<256 && n%1==0) return NUMS[(int) n];
+    if (n>0 & n<256 && n==(int)n) return NUMS[(int) n];
     return new Num(n);
   }
   public static boolean isInt(double d) {

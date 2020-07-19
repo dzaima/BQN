@@ -27,7 +27,6 @@ public class DoubleArr extends Arr {
   
   
   public Value get(int i) { return Num.of(arr[i]); }
-  public Value first() { return Num.of(arr[0]); }
   
   
   

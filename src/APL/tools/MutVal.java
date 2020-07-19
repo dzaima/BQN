@@ -301,19 +301,20 @@ public class MutVal { // inserts can be in any order, but must not override prev
   
   void guess(Value base) {
     assert mode == 0;
-    if (base.quickDoubleArr()) {
-      if (base instanceof BitArr) mode = 1;
-      else if (base instanceof Num || base instanceof SingleItemArr) {
-        double d = ((Num) (base instanceof Num? base : base.get(0))).num;
-        if (d==0 || d==1) mode = 1;
-        else mode = 2;
-      } else mode = 2;
-      if (mode==2 && base.quickIntArr()) mode = 4;
-    } else if (base instanceof ChrArr || base instanceof Char) {
-      mode = 3;
-    } else {
-      mode = 5;
+    if (base instanceof SingleItemArr) {
+      base = base.first();
+      if (!(base instanceof Primitive)) { mode = 5; init(); return; }
     }
+    if (base.quickDoubleArr()) {
+      mode = 2;
+      if (base.quickIntArr()) mode = 4;
+      if (base instanceof BitArr) mode = 1;
+      else if (base instanceof Num) {
+        double d = ((Num) base).num;
+        if (d==0 || d==1) mode = 1;
+      }
+    } else if (base instanceof ChrArr || base instanceof Char) mode = 3;
+    else mode = 5;
     init();
   }
   

@@ -15,7 +15,6 @@ public class SingleItemArr extends Arr {
   }
   
   public Value get(int i) { return item; }
-  public Value first() { return item; }
   
   
   

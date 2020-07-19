@@ -61,10 +61,33 @@ public class GroupBuiltin extends Builtin {
   
   public Value call(Value w, Value x) {
     int depth = MatchBuiltin.full(w);
-    if (depth > 2) throw new DomainError("⊔: depth of 𝕨 must be at most 2 (was "+depth+")", this, w);
-    if (x.rank==1 && depth <= 1) {
-      int[] poss;
-      poss = w.asIntVec();
+    int[][] wp;
+    int wsz;
+    int xsz = x.rank;
+    if (depth == 1) {
+      wsz = 1;
+      if (w.rank != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.rank==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this, w);
+      if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this, w);
+      if (w.ia != x.shape[0]) throw new LengthError("⊔: length of 𝕨 must be ⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
+      wp = new int[][]{w.asIntArr()};
+    } else if (depth == 2) {
+      wsz = w.ia;
+      if (w.rank > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
+      if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
+      wp = new int[w.ia][];
+      for (int i = 0; i < w.ia; i++) {
+        Value c = w.get(i);
+        if (c.rank!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this, w);
+        wp[i] = c.asIntArr();
+        if (c.ia != x.shape[i]) { int[] shs = new int[w.ia]; for (int j = 0; j < w.ia; j++) shs[j] = w.get(j).ia;
+          throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.formatAPL(shs)+" ≡ ≠¨𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w); }
+      }
+    } else throw new DomainError("⊔: depth of 𝕨 must be 1 or 2 (was "+depth+")", this, w);
+    
+    
+    
+    if (x.rank==1) { // fast path
+      int[] poss = wp[0];
       int sz = -1;
       for (int i : poss) sz = Math.max(sz, i);
       sz++;
@@ -98,17 +121,11 @@ public class GroupBuiltin extends Builtin {
       return new HArr(res);
     }
   
-    int wsz = w.ia;
-    int xsz = x.rank;
-    if (w.rank > 1) throw new RankError("⊔: 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
-    if (wsz > xsz) throw new RankError("⊔: length of 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
     int csz = Arr.prod(x.shape, wsz, xsz);
-    int[][] wa = new int[wsz][];
-    for (int i = 0; i < wsz; i++) wa[i] = w.get(i).asIntVec();
     int[] rsh = new int[wsz];
     for (int i = 0; i < wsz; i++) {
       int max = -1;
-      for (int c : wa[i]) max = Math.max(max, c);
+      for (int c : wp[i]) max = Math.max(max, c);
       rsh[i] = max+1;
     }
     int sz = Arr.prod(rsh);
@@ -116,7 +133,7 @@ public class GroupBuiltin extends Builtin {
     int repl = 1;
     for (int i = wsz-1; i >= 0; i--) {
       int[] ca = new int[rsh[i]];
-      for (int c : wa[i]) {
+      for (int c : wp[i]) {
         if (c>=0) ca[c]++;
         else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, w);
       }
@@ -134,7 +151,7 @@ public class GroupBuiltin extends Builtin {
   
     MutVal[] vs = new MutVal[sz];
     for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);
-    recIns(vs, new int[sz], rsh, 0, 0, 0, wa, x, csz);
+    recIns(vs, new int[sz], rsh, 0, 0, 0, wp, x, csz);
     
     Value[] res = new Value[sz];
     for (int i = 0; i < sz; i++) res[i] = vs[i].get();

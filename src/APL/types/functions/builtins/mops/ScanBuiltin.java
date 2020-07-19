@@ -20,57 +20,60 @@ public class ScanBuiltin extends Mop {
     if (x.quickDoubleArr()) {
       Pervasion.NN2N fd = ff.dyNum();
       if (fd != null) {
-        final double[] rd;
+        final double[] dres;
         int i = l;
         ia: if (x.quickIntArr()) {
-          if (x.rank==1 && x instanceof BitArr && f instanceof OrBuiltin) {
-            long[] arr = ((BitArr) x).arr;
-            for (int j = 0; j < arr.length; j++) {
-              long c = arr[j];
-              if (c!=0) {
-                long[] res = new long[arr.length];
-                int sh = Long.numberOfTrailingZeros(c);
-                res[j++] = -(1L << (sh));
-                while (j < arr.length) res[j++] = ~0L;
-                return new BitArr(res, x.shape);
+          if (x.rank==1 && x instanceof BitArr) {
+            if (ff instanceof NEBuiltin) {
+              long[] xl = ((BitArr) x).arr;
+              long[] res = new long[xl.length];
+              long xor = 0;
+              for (int j = 0; j < xl.length; j++) {
+                long c = xl[j];
+                long r = c ^ (c<<1);
+                r^= r<< 2; r^= r<< 4; r^= r<<8;
+                r^= r<<16; r^= r<<32; r^=  xor;
+                res[j] = r;
+                xor = r>>63; // copies sign bit
               }
+              return new BitArr(res, x.shape);
             }
-            return new SingleItemArr(Num.ZERO, x.shape);
+            if (f instanceof OrBuiltin) {
+              long[] xl = ((BitArr) x).arr;
+              for (int j = 0; j < xl.length; j++) {
+                long c = xl[j];
+                if (c!=0) {
+                  long[] res = new long[xl.length];
+                  int sh = Long.numberOfTrailingZeros(c);
+                  res[j++] = -(1L << (sh));
+                  while (j < xl.length) res[j++] = ~0L;
+                  return new BitArr(res, x.shape);
+                }
+              }
+              return new SingleItemArr(Num.ZERO, x.shape);
+            }
           }
-          int[] ri = new int[x.ia];
-          int[] xd = x.asIntArr();
-          System.arraycopy(xd, 0, ri, 0, l);
+          int[] res = new int[x.ia];
+          int[] xi = x.asIntArr();
+          System.arraycopy(xi, 0, res, 0, l);
           while (i < x.ia) {
-            double n = fd.on(ri[i-l], xd[i]);
+            double n = fd.on(res[i-l], xi[i]);
             if ((int)n != n) {
-              rd = new double[x.ia]; for (int j = 0; j < rd.length; j++) rd[j] = ri[j];
-              rd[i++] = n;
+              dres = new double[x.ia]; for (int j = 0; j < dres.length; j++) dres[j] = res[j];
+              dres[i++] = n;
               break ia;
             }
-            ri[i++] = (int) n;
+            res[i++] = (int) n;
           }
-          return new IntArr(ri, x.shape);
-        } else rd = new double[x.ia];
+          return new IntArr(res, x.shape);
+        } else dres = new double[x.ia];
         double[] xd = x.asDoubleArr();
-        System.arraycopy(xd, 0, rd, 0, l);
+        System.arraycopy(xd, 0, dres, 0, l);
         while (i < x.ia) {
-          rd[i] = fd.on(rd[i-l], xd[i]);
+          dres[i] = fd.on(dres[i-l], xd[i]);
           i++;
         }
-        return new DoubleArr(rd, x.shape);
-      } else if (x instanceof BitArr && ff instanceof NEBuiltin && x.rank==1) {
-        long[] arr = ((BitArr) x).arr;
-        long[] res = new long[arr.length];
-        long xor = 0;
-        for (int i = 0; i < arr.length; i++) {
-          long c = arr[i];
-          long r = c ^ (c<<1);
-          r^= r<< 2; r^= r<< 4; r^= r<<8;
-          r^= r<<16; r^= r<<32; r^=  xor;
-          res[i] = r;
-          xor = r>>63; // copies sign bit
-        }
-        return new BitArr(res, x.shape);
+        return new DoubleArr(dres, x.shape);
       }
     }
     Value[] res = new Value[x.ia];

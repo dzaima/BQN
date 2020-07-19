@@ -10,7 +10,6 @@ public abstract class Primitive extends Value {
   }
   
   public final Value get(int i) { return this; }
-  public final Value first() { return this; }
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
     return new SingleItemArr(this, sh);
   }

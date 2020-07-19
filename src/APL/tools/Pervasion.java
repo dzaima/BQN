@@ -57,38 +57,62 @@ public class Pervasion {
     public /*open*/ int[] on(int[] w, int   x) { return null; }
     public /*open*/ int[] on(int[] w, int[] x) { return null; }
     public Value on(Primitive w, Primitive x) {
-      if (w instanceof BigValue && x instanceof BigValue) return on(((BigValue) w), ((BigValue) x));
+      if (w instanceof BigValue || x instanceof BigValue) {
+        BigValue wb = w instanceof BigValue? (BigValue) w : w instanceof Num? new BigValue(((Num) w).num) : null;
+        BigValue xb = x instanceof BigValue? (BigValue) x : x instanceof Num? new BigValue(((Num) x).num) : null;
+        if (wb!=null && xb!=null) return on(wb, xb);
+      }
       if (!(w instanceof Num) || !(x instanceof Num)) throw new DomainError("calling a number only function on "+w.humanType(true)+" and "+x.humanType(false));
       return Num.of(on(((Num) w).num, ((Num) x).num));
     }
     
     public /*open*/ Value on(BigValue w, BigValue x) { throw new DomainError("bigintegers not allowed here", x); }
     
-
+    
+    
     public Value scalarX(Value w, Value x) {
-      if (w.quickDoubleArr() && x instanceof Num) {
-        if (w.quickIntArr() && Num.isInt(((Num) x).num)) {
-          int[] ri = on(w.asIntArr(), (int) ((Num) x).num);
+      if (x instanceof Num) return scalarX(w, ((Num) x).num);
+      return super.scalarX(w, x);
+    }
+    public Value scalarX(Value w, double x) {
+      if (w.quickDoubleArr()) {
+        if (w instanceof Num) return new Num(on(((Num) w).num, x));
+        if (Num.isInt(x) && w.quickIntArr()) {
+          int[] ri = on(w.asIntArr(), (int) x);
           if (ri != null) return new IntArr(ri, w.shape);
         }
         double[] rd = new double[w.ia];
-        on(w.asDoubleArr(), ((Num) x).num, rd);
+        on(w.asDoubleArr(), x, rd);
         return new DoubleArr(rd, w.shape);
       }
-      return super.scalarX(w, x);
+      if (w instanceof Primitive) return on((Primitive) w, new Num(x));
+      Value[] res = new Value[w.ia];
+      for (int i = 0; i < w.ia; i++) res[i] = scalarX(w.get(i), x);
+      return Arr.create(res, w.shape);
     }
+    
     public Value scalarW(Value w, Value x) {
-      if (w instanceof Num && x.quickDoubleArr()) {
-        if (Num.isInt(((Num) w).num) && x.quickIntArr()) {
-          int[] ri = on((int) ((Num) w).num, x.asIntArr());
+      if (w instanceof Num) return scalarW(((Num) w).num, x);
+      return super.scalarW(w, x);
+    }
+    public Value scalarW(double w, Value x) {
+      if (x.quickDoubleArr()) {
+        if (x instanceof Num) return new Num(on(w, ((Num) x).num));
+        if (Num.isInt(w) && x.quickIntArr()) {
+          int[] ri = on((int) w, x.asIntArr());
           if (ri != null) return new IntArr(ri, x.shape);
         }
         double[] rd = new double[x.ia];
-        on(((Num) w).num, x.asDoubleArr(), rd);
+        on(w, x.asDoubleArr(), rd);
         return new DoubleArr(rd, x.shape);
       }
-      return super.scalarW(w, x);
+      if (x instanceof Primitive) return on(new Num(w), (Primitive) x);
+      Value[] res = new Value[x.ia];
+      for (int i = 0; i < x.ia; i++) res[i] = scalarW(w, x.get(i));
+      return Arr.create(res, x.shape);
     }
+    
+    
     public Value each(Value w, Value x) {
       if (w.quickDoubleArr() && x.quickDoubleArr()) {
         if (w.quickIntArr() && x.quickIntArr()) {
@@ -108,12 +132,12 @@ public class Pervasion {
     public abstract Value on(BitArr  w, boolean x);
     public abstract Value on(BitArr  w, BitArr  x);
     
-    public Value scalarW(Value w, Value x) {
-      if (w instanceof Num && Num.isBool(((Num) w).num) && x instanceof BitArr) return on(((Num) w).num==1, (BitArr) x);
+    public Value scalarW(double w, Value x) {
+      if (Num.isBool(w) && x instanceof BitArr) return on(w==1, (BitArr) x);
       return super.scalarW(w, x);
     }
-    public Value scalarX(Value w, Value x) {
-      if (w instanceof BitArr && x instanceof Num && Num.isBool(((Num) x).num)) return on((BitArr) w, ((Num) x).num==1);
+    public Value scalarX(Value w, double x) {
+      if (w instanceof BitArr && Num.isBool(x)) return on((BitArr) w, x==1);
       return super.scalarX(w, x);
     }
     public Value each(Value w, Value x) {

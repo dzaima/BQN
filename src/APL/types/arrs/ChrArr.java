@@ -27,10 +27,6 @@ public class ChrArr extends Arr {
     return Char.of(s.charAt(i));
   }
   
-  public Value first() {
-    if (ia > 0) return Char.of(s.charAt(0));
-    return Char.SPACE;
-  }
   public String asString() {
     if (rank > 1) throw new DomainError("Using rank "+rank+" character array as string", this);
     return s;

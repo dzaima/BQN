@@ -17,6 +17,15 @@ public class NEBuiltin extends Builtin {
     return Num.of(x.shape[0]);
   }
   
+
+  private static final Pervasion.NN2N DFn = new Pervasion.NN2N() { // purely for dyNum
+    public double on(double w, double x) { return w==x? 0 : 1; }
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) { res[i] = (w   !=x[i])?1:0; } }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) { res[i] = (w[i]!=x   )?1:0; } }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) { res[i] = (w[i]!=x[i])?1:0; } }
+  };
+  public Pervasion.NN2N dyNum() { return DFn; }
+  
   public static final Pervasion.VV2B DF = new Pervasion.VV2B() {
     public Value on(Primitive w, Primitive x) { return w.equals(x)? Num.ZERO : Num.ONE; }
     public void on(double   w, double[] x, BitArr.BA res) { for (double cx : x) { res.add( w!=cx); } }

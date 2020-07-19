@@ -1,11 +1,13 @@
 package APL.types.functions.builtins.fns2;
 
 import APL.Main;
-import APL.errors.RankError;
+import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+
+import java.util.Arrays;
 
 
 public class GTBuiltin extends Builtin {
@@ -16,80 +18,32 @@ public class GTBuiltin extends Builtin {
   
   public Value call(Value x) {
     if (x instanceof Arr) {
-      if (x instanceof DoubleArr || x instanceof ChrArr || x instanceof BitArr) return x;
-      Value[] subs = x.values();
-      return merge(subs, x.shape, this);
+      if (x.quickDepth1()) return x;
+      return merge(x.values(), x.shape, this);
     } else return x;
   }
   
-  public static Value merge(Value[] vals, int[] sh, Tokenable blame) {
-    if (vals.length == 0) return EmptyArr.SHAPE0N;
+  public static Value merge(Value[] x, int[] sh, Callable blame) {
+    if (x.length == 0) return EmptyArr.SHAPE0N;
     
-    Value first = vals[0];
-    int[] def = new int[first.rank];
-    System.arraycopy(first.shape, 0, def, 0, def.length);
-    boolean allNums = true;
-    boolean eqShapes = true;
-    for (Value v : vals) {
-      if (v.rank != def.length) {
-        String msg = blame + ": expected equal ranks of items (shapes " + Main.formatAPL(first.shape) + " vs " + Main.formatAPL(v.shape) + ")";
-        if (blame instanceof Callable) throw new RankError(msg, (Callable) blame, v);
-        else throw new RankError(msg, v);
-      }
-      for (int i = 0; i < def.length; i++) {
-        if (v.shape[i] != def[i]) {
-          eqShapes = false;
-          if (v.shape[i] > def[i]) def[i] = v.shape[i];
-        }
-      }
-      if (!v.quickDoubleArr()) {
-        allNums = false;
-      }
-    }
-    int subIA = Arr.prod(def);
-    int totalIA = subIA * Arr.prod(sh);
-    int[] resShape = new int[def.length + sh.length];
+    Value x0 = x[0];
+    int[] sh0 = x0.shape;
+    int[] resShape = new int[sh0.length + sh.length];
     System.arraycopy(sh, 0, resShape, 0, sh.length);
-    System.arraycopy(def, 0, resShape, sh.length, def.length);
+    System.arraycopy(sh0, 0, resShape, sh.length, sh0.length);
     
-    if (eqShapes) {
-      MutVal res = new MutVal(resShape);
-      
-      int i = 0;
-      for (Value v : vals) {
-        res.copy(v, 0, i, v.ia);
-        i+= subIA;
-      }
-      return res.get();
-    }
+    MutVal res = new MutVal(resShape);
     
-    if (allNums) {
-      double[] res = new double[totalIA];
-      
-      int i = 0;
-      for (Value v : vals) {
-        double[] c = v.asDoubleArr();
-        int k = 0;
-        for (int j : new SimpleIndexer(def, v.shape)) {
-          res[i+j] = c[k++];
-        }
-        // automatic zero padding
-        i+= subIA;
-      }
-      
-      return new DoubleArr(res, resShape);
-    }
-    
-    
-    Value[] res = new Value[totalIA]; // complicated valuecopy
     int i = 0;
-    for (Value v : vals) {
-      Value proto = v.prototype();
-      for (int[] c : new Indexer(def)) {
-        res[i++] = v.at(c, proto);
+    for (Value c : x) {
+      if (!Arrays.equals(c.shape, sh0)) {
+        if (c.rank != sh0.length) throw new RankError(blame+": expected equal ranks of items (shapes "+Main.formatAPL(x0.shape)+" vs "+Main.formatAPL(c.shape)+")", blame, c);
+        throw new DomainError(blame+": mismatched shapes ("+Main.formatAPL(sh0)+" vs "+Main.formatAPL(c.shape)+")", blame, c); // cannot be more specific due to the wide array of uses for merging
       }
+      res.copy(c, 0, i, c.ia);
+      i+= x0.ia;
     }
-    return Arr.create(res, resShape);
+    return res.get();
   }
   
   

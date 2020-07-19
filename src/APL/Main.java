@@ -47,7 +47,7 @@ public class Main {
                   println("-p code: execute the argument as APL and print its result");
                   println("-i     : execute STDIN as APL");
                   println("-r     : start the REPL after everything else");
-                  println("-s     : start the REPL without \">\" after everything else");
+                  println("-s     : start the REPL without indenting input after everything else");
                   println("-d     : enable debug mode");
                   println("-q     : quote strings in output");
                   println("-b     : disable boxing");
