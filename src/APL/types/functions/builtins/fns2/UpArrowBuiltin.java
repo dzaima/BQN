@@ -73,9 +73,8 @@ public class UpArrowBuiltin extends Builtin {
       idx: for (int[] c : new Indexer(sh)) {
         int ip = 0;
         for (int i = 0; i < l; i++) {
-          int ri = c.length-i-1;
           int cp = c[i]+off[i];
-          int xl = ri<xsh.length? xsh[ri] : 1;
+          int xl = c.length-xsh.length-1 < i? xsh[i] : 1;
           if (cp>=xl || cp<0) {
             res.set(rp++, proto);
             continue idx;
