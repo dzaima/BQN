@@ -3,12 +3,13 @@ package APL.tokenizer.types;
 import APL.*;
 import APL.errors.*;
 import APL.tokenizer.Token;
-import APL.types.Value;
+import APL.types.*;
+import APL.types.functions.userDefined.*;
 
 import java.util.*;
 
 public class DfnTok extends TokArr<LineTok> {
-  public final Comp comp;
+  public Comp comp;
   public final boolean immediate;
   public final ArrayList<Body> bodies;
   
@@ -53,7 +54,7 @@ public class DfnTok extends TokArr<LineTok> {
         src = part;
         assert tail != 0;
         int rid = parts.size()-i;
-        body = new Body(tail==1? 'a' : rid==1? 'd' : 'm', funType(src, this));
+        body = new Body(tail==1? 'a' : rid==1? 'd' : 'm', funType(src, this), -1);
       }
       bodies.add(body);
       bodySrcs.add(src);
@@ -81,10 +82,10 @@ public class DfnTok extends TokArr<LineTok> {
       }
     } else immediate = false; // no {2+2} for now
     
-    int[] offs = new int[parts.size()];
-    comp = Comp.comp(bodySrcs, offs);
+    Comp.Mut mut = new Comp.Mut();
+    int[] offs = Comp.comp(mut, bodySrcs);
     for (int i = 0; i < bodies.size(); i++) bodies.get(i).start = offs[i];
-    
+    mut.register(this); mut.finish(this);
     this.bodies = bodies;
   }
   
@@ -217,13 +218,15 @@ public class DfnTok extends TokArr<LineTok> {
       
     }
     
-    public Body(char f, boolean imm) { // +TODO
+    public Body(char f, boolean imm, int start) {
+      ftype = f;
+      this.start = start;
+      immediate = imm;
+      
       token = null;
       noHeader = true;
-      ftype = f;
       otype = 0;
       wM=fM=gM=xM=null;
-      immediate = imm;
       self = null;
     }
     
@@ -293,12 +296,11 @@ public class DfnTok extends TokArr<LineTok> {
   }
   
   
-  public DfnTok(Comp code, char type, boolean imm) {
+  public DfnTok(char type, boolean imm, int off) {
     super("•COMPiled function", 0, 18, new ArrayList<>());
     this.type = type;
-    comp = code;
     bodies = new ArrayList<>();
-    bodies.add(new Body('a', imm));
+    bodies.add(new Body('a', imm, off));
     immediate = imm;
   }
   
@@ -338,5 +340,20 @@ public class DfnTok extends TokArr<LineTok> {
     }
     s.append("}");
     return s.toString();
+  }
+  
+  
+  
+  public Value eval(Scope sc) {
+    switch (this.type) {
+      case 'f': return new Dfn(this, sc);
+      case 'm': return new Dmop(this, sc);
+      case 'd': return new Ddop(this, sc);
+      case 'a': {
+        Scope nsc = new Scope(sc);
+        return this.comp.exec(nsc, this.start(nsc, null, null, null, null, Nothing.inst));
+      }
+      default : throw new IllegalStateException(this.type+"");
+    }
   }
 }

@@ -10,7 +10,6 @@ import APL.types.functions.builtins.dops.*;
 import APL.types.functions.builtins.fns2.*;
 import APL.types.functions.builtins.mops.*;
 import APL.types.functions.trains.*;
-import APL.types.functions.userDefined.UserDefined;
 
 import java.util.*;
 
@@ -239,7 +238,7 @@ public class Comp {
         case DFND: {
           int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
           DfnTok dfn = dfns[n];
-          s.push(UserDefined.of(dfn, sc));
+          s.push(dfn.eval(sc));
           break;
         }
         case CHKV: {
@@ -361,9 +360,26 @@ public class Comp {
       b.append("dfns:\n");
       for (int j = 0; j < dfns.length; j++) {
         DfnTok dfn = dfns[j];
-        b.append(' ').append(j).append(":\n  type ").append(dfn.type).append(" \n  ");
-        b.append(dfn.comp.fmt().replace("\n", "\n  "));
-        b.append('\n');
+        b.append(' ').append(j).append(": ").append(dfn.type=='f'? "function" : dfn.type=='d'? "2-modifier" : dfn.type=='m'? "1-modifier" : dfn.type=='a'? "immediate block" : String.valueOf(dfn.type)).append(" \n");
+        assert dfn.bodies != null;
+        if (dfn.bodies.size()>1 || dfn.bodies.get(0).start!=0 || !dfn.bodies.get(0).noHeader) {
+          ArrayList<DfnTok.Body> bodies = dfn.bodies;
+          for (int k = 0; k < bodies.size(); k++) {
+            DfnTok.Body bd = bodies.get(k);
+            b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.ftype=='m'? "monadic" : bd.ftype=='d'? "dyadic" : "ambivalent").append('\n');
+            b.append("    start: ").append(bd.start).append('\n');
+            if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
+            if (bd.wM!=null) b.append("    𝕨: ").append(bd.wM.toRepr()).append('\n');
+            if (bd.xM!=null) b.append("    𝕩: ").append(bd.xM.toRepr()).append('\n');
+            if (bd.fM!=null) b.append("    𝕗: ").append(bd.fM.toRepr()).append('\n');
+            if (bd.gM!=null) b.append("    𝕘: ").append(bd.gM.toRepr()).append('\n');
+          }
+        }
+        if (dfn.comp != this) {
+          b.append("  ");
+          b.append(dfn.comp.fmt().replace("\n", "\n  "));
+          b.append('\n');
+        }
       }
     }
     b.deleteCharAt(b.length()-1);
@@ -412,12 +428,13 @@ public class Comp {
   
   
   
-  static class Mut {
+  public static class Mut {
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<DfnTok> dfns = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
     ArrayList<Byte> bc = new ArrayList<>();
     ArrayList<Token> ref = new ArrayList<>();
+    ArrayList<DfnTok> registered = new ArrayList<>();
     
     
     public void addNum(int n) {
@@ -464,6 +481,18 @@ public class Comp {
         ref.add(tk);
       }
     }
+  
+    public Comp finish(Token tk) { // todo a tk for everything is stupid
+      byte[] br = new byte[bc.size()];
+      for (int i = 0; i < bc.size(); i++) br[i] = bc.get(i);
+      Comp comp = new Comp(br, objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
+      for (DfnTok c : registered) c.comp = comp;
+      return comp;
+    }
+  
+    public void register(DfnTok dfn) {
+      registered.add(dfn);
+    }
   }
   
   
@@ -484,24 +513,20 @@ public class Comp {
       typeof(ln);
       compP(mut, ln, false);
     }
-    byte[] bc = new byte[mut.bc.size()];
-    for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), lns);
+    return mut.finish(lns);
   }
   
-  public static Comp comp(ArrayList<List<LineTok>> parts, int[] offsets) { // offsets is an output
-    Mut mut = new Mut();
+  public static int[] comp(Mut mut, ArrayList<List<LineTok>> parts) {
+    int[] offs = new int[parts.size()];
     for (int i = 0; i < parts.size(); i++) {
-      offsets[i] = mut.bc.size();
+      offs[i] = mut.bc.size();
       for (LineTok ln : parts.get(i)) {
         typeof(ln);
         compP(mut, ln, false);
       }
       if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
     }
-    byte[] bc = new byte[mut.bc.size()];
-    for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), parts.get(0).get(0));
+    return offs;
   }
   
   private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a

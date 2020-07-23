@@ -159,15 +159,17 @@ public class Scope {
             return "•COMP";
           }
           
+          public Value call(Value x) {
+            return call(Num.ONE, x);
+          }
+          
           public Value call(Value w, Value x) {
             if (x.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, x);
-            char type = w.ia==0?0: ((Char) w.get(0)).chr;
-            if (w.ia!=2 && type!='a') throw new DomainError("𝕨 of •COMP must be an array of type and immediateness, or 'a'");
-            boolean imm = type=='a' || Main.bool(w.get(1));
+            boolean allowImm = Main.bool(w);
             Value bc = x.get(0);
             Value obj = x.get(1);
             Value str = x.get(2);
-            Value dfn = x.get(3);
+            Value blocks = x.get(3);
             
             byte[] bcp = new byte[bc.ia];
             for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bc.get(i).asInt();
@@ -179,22 +181,31 @@ public class Scope {
             String[] strp = new String[str.ia];
             for (int i = 0; i < strp.length; i++) strp[i] = str.get(i).asString();
             
-            DfnTok[] dfnp = new DfnTok[dfn.ia];
+            DfnTok[] dfnp = new DfnTok[blocks.ia];
             for (int i = 0; i < dfnp.length; i++) {
-              Value c = dfn.get(i);
-              dfnp[i] = c instanceof Dfn? ((Dfn) c).code : c instanceof Ddop? ((Ddop) c).code : ((Dmop) c).code;
+              Value c = blocks.get(i);
+              if (c.ia!=3) throw new DomainError("•COMP: ¬∧´3 = ≠3⊑𝕩");
+              
+              char type = ((Char) c.get(0)).chr;
+              boolean imm = Main.bool(c.get(1));
+              int off = c.get(2).asInt();
+              if (type=='a' || type=='f'&&imm) {
+                type = 'a';
+                imm = true;
+              }
+              
+              if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
+              dfnp[i] = new DfnTok(type, imm, off);
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
-            if (type == 'f') return new Dfn (new DfnTok(c, 'f', imm), Scope.this);
-            if (type == 'd') return new Ddop(new DfnTok(c, 'd', imm), Scope.this);
-            if (type == 'm') return new Dmop(new DfnTok(c, 'm', imm), Scope.this);
-            if (type == 'a') {
-              DfnTok t = new DfnTok(c, 'a', imm);
-              Scope nsc = new Scope(Scope.this);
-              return t.comp.exec(nsc, t.start(nsc, null, null, null, null, Nothing.inst));
+            for (DfnTok dfn : dfnp) dfn.comp = c;
+            if (!allowImm) {
+              DfnTok f = new DfnTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt());
+              f.comp = c;
+              return f.eval(Scope.this);
             }
-            throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
+            return dfnp[0].eval(Scope.this);
           }
         };
         case "•bc": return new Fun() {
@@ -205,7 +216,7 @@ public class Scope {
           public Value call(Value x) {
             DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Ddop? ((Ddop) x).code : x instanceof Dmop? ((Dmop) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt());
-            return call(Scope.this.get("•comp").asFun().call(new HArr(new Value[]{Char.of('f'), Num.ZERO}  ), x));
+            return call(Scope.this.get("•comp").asFun().call(Num.ZERO, x));
           }
           
         };
