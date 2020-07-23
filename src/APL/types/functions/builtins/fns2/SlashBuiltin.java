@@ -6,10 +6,10 @@ import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
-import APL.types.functions.builtins.mops.ReduceBuiltin;
+import APL.types.functions.builtins.mops.FoldBuiltin;
 
 public class SlashBuiltin extends Builtin {
-  private static final Fun fn = new ReduceBuiltin().derive(new CeilingBuiltin());
+  private static final Fun fn = new FoldBuiltin().derive(new CeilingBuiltin());
   
   public String repr() {
     return "/";

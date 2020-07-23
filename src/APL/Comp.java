@@ -102,7 +102,7 @@ public class Comp {
         case VARO: {
           int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
           Value got = sc.get(strs[n]);
-          if (got == null) throw new ValueError("Unknown variable \"" + strs[bc[i - 1] & 0xff] + "\"");
+          if (got == null) throw new ValueError("Unknown variable \"" + strs[n] + "\""); // TODO token
           s.push(got);
           break;
         }
@@ -1096,6 +1096,7 @@ public class Comp {
       
       // mops
       case '´': return new ReduceBuiltin();
+      case '˝': return new InsertBuiltin();
       case '`': return new ScanBuiltin();
       case '¨': return new EachBuiltin();
       case '˜': return new SelfieBuiltin();

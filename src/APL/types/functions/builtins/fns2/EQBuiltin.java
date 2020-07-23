@@ -12,7 +12,9 @@ public class EQBuiltin extends Builtin {
   }
   
   
-  
+  public Value call(Value x) {
+    return Num.of(x.rank);
+  }
   
   public static final Pervasion.VV2B DF = new Pervasion.VV2B() {
     public Value on(Primitive w, Primitive x) { return w.equals(x)? Num.ONE : Num.ZERO; }

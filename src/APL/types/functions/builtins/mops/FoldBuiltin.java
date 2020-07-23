@@ -8,7 +8,7 @@ import APL.types.arrs.BitArr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
-public class ReduceBuiltin extends Mop {
+public class FoldBuiltin extends Mop {
   @Override public String repr() {
     return "´";
   }
