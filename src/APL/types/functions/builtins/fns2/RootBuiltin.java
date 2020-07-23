@@ -1,5 +1,6 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
@@ -33,29 +34,23 @@ public class RootBuiltin extends Builtin {
     return numM(NFi, x);
   }
   
-  public static final D_NNeN DNF = new D_NNeN() {
-    public double on(double w, double x) {
-      return Math.pow(x, 1/w);
-    }
-    public void on(double[] res, double w, double[] x) {
+  public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
+    public double on(double w, double x) { return Math.pow(x, 1/w); }
+    public void on(double   w, double[] x, double[] res) {
       double pow = 1/w;
       for (int i = 0; i < x.length; i++) res[i] = Math.pow(x[i], pow);
     }
-    public void on(double[] res, double[] w, double x) {
-      for (int i = 0; i < w.length; i++) res[i] = Math.pow(x, 1/w[i]);
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = Math.pow(x[i], 1/w[i]);
-    }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = Math.pow(x   , 1/w[i]); }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = Math.pow(x[i], 1/w[i]); }
   };
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   
   public Value callInvW(Value w, Value x) {
-    return numD(StarBuiltin.DNF, x, w);
+    return StarBuiltin.DF.call(x, w);
   }
   public Value callInvA(Value w, Value x) {
-    return numD(LogBuiltin.DNF, w, x);
+    return LogBuiltin.DF.call(w, x);
   }
 }

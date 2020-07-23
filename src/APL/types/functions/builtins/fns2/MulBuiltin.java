@@ -72,7 +72,7 @@ public class MulBuiltin extends Builtin {
   }
   
   
-  private static final D_NNeN SET_SGN = new D_NNeN() {
+  private static final Pervasion.NN2N SET_SGN = new Pervasion.NN2N() {
     public double on(double w, double x) {
       if (x==0) return 0;
       if (w==0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(x));
@@ -80,7 +80,7 @@ public class MulBuiltin extends Builtin {
       if (x==-1) return -Math.abs(w);
       throw new DomainError("⌾×: cannot set sign to "+x);
     }
-    public void on(double[] res, double w, double[] x) {
+    public void on(double w, double[] x, double[] res) {
       for (int i = 0; i < res.length; i++) {
         double nc = x[i];
         if (w==0 && nc!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(nc));
@@ -88,7 +88,7 @@ public class MulBuiltin extends Builtin {
         else throw new DomainError("⌾×: cannot set sign to "+nc);
       }
     }
-    public void on(double[] res, double[] w, double x) {
+    public void on(double[] w, double x, double[] res) {
       for (int i = 0; i < res.length; i++) {
         double oc = w[i];
         if (oc==0 && x!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(x));
@@ -96,7 +96,7 @@ public class MulBuiltin extends Builtin {
         else throw new DomainError("⌾×: cannot set sign to "+x);
       }
     }
-    public void on(double[] res, double[] w, double[] x) {
+    public void on(double[] w, double[] x, double[] res) {
       for (int i = 0; i < res.length; i++) {
         double oc = w[i];
         double nc = x[i];
@@ -105,7 +105,7 @@ public class MulBuiltin extends Builtin {
         else throw new DomainError("⌾×: cannot set sign to "+nc);
       }
     }
-    public Value call(BigValue w, BigValue x) {
+    public Value on(BigValue w, BigValue x) {
       BigInteger oi = w.i;
       int ni = BigValue.safeInt(x.i);
       if (oi.signum()==0 && ni!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+ni);
@@ -119,6 +119,6 @@ public class MulBuiltin extends Builtin {
   public Value under(Value o, Value x) {
     Main.faulty = this;
     Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
-    return numD(SET_SGN, x, v);
+    return SET_SGN.call(x, v);
   }
 }

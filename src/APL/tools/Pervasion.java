@@ -24,8 +24,16 @@ public class Pervasion {
       if (wr==xr) {
         Arr.eqShapes(w, x);
         return each(w, x);
-      } else {
-        throw new NYIError("mismatched rank pervasion", x);
+      } else { // TODO optimize for w.quickDoubleArr/x.quickDoubleArr
+        boolean we = w.rank < x.rank; // w is expanded
+        int max = Math.max(w.ia, x.ia);
+        int min = Math.min(w.ia, x.ia);
+        int ext = max/min;
+        Value[] n = new Value[max];
+        int r = 0;
+        if (we) for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = call(c, x.get(r)); r++; } }
+        else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = call(w.get(r), c); r++; } }
+        return Arr.create(n, we? x.shape : w.shape);
       }
     }
     

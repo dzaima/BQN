@@ -1,6 +1,7 @@
 package APL.types.functions.builtins.fns2;
 
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
@@ -28,21 +29,15 @@ public class StarBuiltin extends Builtin {
     return numM(LogBuiltin.NF, x);
   }
   
-  public static final D_NNeN DNF = new D_NNeN() {
+  public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public double on(double w, double x) {
       return Math.pow(w, x);
     }
-    public void on(double[] res, double w, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = Math.pow(w, x[i]);
-    }
-    public void on(double[] res, double[] w, double x) {
-      if (x == 2) for (int i = 0; i < w.length; i++) res[i] = w[i]*w[i];
-      else for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x);
-    }
-    public void on(double[] res, double[] w, double[] x) {
-      for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x[i]);
-    }
-    public Value call(BigValue w, BigValue x) {
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) res[i] = Math.pow(w   , x[i]); }
+    public void on(double[] w, double   x, double[] res) { if (x == 2) for (int i = 0; i < w.length; i++) res[i] = w[i]*w[i];
+                                                      else for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x   ); }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x[i]); }
+    public Value on(BigValue w, BigValue x) {
       if (w.i.signum() == 0) return BigValue.ZERO;
       if (w.i.equals(BigInteger.ONE)) return BigValue.ONE;
       if (w.i.equals(BigValue.MINUS_ONE.i)) return x.i.intValue()%2 == 0? BigValue.ONE : BigValue.MINUS_ONE;
@@ -50,13 +45,15 @@ public class StarBuiltin extends Builtin {
       return new BigValue(w.i.pow(x.i.intValue()));
     }
   };
+  
+  public Pervasion.NN2N dyNum() { return DF; }
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   public Value callInvW(Value w, Value x) {
-    return numD(LogBuiltin.DNF, w, x);
+    return LogBuiltin.DF.call(w, x);
   }
   public Value callInvA(Value w, Value x) {
-    return numD(RootBuiltin.DNF, x, w);
+    return RootBuiltin.DF.call(w, x);
   }
 }

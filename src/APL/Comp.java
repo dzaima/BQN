@@ -1095,7 +1095,7 @@ public class Comp {
       case '≠': return new NEBuiltin();
       
       // mops
-      case '´': return new ReduceBuiltin();
+      case '´': return new FoldBuiltin();
       case '˝': return new InsertBuiltin();
       case '`': return new ScanBuiltin();
       case '¨': return new EachBuiltin();
