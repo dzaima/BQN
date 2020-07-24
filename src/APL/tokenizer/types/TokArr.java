@@ -14,8 +14,8 @@ abstract public class TokArr<T extends Token> extends Token {
   
   public String toTree(String p) {
     StringBuilder r = new StringBuilder();
-    r.append(p).append(this.getClass().getCanonicalName());
-    r.append(' ').append(spos).append('-').append(epos);
+    r.append(p).append(this.getClass().getSimpleName());
+    r.append(' ').append(spos).append('-').append(epos).append(' ').append(type).append(' ').append(flags);
     r.append('\n');
     p+= "  ";
     for (Token t : tokens) r.append(t.toTree(p));

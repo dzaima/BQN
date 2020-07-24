@@ -44,7 +44,7 @@ public abstract class Sys {
       case "ONELINE":
         oneline = !oneline;
         break;
-      case "TOKENIZE"    : println(Tokenizer.tokenize(rest).toTree("")); break;
+      case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
       case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
       case "CLASS"       : var r = Main.exec(rest, csc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : var e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;

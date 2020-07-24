@@ -3,6 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.*;
 import APL.tokenizer.types.LineTok;
+import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.ChrArr;
 import APL.types.functions.MutArr;
@@ -57,6 +58,9 @@ public class Main {
                   println("-E a b : encode the file A in the SBCS, save as B");
                   println("If given no arguments, an implicit -r will be added");
                   System.exit(0);
+                  break;
+                case "--q":
+                  System.out.println(new JComp(comp(args[++i])).r.get(sys.csc, 0));
                   break;
                 default:
                   throw new DomainError("Unknown command-line argument " + p);

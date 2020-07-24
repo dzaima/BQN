@@ -4,6 +4,7 @@ import APL.types.Tokenable;
 
 public abstract class Token implements Tokenable {
   public char type; // \0 by default
+  public byte flags = -1; // 1 - is constant; 2 - has no inner dfns; 4 - is safe for variable renaming
   public final String raw;
   public final int spos; // incl
   public final int epos; // excl
@@ -17,7 +18,7 @@ public abstract class Token implements Tokenable {
     return this;
   }
   public String toTree(String p) {
-    return p + this.getClass().getCanonicalName()+" "+spos+"-"+epos+"\n";
+    return p + this.getClass().getSimpleName()+" "+spos+"-"+epos+" "+type+" "+flags+"\n";
   }
   public abstract String toRepr();
   

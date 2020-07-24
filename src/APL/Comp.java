@@ -369,7 +369,7 @@ public class Comp {
       for (int j = 0; j < dfns.length; j++) {
         DfnTok dfn = dfns[j];
         b.append(' ').append(j).append(": ").append(dfn.type=='f'? "function" : dfn.type=='d'? "2-modifier" : dfn.type=='m'? "1-modifier" : dfn.type=='a'? "immediate block" : String.valueOf(dfn.type)).append(" \n");
-        assert dfn.bodies != null;
+        b.append("  flags: ").append(dfn.flags).append('\n');
         if (dfn.bodies.size()>1 || dfn.bodies.get(0).start!=0 || !dfn.bodies.get(0).noHeader) {
           ArrayList<DfnTok.Body> bodies = dfn.bodies;
           for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
@@ -524,7 +524,7 @@ public class Comp {
   
   
   public static Comp comp(LineTok ln) {
-    typeof(ln);
+    typeof(ln); flags(ln);
     Mut mut = new Mut();
     compP(mut, ln, false);
     byte[] bc = new byte[mut.bc.size()];
@@ -536,7 +536,7 @@ public class Comp {
     Mut mut = new Mut();
     int sz = lns.tokens.size();
     for (int i = 0; i < sz; i++) {
-      LineTok ln = lns.tokens.get(i); typeof(ln);
+      LineTok ln = lns.tokens.get(i); typeof(ln); flags(ln);
       compP(mut, ln, false);
       if (i!=sz-1) mut.add(POPS);
     }
@@ -551,7 +551,7 @@ public class Comp {
       offs[i] = mut.bc.size();
   
       for (int j = 0; j < sz; j++) {
-        LineTok ln = cp.get(j); typeof(ln);
+        LineTok ln = cp.get(j); typeof(ln); flags(ln);
         typeof(ln);
         compP(mut, ln, false);
         if (j!=sz-1) mut.add(POPS);
@@ -623,6 +623,7 @@ public class Comp {
   
   static abstract class Res {
     char type;
+    Value c;
     public Res(char type) {
       this.type = type;
     }
@@ -640,6 +641,7 @@ public class Comp {
     public ResTk(Token tk) {
       super(tk.type);
       this.tk = tk;
+      this.c = (tk.flags&1)!=0? constFold(tk) : null;
       type = tk.type;
     }
     
@@ -713,6 +715,23 @@ public class Comp {
       return Arrays.toString(all);
     }
   }
+  static class ResCf extends Res {
+    private final Token last;
+  
+    public ResCf(char type, Value val, Token last) {
+      super(type);
+      this.c = val;
+      this.last = last;
+    }
+  
+    void add(Mut m) {
+      m.push(c);
+    }
+  
+    public Token lastTok() {
+      return last;
+    }
+  }
   
   public static byte[] cat(byte[][] bcs) {
     int am = 0;
@@ -732,29 +751,30 @@ public class Comp {
   private static void printlvl(String s) {
     System.out.println(Main.repeat(" ", Main.printlvl*2) + s);
   }
-  public static void collect(LinkedList<Res> tps, Mut m, boolean train, boolean last) {
+  public static void collect(LinkedList<Res> tps, boolean train, boolean last) {
     while (true) {
       if (Main.debug) printlvl(tps.toString());
       if (tps.size() <= 1) break;
       if (train) { // trains only
         if (isE(tps, "d!|Off", last)) {
           if (Main.debug) printlvl("match F F F");
-          Res f;
-          tps.addLast(new ResMix('f',
-            (  tps.removeLast()),
-            (  tps.removeLast()),
-            (f=tps.removeLast()),
-            new ResBC(f.type=='A'? TR3O : TR3D)
-          ));
+          Res h = tps.removeLast();
+          Res g = tps.removeLast();
+          Res f = tps.removeLast();
+          if (h.c!=null && g.c!=null && f.c!=null) {
+            if (f.c instanceof Nothing) tps.addLast(new ResCf('f', new Atop(g.c.asFun(), h.c.asFun()), h.lastTok()));
+            else tps.addLast(new ResCf('f', new Fork(f.c, g.c.asFun(), h.c.asFun()), h.lastTok()));
+          } else {
+            tps.addLast(new ResMix('f', h, g, f, new ResBC(f.type=='A'? TR3O : TR3D) ));
+          }
           continue;
         }
         if (isE(tps, "[←↩]|ff", last)) {
           if (Main.debug) printlvl("match F F");
-          tps.addLast(new ResMix('f',
-            tps.removeLast(),
-            tps.removeLast(),
-            new ResBC(TR2D)
-          ));
+          Res h = tps.removeLast();
+          Res g = tps.removeLast();
+          if (h.c!=null && g.c!=null) tps.addLast(new ResCf('f', new Atop(g.c.asFun(), h.c.asFun()), h.lastTok()));
+          else tps.addLast(new ResMix('f', h, g, new ResBC(TR2D)));
           continue;
         }
       } else { // value expressions
@@ -764,9 +784,7 @@ public class Comp {
           Res f = tps.removeLast();
           Res w = tps.removeLast();
           tps.addLast(new ResMix(x.type,
-            x,
-            f,
-            w,
+            x, f, w,
             new ResBC(f.lastTok(), x.type=='A' | w.type=='A'? FN2O : FN2C)
           ));
           continue;
@@ -776,8 +794,7 @@ public class Comp {
           Res x = tps.removeLast();
           Res f = tps.removeLast();
           tps.addLast(new ResMix(x.type,
-            x,
-            f,
+            x, f,
             new ResBC(f.lastTok(), x.type=='A'? FN1O : FN1C)
           ));
           continue;
@@ -789,10 +806,11 @@ public class Comp {
       if (tps.get(0).type!='d') {
         if (isS(tps, "Om", i)) {
           if (Main.debug) printlvl("match O m");
-          Res c, f;
-          tps.add(i, new ResMix('f',
-            (c=tps.remove(i+1)),
-            (f=tps.remove(i  )),
+          Res c=tps.remove(i+1);
+          Res f=tps.remove(i  );
+          if (c.c!=null && f.c!=null) {
+            tps.add(i, new ResCf('f', ((Mop) c.c).derive(f.c), c.lastTok()));
+          } else tps.add(i, new ResMix('f', c, f,
             new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
             new ResBC(c.lastTok(), OP1D)
           ));
@@ -800,13 +818,16 @@ public class Comp {
         }
         if (isS(tps, "OdO", i)) {
           if (Main.debug) printlvl("match O d O "+i);
-          Res f, c, g;
-          tps.add(i, new ResMix('f',
-            (f=tps.remove(i+2)),
-            new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
-            (c=tps.remove(i+1)),
-            (g=tps.remove(i  )),
-            new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOBYTES),
+          Res g=tps.remove(i+2);
+          Res c=tps.remove(i+1);
+          Res f=tps.remove(i  );
+          if (g.c!=null && c.c!=null && f.c!=null) {
+            if (g.c instanceof Nothing || f.c instanceof Nothing) throw new SyntaxError("didn't expect · here", g.c instanceof Nothing? g.lastTok() : f.lastTok() );
+            tps.add(i, new ResCf('f', ((Dop) c.c).derive(f.c, g.c), f.lastTok()));
+          } else tps.add(i, new ResMix('f',
+            g, new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOBYTES),
+            c,
+            f, new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
             new ResBC(c.lastTok(), OP2D)
           ));
           continue;
@@ -886,7 +907,7 @@ public class Comp {
             return t.type = 'A';
           case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣": case "•":
             return t.type = 'a';
-          case "𝔾": case "𝔽": case "𝕏": case "⍎": case "𝕎": case "𝕊": case "ℝ":
+          case "𝔾": case "𝔽": case "𝕏": case "𝕎": case "𝕊": case "ℝ": case "⍎":
             return t.type = 'f';
           default: throw new ImplementationError("Undefined unknown built-in "+s, op);
         }
@@ -921,8 +942,38 @@ public class Comp {
           return t.type = 'm';
         }
       }
+    } else if (t instanceof BasicLines) {
+      List<LineTok> ts = ((BasicLines) t).tokens;
+      for (Token c : ts) typeof(c);
+      return t.type = ts.get(ts.size()-1).type;
     }
     throw new ImplementationError("can't get type of "+t.getClass().getCanonicalName(), t);
+  }
+  
+  public static byte flags(Token t) {
+    if (t.flags != -1) return t.flags;
+    if (t instanceof ConstTok || t instanceof NothingTok) return t.flags = 7;
+    if (t instanceof ModTok || t instanceof SetTok || t instanceof NameTok) return t.flags = 6;
+    
+    if (t instanceof ParenTok) return t.flags = flags(((ParenTok) t).ln);
+    if (t instanceof TokArr<?>) {
+      List<? extends Token> ts = ((TokArr<?>) t).tokens;
+      if (t instanceof ArrayTok || t instanceof StrandTok 
+      ||  t instanceof LineTok && ts.size()==1) {
+        t.flags = 7;
+      } else t.flags = 6;
+      for (Token c : ts) {
+        if (c instanceof DfnTok) t.flags&= ~2;
+        t.flags&= flags(c);
+      }
+      return t.flags;
+    }
+    if (t instanceof OpTok) {
+      if (((OpTok) t).op.equals("⍎")) return t.flags = 0;
+      if (builtin((OpTok) t)==null) return t.flags = 6;
+      return t.flags = 7;
+    }
+    throw new ImplementationError("didn't check for "+t.getClass().getSimpleName());
   }
   
   
@@ -970,12 +1021,9 @@ public class Comp {
       }
       throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
     }
+    if ((tk.flags&1)!=0) { m.push(constFold(tk)); return; } // ConstTok, NothingTok
     if (tk instanceof ParenTok) {
       compP(m, ((ParenTok) tk).ln, false);
-      return;
-    }
-    if (tk instanceof ConstTok) {
-      m.push(((ConstTok) tk).val);
       return;
     }
     if (tk instanceof LineTok) {
@@ -999,10 +1047,10 @@ public class Comp {
       while (i>=0) {
         Res c = new ResTk(ts.get(i));
         tps.addFirst(c);
-        collect(tps, m, train, false);
+        collect(tps, train, false);
         i--;
       }
-      collect(tps, m, train, true);
+      collect(tps, train, true);
       if (Main.debug) Main.printlvl--;
       
       if (tps.size()!=1) {
@@ -1071,11 +1119,37 @@ public class Comp {
       m.push((DfnTok) tk);
       return;
     }
-    if (tk instanceof NothingTok) {
-      m.push(((NothingTok) tk).val);
-      return;
-    }
     throw new ImplementationError("can't compile "+tk.getClass());
+  }
+  
+  public static Value constFold(Token t) {
+    assert (t.flags&1)!=0 && t.flags!=-1;
+    if (t instanceof ConstTok) return ((ConstTok) t).val;
+    if (t instanceof ParenTok) return constFold(((ParenTok) t).ln);
+    if (t instanceof LineTok) {
+      List<Token> ts = ((LineTok) t).tokens;
+      assert ts.size() == 1;
+      return constFold(ts.get(0));
+    }
+    if (t instanceof StrandTok) {
+      List<Token> ts = ((StrandTok) t).tokens;
+      Value[] ps = new Value[ts.size()];
+      for (int i = 0; i < ps.length; i++) ps[i] = constFold(ts.get(i));
+      return Arr.create(ps);
+    }
+    if (t instanceof ArrayTok) {
+      List<LineTok> ts = ((ArrayTok) t).tokens;
+      Value[] ps = new Value[ts.size()];
+      for (int i = 0; i < ps.length; i++) ps[i] = constFold(ts.get(i));
+      return Arr.create(ps);
+    }
+    if (t instanceof OpTok) {
+      Value builtin = builtin((OpTok) t);
+      if (builtin == null) throw new ImplementationError(t.source());
+      return builtin;
+    }
+    if (t instanceof NothingTok) return ((NothingTok) t).val;
+    throw new ImplementationError("couldn't constant fold "+t.getClass().getSimpleName());
   }
   
   public static Value builtin(OpTok t) {
