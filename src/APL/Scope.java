@@ -223,24 +223,6 @@ public class Scope {
           }
           
         };
-        case "•catch": return new Dop() {
-          public String repr() { return "•_catch_"; }
-  
-          public Value call(Value f, Value g, Value x, DerivedDop derv) {
-            try {
-              return f.asFun().call(x);
-            } catch (Throwable e) {
-              return g.asFun().call(x);
-            }
-          }
-          public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-            try {
-              return f.asFun().call(w, x);
-            } catch (Throwable e) {
-              return g.asFun().call(w, x);
-            }
-          }
-        };
         case "•opt": case "•optimize":
           return new Optimizer();
       }

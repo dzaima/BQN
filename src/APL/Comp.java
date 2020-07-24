@@ -1080,8 +1080,6 @@ public class Comp {
   
   public static Value builtin(OpTok t) {
     switch (t.op.charAt(0)) {
-      // slashes: / - reduce; ⌿ - replicate; \ - reduce (r[3]←(r[2] ← (r[1]←a) f b) f c); ⍀ - extend
-      // in Dyalog but not at least partially implemented: ⊆⌹→  &⌶⌺
       // fns
       // case '⍲': return new NandBuiltin(sc);
       // case '⍱': return new NorBuiltin(sc);
@@ -1177,6 +1175,7 @@ public class Comp {
       case '⊘': return new AmbivalentBuiltin();
       case '◶': return new CondBuiltin();
       case '⎉': return new NCellBuiltin();
+      case '⎊': return new CatchBuiltin();
       
       
       // case '@': return new AtBuiltin(sc);
