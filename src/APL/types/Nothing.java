@@ -24,6 +24,10 @@ public class Nothing extends Primitive {
     throw gotten();
   }
   
+  public Fun asFun() {
+    throw new SyntaxError("didn't expect · here", this);
+  }
+  
   public String toString() {
     return "·";
   }

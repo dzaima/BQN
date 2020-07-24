@@ -2,6 +2,8 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.Tokenizer;
+import APL.tokenizer.types.BasicLines;
+import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.builtins.fns2.EvalBuiltin;
@@ -96,6 +98,9 @@ public abstract class Sys {
         break;
       case "TYPE":
         println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
+        break;
+      case "JEVAL":
+        println(new JComp(Main.comp(rest)).r.get(csc, 0));
         break;
       default:
         throw new SyntaxError("Undefined user command");

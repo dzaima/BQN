@@ -63,6 +63,9 @@ public class Scope {
         case "•vi":
           Main.vind = Main.bool(val);
           break;
+        case "•compstart":
+          Comp.compileStart = val.asInt();
+          break;
         case "•rl":
           rnd = new Random(val.asInt());
           break;
@@ -248,6 +251,11 @@ public class Scope {
       else return parent.get(name);
     } else return f;
   }
+  public Value getC(String name) {
+    Value got = get(name);
+    if (got == null) throw new SyntaxError("Unknown variable \"" + name + "\"");
+    return got;
+  }
   
   public String toString() {
     return toString("");
@@ -343,7 +351,7 @@ public class Scope {
     if (ns < 1000) return Main.toAPL(ns+"ns");
     double ms = ns/1e6;
     if (ms > 500) return Main.toAPL(new Num(ms/1000d)+" seconds");
-    return Main.toAPL(new Num(ms)+"ms");
+    return Main.toAPL(Num.format(ms, 3, -99, 99)+"ms");
   }
   static class CompTimer extends Builtin {
     public String repr() {

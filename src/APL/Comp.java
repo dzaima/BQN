@@ -3,6 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.*;
 import APL.tokenizer.types.*;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.functions.*;
 import APL.types.functions.builtins.Quad;
@@ -15,11 +16,15 @@ import java.util.*;
 
 public class Comp {
   public final byte[] bc;
-  private final Value[] objs;
-  private final String[] strs;
-  private final DfnTok[] dfns;
+  public final Value[] objs;
+  public final String[] strs;
+  public final DfnTok[] dfns;
   private final Token[] ref;
   private final Token tk;
+  
+  public static int compileStart = 0; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
+  private int iter;
+  private JFn gen;
   
   public Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns, Token[] ref, Token tk) {
     this.bc = bc;
@@ -75,7 +80,6 @@ public class Comp {
     Obj peek() {
       return vals[sz-1];
     }
-    
   }
   
   public static final boolean DBGPROG = true;
@@ -83,6 +87,11 @@ public class Comp {
     return exec(sc, 0);
   }
   public Value exec(Scope sc, int spt) {
+    if (gen!=null) return gen.get(sc, spt);
+    if (iter++>=compileStart && compileStart>=0) {
+      gen = new JComp(this).r;
+      return gen.get(sc, spt);
+    }
     Value last = null;
     int pi = spt;
     try {
@@ -100,8 +109,7 @@ public class Comp {
         }
         case VARO: {
           int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-          Value got = sc.get(strs[n]);
-          if (got == null) throw new ValueError("Unknown variable \"" + strs[n] + "\""); // TODO token
+          Value got = sc.getC(strs[n]);
           s.push(got);
           break;
         }
@@ -243,7 +251,7 @@ public class Comp {
         }
         case CHKV: {
           Obj v = s.peek();
-          if (v instanceof Nothing) throw new SyntaxError("Didn't expect · here", v);
+          if (v instanceof Nothing) throw new SyntaxError("didn't expect · here", v);
           break;
         }
         case RETN: {
@@ -350,7 +358,7 @@ public class Comp {
     }
     if (objs.length > 0) {
       b.append("objs:\n");
-      for (int j = 0; j < objs.length; j++) b.append(' ').append(j).append(": ").append(objs[j]).append('\n');
+      for (int j = 0; j < objs.length; j++) b.append(' ').append(j).append(": ").append(objs[j].oneliner()).append('\n');
     }
     if (strs.length > 0) {
       b.append("strs:\n");
@@ -364,7 +372,7 @@ public class Comp {
         assert dfn.bodies != null;
         if (dfn.bodies.size()>1 || dfn.bodies.get(0).start!=0 || !dfn.bodies.get(0).noHeader) {
           ArrayList<DfnTok.Body> bodies = dfn.bodies;
-          for (int k = 0; k < bodies.size(); k++) {
+          for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
             DfnTok.Body bd = bodies.get(k);
             b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.ftype=='m'? "monadic" : bd.ftype=='d'? "dyadic" : "ambivalent").append('\n');
             b.append("    start: ").append(bd.start).append('\n');
@@ -387,6 +395,24 @@ public class Comp {
   }
   
   
+  public int next(int i) {
+    switch (bc[i]) {
+      case PUSH: case DFND:
+      case VARO: case VARM:
+      case ARRO: case ARRM:
+        return l7end(bc, i+1);
+      case FN1C: case FN2C: case FN1O: case FN2O:
+      case OP1D: case OP2D: case OP2H:
+      case TR2D: case TR3D: case TR3O:
+      case SETN: case SETU: case SETM:
+      case POPS: case CHKV: case RETN:
+        return i+1;
+      case SPEC: return i+2;
+      default  : return -1;
+    }
+  }
+  
+  
   private int l7dec(byte[] bc, int i) {
     int n=0, h=0;
     while (true) {
@@ -404,7 +430,7 @@ public class Comp {
   
   private String safeObj(int l) {
     if (l>=objs.length) return "INVALID";
-    return "!"+objs[l];
+    return "!"+objs[l].oneliner();
   }
   private String safeStr(int l) {
     if (l>=strs.length) return "INVALID";
@@ -508,10 +534,11 @@ public class Comp {
   
   public static Comp comp(TokArr<LineTok> lns) {
     Mut mut = new Mut();
-    for (int i = 0; i < lns.tokens.size(); i++) {
-      LineTok ln = lns.tokens.get(i);
-      typeof(ln);
+    int sz = lns.tokens.size();
+    for (int i = 0; i < sz; i++) {
+      LineTok ln = lns.tokens.get(i); typeof(ln);
       compP(mut, ln, false);
+      if (i!=sz-1) mut.add(POPS);
     }
     return mut.finish(lns);
   }
@@ -519,10 +546,15 @@ public class Comp {
   public static int[] comp(Mut mut, ArrayList<List<LineTok>> parts) {
     int[] offs = new int[parts.size()];
     for (int i = 0; i < parts.size(); i++) {
+      List<LineTok> cp = parts.get(i);
+      int sz = cp.size();
       offs[i] = mut.bc.size();
-      for (LineTok ln : parts.get(i)) {
+  
+      for (int j = 0; j < sz; j++) {
+        LineTok ln = cp.get(j); typeof(ln);
         typeof(ln);
         compP(mut, ln, false);
+        if (j!=sz-1) mut.add(POPS);
       }
       if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
     }
