@@ -12,7 +12,7 @@ public class LTBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    return new Rank0Arr(x);
+    return SingleItemArr.r0(x);
   }
   
   

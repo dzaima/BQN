@@ -16,7 +16,7 @@ public class LShoeBuiltin extends Builtin {
   
   
   public Value call(Value x) {
-    return new Rank0Arr(x);
+    return SingleItemArr.r0(x);
   }
   
   @Override public Value call(Value w, Value x) {

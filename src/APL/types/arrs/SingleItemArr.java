@@ -14,6 +14,14 @@ public class SingleItemArr extends Arr {
     this.item = item;
   }
   
+  public static Value r0(Value v) {
+    return new SingleItemArr(v, EmptyArr.NOINTS);
+  }
+  public static final int[] SH1 = new int[]{1};
+  public static Value sh1(Value v) {
+    return new SingleItemArr(v, SH1);
+  }
+  
   public Value get(int i) { return item; }
   
   

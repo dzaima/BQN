@@ -383,14 +383,13 @@ public class JComp {
                 break;
               case STDOUT:
                 fn.new_(Quad.class); fn.dup();
-                fn.aload(SC);
-                fn.invspec(Quad.class, "<init>", met(void.class, Scope.class));
+                fn.invspec(Quad.class, "<init>", met(void.class));
                 break;
               case STDIN:
                 fn.new_(Quad.class); fn.dup();
+                fn.invspec(Quad.class, "<init>", met(void.class));
                 fn.aload(SC);
-                fn.invspec(Quad.class, "<init>", met(void.class, Scope.class));
-                fn.invvirt(Quad.class, "get", met(Value.class));
+                fn.invvirt(Quad.class, "get", met(Value.class, Scope.class));
                 break;
               default:
                 throw new InternalError("Unknown special "+bc[i-1]);

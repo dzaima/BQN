@@ -110,7 +110,7 @@ public class MutVal { // inserts can be in any order, but must not override prev
           } else if (x instanceof Num) {
             ds[rS] = ((Num) x).num;
             return;
-          } else if (x instanceof Shape1Arr) {
+          } else if (x instanceof SingleItemArr) {
             double d = ((Num) x.get(0)).num;
             Arrays.fill(ds, rS, rS+len, d);
             return;
@@ -146,7 +146,7 @@ public class MutVal { // inserts can be in any order, but must not override prev
           if (x instanceof IntArr) {
             System.arraycopy(x.asIntArr(), xS, is, rS, len);
             return;
-          } else if (x instanceof Shape1Arr) {
+          } else if (x instanceof SingleItemArr) {
             double d = ((Num) x.get(0)).num;
             Arrays.fill(is, rS, rS+len, (int) d);
             return;

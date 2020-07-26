@@ -159,7 +159,7 @@ public abstract class Fun extends Callable {
       Value w0 = w.first();
       
       if (x.scalar()) {
-        return new Rank0Arr(allD(f, w0, x.first()));
+        return SingleItemArr.r0(allD(f, w0, x.first()));
       } else { // 𝕨 𝕩¨
         Value[] arr = new Value[x.ia];
         Iterator<Value> xi = x.iterator();
@@ -311,7 +311,7 @@ public abstract class Fun extends Callable {
             else return f.call((BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           }
           throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
-        } else return new Rank0Arr(numD(f, w.first(), x.first()));
+        } else return SingleItemArr.r0(numD(f, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
         if (x.quickDoubleArr() && w instanceof Num) {
@@ -368,7 +368,7 @@ public abstract class Fun extends Callable {
           if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn))
             return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           throw new DomainError("calling a number-only function with "+w.humanType(true)+" and "+x.humanType(false), this);
-        } else return new Rank0Arr(bitD(n, b, w.first(), x.first()));
+        } else return SingleItemArr.r0(bitD(n, b, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
         if (w instanceof Primitive) {
@@ -442,7 +442,7 @@ public abstract class Fun extends Callable {
             return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           if (w instanceof Char & x instanceof Char) return c.call(((Char) w).chr, ((Char) x).chr);
           return def.call(w, x);
-        } else return new Rank0Arr(numChrD(n, c, def, w.first(), x.first()));
+        } else return SingleItemArr.r0(numChrD(n, c, def, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
         if (w instanceof Num && x.quickDoubleArr()) {
@@ -500,7 +500,7 @@ public abstract class Fun extends Callable {
           else if ((w instanceof BigValue|wn) & (x instanceof BigValue|xn))
             return n.call(wn? new BigValue(((Num) w).num) : (BigValue) w, xn? new BigValue(((Num) x).num) : (BigValue) x);
           else return def.call(w, x);
-        } else return new Rank0Arr(ncbaD(n, b, c, def, w.first(), x.first()));
+        } else return SingleItemArr.r0(ncbaD(n, b, c, def, w.first(), x.first()));
         
       } else { // 𝕨¨ 𝕩
         if (w instanceof Primitive) {

@@ -17,7 +17,7 @@ public class OldDownArrowBuiltin extends Builtin {
   
   public Value call(Value x) {
     if (x instanceof Primitive) return x;
-    if (x.rank <= 1) return new Rank0Arr(x);
+    if (x.rank <= 1) return SingleItemArr.r0(x);
     if (x.quickDoubleArr()) {
       double[] dw = x.asDoubleArr();
       int csz = x.shape[x.rank-1]; // chunk size

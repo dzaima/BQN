@@ -12,20 +12,18 @@ public class Pervasion {
     public Value call(Value w, Value x) {
       int wr = w.rank;
       int xr = x.rank;
-      if (xr==0) {
-        if (wr==0) {
-          if (w instanceof Primitive && x instanceof Primitive) return on((Primitive) w, (Primitive) x);
-          else return new Rank0Arr(call(w.first(), x.first()));
-        }
-        return scalarX(w, x.first());
-      } else if (wr==0) {
-        return scalarW(w.first(), x);
+      if (xr==0 || wr==0) {
+        if (wr!=0) return scalarX(w, x.first());
+        if (xr!=0) return scalarW(w.first(), x);
+        
+        if (w instanceof Primitive && x instanceof Primitive) return on((Primitive) w, (Primitive) x);
+        return SingleItemArr.r0(call(w.first(), x.first()));
       }
       if (wr==xr) {
         Arr.eqShapes(w, x);
         return each(w, x);
       } else { // TODO optimize for w.quickDoubleArr/x.quickDoubleArr
-        boolean we = w.rank < x.rank; // w is expanded
+        boolean we = wr < xr; // w is expanded
         int max = Math.max(w.ia, x.ia);
         int min = Math.min(w.ia, x.ia);
         int ext = max/min;

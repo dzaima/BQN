@@ -21,7 +21,7 @@ public class EachBuiltin extends Mop {
   }
   
   public static Value on(Value f, Value x) {
-    if (x.scalar()) return new Rank0Arr(f.asFun().call(x.first()));
+    if (x.scalar()) return SingleItemArr.r0(f.asFun().call(x.first()));
     if (!f.notIdentity()) {
       if (f instanceof Num && Num.isBool(((Num) f).num)) { // bitarr code is very bad at respecting SingleItemArrs
         long[] ls = new long[BitArr.sizeof(x.ia)];
@@ -41,7 +41,7 @@ public class EachBuiltin extends Mop {
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
     if (x.scalar()) {
-      if (w.scalar()) return new Rank0Arr(ff.call(w.first(), x.first()));
+      if (w.scalar()) return SingleItemArr.r0(ff.call(w.first(), x.first()));
       Value[] n = new Value[w.ia];
       for (int i = 0; i < n.length; i++) n[i] = ff.call(w.get(i), x.first());
       return Arr.create(n, w.shape);
@@ -115,8 +115,8 @@ public class EachBuiltin extends Mop {
     if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
     int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
-    if (w.rank==0 && !(w instanceof Primitive)) w = new Rank0Arr(w.first()); // abuse that get doesn't check indexes for simple scalar extension
-    if (x.rank==0 && !(x instanceof Primitive)) x = new Rank0Arr(w.first());
+    if (w.rank==0 && !(w instanceof Primitive)) w = SingleItemArr.r0(w.first()); // abuse that get doesn't check indexes for simple scalar extension
+    if (x.rank==0 && !(x instanceof Primitive)) x = SingleItemArr.r0(w.first());
     rec(f, o, w, x, 0, new Value[ia], new Value[1], res2);
     return Arr.create(res2, x.shape);
   }

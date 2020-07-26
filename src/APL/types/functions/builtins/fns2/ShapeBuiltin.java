@@ -17,9 +17,9 @@ public class ShapeBuiltin extends Builtin {
   
   public Value call(Value x) {
     if (x instanceof Primitive) {
-      if (x instanceof Num) return x.ofShape(Shape1Arr.SHAPE);
+      if (x instanceof Num) return x.ofShape(SingleItemArr.SH1);
       if (x instanceof Char) return new ChrArr(String.valueOf(((Char) x).chr));
-      return new Shape1Arr(x);
+      return SingleItemArr.sh1(x);
     }
     return x.ofShape(new int[]{x.ia});
   }

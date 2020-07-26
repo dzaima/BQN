@@ -173,7 +173,7 @@ public class JoinBuiltin extends Builtin {
   
   public static Value cat(Value w, Value x, int k, Callable blame) {
     boolean wScalar = w.scalar(), xScalar = x.scalar();
-    if (wScalar && xScalar) return cat(new Shape1Arr(w.first()), x, 0, blame);
+    if (wScalar && xScalar) return cat(SingleItemArr.sh1(w.first()), x, 0, blame);
     if (!wScalar && !xScalar) {
       if (w.rank != x.rank) throw new RankError("ranks not matchable", blame, x);
       for (int i = 0; i < w.rank; i++) {

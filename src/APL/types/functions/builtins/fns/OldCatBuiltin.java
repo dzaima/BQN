@@ -16,7 +16,7 @@ public class OldCatBuiltin extends Builtin {
     if (x instanceof Primitive) {
       if (x instanceof Num) return new DoubleArr(new double[]{((Num) x).num});
       if (x instanceof Char) return new ChrArr(String.valueOf(((Char) x).chr));
-      return new Shape1Arr(x);
+      return SingleItemArr.sh1(x);
     }
     return x.ofShape(new int[]{x.ia});
   }

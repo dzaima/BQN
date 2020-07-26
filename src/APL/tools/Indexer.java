@@ -146,7 +146,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       if (!deep) { // either the rank==1 case or a single position
         int[] res = v.asIntArr();
         if (ish.length == 1) return new PosSh(res, new int[]{res.length});
-        return new PosSh(new int[]{fromShapeChk(ish, res, blame)}, Rank0Arr.SHAPE);
+        return new PosSh(new int[]{fromShapeChk(ish, res, blame)}, EmptyArr.NOINTS);
       }
       
       int[] res = new int[Arr.prod(rsh)];

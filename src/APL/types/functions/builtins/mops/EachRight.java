@@ -1,7 +1,7 @@
 package APL.types.functions.builtins.mops;
 
 import APL.types.*;
-import APL.types.arrs.Rank0Arr;
+import APL.types.arrs.SingleItemArr;
 import APL.types.functions.*;
 
 public class EachRight extends Mop {
@@ -19,6 +19,6 @@ public class EachRight extends Mop {
   }
   
   public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
-    return EachBuiltin.underW(f.asFun(), o, new Rank0Arr(w), x, this);
+    return EachBuiltin.underW(f.asFun(), o, SingleItemArr.r0(w), x, this);
   }
 }
