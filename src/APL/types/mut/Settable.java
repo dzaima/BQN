@@ -1,6 +1,7 @@
-package APL.types;
+package APL.types.mut;
 
 import APL.Scope;
+import APL.types.*;
 
 public abstract class Settable extends Obj {
   

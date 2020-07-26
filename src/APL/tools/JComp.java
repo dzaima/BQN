@@ -5,9 +5,9 @@ import APL.errors.*;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 import APL.types.functions.*;
-import APL.types.functions.builtins.Quad;
 import APL.types.functions.builtins.fns2.EvalBuiltin;
 import APL.types.functions.trains.*;
+import APL.types.mut.*;
 
 import java.util.*;
 

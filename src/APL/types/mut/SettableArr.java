@@ -1,7 +1,7 @@
-package APL.types.functions;
+package APL.types.mut;
 
 import APL.*;
-import APL.errors.*;
+import APL.errors.LengthError;
 import APL.types.*;
 
 public class SettableArr extends Settable {

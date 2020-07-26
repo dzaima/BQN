@@ -1,6 +1,6 @@
 package APL.types;
 
-import APL.*;
+import APL.Main;
 import APL.types.arrs.HArr;
 
 import java.util.*;

@@ -1,7 +1,8 @@
-package APL.types;
+package APL.types.mut;
 
-import APL.*;
+import APL.Scope;
 import APL.errors.*;
+import APL.types.*;
 
 public class Variable extends Settable {
   

@@ -1,4 +1,4 @@
-package APL.types.functions.builtins;
+package APL.types.mut;
 
 import APL.*;
 import APL.types.*;

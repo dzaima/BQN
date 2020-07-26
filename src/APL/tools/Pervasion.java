@@ -1,6 +1,6 @@
 package APL.tools;
 
-import APL.errors.*;
+import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.builtins.fns2.NotBuiltin;

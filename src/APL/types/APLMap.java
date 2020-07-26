@@ -2,6 +2,7 @@ package APL.types;
 
 import APL.*;
 import APL.errors.SyntaxError;
+import APL.types.mut.Settable;
 
 public abstract class APLMap extends Primitive {
   

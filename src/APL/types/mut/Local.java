@@ -1,7 +1,8 @@
-package APL.types;
+package APL.types.mut;
 
-import APL.*;
-import APL.errors.*;
+import APL.Scope;
+import APL.errors.ValueError;
+import APL.types.*;
 
 public class Local extends Settable {
   

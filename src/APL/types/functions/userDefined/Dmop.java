@@ -5,8 +5,6 @@ import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 import APL.types.functions.*;
 
-import java.util.Arrays;
-
 
 public class Dmop extends Mop {
   public final DfnTok code;

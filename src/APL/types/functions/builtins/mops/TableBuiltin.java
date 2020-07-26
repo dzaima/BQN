@@ -28,8 +28,9 @@ public final class TableBuiltin extends Mop {
       if (fd != null) {
         double[] arr = new double[w.ia*x.ia];
         int i = 0;
+        double[] xd = x.asDoubleArr();
         for (double na : w.asDoubleArr()) {
-          for (double nw : x.asDoubleArr()) {
+          for (double nw : xd) {
             arr[i++] = fd.on(na, nw);
           }
         }
