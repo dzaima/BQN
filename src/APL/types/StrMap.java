@@ -9,11 +9,6 @@ public class StrMap extends APLMap {
   public final HashMap<String, Value> vals;
   // public final Scope sc;
   
-  public StrMap(Scope sc) {
-    this.vals = sc.vars;
-    // this.sc = sc;
-  }
-  
   public StrMap(HashMap<String, Value> vals) {
     this.vals = vals;
   }

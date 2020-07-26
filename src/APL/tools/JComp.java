@@ -38,7 +38,7 @@ public class JComp {
       
       
       MA fn = new MA(0x0001, "get", met(Value.class, Scope.class, int.class), 3);
-      // aload 0 - this (JGen); 1 - scope; 2,3,4 - temp values
+      // aload 0 - this (JFn); 1 - scope; 2 - offset; 3,4,5 - temp values
       int SC   = 1;
       int OFF  = 2;
       int TMP  = 3;
@@ -88,13 +88,14 @@ public class JComp {
           case PUSH: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(0);
-            fn.getfield(JFn.class, "vals", "[L"+name(Value.class)+";");
+            fn.getfield(JFn.class, "vals", Value[].class);
             fn.iconst(n);
             fn.aaload();
             mstack = Math.max(mstack, cstack+2);
             cstack++;
             break;
           }
+          
           case VARO: { // MA.Lbl l = fn.lbl();
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(SC);
@@ -104,7 +105,6 @@ public class JComp {
             cstack++;
             break;
           }
-          
           case VARM: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             // s.push(new Variable(sc, strs[n]));
@@ -116,6 +116,31 @@ public class JComp {
             cstack++;
             break;
           }
+  
+  
+          case LOCO: {
+            int depth = bc[i++];
+            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            fn.aload(SC);
+            for (int j = 0; j < depth; j++) fn.getfield(Scope.class, "parent", Scope.class);
+            fn.getfield(Scope.class, "vars", Value[].class);
+            fn.iconst(n); fn.aaload();
+            mstack = Math.max(mstack, cstack+2);
+            cstack++;
+            break;
+          }
+          case LOCM: {
+            int depth = bc[i++];
+            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            fn.new_(Local.class); fn.dup();
+            fn.aload(SC); fn.iconst(depth); fn.iconst(n);
+            fn.invspec(Local.class, "<init>", met(void.class, Scope.class, int.class, int.class));
+            mstack = Math.max(mstack, cstack+5);
+            cstack++;
+            break;
+          }
+          
+          
           case ARRO: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.iconst(n); fn.anewarray(Value.class);
@@ -323,7 +348,7 @@ public class JComp {
           case DFND: {
             int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(0);
-            fn.getfield(JFn.class, "dfns", "[L"+name(DfnTok.class)+";");
+            fn.getfield(JFn.class, "dfns", DfnTok[].class);
             fn.iconst(n);
             fn.aaload();
             fn.aload(SC);
@@ -581,7 +606,14 @@ public class JComp {
     public Const(byte[] bs) { this.bs = bs; }
   
     public int compareTo(JComp.Const o) {
-      return Arrays.compare(bs, o.bs);
+      int c;
+      c = Integer.compare(bs.length, o.bs.length);
+      if(c!=0) return c;
+      for (int i = 0; i < bs.length; i++) {
+        c = Byte.compare(bs[i], o.bs[i]);
+        if (c!=0) return c;
+      }
+      return 0;
     }
     
     public boolean equals(Object o) {
@@ -695,10 +727,10 @@ public class JComp {
     void invstat (String cls, String name, String type) { b(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
     void getfield(String cls, String name, String type) { b(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
   
-    void invvirt (Class<?> cls, String name, String type) { invvirt (name(cls), name, type); }
-    void invspec (Class<?> cls, String name, String type) { invspec (name(cls), name, type); }
-    void invstat (Class<?> cls, String name, String type) { invstat (name(cls), name, type); }
-    void getfield(Class<?> cls, String name, String type) { getfield(name(cls), name, type); }
+    void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,      type ); }
+    void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,      type ); }
+    void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,      type ); }
+    void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, name(type)); }
     
     public void new_     (String cls) { b(187); u2(CONSTANT_Class(cls)); }
     public void anewarray(String cls) { b(189); u2(CONSTANT_Class(cls)); }

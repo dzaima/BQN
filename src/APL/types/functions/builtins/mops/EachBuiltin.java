@@ -17,6 +17,10 @@ public class EachBuiltin extends Mop {
   
   
   public Value call(Value f, Value x, DerivedMop derv) {
+    return on(f, x);
+  }
+  
+  public static Value on(Value f, Value x) {
     if (x.scalar()) return new Rank0Arr(f.asFun().call(x.first()));
     if (!f.notIdentity()) {
       if (f instanceof Num && Num.isBool(((Num) f).num)) { // bitarr code is very bad at respecting SingleItemArrs
@@ -33,6 +37,7 @@ public class EachBuiltin extends Mop {
     }
     return res.get();
   }
+  
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
     if (x.scalar()) {

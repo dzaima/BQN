@@ -15,7 +15,7 @@ public class DfnTok extends TokArr<LineTok> {
   
   public DfnTok(String line, int spos, int epos, List<LineTok> tokens) {
     super(line, spos, epos, tokens);
-    type = 'f';
+    type = 'f'; funType(tokens, this);
     ArrayList<List<LineTok>> parts = new ArrayList<>();
     int li = 0;
     for (int i = 0; i < tokens.size(); i++) {
@@ -54,7 +54,7 @@ public class DfnTok extends TokArr<LineTok> {
         src = part;
         assert tail != 0;
         int rid = parts.size()-i;
-        body = new Body(tail==1? 'a' : rid==1? 'd' : 'm', funType(src, this), -1);
+        body = new Body(tail==1? 'a' : rid==1? 'd' : 'm', funType(src, this), -1, this);
       }
       bodies.add(body);
       bodySrcs.add(src);
@@ -106,6 +106,7 @@ public class DfnTok extends TokArr<LineTok> {
     public final boolean immediate;
     public final Token wM, fM, gM, xM;
     public final String self;
+    public final String[] varNames; // must start with whatever is applicable of 𝕨𝕗𝕊𝕣𝕘𝕩
     
     public Body(LineTok header, boolean imm) {
       token = header;
@@ -215,12 +216,36 @@ public class DfnTok extends TokArr<LineTok> {
           } else throw new SyntaxError("Invalid header", header);
         } else throw new SyntaxError("Invalid header", header);
       }
-      
+      varNames = varnames(otype, immediate);
     }
-    
-    public Body(char f, boolean imm, int start) {
+    public Body(char f, boolean imm, int start, DfnTok dfn) { // no-header bodies
       ftype = f;
       this.start = start;
+      if (dfn.type == 'f') imm = false; // still don't like {2+2} being immediate
+      varNames = varnames(dfn.type, imm);
+      immediate = imm;
+      token = null;
+      noHeader = true;
+      otype = 0;
+      wM=fM=gM=xM=null;
+      self = null;
+    }
+    static String[] varnames(char t, boolean imm) {
+      assert "fmda".indexOf(t)!=-1;
+      switch ((t=='d'? 2 : t=='m'? 1 : 0) + (imm? 3 : 0)) { default: throw new IllegalStateException();
+                                                              //    𝕊𝕩𝕨𝕣𝕗𝕘 | 012345
+        case 0: return new String[]{"𝕤","𝕩","𝕨"            }; // f  012··· | 𝕊𝕩𝕨···
+        case 1: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗"    }; // m  01234· | 𝕊𝕩𝕨𝕣𝕗·
+        case 2: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗","𝕘"}; // d  012345 | 𝕊𝕩𝕨𝕣𝕗𝕘
+        case 3: return new String[]{                       }; // fi ······ | ······
+        case 4: return new String[]{            "𝕣","𝕗"    }; // mi ···01· | 𝕣𝕗····
+        case 5: return new String[]{            "𝕣","𝕗","𝕘"}; // di ···012 | 𝕣𝕗𝕘···
+      }
+    }
+    public Body(char f, boolean imm, int start, String[] varNames) { // •COMPiled bodies
+      ftype = f;
+      this.start = start;
+      this.varNames = varNames;
       immediate = imm;
       
       token = null;
@@ -282,33 +307,35 @@ public class DfnTok extends TokArr<LineTok> {
   }
   
   
-  public int start(Scope nsc, Value w, Value f, Value g, Value x, Value self) {
-    assert nsc.vars.size() == 0;
+  public int find(Scope nsc, Value w, Value f, Value g, Value x, Value self) { // todo this is stupid
+    assert nsc.varAm == 0;
     for (Body b : bodies) {
+      nsc.removeMap();
+      nsc.varNames = b.varNames; // no cloning is suuuuurely fiiine
+      nsc.vars = new Value[b.varNames.length];
+      nsc.varAm = b.varNames.length;
       if (b.match(nsc, w, f, g, x)) {
         if (b.self != null) nsc.set(b.self, self);
         return b.start;
       }
-      nsc.vars.clear();
     }
-    type = 'a';
-    throw new DomainError("No dfn header matched", this);
+    throw new DomainError("No header matched", this);
   }
   
   
-  public DfnTok(char type, boolean imm, int off) {
+  public DfnTok(char type, boolean imm, int off, String[] varNames) {
     super("•COMPiled function", 0, 18, new ArrayList<>());
     this.type = type;
     bodies = new ArrayList<>();
-    bodies.add(new Body('a', imm, off));
+    bodies.add(new Body('a', imm, off, varNames));
     immediate = imm;
   }
   
-  public static boolean funType(Token t, DfnTok dt, boolean first) { // returns immediate, mutates dt's type; +TODO remove first
+  public static boolean funType(Token t, DfnTok dt) { // returns immediate, mutates dt's type
     if (t instanceof TokArr<?>) {
-      if (first || !(t instanceof DfnTok)) {
+      if (!(t instanceof DfnTok)) {
         boolean imm = true;
-        for (Token c : ((TokArr<?>) t).tokens) imm&= funType(c, dt, false);
+        for (Token c : ((TokArr<?>) t).tokens) imm&= funType(c, dt);
         return imm;
       }
       return true;
@@ -320,17 +347,17 @@ public class DfnTok extends TokArr<LineTok> {
       }
       return !(op.equals("𝕨") || op.equals("𝕎") || op.equals("𝕩") || op.equals("𝕏"));
     } else if (t instanceof ParenTok) {
-      return funType(((ParenTok) t).ln, dt, false);
+      return funType(((ParenTok) t).ln, dt);
     } else return true;
   }
   
-  private boolean funType(List<LineTok> lns, DfnTok dfn) {
+  private boolean funType(List<LineTok> lns, DfnTok dfn) { // TODO split up into separate thing getting immediate and type
     boolean imm = true;
-    for (LineTok ln : lns) imm&= funType(ln, dfn, true);
+    for (LineTok ln : lns) imm&= funType(ln, dfn);
     return imm;
   }
   
-  @Override public String toRepr() {
+  public String toRepr() {
     StringBuilder s = new StringBuilder("{");
     boolean tail = false;
     for (LineTok v : tokens) {
@@ -351,7 +378,8 @@ public class DfnTok extends TokArr<LineTok> {
       case 'd': return new Ddop(this, sc);
       case 'a': {
         Scope nsc = new Scope(sc);
-        return this.comp.exec(nsc, this.start(nsc, null, null, null, null, Nothing.inst));
+        int b = this.find(nsc, null, null, null, null, Nothing.inst);
+        return this.comp.exec(nsc, b);
       }
       default : throw new IllegalStateException(this.type+"");
     }

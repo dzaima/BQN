@@ -15,7 +15,7 @@ public class Variable extends Settable {
   }
   
   public Value get() {
-    if (v == null) throw new ValueError("Getting value of non-existing variable '"+name+"'", this);
+    if (v == null) throw new ValueError("getting value of non-existing variable \""+name+"\"", this);
     return v;
   }
   
@@ -23,7 +23,7 @@ public class Variable extends Settable {
     if (update) {
       sc.update(name, v);
     } else {
-      if (sc.vars.containsKey(name)) throw new SyntaxError("←: Cannot redefine '"+name+"'", blame, this);
+      if (sc.varMap().containsKey(name)) throw new SyntaxError("←: cannot redefine \""+name+"\"", blame, this);
       sc.set(name, v);
     }
   }

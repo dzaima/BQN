@@ -12,6 +12,7 @@ public class EmptyArr extends Arr {
   public static final EmptyArr SHAPE0S = new EmptyArr(SHAPE0, Char.SPACE);
   public static final int[] NOINTS = new int[0];
   public static final Value[] NOVALUES = new Value[0];
+  public static final String[] NOSTRS = new String[0];
   
   private final Value proto;
   public EmptyArr(int[] sh, Value proto) {

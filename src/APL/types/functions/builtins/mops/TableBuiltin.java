@@ -10,8 +10,11 @@ public final class TableBuiltin extends Mop {
     return "⌜";
   }
   
+  public Value call(Value f, Value x, DerivedMop derv) {
+    return EachBuiltin.on(f, x);
+  }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, DerivedMop derv) { // TODO use valuecopy
     int[] sh = new int[w.rank+x.rank];
     System.arraycopy(w.shape, 0, sh, 0, w.rank);
     System.arraycopy(x.shape, 0, sh, w.rank, x.rank);
@@ -51,44 +54,41 @@ public final class TableBuiltin extends Mop {
             firstSkipped = true;
             r = first;
           }
-          if (r instanceof Num) dres[i++] = ((Num) r).num;
-          else {
+          if (r instanceof Num) {
+            dres[i++] = ((Num) r).num;
+          } else {
             allNums = false;
             failure = r;
             break numatt;
           }
         }
       }
-      if (allNums) {
-        if (sh.length == 0) return new Num(dres[0]);
-        return new DoubleArr(dres, sh);
-      } else { // i points to the place the failure should be
-        Value[] res = new Value[w.ia*x.ia];
-        for (int n = 0; n < i; n++) { // slowly copy the data back..
-          res[n] = new Num(dres[n]);
+      if (allNums) return new DoubleArr(dres, sh);
+      // i points to the place the failure should be
+      Value[] res = new Value[w.ia*x.ia];
+      
+      for (int n = 0; n < i; n++) res[n] = Num.of(dres[n]); // slowly copy the data back..
+      
+      res[i++] = failure; // insert that horrible thing that broke everything
+      if (i%x.ia != 0) { // finish the damn row..
+        Value va = w.get(i / x.ia);
+        for (int wi = i % x.ia; wi < x.ia; wi++) {
+          res[i++] = ff.call(va, x.get(wi));
         }
-        res[i++] = failure; // insert that horrible thing that broke everything
-        if (i%x.ia != 0) { // finish the damn row..
-          Value va = w.get(i / x.ia);
-          for (int wi = i % x.ia; wi < x.ia; wi++) {
-            res[i++] = ff.call(va, x.get(wi));
-          }
-        }
-        for (int ai = (i+x.ia-1) / x.ia; ai < w.ia; ai++) { // and do the rest, slowly and horribly
-          Value va = w.get(ai);
-          for (Value vw : x) {
-            res[i++] = ff.call(va, vw);
-          }
-        }
-        return Arr.create(res, sh);
       }
+      for (int ai = (i+x.ia-1) / x.ia; ai < w.ia; ai++) { // and do the rest, slowly and horribly
+        Value va = w.get(ai);
+        for (Value vw : x) res[i++] = ff.call(va, vw);
+      }
+      return Arr.create(res, sh);
     }
     boolean firstSkipped = false;
     Value[] arr = new Value[w.ia*x.ia];
     for (Value na : w) {
       for (Value nw : x) {
-        if (firstSkipped) arr[i++] = ff.call(na, nw);
-        else {
+        if (firstSkipped) {
+          arr[i++] = ff.call(na, nw);
+        } else {
           firstSkipped = true;
           arr[i++] = first;
         }

@@ -22,7 +22,7 @@ public class Comp {
   private final Token[] ref;
   private final Token tk;
   
-  public static int compileStart = 0; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
+  public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
   private int iter;
   private JFn gen;
   
@@ -56,10 +56,12 @@ public class Comp {
   public static final byte CHKV = 18; // error if ToS is ·
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   public static final byte OP2H = 20; // derive composition to modifier
+  public static final byte LOCO = 21; // 1B,N; push local object
+  public static final byte LOCM = 22; // 1B,N; push mutable local object
   public static final byte RETN = 25; // returns, giving ToS
   // public static final byte ____ = 6;
   
-  public static final byte SPEC = -1; // special
+  public static final byte SPEC = 30; // special
   public static final byte   EVAL = 0; // ⍎
   public static final byte   STDIN = 1; // •
   public static final byte   STDOUT = 2; // •←
@@ -116,6 +118,19 @@ public class Comp {
         case VARM: {
           int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
           s.push(new Variable(sc, strs[n]));
+          break;
+        }
+        case LOCO: {
+          int depth = bc[i++];
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          Value got = sc.getL(depth, n);
+          s.push(got);
+          break;
+        }
+        case LOCM: {
+          int depth = bc[i++];
+          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          s.push(new Local(sc, depth, n));
           break;
         }
         case ARRO: {
@@ -338,6 +353,8 @@ public class Comp {
           case CHKV: cs = " CHKV"; break;
           case TR3O: cs = " TR3O"; break;
           case OP2H: cs = " OP2H"; break;
+          case LOCO: cs = " LOCO " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
+          case LOCM: cs = " LOCM " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
           case RETN: cs = " RETN"; break;
           case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
           default  : cs = " unknown";
@@ -408,6 +425,8 @@ public class Comp {
       case POPS: case CHKV: case RETN:
         return i+1;
       case SPEC: return i+2;
+      case LOCO: case LOCM:
+        return l7end(bc, i+2);
       default  : return -1;
     }
   }

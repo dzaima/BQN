@@ -18,48 +18,104 @@ import java.util.*;
 
 public class Scope {
   private final Scope parent;
-  public final HashMap<String, Value> vars;
   public final Sys sys;
   public Random rnd;
   public final Value[] args;
+  
+  private HashMap<String, Integer> varMap;
+  public Value[] vars;
+  public String[] varNames;
+  //    𝕊𝕩𝕨𝕣𝕗𝕘 | 012345
+  // fi ······ | ······ | ······
+  // f  012··· | 𝕊𝕩𝕨··· | 𝕊𝕩𝕨···
+  // mi ···01· | 𝕣𝕗···· | ···𝕣𝕗·
+  // m  01234· | 𝕊𝕩𝕨𝕣𝕗· | 𝕊𝕩𝕨𝕣𝕗·
+  // di ···012 | 𝕣𝕗𝕘··· | ···𝕣𝕗𝕘
+  // d  012345 | 𝕊𝕩𝕨𝕣𝕗𝕘 | 𝕊𝕩𝕨𝕣𝕗𝕘
+  
+  public int varAm;
+  
   public Scope(Sys s) {
-    vars = new HashMap<>();
+    varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
     sys = s;
     parent = null;
     args = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
     rnd = new Random();
   }
   public Scope(Scope p) {
-    vars = new HashMap<>();
+    varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
     sys = p.sys;
     parent = p;
     args = p.args;
     rnd = p.rnd;
   }
-  public Scope(Scope inherit, Value[] args) {
-    vars = inherit.vars;
+  public Scope(Scope p, String[] varNames) {
+    varMap = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
+    sys = p.sys;
+    parent = p;
+    args = p.args;
+    rnd = p.rnd;
+  }
+  public Scope(Scope inherit, Value[] args) { // TODO fix this
+    varMap = null; this.varNames = new String[1]; vars = new Value[1]; varAm = 0;
+    // varMap = inherit.varMap; varNames = inherit.varNames; vars = inherit.vars; varAm = inherit.varAm;
     sys = inherit.sys;
     parent = inherit.parent;
     this.args = args;
     rnd = inherit.rnd;
   }
-  public Scope owner(String name) {
-    if (vars.containsKey(name)) return this;
-    else if (parent == null) return null;
-    else return parent.owner(name);
+  
+  public HashMap<String, Integer> varMap() {
+    if (varMap==null) {
+      varMap = new HashMap<>();
+      for (int i = 0; i < varAm; i++) varMap.put(varNames[i], i);
+    }
+    return varMap;
   }
+  
+  public Scope owner(String name) {
+    if (name.startsWith("•")) return this;
+    Scope c = this;
+    while (!c.varMap().containsKey(name)) {
+      c = c.parent;
+      if (c == null) return null;
+    }
+    return c;
+  }
+  public Scope owner(int depth) {
+    Scope c = this;
+    while (depth--!=0) c = c.parent;
+    return c;
+  }
+  
+  public int alloc(String name) {
+    if (varAm==vars.length) {
+      int nlen = vars.length*2+1;
+      vars = Arrays.copyOf(vars, nlen);
+      varNames = Arrays.copyOf(varNames, nlen);
+    }
+    int idx = varAm++;
+    varNames[idx] = name;
+    if (varMap!=null) varMap.put(name, idx);
+    return idx;
+  }
+  public void removeMap() {
+    varMap = null;
+  }
+  
   
   public void update(String name, Value val) { // sets wherever var already exists
     Scope sc = owner(name);
     if (sc == null) throw new SyntaxError("No variable '"+name+"' to update", val);
     sc.set(name, val);
   }
-  public void set(String name, Value val) { // sets in current scope
-    if (name.charAt(0) == '•') {
-      switch (name) {
-        case "•io":
-          if (!val.equals(Num.ZERO)) throw new DomainError("Cannot set •io to "+val);
-          break;
+  public void set(int index, Value val) {
+    assert varNames[index] != null;
+    vars[index] = val;
+  }
+  public void set(String key, Value val) { // sets in current scope
+    if (key.charAt(0) == '•') {
+      switch (key) {
         case "•vi":
           Main.vind = Main.bool(val);
           break;
@@ -79,13 +135,15 @@ public class Scope {
           }
           break;
         default:
-          throw new DomainError("setting unknown quad "+name);
+          throw new DomainError("setting unknown quad "+key);
       }
     } else {
-      if (val == null) vars.remove(name);
-      else vars.put(name, val); // +TODO a separate "remove" call
+      Integer k = varMap().get(key);
+      if (k==null) k = alloc(key);
+      vars[k] = val;
     }
   }
+  
   public Value get(String name) {
     if (name.startsWith("•")) {
       switch (name) {
@@ -113,7 +171,6 @@ public class Scope {
         case "•dr": return new DR();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
-        case "•io": return Num.ZERO;
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
         case "•class": return new ClassGetter();
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
@@ -187,7 +244,7 @@ public class Scope {
             DfnTok[] dfnp = new DfnTok[blocks.ia];
             for (int i = 0; i < dfnp.length; i++) {
               Value c = blocks.get(i);
-              if (c.ia!=3) throw new DomainError("•COMP: ¬∧´3 = ≠3⊑𝕩");
+              if (c.ia!=4) throw new DomainError("•COMP: ¬∧´4 = ≠3⊑𝕩");
               
               char type = ((Char) c.get(0)).chr;
               boolean imm = Main.bool(c.get(1));
@@ -196,15 +253,18 @@ public class Scope {
                 type = 'a';
                 imm = true;
               }
+              int lvarAm = c.get(3).ia;
+              String[] lvars = new String[lvarAm];
+              for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
               
               if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
-              dfnp[i] = new DfnTok(type, imm, off);
+              dfnp[i] = new DfnTok(type, imm, off, lvars);
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
             for (DfnTok dfn : dfnp) dfn.comp = c;
             if (!allowImm) {
-              DfnTok f = new DfnTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt());
+              DfnTok f = new DfnTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt(), null);
               f.comp = c;
               return f.eval(Scope.this);
             }
@@ -227,11 +287,13 @@ public class Scope {
           return new Optimizer();
       }
     }
-    Value f = vars.get(name);
-    if (f == null) {
-      if (parent == null) return null;
-      else return parent.get(name);
-    } else return f;
+    Scope c = this;
+    while (true) {
+      Integer pos = c.varMap().get(name);
+      if (pos!=null) return c.vars[pos];
+      c = c.parent;
+      if (c == null) return null;
+    }
   }
   public Value getC(String name) {
     Value got = get(name);
@@ -245,7 +307,9 @@ public class Scope {
   private String toString(String prep) {
     StringBuilder res = new StringBuilder("{\n");
     String cp = prep+"  ";
-    for (String n : vars.keySet()) res.append(cp).append(n).append(" ← ").append(get(n)).append("\n");
+    for (int i = 0; i < varAm; i++) {
+      res.append(cp).append(varNames[i]).append(" ← ").append(vars[i]).append("\n");
+    }
     if (parent != null) res.append(cp).append("parent: ").append(parent.toString(cp));
     res.append(prep).append("}\n");
     return res.toString();
@@ -259,6 +323,10 @@ public class Scope {
   }
   public int rand(int n) {
     return rnd.nextInt(n);
+  }
+  
+  public Value getL(int depth, int n) {
+    return owner(depth).vars[n];
   }
   
   static class GCLog extends Builtin {
@@ -330,9 +398,9 @@ public class Scope {
     }
   }
   public static Value formatTime(double ns) {
-    if (ns < 1000) return Main.toAPL(ns+"ns");
+    if (ns < 1000) return Main.toAPL(Num.format(ns, 3, -99, 99)+"ns");
     double ms = ns/1e6;
-    if (ms > 500) return Main.toAPL(new Num(ms/1000d)+" seconds");
+    if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, -99, 99)+" seconds");
     return Main.toAPL(Num.format(ms, 3, -99, 99)+"ms");
   }
   static class CompTimer extends Builtin {
@@ -367,14 +435,17 @@ public class Scope {
       }
     }
   }
-  class Eraser extends Builtin {
-    public String repr() {
-      return "•ERASE";
-    }
+  class Eraser extends Builtin { // leaves a hole in the local variable map; TODO should maybe be a ucmd?
+    public String repr() { return "•ERASE"; }
     
     public Value call(Value x) {
-      Scope.this.set(x.asString(), null);
-      return x;
+      String k = x.asString();
+      Scope o = owner(k);
+      if (o==null) return Num.ZERO;
+      int p = o.varMap().get(k);
+      o.vars[p] = null; // don't keep garbage
+      o.varMap().remove(k);
+      return Num.ONE;
     }
   }
   static class Delay extends Builtin {
@@ -618,13 +689,13 @@ public class Scope {
         Process p;
         if (w.get(0) instanceof Char) {
           String cmd = w.asString();
-          p = Runtime.getRuntime().exec(cmd, new String[0], f);
+          p = Runtime.getRuntime().exec(cmd, EmptyArr.NOSTRS, f);
         } else {
           String[] parts = new String[w.ia];
           for (int i = 0; i < parts.length; i++) {
             parts[i] = w.get(i).asString();
           }
-          p = Runtime.getRuntime().exec(parts, new String[0], f);
+          p = Runtime.getRuntime().exec(parts, EmptyArr.NOSTRS, f);
         }
         Num ret = Num.of(p.waitFor());
         if (inp != null) p.getOutputStream().write(inp);
