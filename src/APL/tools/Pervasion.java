@@ -15,7 +15,7 @@ public class Pervasion {
       if (xr==0) {
         if (wr==0) {
           if (w instanceof Primitive && x instanceof Primitive) return on((Primitive) w, (Primitive) x);
-          else call(w.first(), x.first());
+          else return new Rank0Arr(call(w.first(), x.first()));
         }
         return scalarX(w, x.first());
       } else if (wr==0) {
