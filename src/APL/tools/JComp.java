@@ -96,7 +96,7 @@ public class JComp {
             break;
           }
           
-          case VARO: { // MA.Lbl l = fn.lbl();
+          case VARO: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(SC);
             fn.ldc(comp.strs[n]);
@@ -107,11 +107,9 @@ public class JComp {
           }
           case VARM: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-            // s.push(new Variable(sc, strs[n]));
             fn.new_(Variable.class); fn.dup();
-            fn.aload(SC);
             fn.ldc(comp.strs[n]);
-            fn.invspec(Variable.class, "<init>", met(void.class, Scope.class, String.class));
+            fn.invspec(Variable.class, "<init>", met(void.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             cstack++;
             break;
@@ -133,9 +131,9 @@ public class JComp {
             int depth = bc[i++];
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.new_(Local.class); fn.dup();
-            fn.aload(SC); fn.iconst(depth); fn.iconst(n);
-            fn.invspec(Local.class, "<init>", met(void.class, Scope.class, int.class, int.class));
-            mstack = Math.max(mstack, cstack+5);
+            fn.iconst(depth); fn.iconst(n);
+            fn.invspec(Local.class, "<init>", met(void.class, int.class, int.class));
+            mstack = Math.max(mstack, cstack+4);
             cstack++;
             break;
           }
@@ -312,10 +310,9 @@ public class JComp {
           case SETU:
           case SETN: {
             fn.swap(); fn.dup_x1(); // v k → v k v
-            fn.iconst(bc[pi]==SETU? 1 : 0);
-            fn.aconst_null();
-            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Callable.class));
-            mstack = Math.max(mstack, cstack+3);
+            fn.iconst(bc[pi]==SETU? 1 : 0); fn.aload(SC); fn.aconst_null();
+            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class));
+            mstack = Math.max(mstack, cstack+4);
             cstack--;
             break;
           }
@@ -328,14 +325,15 @@ public class JComp {
             fn.invvirt(Value.class, "asFun", met(Fun.class)); // v k F
             fn.astore(TMP); // v k
             fn.dup2();      // v k v k
-            fn.invvirt(Settable.class, "get", met(Value.class)); // v k v K
+            fn.aload(SC);   // v k v k sc
+            fn.invvirt(Settable.class, "get", met(Value.class, Scope.class)); // v k v K
             fn.aload(TMP);  // v k v K F
             fn.dup_x2();    // v k F v K F
             fn.pop();       // v k F v K
             fn.swap();      // v k F K v
             fn.invvirt(Fun.class, "call",  met(Value.class, Value.class, Value.class)); // v k n
-            fn.iconst(1); fn.aconst_null(); // v k n true null
-            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Callable.class));
+            fn.iconst(1); fn.aload(SC); fn.aconst_null(); // v k n true sc null
+            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class));
             mstack = Math.max(mstack, cstack+3);
             cstack-= 2;
             break;

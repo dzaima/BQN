@@ -39,6 +39,4 @@ public class Dfn extends Fun {
   public String repr() {
     return code.toRepr();
   }
-  
-  public String name() { return "dfn"; }
 }

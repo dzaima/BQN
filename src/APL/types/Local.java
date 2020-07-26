@@ -5,32 +5,29 @@ import APL.errors.*;
 
 public class Local extends Settable {
   
-  private final Scope sc;
-  public final int index;
+  public final int depth, index;
   
-  public Local(Scope sc, int depth, int index) {
-    this(sc.owner(depth), index);
-  }
-  public Local(Scope sc, int index) {
-    super(sc.vars[index]);
-    this.sc = sc;
+  public Local(int depth, int index) {
+    this.depth = depth;
     this.index = index;
   }
   
-  public Value get() {
-    if (v == null) throw new ValueError("Getting value of non-existing variable \""+this+"\"", this);
-    return v;
+  public Value get(Scope sc) {
+    Value got = sc.getL(depth, index);
+    if (got == null) throw new ValueError("Getting value of non-existing variable \""+this+"\"", this);
+    return got;
   }
   
-  public void set(Value v, boolean update, Callable blame) {
+  public void set(Value v, boolean update, Scope sc, Callable blame) {
+    sc = sc.owner(depth);
     if (update ^ v!=null) {
-      if (update) throw new ValueError("no variable \""+this+"\" to update", blame);
+      if (update) throw new ValueError("no variable \""+sc.varNames[index]+"\" to update", blame);
       else        throw new ValueError("←: cannot redefine \""+this+"\"", blame);
     }
     sc.vars[index] = v;
   }
   
   public String toString() {
-    return sc.varNames[index];
+    return "loc("+depth+","+index+")";
   }
 }

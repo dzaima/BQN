@@ -6,7 +6,6 @@ import APL.tokenizer.types.LineTok;
 import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.ChrArr;
-import APL.types.functions.MutArr;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -252,27 +251,17 @@ public class Main {
     return tok.toRepr();
   }
   
+  
   public static boolean isBool(Value x) {
     if (!(x instanceof Num)) return false;
     Num n = (Num) x;
     return n.num==0 || n.num==1;
   }
-  
-  
-  public static Value san(Obj o) {
-    if (o instanceof Value   ) return (Value) o;
-    if (o instanceof MutArr) return ((MutArr) o).get();
-    if (o instanceof Settable) return ((Settable) o).get();
-    throw new DomainError("Cannot convert "+o.humanType(true)+" to array", o);
-  }
-  
-  
   public static boolean bool(double d) {
     if (d == 1) return true;
     if (d == 0) return false;
     throw new DomainError("Expected boolean, got "+d);
   }
-  
   public static boolean bool(Value v) {
     if (v instanceof Num) {
       double num = ((Num) v).num;
@@ -281,6 +270,7 @@ public class Main {
     }
     throw new DomainError("Expected boolean, got "+v, v);
   }
+  
   
   public static ChrArr toAPL(String s) {
     return new ChrArr(s);

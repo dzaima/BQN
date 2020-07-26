@@ -21,7 +21,6 @@ public abstract class Obj implements Tokenable {
     if (this instanceof APLMap  )return article? "a map"        : "map";
     if (this instanceof Fun     )return article? "a function"   : "function";
     if (this instanceof Null    )return article? "javanull"     : "javanull";
-    if (this instanceof MutArr  )return article? "a vararr"     : "vararr";
     if (this instanceof Variable)return article? "a variable"   : "variable";
     if (this instanceof Mop     )return article? "monadic operator" : "a monadic operator";
     if (this instanceof Dop     )return article? "dyadic operator" : "a dyadic operator";

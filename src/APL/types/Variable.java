@@ -5,21 +5,19 @@ import APL.errors.*;
 
 public class Variable extends Settable {
   
-  private final Scope sc;
   public final String name;
   
-  public Variable(Scope sc, String name) {
-    super(sc.get(name));
-    this.sc = sc;
+  public Variable(String name) {
     this.name = name;
   }
   
-  public Value get() {
-    if (v == null) throw new ValueError("getting value of non-existing variable \""+name+"\"", this);
-    return v;
+  public Value get(Scope sc) {
+    Value got = sc.get(name);
+    if (got == null) throw new ValueError("getting value of non-existing variable \""+name+"\"", this);
+    return got;
   }
   
-  public void set(Value v, boolean update, Callable blame) {
+  public void set(Value v, boolean update, Scope sc, Callable blame) {
     if (update) {
       sc.update(name, v);
     } else {
@@ -28,9 +26,7 @@ public class Variable extends Settable {
     }
   }
   
-  @Override
   public String toString() {
-    if (Main.debug) return v == null? "var:"+name : "var:"+v;
-    return v == null? "var:"+name : v.toString();
+    return "var("+name+")";
   }
 }

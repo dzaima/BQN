@@ -1,23 +1,15 @@
 package APL.types;
 
-import APL.errors.ValueError;
+import APL.Scope;
 
 public abstract class Settable extends Obj {
-  final Value v;
-  protected Settable(Value v) {
-    this.v = v;
-  }
-  public abstract void set(Value v, boolean update, Callable blame);
-  public Value get() {
-    if (v == null) throw new ValueError("trying to get non-existing value", this);
-    return v;
-  }
-  public Obj getOrThis() {
-    if (v == null) return this;
-    return v;
-  }
   
-  public Fun asFun() {
-    return get().asFun();
+  public abstract Value get(Scope sc);
+  public abstract void set(Value v, boolean update, Scope sc, Callable blame);
+  
+  public Obj getOrThis(Scope sc) {
+    Value got = get(sc);
+    if (got == null) return this;
+    return got;
   }
 }

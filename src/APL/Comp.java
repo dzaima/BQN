@@ -38,8 +38,8 @@ public class Comp {
   public static final byte PUSH =  0; // N; 2
   public static final byte VARO =  1; // N; x/𝕨/𝕏
   public static final byte VARM =  2; // N; mutable x/𝕨/𝕏
-  public static final byte ARRO =  3; // 1B; 1‿2‿3 / ⟨1⋄2⋄3⟩; compilers job to extend past 255 (or maybe another op?)
-  public static final byte ARRM =  4; // 1B; mutable x‿y‿z / ⟨x⋄y⋄z)
+  public static final byte ARRO =  3; // N; 1‿2‿3 / ⟨1⋄2⋄3⟩
+  public static final byte ARRM =  4; // N; mutable x‿y‿z / ⟨x⋄y⋄z)
   public static final byte FN1C =  5; // monadic call
   public static final byte FN2C =  6; // dyadic call
   public static final byte OP1D =  7; // derive modifier
@@ -117,7 +117,7 @@ public class Comp {
         }
         case VARM: {
           int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-          s.push(new Variable(sc, strs[n]));
+          s.push(new Variable(strs[n]));
           break;
         }
         case LOCO: {
@@ -130,7 +130,7 @@ public class Comp {
         case LOCM: {
           int depth = bc[i++];
           int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-          s.push(new Local(sc, depth, n));
+          s.push(new Local(depth, n));
           break;
         }
         case ARRO: {
@@ -235,14 +235,14 @@ public class Comp {
         case SETN: {
           Settable k = (Settable) s.pop();
           Value    v = (Value   ) s.pop();
-          k.set(v, false, null);
+          k.set(v, false, sc, null);
           s.push(v);
           break;
         }
         case SETU: {
           Settable k = (Settable) s.pop();
           Value    v = (Value   ) s.pop();
-          k.set(v, true, null);
+          k.set(v, true, sc, null);
           s.push(v);
           break;
         }
@@ -250,7 +250,7 @@ public class Comp {
           Settable k = (Settable) s.pop();
           Value    f = (Value   ) s.pop();
           Value    v = (Value   ) s.pop();
-          k.set(f.asFun().call(k.get(), v), true, null);
+          k.set(f.asFun().call(k.get(sc), v), true, sc, null);
           s.push(v);
           break;
         }
@@ -278,10 +278,10 @@ public class Comp {
               s.push(new EvalBuiltin(sc));
               break;
             case STDOUT:
-              s.push(new Quad(sc));
+              s.push(new Quad());
               break;
             case STDIN:
-              s.push(new Quad(sc).get());
+              s.push(new Quad().get(sc));
               break;
             default:
               throw new InternalError("Unknown special "+bc[i-1]);
