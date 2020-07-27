@@ -3,7 +3,7 @@ package APL.types;
 import APL.Main;
 import APL.errors.*;
 import APL.types.arrs.*;
-import APL.types.functions.builtins.fns2.*;
+import APL.types.functions.builtins.fns2.LBoxBuiltin;
 
 import java.util.*;
 
@@ -69,10 +69,7 @@ public abstract class Arr extends Value {
       for (Value v : this) {
         if (res.length() > 0) res.append('‿');
         if (v != null) {
-          if (!(v instanceof Primitive)) {
-            simple = false;
-            break;
-          }
+          if (!simple(v)) { simple = false; break; }
           res.append(v.oneliner());
         } else res.append("NULLPTR");
       }
@@ -108,19 +105,19 @@ public abstract class Arr extends Value {
       int[][] itemWidths = new int[w][h];
       int[] widths = new int[w];
       int[] heights = new int[h];
-      var simple = true;
+      boolean simple = true;
       int x=0, y=0;
       for (Value v : this) {
         if (v == null) v = Main.toAPL("NULLPTR");
-        simple&= v instanceof Primitive;
-        var c = v.toString().split("\n");
-        var cw = 0;
-        for (var ln : c) {
-          cw = Math.max(ln.length(), cw);
-        }
+        simple&= simple(v);
+        String[] c = v.toString().split("\n");
+        int cw = 0;
+        for (String ln : c) cw = Math.max(ln.length(), cw);
         itemWidths[x][y] = cw;
+        
         widths[x] = Math.max(widths[x], cw);
         heights[y] = Math.max(heights[y], c.length);
+        
         stringified[x][y] = c;
         x++;
         if (x==w) {
@@ -193,7 +190,10 @@ public abstract class Arr extends Value {
     if (rank == 0) return "<" + get(0).oneliner();
     if (rank == 1) {
       if (ia == 1) return "⟨"+get(0).oneliner()+"⟩";
-      boolean vec = MatchBuiltin.full(this) != 1;
+      boolean vec = false;
+      for (Value c : this) {
+        if (!simple(c)) { vec = true; break; }
+      }
       StringBuilder b = new StringBuilder();
       if (vec) b.append('⟨');
       boolean first = true;
@@ -213,6 +213,9 @@ public abstract class Arr extends Value {
     }
     b.append("⟩");
     return b.toString();
+  }
+  private static boolean simple(Value v) {
+    return v instanceof Num || v instanceof Char || v instanceof BigValue;
   }
   public Arr reverseOn(int dim) {
     if (rank == 0) {

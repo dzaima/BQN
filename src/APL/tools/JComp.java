@@ -724,10 +724,10 @@ public class JComp {
     void invstat (String cls, String name, String type) { b(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
     void getfield(String cls, String name, String type) { b(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
   
-    void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,      type ); }
-    void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,      type ); }
-    void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,      type ); }
-    void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, name(type)); }
+    void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,       type ); }
+    void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,       type ); }
+    void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,       type ); }
+    void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, fname(type)); }
     
     public void new_     (String cls) { b(187); u2(CONSTANT_Class(cls)); }
     public void anewarray(String cls) { b(189); u2(CONSTANT_Class(cls)); }

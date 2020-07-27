@@ -17,7 +17,7 @@ import java.util.*;
 
 
 public class Scope {
-  private final Scope parent;
+  public final Scope parent;
   public final Sys sys;
   public Random rnd;
   public final Value[] args;
