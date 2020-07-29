@@ -387,10 +387,11 @@ public class Comp {
         DfnTok dfn = dfns[j];
         b.append(' ').append(j).append(": ").append(dfn.type=='f'? "function" : dfn.type=='d'? "2-modifier" : dfn.type=='m'? "1-modifier" : dfn.type=='a'? "immediate block" : String.valueOf(dfn.type)).append(" \n");
         b.append("  flags: ").append(dfn.flags).append('\n');
-        if (dfn.bodies.size()>1 || dfn.bodies.get(0).start!=0 || !dfn.bodies.get(0).noHeader) {
-          ArrayList<DfnTok.Body> bodies = dfn.bodies;
+        Body b0 = dfn.bodies.get(0);
+        if (dfn.bodies.size()>1 || b0.start!=0 || !b0.noHeader || b0.vars.length!=0) {
+          ArrayList<Body> bodies = dfn.bodies;
           for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
-            DfnTok.Body bd = bodies.get(k);
+            Body bd = bodies.get(k);
             b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.ftype=='m'? "monadic" : bd.ftype=='d'? "dyadic" : "ambivalent").append('\n');
             b.append("    start: ").append(bd.start).append('\n');
             if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
@@ -398,6 +399,7 @@ public class Comp {
             if (bd.xM!=null) b.append("    𝕩: ").append(bd.xM.toRepr()).append('\n');
             if (bd.fM!=null) b.append("    𝕗: ").append(bd.fM.toRepr()).append('\n');
             if (bd.gM!=null) b.append("    𝕘: ").append(bd.gM.toRepr()).append('\n');
+            if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
           }
         }
         if (dfn.comp != this) {
@@ -477,18 +479,24 @@ public class Comp {
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<DfnTok> dfns = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
-    ArrayList<Byte> bc = new ArrayList<>();
+    MutByteArr bc = new MutByteArr(10);
     ArrayList<Token> ref = new ArrayList<>();
     ArrayList<DfnTok> registered = new ArrayList<>();
-    
-    
+  
+    HashMap<String, Integer> vars; // map of varName→index
+    ArrayList<String> varnames;
+    public void newBody(String[] preset) {
+      varnames = new ArrayList<>();
+      Collections.addAll(varnames, preset);
+      vars = new HashMap<>();
+      for (int i = 0; i < preset.length; i++) vars.put(preset[i], i);
+    }
+    public String[] getVars() {
+      return varnames.toArray(new String[0]);
+    }
+  
     public void addNum(int n) {
-      do {
-        byte b = (byte) (n&0x7f);
-        n>>= 7;
-        if (n!=0) b|= 0x80;
-        bc.add(b); ref.add(null);
-      } while (n != 0);
+      leb128(bc, n, ref);
     }
     
     public void push(Value o) {
@@ -503,34 +511,44 @@ public class Comp {
       dfns.add(o);
     }
     
-    public void varo(Token t, String s) {
-      add(t, VARO);
-      addNum(strs.size());
-      strs.add(s);
-    }
-    public void varm(Token t, String s) {
-      add(t, VARM);
-      addNum(strs.size());
-      strs.add(s);
+    public void var(Token t, String s, boolean mut) {
+      Integer pos = vars.get(s);
+      if (pos == null) {
+        add(t, mut? VARM : VARO);
+        addNum(strs.size());
+        strs.add(s);
+      } else {
+        add(t, mut? LOCM : LOCO);
+        add((byte) 0);
+        addNum(pos);
+      }
     }
     
     public void add(byte... nbc) {
       for (byte b : nbc) {
-        bc.add(b);
-        ref.add(null);
+        bc.u(b); ref.add(null);
       }
     }
     public void add(Token tk, byte... nbc) {
       for (byte b : nbc) {
-        bc.add(b);
-        ref.add(tk);
+        bc.u(b); ref.add(tk);
       }
     }
+    
+    public static void leb128(MutByteArr ba, int n, ArrayList<Token> ref) {
+      do {
+        byte b = (byte) (n&0x7f);
+        n>>= 7;
+        if (n!=0) b|= 0x80;
+        ba.s(b);
+        ref.add(null);
+      } while (n != 0);
+    }
   
-    public Comp finish(Token tk) { // todo a tk for everything is stupid
-      byte[] br = new byte[bc.size()];
-      for (int i = 0; i < bc.size(); i++) br[i] = bc.get(i);
-      Comp comp = new Comp(br, objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
+    public Comp finish(Token tk) {
+      assert bc.len == ref.size() : bc.len +" "+ ref.size();
+      
+      Comp comp = new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
       for (DfnTok c : registered) c.comp = comp;
       return comp;
     }
@@ -542,39 +560,37 @@ public class Comp {
   
   
   
-  public static Comp comp(LineTok ln) {
-    typeof(ln); flags(ln);
+  public static Comp comp(TokArr<LineTok> lns, Scope sc) {
     Mut mut = new Mut();
-    compP(mut, ln, false);
-    byte[] bc = new byte[mut.bc.size()];
-    for (int i = 0; i < mut.bc.size(); i++) bc[i] = mut.bc.get(i);
-    return new Comp(bc, mut.objs.toArray(new Value[0]), mut.strs.toArray(new String[0]), mut.dfns.toArray(new DfnTok[0]), mut.ref.toArray(new Token[0]), ln);
-  }
-  
-  public static Comp comp(TokArr<LineTok> lns) {
-    Mut mut = new Mut();
+    mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
     for (int i = 0; i < sz; i++) {
       LineTok ln = lns.tokens.get(i); typeof(ln); flags(ln);
-      compP(mut, ln, false);
+      compO(mut, ln);
       if (i!=sz-1) mut.add(POPS);
     }
+    sc.varNames = mut.getVars();
+    sc.varAm = sc.varNames.length;
+    if (sc.vars.length < sc.varAm) sc.vars = Arrays.copyOf(sc.vars, sc.varAm);
+    sc.removeMap();
     return mut.finish(lns);
   }
   
-  public static int[] comp(Mut mut, ArrayList<List<LineTok>> parts) {
+  public static int[] comp(Mut mut, ArrayList<Body> parts) {
     int[] offs = new int[parts.size()];
     for (int i = 0; i < parts.size(); i++) {
-      List<LineTok> cp = parts.get(i);
-      int sz = cp.size();
-      offs[i] = mut.bc.size();
-  
+      Body b = parts.get(i);
+      offs[i] = mut.bc.len;
+      mut.newBody(b.defNames());
+      
+      int sz = b.lns.size();
       for (int j = 0; j < sz; j++) {
-        LineTok ln = cp.get(j); typeof(ln); flags(ln);
+        LineTok ln = b.lns.get(j); typeof(ln); flags(ln);
         typeof(ln);
-        compP(mut, ln, false);
+        compO(mut, ln);
         if (j!=sz-1) mut.add(POPS);
       }
+      b.vars = mut.getVars();
       if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
     }
     return offs;
@@ -648,7 +664,7 @@ public class Comp {
     }
     
     abstract void add(Mut m);
-    Res mut() { throw new Error(getClass()+" cannot be mutated"); }
+    Res mut(boolean create) { throw new Error(getClass()+" cannot be mutated"); }
     
     public abstract Token lastTok();
   }
@@ -656,6 +672,7 @@ public class Comp {
   static class ResTk extends Res {
     Token tk;
     private boolean mut;
+    private boolean create;
     
     public ResTk(Token tk) {
       super(tk.type);
@@ -665,12 +682,14 @@ public class Comp {
     }
     
     void add(Mut m) {
-      compP(m, tk, mut);
+      if (mut) compM(m, tk, create);
+      else compO(m, tk);
     }
     
-    Res mut() {
+    Res mut(boolean create) {
       assert !mut;
       mut = true;
+      this.create = create;
       return this;
     }
     
@@ -873,7 +892,7 @@ public class Comp {
           tps.removeLast(),
           tps.removeLast(),
           tps.removeLast(), // empty
-          tps.removeLast().mut(),
+          tps.removeLast().mut(false),
           new ResBC(SETM)
         ));
         continue;
@@ -894,7 +913,7 @@ public class Comp {
               tps.removeLast(),
               new ResBC(ov=='A'? CHKVBC : NOBYTES),
               tps.removeLast(), // empty
-              tps.removeLast().mut(),
+              tps.removeLast().mut(a=='←'),
               new ResBC(a=='←'? SETN : SETU)
             ));
             continue;
@@ -995,60 +1014,66 @@ public class Comp {
     throw new ImplementationError("didn't check for "+t.getClass().getSimpleName());
   }
   
-  
-  public static void compP(Mut m, Token tk, boolean mut) { // assumes tk has been typechecked
+  public static void compM(Mut m, Token tk, boolean create) {
     assert tk.type != 0;
-    if (mut) {
-      if (tk instanceof NameTok) {
-        m.varm(tk, ((NameTok) tk).name);
-        return;
+    if (tk instanceof NameTok) {
+      String name = ((NameTok) tk).name;
+      if (create) {
+        if (m.vars.containsKey(name)) throw Local.redefine(name, tk);
+        m.vars.put(name, m.varnames.size());
+        m.varnames.add(name);
       }
-      if (tk instanceof StrandTok) {
-        List<Token> tks = ((StrandTok) tk).tokens;
-        for (Token c : tks) compP(m, c, true);
-        m.add(tk, ARRM); m.addNum(tks.size());
-        return;
-      }
-      if (tk instanceof ArrayTok) {
-        List<LineTok> tks = ((ArrayTok) tk).tokens;
-        for (LineTok c : tks) compP(m, c, true);
-        m.add(tk, ARRM); m.addNum(tks.size());
-        return;
-      }
-      if (tk instanceof ParenTok) {
-        compP(m, ((ParenTok) tk).ln, true);
-        return;
-      }
-      if (tk instanceof LineTok) {
-        if (((LineTok) tk).tokens.size() == 1) {
-          compP(m, ((LineTok) tk).tokens.get(0), true);
-          return;
-        }
-      }
-      if (tk instanceof OpTok) {
-        String op = ((OpTok) tk).op;
-        if (op.equals("•")) {
-          m.add(tk, SPEC, STDOUT);
-          return;
-        }
-        int aid = Tokenizer.surrogateOps.indexOf(op);
-        if (aid != -1) {
-          aid = aid/4*4;
-          m.varm(tk, Tokenizer.surrogateOps.substring(aid, aid+2));
-          return;
-        }
-      }
-      throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
+      m.var(tk, name, true);
+      return;
     }
+    if (tk instanceof StrandTok) {
+      List<Token> tks = ((StrandTok) tk).tokens;
+      for (Token c : tks) compM(m, c, create);
+      m.add(tk, ARRM); m.addNum(tks.size());
+      return;
+    }
+    if (tk instanceof ArrayTok) {
+      List<LineTok> tks = ((ArrayTok) tk).tokens;
+      for (LineTok c : tks) compM(m, c, create);
+      m.add(tk, ARRM); m.addNum(tks.size());
+      return;
+    }
+    if (tk instanceof ParenTok) {
+      compM(m, ((ParenTok) tk).ln, create);
+      return;
+    }
+    if (tk instanceof LineTok) {
+      if (((LineTok) tk).tokens.size() == 1) {
+        compM(m, ((LineTok) tk).tokens.get(0), create);
+        return;
+      }
+    }
+    if (tk instanceof OpTok) {
+      String op = ((OpTok) tk).op;
+      if (op.equals("•")) {
+        m.add(tk, SPEC, STDOUT);
+        return;
+      }
+      int aid = Tokenizer.surrogateOps.indexOf(op);
+      if (aid != -1) {
+        aid = aid/4*4;
+        m.var(tk, Tokenizer.surrogateOps.substring(aid, aid+2), true);
+        return;
+      }
+    }
+    throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
+  }
+  
+  public static void compO(Mut m, Token tk) { // assumes tk has been typechecked
     if ((tk.flags&1)!=0) { m.push(constFold(tk)); return; } // ConstTok, NothingTok
     if (tk instanceof ParenTok) {
-      compP(m, ((ParenTok) tk).ln, false);
+      compO(m, ((ParenTok) tk).ln);
       return;
     }
     if (tk instanceof LineTok) {
       List<Token> ts = ((LineTok) tk).tokens;
       if (ts.size() == 0) return;
-      if (ts.size() == 1) { compP(m, ts.get(0), false); return; }
+      if (ts.size() == 1) { compO(m, ts.get(0)); return; }
       int i = ts.size()-1;
       
       LinkedList<Res> tps = new LinkedList<>();
@@ -1099,10 +1124,10 @@ public class Comp {
       String s = op.op;
       switch (s) {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣":
-          m.varo(tk, s);
+          m.var(tk, s, false);
           return;
         case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊": case "ℝ":
-          m.varo(tk, new String(new char[]{55349, (char) (s.charAt(1)+26)})); // lowercase
+          m.var(tk, new String(new char[]{55349, (char) (s.charAt(1)+26)}), false); // lowercase
           return;
         case "⍎": m.add(op, SPEC, EVAL ); return;
         case "•": m.add(op, SPEC, STDIN); return;
@@ -1110,13 +1135,13 @@ public class Comp {
       }
     }
     if (tk instanceof NameTok) {
-      m.varo(tk, ((NameTok) tk).name);
+      m.var(tk, ((NameTok) tk).name, false);
       return;
     }
     if (tk instanceof StrandTok) { // +TODO (+↓) check for type A
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<Token> tks = ((StrandTok) tk).tokens;
-      for (Token c : tks) compP(m, c, false);
+      for (Token c : tks) compO(m, c);
       if (Main.debug) Main.printlvl--;
       
       m.add(tk, ARRO); m.addNum(tks.size());
@@ -1125,7 +1150,7 @@ public class Comp {
     if (tk instanceof ArrayTok) {
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<LineTok> tks = ((ArrayTok) tk).tokens;
-      for (LineTok c : tks) compP(m, c, false);
+      for (LineTok c : tks) compO(m, c);
       if (Main.debug) Main.printlvl--;
       
       m.add(tk, ARRO); m.addNum(tks.size());

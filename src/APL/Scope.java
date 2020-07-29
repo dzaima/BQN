@@ -37,32 +37,31 @@ public class Scope {
   
   public Scope(Sys s) {
     varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
-    sys = s;
     parent = null;
+    sys = s;
     args = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
     rnd = new Random();
   }
   public Scope(Scope p) {
     varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
-    sys = p.sys;
     parent = p;
+    sys = p.sys;
     args = p.args;
     rnd = p.rnd;
   }
   public Scope(Scope p, String[] varNames) {
     varMap = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
-    sys = p.sys;
     parent = p;
+    sys = p.sys;
     args = p.args;
     rnd = p.rnd;
   }
-  public Scope(Scope inherit, Value[] args) { // TODO fix this
+  public Scope(Scope p, Value[] args) { // TODO fix this
     varMap = null; this.varNames = new String[1]; vars = new Value[1]; varAm = 0;
-    // varMap = inherit.varMap; varNames = inherit.varNames; vars = inherit.vars; varAm = inherit.varAm;
-    sys = inherit.sys;
-    parent = inherit.parent;
+    parent = p;
+    sys = p.sys;
     this.args = args;
-    rnd = inherit.rnd;
+    rnd = p.rnd;
   }
   
   public HashMap<String, Integer> varMap() {
@@ -148,8 +147,8 @@ public class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "•time": return new Timer();
-        case "•ctime": return new CompTimer();
+        case "•time": return new Timer(this);
+        case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex();
         case "•lns": return new Lns();
         case "•sh": return new Shell();
@@ -176,7 +175,7 @@ public class Scope {
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•pfx": return new Profiler(this);
         case "•pfo": return new Profiler.ProfilerOp(this);
-        case "•pfc": return new Profiler.ProfilerDop();
+        case "•pfc": return new Profiler.ProfilerDop(this);
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
@@ -290,7 +289,7 @@ public class Scope {
     Scope c = this;
     while (true) {
       Integer pos = c.varMap().get(name);
-      if (pos!=null) return c.vars[pos];
+      if (pos!=null && c.vars[pos]!=null) return c.vars[pos]; // TODO remove c.vars[pos]!=null once LOC_ usage is finished
       c = c.parent;
       if (c == null) return null;
     }
@@ -330,15 +329,15 @@ public class Scope {
   }
   
   static class GCLog extends Builtin {
-    private final Scope sc;
+    public String repr() {
+      return "•GCLOG";
+    }
     
+    private final Scope sc;
     protected GCLog(Scope sc) {
       this.sc = sc;
     }
     
-    @Override public String repr() {
-      return "•GCLOG";
-    }
     
     @Override
     public Value call(Value x) {
@@ -361,35 +360,67 @@ public class Scope {
       }
     }
   }
-  class Timer extends Builtin {
-    @Override public String repr() {
-      return "•TIME";
-    }
+  static class Timer extends Builtin {
+    public String repr() { return "•TIME"; }
+    
+    private final Scope sc;
+    Timer(Scope sc) { this.sc = sc; }
+  
     public Value call(Value x) {
       return call(Num.ONE, x);
     }
     public Value call(Value w, Value x) {
       int[] options = w.asIntVec();
       int n = options[0];
-  
       int mode = options.length>=2? options[1] : 0;
-      
       String test = x.asString();
-      
-      Comp testCompiled = Comp.comp(Tokenizer.tokenize(test));
+      Comp testCompiled = Main.comp(test, sc);
       
       if (mode==2) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          testCompiled.exec(Scope.this);
+          testCompiled.exec(sc);
           long end = System.nanoTime();
           r[i] = end-start;
         }
         return new DoubleArr(r);
       } else {
         long sns = System.nanoTime();
-        for (int i = 0; i < n; i++) testCompiled.exec(Scope.this);
+        for (int i = 0; i < n; i++) testCompiled.exec(sc);
+        long ens = System.nanoTime();
+        double ns = (ens-sns) / (double)n;
+        if (mode==1) return new Num(ns);
+        else return formatTime(ns);
+      }
+    }
+  }
+  
+  
+  static class CompTimer extends Builtin {
+    public String repr() { return "•CTIME"; }
+    
+    private final Scope sc;
+    public CompTimer(Scope sc) { this.sc = sc; }
+    
+    public Value call(Value w, Value x) {
+      int[] options = w.asIntVec();
+      int n = options[0];
+      int mode = options.length>=2? options[1] : 0;
+      String str = x.asString();
+      
+      if (mode==2) {
+        double[] r = new double[n];
+        for (int i = 0; i < n; i++) {
+          long start = System.nanoTime();
+          Main.comp(str, sc);
+          long end = System.nanoTime();
+          r[i] = end-start;
+        }
+        return new DoubleArr(r);
+      } else {
+        long sns = System.nanoTime();
+        for (int i = 0; i < n; i++) Main.comp(str, sc);
         long ens = System.nanoTime();
         double ns = (ens-sns) / (double)n;
         if (mode==1) return new Num(ns);
@@ -403,39 +434,9 @@ public class Scope {
     if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, -99, 99)+" seconds");
     return Main.toAPL(Num.format(ms, 3, -99, 99)+"ms");
   }
-  static class CompTimer extends Builtin {
-    public String repr() {
-      return "•CTIME";
-    }
-    public Value call(Value w, Value x) {
-      int[] options = w.asIntVec();
-      int n = options[0];
   
-      int mode = options.length>=2? options[1] : 0;
-      
-      String str = x.asString();
-      
-      
-      if (mode==2) {
-        double[] r = new double[n];
-        for (int i = 0; i < n; i++) {
-          long start = System.nanoTime();
-          Comp.comp(Tokenizer.tokenize(str));
-          long end = System.nanoTime();
-          r[i] = end-start;
-        }
-        return new DoubleArr(r);
-      } else {
-        long sns = System.nanoTime();
-        for (int i = 0; i < n; i++) Comp.comp(Tokenizer.tokenize(str));
-        long ens = System.nanoTime();
-        double ns = (ens-sns) / (double)n;
-        if (mode==1) return new Num(ns);
-        else return formatTime(ns);
-      }
-    }
-  }
-  class Eraser extends Builtin { // leaves a hole in the local variable map; TODO should maybe be a ucmd?
+  
+  class Eraser extends Builtin { // leaves a hole in the local variable map and probably breaks many things; TODO should maybe be a ucmd?
     public String repr() { return "•ERASE"; }
     
     public Value call(Value x) {
@@ -443,8 +444,7 @@ public class Scope {
       Scope o = owner(k);
       if (o==null) return Num.ZERO;
       int p = o.varMap().get(k);
-      o.vars[p] = null; // don't keep garbage
-      o.varMap().remove(k);
+      o.vars[p] = null;
       return Num.ONE;
     }
   }
@@ -488,9 +488,7 @@ public class Scope {
   }
   
   private static class MapGen extends Builtin {
-    public String repr() {
-      return "•MAP";
-    }
+    public String repr() { return "•MAP"; }
     
     public Value call(Value x) {
       if (x instanceof StrMap) {
@@ -529,9 +527,7 @@ public class Scope {
   }
   
   private class Optimizer extends Builtin {
-    public String repr() {
-      return "•OPT";
-    }
+    public String repr() { return "•OPT"; }
     
     public Value call(Value x) {
       String name = x.asString();
@@ -543,18 +539,15 @@ public class Scope {
     }
   }
   private static class ClassGetter extends Builtin {
-    public String repr() {
-      return "•CLASS";
-    }
+    public String repr() { return "•CLASS"; }
+    
     public Value call(Value x) {
       return new ChrArr(x.getClass().getCanonicalName());
     }
   }
   
   private class Ex extends Builtin {
-    public String repr() {
-      return "•EX";
-    }
+    public String repr() { return "•EX"; }
     
     public Value call(Value x) {
       return call(EmptyArr.SHAPE0S, x);
@@ -567,9 +560,7 @@ public class Scope {
     }
   }
   private static class Lns extends Builtin {
-    public String repr() {
-      return "•LNS";
-    }
+    public String repr() { return "•LNS"; }
     
     public Value call(Value x) {
       String path = x.asString();
@@ -649,9 +640,7 @@ public class Scope {
   
   
   private static class Shell extends Builtin {
-    public String repr() {
-      return "•SH";
-    }
+    public String repr() { return "•SH"; }
     
     public Value call(Value x) {
       return exec(x, null, null, false);
@@ -730,9 +719,7 @@ public class Scope {
   
   
   private class NC extends Builtin {
-    public String repr() {
-      return "•NC";
-    }
+    public String repr() { return "•NC"; }
     
     public Value call(Value x) {
       Obj obj = Scope.this.get(x.asString());
@@ -747,17 +734,14 @@ public class Scope {
   
   
   private static class Hasher extends Builtin {
-    public String repr() {
-      return "•HASH";
-    }
+    public String repr() { return "•HASH"; }
+    
     public Value call(Value x) {
       return Num.of(x.hashCode());
     }
   }
   private static class Stdin extends Builtin {
-    public String repr() {
-      return "•STDIN";
-    }
+    public String repr() { return "•STDIN"; }
     public Value call(Value x) {
       if (x instanceof Num) {
         int n = x.asInt();
@@ -775,10 +759,10 @@ public class Scope {
   }
   
   public static class Profiler extends Builtin {
+    public String repr() { return "•PFX"; }
+    
     private final Scope sc;
-    Profiler(Scope sc) {
-      this.sc = sc;
-    }
+    Profiler(Scope sc) { this.sc = sc; }
     
     static final HashMap<String, Pr> pfRes = new HashMap<>();
     static Value results() {
@@ -802,21 +786,18 @@ public class Scope {
       return new HArr(arr, new int[]{arr.length>>2, 4});
     }
     
-    public String repr() {
-      return "•PFX";
-    }
     public Value call(Value x) {
       return call(x, x);
     }
-    public static Pr pr(Value ko, Value vo) {
+    public static Pr pr(Value ko, Value vo, Scope sc) {
       String k = ko.asString();
       Pr p = pfRes.get(k);
-      if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString())));
+      if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString(), sc)));
       return p;
     }
     
     public Value call(Value w, Value x) {
-      Pr p = pr(w, x); p.start();
+      Pr p = pr(w, x, sc); p.start();
       long sns = System.nanoTime();
       Value res = p.c.exec(sc);
       long ens = System.nanoTime();
@@ -834,7 +815,7 @@ public class Scope {
         String s = ((Value) f).asString();
         Pr p = pfRes.get(s);
         if (p == null) {
-          pfRes.put(s, p = new Pr(Main.comp(s)));
+          pfRes.put(s, p = new Pr(Main.comp(s, sc)));
           p.fn = (Fun) p.c.exec(sc);
         }
         return p;
@@ -863,9 +844,13 @@ public class Scope {
       }
     }
     public static class ProfilerDop extends Dop {
+      public String repr() { return "•_PFC_"; }
+      
+      private final Scope sc;
+      ProfilerDop(Scope sc) { this.sc = sc; }
       
       public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-        Pr p = pr(g, null); Fun ff = f.asFun(); p.start();
+        Pr p = pr(g, null, sc); Fun ff = f.asFun(); p.start();
         long sns = System.nanoTime();
         Value res = ff.call(w, x);
         long ens = System.nanoTime();
@@ -874,17 +859,12 @@ public class Scope {
       }
       
       public Value call(Value f, Value g, Value x, DerivedDop derv) {
-        Pr p = pr(g, null); Fun ff = f.asFun(); p.start();
+        Pr p = pr(g, null, sc); Fun ff = f.asFun(); p.start();
         long sns = System.nanoTime();
         Value res = ff.call(x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;
-      }
-      
-      
-      public String repr() {
-        return "•_PFC_";
       }
     }
   }
@@ -913,6 +893,8 @@ public class Scope {
   }
   
   private static class Big extends Builtin {
+    public String repr() { return "•BIG"; }
+    
     public Value call(Value x) {
       return rec(x);
     }
@@ -941,12 +923,11 @@ public class Scope {
       }
       return HArr.create(va, x.shape);
     }
-    public String repr() {
-      return "•BIG";
-    }
   }
   
   private static class DR extends Builtin {
+    public String repr() { return "•DR"; }
+    
     /*
        0=100| - unknown
        1=100| - bit
@@ -1014,9 +995,6 @@ public class Scope {
     }
     public Value callInvW(Value w, Value x) {
       return call(ReverseBuiltin.on(w), x);
-    }
-    public String repr() {
-      return "•DR";
     }
   }
   

@@ -91,16 +91,16 @@ public abstract class Sys {
         }
         break;
       case "BC":
-        println(Main.comp(rest).fmt());
+        println(Main.comp(rest, csc).fmt());
         break;
       case "BCE":
-        println(Main.comp(Main.exec(rest, csc).asString()).fmt());
+        println(Main.comp(Main.exec(rest, csc).asString(), csc).fmt());
         break;
       case "TYPE":
         println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
         break;
       case "JEVAL":
-        println(new JComp(Main.comp(rest)).r.get(csc, 0));
+        println(new JComp(Main.comp(rest, csc)).r.get(csc, 0));
         break;
       default:
         throw new SyntaxError("Undefined user command");
@@ -124,7 +124,7 @@ public abstract class Sys {
     if (s.startsWith(")")) {
       ucmd(s.substring(1));
     } else {
-      Comp comp = Main.comp(s);
+      Comp comp = Main.comp(s, csc);
       byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
       Value r = comp.exec(csc);
       if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {

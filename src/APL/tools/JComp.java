@@ -22,11 +22,11 @@ public class JComp {
     
     
     
-    ArrayList<MA> methods = new ArrayList<>();
+    ArrayList<Met> methods = new ArrayList<>();
     ArrayList<Fld> fields = new ArrayList<>();
   
     {
-      MA fn = new MA(0x1001, "<init>", "()V", 1);
+      Met fn = new Met(0x1001, "<init>", "()V", 1);
       fn.aload(0);
       fn.invspec(JFn.class, "<init>", "()V");
       fn.vret();
@@ -37,7 +37,7 @@ public class JComp {
     {
       
       
-      MA fn = new MA(0x0001, "get", met(Value.class, Scope.class, int.class), 3);
+      Met fn = new Met(0x0001, "get", met(Value.class, Scope.class, int.class), 3);
       // aload 0 - this (JFn); 1 - scope; 2 - offset; 3,4,5 - temp values
       int SC   = 1;
       int OFF  = 2;
@@ -57,12 +57,13 @@ public class JComp {
           i = comp.next(i);
         }
       }
-      MA.Lbl[] bodyBlocks = new MA.Lbl[offs.sz];
+      Met.Lbl[] bodyBlocks = new Met.Lbl[offs.sz];
       for (int i = 0; i < bodyBlocks.length; i++) bodyBlocks[i] = fn.lbl();
       int cbody = 0;
+      int mstack;
       
       if (offs.sz!=1) {
-        MA.Lbl def = fn.lbl();
+        Met.Lbl def = fn.lbl();
         fn.iload(OFF);
         fn.lookupswitch(def, bodyBlocks.length);
         for (int i = 0; i < bodyBlocks.length; i++) fn.lookup(offs.is[i], bodyBlocks[i]);
@@ -70,17 +71,17 @@ public class JComp {
         def.here();
         fn.new_(ImplementationError.class);
         fn.dup();
-        fn.ldc("bad starting offset");
+        fn.ldc("function offset must be either 0 or right after RETN");
         fn.invspec(ImplementationError.class, "<init>", met(void.class, String.class));
         fn.athrow();
-        
+        mstack = 3;
         bodyBlocks[cbody++].here();
-      }
+      } else mstack = 0;
       
       
       byte[] bc = comp.bc;
       int i = 0;
-      int cstack=0, mstack=0;
+      int cstack=0;
       while (i != bc.length) {
         int pi = i;
         i++;
@@ -194,7 +195,7 @@ public class JComp {
             cstack-= 2;
             break;
           }
-          case FN1O: { MA.Lbl l1 = fn.lbl(), l2 = fn.lbl();
+          case FN1O: { Met.Lbl l1 = fn.lbl(), l2 = fn.lbl();
             
             fn.invvirt(Value.class, "asFun", met(Fun.class)); // note that this executes even when 𝕩 is ·; ¯\\_(ツ)_/¯
                        // x f
@@ -212,7 +213,7 @@ public class JComp {
             cstack--;
             break;
           }
-          case FN2O: { MA.Lbl l1=fn.lbl(), l2=fn.lbl(), l3=fn.lbl();
+          case FN2O: { Met.Lbl l1=fn.lbl(), l2=fn.lbl(), l3=fn.lbl();
             // x f w
             fn.astore(TMP); // x f
             fn.invvirt(Value.class, "asFun", met(Fun.class));
@@ -286,7 +287,7 @@ public class JComp {
             cstack-= 2;
             break;
           }
-          case TR3O: { MA.Lbl l1 = fn.lbl(), l2 = fn.lbl();
+          case TR3O: { Met.Lbl l1 = fn.lbl(), l2 = fn.lbl();
                                                               fn.astore(TMP ); // f
             fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP2); // g
             fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP3); // h
@@ -355,7 +356,7 @@ public class JComp {
             cstack++;
             break;
           }
-          case CHKV: { MA.Lbl l = fn.lbl();
+          case CHKV: { Met.Lbl l = fn.lbl();
             fn.dup();
             fn.is(Nothing.class);
             fn.ifeq0(l);
@@ -415,14 +416,14 @@ public class JComp {
     
     
     
-    BA res = new BA();
-    res.b(0xCA,0xFE,0xBA,0xBE); // magic
+    MutByteArr res = new MutByteArr();
+    res.u(0xCA,0xFE,0xBA,0xBE); // magic
     res.u2(0x00); res.u2(49); // version
     res.u2(constants.size()+1); // constant count
     
     byte[][] map = new byte[constants.size()][];
     constants.forEach((k, v) -> map[v-1] = k.bs);
-    for (byte[] c : map) res.b(c); // constants
+    for (byte[] c : map) res.u(c); // constants
     
     res.u2(0x0021); // access flags; ACC_PUBLIC ACC_SUPER
     res.u2(this_class);
@@ -439,7 +440,7 @@ public class JComp {
     }
     
     res.u2(methods.size()); // method count
-    for (MA c : methods) {
+    for (Met c : methods) {
       c.finish();
       res.u2(c.acc);
       res.u2(c.name);
@@ -450,7 +451,7 @@ public class JComp {
       res.u2(c.mstack); // max_stack
       res.u2(c.localc); // max locals
       res.u4(c.len);
-      res.b(c.get());
+      res.u(c.get());
       res.u2(0); // exception table length
       // no exceptions
       res.u2(0);
@@ -492,20 +493,20 @@ public class JComp {
   
   
   public int CONSTANT_Utf8(String s) {
-    BA bs = new BA();
-    bs.b(1);
+    MutByteArr bs = new MutByteArr();
+    bs.u(1);
     bs.u2(0); // placeholder
     for (int i = 0; i < s.length(); i++) {
       int c = s.charAt(i)&0xffff;
       if (c<=0x7f && c!=0) {
-        bs.b(c);
+        bs.u(c);
       } else if (c<=0x07ff) {
-        bs.b(0b1100_0000 | c>> 6);
-        bs.b(0b1000_0000 | c     & 0b0011_1111);
+        bs.u(0b1100_0000 | c>> 6);
+        bs.u(0b1000_0000 | c     & 0b0011_1111);
       } else {
-        bs.b(0b1110_0000 | c>>12);
-        bs.b(0b1000_0000 | (c>>6)& 0b0011_1111);
-        bs.b(0b1000_0000 | c     & 0b0011_1111);
+        bs.u(0b1110_0000 | c>>12);
+        bs.u(0b1000_0000 | (c>>6)& 0b0011_1111);
+        bs.u(0b1000_0000 | c     & 0b0011_1111);
       }
     }
     u2(bs.bs, 1, bs.len-3);
@@ -564,9 +565,6 @@ public class JComp {
     a[pos+1] = (byte) ((v>>16)&0xff);
     a[pos+2] = (byte) ((v>> 8)&0xff);
     a[pos+3] = (byte) ( v     &0xff);
-  }
-  static void ins(byte[] a, int pos, byte[] v) {
-    System.arraycopy(v, 0, a, pos, v.length);
   }
   
   
@@ -629,42 +627,8 @@ public class JComp {
   }
   
   
-  static class BA {
-    byte[] bs = new byte[20];
-    int len;
-    void b(int v) {
-      if (len>=bs.length) dbl();
-      bs[len++] = (byte) v;
-    }
-    void b(byte... v) {
-      while (len+v.length>=bs.length) dbl();
-      System.arraycopy(v,0,bs,len,v.length);
-      len+= v.length;
-    }
-    void b(int... v) {
-      while (len+v.length>=bs.length) dbl();
-      for (int i = 0; i < v.length; i++) bs[i+len] = (byte) v[i];
-      len+= v.length;
-    }
-    void u2(int v) {
-      b((v>>8)&0xff);
-      b( v    &0xff);
-    }
-    void u4(int v) {
-      b((v>>24)&0xff);
-      b((v>>16)&0xff);
-      b((v>> 8)&0xff);
-      b( v     &0xff);
-    }
-    void dbl() {
-      bs = Arrays.copyOf(bs, bs.length*2);
-    }
-    byte[] get() {
-      return Arrays.copyOf(bs, len);
-    }
-  }
   
-  class MA extends BA {
+  class Met extends MutByteArr {
     public final int acc, name, type;
     public int mstack = 0; // max stack size
     public int localc; // local variable count
@@ -672,7 +636,7 @@ public class JComp {
     // public BA smt = new BA(); // StackMapTable bytes
     // public int smtc; // StackMapTable entry count 
   
-    public MA(int acc, String name, String type, int argc) { // argc should include `this` if applicable
+    public Met(int acc, String name, String type, int argc) { // argc should include `this` if applicable
       this.acc = acc;
       this.name = CONSTANT_Utf8(name);
       this.type = CONSTANT_Utf8(type);
@@ -681,31 +645,31 @@ public class JComp {
   
     void aload(int i) { // get local variable
       localc = Math.max(i+1, localc);
-      if (i<4) b(42+i);
-      else if (i<256) b(25, i);
+      if (i<4) u(42+i);
+      else if (i<256) u(25, i);
       else throw new NYIError("aload>255");
     }
     void astore(int i) { // store local variable
       localc = Math.max(i+1, localc);
-      if (i<4) b(75+i);
-      else if (i<256) b(58, i);
+      if (i<4) u(75+i);
+      else if (i<256) u(58, i);
       else throw new NYIError("astore>255");
     }
     void iload(int i) { // get local var int
       localc = Math.max(i+1, localc);
-      if (i<4) b(26+i);
-      else if (i<256) b(21, i);
+      if (i<4) u(26+i);
+      else if (i<256) u(21, i);
       else throw new NYIError("iload>255");
     }
     
-    void aaload () { b(50); } // get array item
-    void aastore() { b(83); } // set array item
+    void aaload () { u(50); } // get array item
+    void aastore() { u(83); } // set array item
     
-    void aconst_null() { b(1); } // push null
+    void aconst_null() { u(1); } // push null
     void iconst(int i) { // push integer constant
-      if (i>=-1 && i<=5) b(3+i);
-      else if (( byte)i == i) b(16, i);
-      else if ((short)i == i) { b(17); u2(i); }
+      if (i>=-1 && i<=5) u(3+i);
+      else if (( byte)i == i) { u(16); s (i); }
+      else if ((short)i == i) { u(17); s2(i); }
       // else if (constants.size()<254) {
       //   b(18); b()
       // }
@@ -715,60 +679,60 @@ public class JComp {
       byte[] bs = new byte[3]; bs[0] = 8;
       JComp.u2(bs, 1, CONSTANT_Utf8(str));
       int v = JComp.this.get(bs);
-      if (v < 256) b(18, v);
-      else { b(19); u2(v); }
+      if (v < 256) u(18, v);
+      else { u(19); u2(v); }
     }
   
-    void invvirt (String cls, String name, String type) { b(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
-    void invspec (String cls, String name, String type) { b(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
-    void invstat (String cls, String name, String type) { b(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
-    void getfield(String cls, String name, String type) { b(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
+    void invvirt (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
+    void invspec (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
+    void invstat (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
+    void getfield(String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
   
     void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,       type ); }
     void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,       type ); }
     void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,       type ); }
     void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, fname(type)); }
     
-    public void new_     (String cls) { b(187); u2(CONSTANT_Class(cls)); }
-    public void anewarray(String cls) { b(189); u2(CONSTANT_Class(cls)); }
-    public void is       (String cls) { b(193); u2(CONSTANT_Class(cls)); }
+    public void new_     (String cls) { u(187); u2(CONSTANT_Class(cls)); }
+    public void anewarray(String cls) { u(189); u2(CONSTANT_Class(cls)); }
+    public void is       (String cls) { u(193); u2(CONSTANT_Class(cls)); }
     
     public void new_     (Class<?> cls) { new_     (name(cls)); }
     public void anewarray(Class<?> cls) { anewarray(name(cls)); }
     public void is       (Class<?> cls) { is       (name(cls)); }
     
     public void cast(String cls) {
-      b(192);
+      u(192);
       u2(CONSTANT_Class(cls));
     }
     public void cast(Class<?> c) { cast(name(c)); }
     
-    void vret() { b(177); } // return void
-    void aret() { b(176); } // return object
-    void athrow(){b(191); } // throw ToS
+    void vret() { u(177); } // return void
+    void aret() { u(176); } // return object
+    void athrow(){u(191); } // throw ToS
     
-    void swap  () { b( 95); } // ab → ba
-    void dup   () { b( 89); } // a → aa
-    void dup2  () { b( 92); } // ab → abab
-    void dup_x1() { b( 90); } // ab → bab
-    void dup_x2() { b( 91); } // abc → cabc
-    void pop   () { b( 87); } // .. a → ..
+    void swap  () { u( 95); } // ab → ba
+    void dup   () { u( 89); } // a → aa
+    void dup2  () { u( 92); } // ab → abab
+    void dup_x1() { u( 90); } // ab → bab
+    void dup_x2() { u( 91); } // abc → cabc
+    void pop   () { u( 87); } // .. a → ..
     
-    public void ifeq0   (Lbl l) { b(153); l.add2(); }
-    public void ifne0   (Lbl l) { b(154); l.add2(); }
-    public void iflt0   (Lbl l) { b(155); l.add2(); }
-    public void ifge0   (Lbl l) { b(156); l.add2(); }
-    public void ifgt0   (Lbl l) { b(157); l.add2(); }
-    public void ifle0   (Lbl l) { b(158); l.add2(); }
-    public void goto_   (Lbl l) { b(167); l.add2(); }
-    public void ifnenull(Lbl l) { b(199); l.add2(); } // branch if pop!=null
+    public void ifeq0   (Lbl l) { u(153); l.add2(); }
+    public void ifne0   (Lbl l) { u(154); l.add2(); }
+    public void iflt0   (Lbl l) { u(155); l.add2(); }
+    public void ifge0   (Lbl l) { u(156); l.add2(); }
+    public void ifgt0   (Lbl l) { u(157); l.add2(); }
+    public void ifle0   (Lbl l) { u(158); l.add2(); }
+    public void goto_   (Lbl l) { u(167); l.add2(); }
+    public void ifnenull(Lbl l) { u(199); l.add2(); } // branch if pop!=null
     
     
     int lookupStart;
     public void lookupswitch(Lbl def, int count) {
       lookupStart = len;
-      b(171);
-      while (len%4!=0) b(0);
+      u(171);
+      while (len%4!=0) u(0);
       def.add4(len, lookupStart);
       u4(count);
     }

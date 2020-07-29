@@ -59,7 +59,7 @@ public class Main {
                   System.exit(0);
                   break;
                 case "--q":
-                  System.out.println(new JComp(comp(args[++i])).r.get(sys.csc, 0));
+                  System.out.println(new JComp(comp(args[++i], sys.csc)).r.get(sys.csc, 0));
                   break;
                 default:
                   throw new DomainError("Unknown command-line argument " + p);
@@ -228,13 +228,10 @@ public class Main {
   }
   
   public static Value exec(String s, Scope sc) {
-    return comp(s).exec(sc);
+    return Comp.comp(Tokenizer.tokenize(s), sc).exec(sc);
   }
-  public static Value exec(LineTok ln, Scope sc) {
-    return Comp.comp(ln).exec(sc);
-  }
-  public static Comp comp(String s) {
-    return Comp.comp(Tokenizer.tokenize(s));
+  public static Comp comp(String s, Scope sc) {
+    return Comp.comp(Tokenizer.tokenize(s), sc);
   }
   
   public static void printdbg(Object... args) {
