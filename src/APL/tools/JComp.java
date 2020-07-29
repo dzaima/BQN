@@ -366,6 +366,7 @@ public class JComp {
               fn.invspec(ValueError.class, "<init>", met(void.class, String.class, Tokenable.class));
               fn.athrow();
             l.here();
+            mstack = Math.max(mstack, cstack+3);
             break;
           }
           case RETN: {
@@ -755,7 +756,7 @@ public class JComp {
       int pos = -1;
       public void add2() {
         fr2.add(len);
-        u2(-1);
+        u2(65535);
       }
       public void add4(int pos, int rel) {
         fr4p.add(pos);
