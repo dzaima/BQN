@@ -27,6 +27,32 @@ public class Ddop extends Dop {
     return code.comp.exec(nsc, s).asFun();
   }
   
+  public Mop derive(Value g) {
+    if (!code.immediate) return super.derive(g);
+    Main.printdbg("ddop immediate half-derive", g);
+    return new HalfDerivedDdop(g, this);
+  }
+  
+  public static class HalfDerivedDdop extends Mop {
+    public final Value g;
+    public final Ddop op;
+    
+    public HalfDerivedDdop(Value g, Ddop op) {
+      this.g = g;
+      this.op = op;
+    }
+    
+    public Fun derive(Value f) {
+      return op.derive(f, g);
+    }
+    
+    public String repr() {
+      String gs = g.oneliner();
+      if (!(g instanceof Arr) && gs.length() != 1) gs = "("+gs+")";
+      return op.repr()+gs;
+    }
+  }
+  
   public Value call(Value f, Value g, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
     Main.printdbg("ddop call", x);
     Scope nsc = new Scope(sc);

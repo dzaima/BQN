@@ -21,7 +21,7 @@ public class FoldBuiltin extends Mop {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
     if (x.ia==0) {
       Value id = ff.identity();
-      if (id == null) throw new DomainError("no identity defined for "+f.name(), this, f);
+      if (id == null) throw new DomainError("no identity defined for "+f, this, f);
       return id;
     }
     

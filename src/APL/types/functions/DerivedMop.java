@@ -28,7 +28,7 @@ public class DerivedMop extends Fun {
   }
   
   @Override public String repr() {
-    return f.toString()+op.repr();
+    return f.oneliner()+op.repr();
   }
   
   public Value under(Value o, Value x) {

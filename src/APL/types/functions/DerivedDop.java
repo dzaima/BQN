@@ -28,9 +28,9 @@ public class DerivedDop extends Fun {
     return op.callInvA(f, g, w, x);
   }
   @Override public String repr() {
-    String wws = g.toString();
+    String wws = g.oneliner();
     if (!(g instanceof Arr) && wws.length() != 1) wws = "("+wws+")";
-    return f.toString()+op.repr()+wws;
+    return f.oneliner()+op.repr()+wws;
   }
   
   public Value under(Value o, Value x) {

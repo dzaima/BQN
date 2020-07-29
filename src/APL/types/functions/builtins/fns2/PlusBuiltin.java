@@ -6,7 +6,7 @@ import APL.types.functions.Builtin;
 
 
 public class PlusBuiltin extends Builtin {
-  @Override public String repr() {
+  public String repr() {
     return "+";
   }
   

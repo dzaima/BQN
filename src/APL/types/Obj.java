@@ -37,10 +37,6 @@ public abstract class Obj implements Tokenable {
     return obj instanceof Obj && equals((Obj) obj);
   }
   
-  public String name() {
-    return toString();
-  }
-  
   @Override
   public String toString() {
     return humanType(false);

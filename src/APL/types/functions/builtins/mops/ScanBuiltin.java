@@ -15,7 +15,7 @@ public class ScanBuiltin extends Mop {
   public Value call(Value f, Value x, DerivedMop derv) {
     Fun ff = f.asFun();
     if (x.ia == 0) return x;
-    if (x.rank == 0) throw new DomainError("`: rank must be at least 1, 𝕩 was a scalar", this, x);
+    if (x.rank == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
     int l = Arr.prod(x.shape, 1, x.shape.length);
     if (x.quickDoubleArr()) {
       Pervasion.NN2N fd = ff.dyNum();

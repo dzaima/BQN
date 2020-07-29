@@ -147,8 +147,8 @@ public class Tokenizer {
             throw new SyntaxError("mismatched parentheses of " + c + " and " + closed.b);
           }
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
-          
-          var lineTokens = new ArrayList<LineTok>();
+  
+          ArrayList<LineTok> lineTokens = new ArrayList<>();
           for (Line ta : closed.a) lineTokens.add(ta.tok(pointless));
           Token r;
           switch (c) {

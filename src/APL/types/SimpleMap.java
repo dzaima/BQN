@@ -15,18 +15,18 @@ public abstract class SimpleMap extends APLMap {
   }
   
   @Override public Arr allValues() {
-    throw new SyntaxError("getting list of values of "+name());
+    throw new SyntaxError("getting list of values of "+this);
   }
   
   @Override public Arr allKeys() {
-    throw new SyntaxError("getting list of keys of "+name());
+    throw new SyntaxError("getting list of keys of "+this);
   }
   
   @Override public Arr kvPair() {
-    throw new SyntaxError("getting entries of "+name());
+    throw new SyntaxError("getting entries of "+this);
   }
   
   @Override public int size() {
-    throw new SyntaxError("getting size of "+name());
+    throw new SyntaxError("getting size of "+this);
   }
 }
