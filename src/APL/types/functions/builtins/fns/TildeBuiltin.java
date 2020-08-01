@@ -63,7 +63,7 @@ public class TildeBuiltin extends Builtin {
     a: for (int i = 0; i < w.ia; i++) {
       Value v = w.get(i);
       for (Value c : x) {
-        if (v.equals(c)) continue a;
+        if (v.eq(c)) continue a;
       }
       leave[i] = true;
       ia++;

@@ -125,7 +125,14 @@ public abstract class Sys {
       ucmd(s.substring(1));
     } else {
       Comp comp = Main.comp(s, csc);
-      byte lins = comp.bc.length==0? 0 : comp.bc[comp.bc.length-1];
+      if (comp.bc.length==0) return;
+      int ci = 0;
+      while (true) {
+        int ni = comp.next(ci);
+        if (ni == comp.bc.length) break;
+        ci = ni;
+      }
+      byte lins = comp.bc[ci];
       Value r = comp.exec(csc);
       if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
         println(r);

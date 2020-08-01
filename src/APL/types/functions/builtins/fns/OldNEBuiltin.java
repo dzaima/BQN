@@ -27,7 +27,7 @@ public class OldNEBuiltin extends Builtin {
       for (int i = 0; i < w.length; i++) res.add(w[i] != x[i]);
     }
     public Value call(BigValue w, BigValue x) {
-      return w.equals(x)? Num.ZERO : Num.ONE;
+      return w.eq(x)? Num.ZERO : Num.ONE;
     }
   };
   private static final D_BB DBF = new D_BB() {
@@ -47,6 +47,6 @@ public class OldNEBuiltin extends Builtin {
   };
   
   public Value call(Value w0, Value x0) {
-    return ncbaD(DNF, DBF, (w, x) -> w!=x? Num.ONE : Num.ZERO, (w, x) -> w.equals(x)? Num.ZERO : Num.ONE, w0, x0);
+    return ncbaD(DNF, DBF, (w, x) -> w!=x? Num.ONE : Num.ZERO, (w, x) -> w.eq(x)? Num.ZERO : Num.ONE, w0, x0);
   }
 }

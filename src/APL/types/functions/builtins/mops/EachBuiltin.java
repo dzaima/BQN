@@ -91,9 +91,9 @@ public class EachBuiltin extends Mop {
     return Arr.create(res2, x.shape);
   }
   
-  private static void rec(Fun f, Obj o, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
+  private static void rec(Fun f, Value o, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
     if (i == args.length) {
-      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : (Value) o;
+      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
       res[i] = f.under(new Fun() { public String repr() { return f.repr()+"¨"; }
@@ -111,7 +111,7 @@ public class EachBuiltin extends Mop {
     return underW(f.asFun(), o, w, x, this);
   }
   
-  public static Value underW(Fun f, Obj o, Value w, Value x, Callable blame) {
+  public static Value underW(Fun f, Value o, Value w, Value x, Callable blame) {
     if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
     int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
@@ -121,9 +121,9 @@ public class EachBuiltin extends Mop {
     return Arr.create(res2, x.shape);
   }
   
-  private static void rec(Fun f, Obj o, Value w, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
+  private static void rec(Fun f, Value o, Value w, Value x, int i, Value[] args, Value[] resPre, Value[] res) {
     if (i == args.length) {
-      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : (Value) o;
+      Value v = o instanceof Fun? ((Fun) o).call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
       res[i] = f.underW(new Fun() { public String repr() { return f.repr()+"¨"; }

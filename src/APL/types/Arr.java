@@ -324,7 +324,7 @@ public abstract class Arr extends Value {
     return new HArr(v, sh);
   }
   
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     if (!(o instanceof Arr)) return false;
     Arr a = (Arr) o;
     if (!Arrays.equals(shape, a.shape)) return false;
@@ -332,7 +332,7 @@ public abstract class Arr extends Value {
     Value[] mvs = values();
     Value[] ovs = a.values();
     for (int i = 0; i < mvs.length; i++) {
-      if (!mvs[i].equals(ovs[i])) return false;
+      if (!mvs[i].eq(ovs[i])) return false;
     }
     return true;
   }

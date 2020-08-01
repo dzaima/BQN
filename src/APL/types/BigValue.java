@@ -80,7 +80,7 @@ public class BigValue extends Primitive {
     if (i.signum()==-1) return "¯" + i.negate() + "L";
     return i.toString()+"L";
   }
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     return o instanceof BigValue && i.equals(((BigValue) o).i);
   }
   public int hashCode() {

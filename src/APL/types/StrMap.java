@@ -46,16 +46,11 @@ public class StrMap extends APLMap {
     else vals.put(k, v);
   }
   
-  @Override
   public Arr allValues() {
-    ArrayList<Value> items = new ArrayList<>();
-    for (Obj o : vals.values()) {
-      if (o instanceof Value) items.add((Value) o);
-    }
-    return Arr.create(items);
+    return Arr.create(new ArrayList<>(vals.values()));
   }
   
-  @Override public Arr allKeys() {
+  public Arr allKeys() {
     ArrayList<Value> items = new ArrayList<>();
     for (String o : vals.keySet()) {
       items.add(Main.toAPL(o));
@@ -63,7 +58,7 @@ public class StrMap extends APLMap {
     return Arr.create(items);
   }
   
-  @Override public Arr kvPair() {
+  public Arr kvPair() {
     ArrayList<Value> ks = new ArrayList<>();
     ArrayList<Value> vs = new ArrayList<>();
     vals.forEach((k, v) -> {
@@ -75,17 +70,20 @@ public class StrMap extends APLMap {
        Arr.create(vs)});
   }
   
-  @Override
   public int size() {
     return vals.size();
   }
   
-  @Override
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     return o instanceof StrMap && vals.equals(((StrMap) o).vals);
   }
+  public int hashCode() {
+    final int[] res = {0};
+    vals.forEach((k, v) -> res[0]+= k.hashCode()*387678968 + v.hashCode());
+    return res[0];
+  }
   
-  @Override
+  
   public String toString() {
     StringBuilder res = new StringBuilder("(");
     vals.forEach((key, value) -> {

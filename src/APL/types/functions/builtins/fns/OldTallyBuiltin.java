@@ -14,6 +14,6 @@ public class OldTallyBuiltin extends Builtin {
     return Num.of(x.shape[0]);
   }
   public Value call(Value w, Value x) {
-    return w.equals(x)? Num.ZERO : Num.ONE;
+    return w.eq(x)? Num.ZERO : Num.ONE;
   }
 }

@@ -56,8 +56,8 @@ public class Comp {
   public static final byte CHKV = 18; // error if ToS is ·
   public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
   public static final byte OP2H = 20; // derive composition to modifier
-  public static final byte LOCO = 21; // 1B,N; push local object
-  public static final byte LOCM = 22; // 1B,N; push mutable local object
+  public static final byte LOCO = 21; // B,N; push local object
+  public static final byte LOCM = 22; // B,N; push mutable local object
   public static final byte RETN = 25; // returns, giving ToS
   // public static final byte ____ = 6;
   

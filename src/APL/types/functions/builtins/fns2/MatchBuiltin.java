@@ -31,6 +31,6 @@ public class MatchBuiltin extends Builtin {
     return Num.of(full(x));
   }
   public Value call(Value w, Value x) {
-    return w.equals(x)? Num.ONE : Num.ZERO;
+    return w.eq(x)? Num.ONE : Num.ZERO;
   }
 }

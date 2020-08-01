@@ -51,13 +51,13 @@ public class HArr extends Arr {
   
   
   
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     if (!(o instanceof Value)) return false;
     Value v = (Value) o;
     if (!Arrays.equals(shape, v.shape)) return false;
     assert ia == v.ia;
     for (int i = 0; i < ia; i++) {
-      if (!arr[i].equals(v.get(i))) return false;
+      if (!arr[i].eq(v.get(i))) return false;
     }
     return true;
   }

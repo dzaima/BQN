@@ -2,7 +2,6 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.*;
-import APL.tokenizer.types.LineTok;
 import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.ChrArr;

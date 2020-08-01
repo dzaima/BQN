@@ -71,7 +71,7 @@ public class DoubleArr extends Arr {
   
   
   
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     if (o instanceof DoubleArr) {
       DoubleArr da = (DoubleArr) o;
       if ((hash!=0 && da.hash!=0 && hash != da.hash) || !Arrays.equals(shape, da.shape)) return false;
@@ -80,7 +80,7 @@ public class DoubleArr extends Arr {
       }
       return true;
     }
-    return super.equals(o);
+    return super.eq(o);
   }
   public int hashCode() {
     if (hash == 0) {

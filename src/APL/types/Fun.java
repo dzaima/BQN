@@ -581,7 +581,7 @@ public abstract class Fun extends Callable {
   public int hashCode() {
     return actualHashCode();
   }
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     return this == o;
   }
 }

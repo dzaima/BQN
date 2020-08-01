@@ -8,6 +8,10 @@ public class Null extends Primitive {
   public String toString() {
     return "•NULL";
   }
+  
+  public boolean eq(Value o) {
+    return o==NULL;
+  }
   public int hashCode() {
     return 387678968; // random yay
   }

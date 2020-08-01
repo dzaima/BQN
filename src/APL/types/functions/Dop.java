@@ -58,7 +58,7 @@ public abstract class Dop extends Callable {
   @Override public int hashCode() {
     return actualHashCode();
   }
-  @Override public boolean equals(Obj o) {
+  @Override public boolean eq(Value o) {
     return this == o;
   }
 }

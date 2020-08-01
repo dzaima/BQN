@@ -6,29 +6,23 @@ public class Nothing extends Primitive {
   public static final Nothing inst = new Nothing();
   
   
-  SyntaxError gotten() {
-    return new SyntaxError("Using ·", this);
+  SyntaxError used() {
+    return new SyntaxError("didn't expect ·", this);
   }
   
   
   
-  public String asString() {
-    throw gotten();
-  }
+  public String asString() { throw used(); }
+  public Value safePrototype() { throw used(); }
+  public Value ofShape(int[] sh) { throw used(); }
+  public Fun asFun() { throw used(); }
   
-  public Value safePrototype() {
-    throw gotten();
-  }
   
-  public Value ofShape(int[] sh) {
-    throw gotten();
-  }
+  public String toString() { return "·"; }
   
-  public Fun asFun() {
-    throw new SyntaxError("didn't expect · here", this);
-  }
   
-  public String toString() {
-    return "·";
+  public int hashCode() { return 0; }
+  public boolean eq(Value o) {
+    return o instanceof Nothing;
   }
 }

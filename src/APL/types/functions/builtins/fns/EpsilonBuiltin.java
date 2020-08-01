@@ -43,7 +43,7 @@ public class EpsilonBuiltin extends Builtin {
     if (w.scalar()) {
       Value w0 = w.first();
       for (Value v : x) {
-        if (v.equals(w0)) {
+        if (v.eq(w0)) {
           return Num.ONE;
         }
       }
@@ -54,7 +54,7 @@ public class EpsilonBuiltin extends Builtin {
       Value w0 = w.get(i);
       boolean b = false;
       for (Value v : x) {
-        if (v.equals(w0)) {
+        if (v.eq(w0)) {
           b = true;
           break;
         }

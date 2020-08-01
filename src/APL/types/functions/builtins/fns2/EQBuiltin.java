@@ -17,7 +17,7 @@ public class EQBuiltin extends Builtin {
   }
   
   public static final Pervasion.VV2B DF = new Pervasion.VV2B() {
-    public Value on(Primitive w, Primitive x) { return w.equals(x)? Num.ONE : Num.ZERO; }
+    public Value on(Primitive w, Primitive x) { return w.eq(x)? Num.ONE : Num.ZERO; }
     public void on(double   w, double[] x, BitArr.BA res) { for (double cx : x) { res.add( w==cx); } }
     public void on(double[] w, double   x, BitArr.BA res) { for (double cw : w) { res.add(cw== x); } }
     public void on(double[] w, double[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i]==x[i]); } }

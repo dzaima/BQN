@@ -53,7 +53,7 @@ public class Char extends Primitive {
     if (Main.quotestrings) return "'"+chr+"'";
     else return String.valueOf(chr);
   }
-  public boolean equals(Obj c) {
+  public boolean eq(Value c) {
     return c instanceof Char && chr == ((Char) c).chr;
   }
   public int compareTo(Char v) {

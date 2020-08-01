@@ -1,7 +1,7 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.*;
+import APL.tokenizer.Token;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -205,9 +205,9 @@ public class Scope {
           }
         };
         case "•u": return new Builtin() {
-          @Override public String repr() { return "•U"; }
+          public String repr() { return "•U"; }
   
-          @Override public Value call(Value x) {
+          public Value call(Value x) {
             sys.ucmd(x.asString());
             return null;
           }
@@ -339,7 +339,6 @@ public class Scope {
     }
     
     
-    @Override
     public Value call(Value x) {
       return new Logger(sc, x.toString());
     }
@@ -358,6 +357,9 @@ public class Scope {
       public String toString() {
         return "•GCLOG["+msg+"]";
       }
+  
+      public boolean eq(Value o) { return this == o; }
+      public int hashCode() { return 0; }
     }
   }
   static class Timer extends Builtin {
@@ -591,7 +593,7 @@ public class Scope {
           conn.setRequestProperty("Content-Language", get(m, "language", "en-US"));
           conn.setRequestProperty("Content-Length", Integer.toString(content.length()));
           
-          Obj eo = m.getRaw("e");
+          Value eo = m.getRaw("e");
           if (eo != Null.NULL) {
             APLMap e = (APLMap) eo;
             for (Value k : e.allKeys()) {
@@ -722,13 +724,12 @@ public class Scope {
     public String repr() { return "•NC"; }
     
     public Value call(Value x) {
-      Obj obj = Scope.this.get(x.asString());
-      if (obj == null) return Num.ZERO;
-      if (obj instanceof Fun  ) return Num.NUMS[3];
-      if (obj instanceof Dop  ) return Num.NUMS[4];
-      if (obj instanceof Mop  ) return Num.NUMS[5];
-      if (obj instanceof Value) return Num.NUMS[2];
-      return Num.NUMS[9];
+      Value o = Scope.this.get(x.asString());
+      if (o == null) return Num.ZERO;
+      if (o instanceof Fun) return Num.NUMS[3];
+      if (o instanceof Dop) return Num.NUMS[4];
+      if (o instanceof Mop) return Num.NUMS[5];
+      return Num.NUMS[2];
     }
   }
   
@@ -811,8 +812,8 @@ public class Scope {
         this.sc = sc;
       }
       
-      Pr pr(Obj f) {
-        String s = ((Value) f).asString();
+      Pr pr(Value f) {
+        String s = f.asString();
         Pr p = pfRes.get(s);
         if (p == null) {
           pfRes.put(s, p = new Pr(Main.comp(s, sc)));

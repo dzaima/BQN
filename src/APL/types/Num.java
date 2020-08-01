@@ -95,7 +95,7 @@ public class Num extends Primitive {
   public String toString() {
     return format(num);
   }
-  public boolean equals(Obj n) {
+  public boolean eq(Value n) {
     return n instanceof Num && ((Num) n).num == num;
   }
   public int hashCode() {

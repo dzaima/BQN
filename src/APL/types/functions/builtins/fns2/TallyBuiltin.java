@@ -16,7 +16,7 @@ public class TallyBuiltin extends Builtin {
   }
   
   public Value call(Value w, Value x) {
-    return w.equals(x)? Num.ZERO : Num.ONE;
+    return w.eq(x)? Num.ZERO : Num.ONE;
   }
   
   public Value under(Value o, Value x) {

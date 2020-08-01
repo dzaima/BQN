@@ -59,7 +59,7 @@ public class IntArr extends Arr {
   public Value squeeze() {
     return this;
   }
-  public boolean equals(Obj o) {
+  public boolean eq(Value o) {
     if (o instanceof IntArr) {
       IntArr da = (IntArr) o;
       if ((hash!=0 && da.hash!=0 && hash != da.hash) || !Arrays.equals(shape, da.shape)) return false;
@@ -68,7 +68,7 @@ public class IntArr extends Arr {
       }
       return true;
     }
-    return super.equals(o);
+    return super.eq(o);
   }
   
   public int hashCode() {

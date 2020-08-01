@@ -96,7 +96,7 @@ public class IotaBuiltin extends Builtin {
     for (Value cx : x) {
       int j = 0;
       for (Value cw : w) {
-        if (cw.equals(cx)) break;
+        if (cw.eq(cx)) break;
         j++;
       }
       res[i++] = j;

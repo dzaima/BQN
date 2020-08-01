@@ -60,7 +60,7 @@ public class FindBuiltin extends Builtin {
       } else {
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
-            if (!w.get(ia).equals(x.get(ia + ir))) continue w;
+            if (!w.get(ia).eq(x.get(ia + ir))) continue w;
           }
           bc.set(ir);
         }
@@ -71,7 +71,7 @@ public class FindBuiltin extends Builtin {
         for (int[] inA : new Indexer(w.shape)) {
           Value vA = w.simpleAt(inA);
           Value vW = x.simpleAt(Indexer.add(inA, inW));
-          if (!vA.equals(vW)) continue w;
+          if (!vA.eq(vW)) continue w;
         }
         bc.set(Indexer.fromShape(x.shape, inW));
       }

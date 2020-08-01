@@ -2,6 +2,7 @@ package APL.types;
 
 import APL.errors.*;
 import APL.types.arrs.*;
+import APL.types.functions.*;
 
 import java.util.Iterator;
 
@@ -170,6 +171,10 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return this;
   }
   
+  public boolean equals(Object obj) {
+    return obj instanceof Value && eq((Value) obj);
+  }
+  public abstract boolean eq(Value o);
   public int compareTo(Value x) {
     Value w = this;
     
@@ -207,14 +212,24 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
         return Value.this.toString();
       }
       
-      public Value call(Value x) {
-        return Value.this;
-      }
-      
-      public Value call(Value w, Value x) {
-        return Value.this;
-      }
+      public Value call(         Value x) { return Value.this; }
+      public Value call(Value w, Value x) { return Value.this; }
     };
   }
+  
+  public String humanType(boolean article) {
+    if (this instanceof Arr     )return article? "an array"     : "array";
+    if (this instanceof Char    )return article? "a character"  : "character";
+    if (this instanceof Num     )return article? "a number"     : "number";
+    if (this instanceof APLMap  )return article? "a map"        : "map";
+    if (this instanceof Fun     )return article? "a function"   : "function";
+    if (this instanceof Null    )return article? "null"         : "null";
+    if (this instanceof Mop     )return article? "a 1-modifier" : "1-modifier";
+    if (this instanceof Dop     )return article? "a 2-modifier" : "2-modifier";
+    if (this instanceof BigValue)return article? "a bigint"     : "bigint";
+    if (this instanceof Nothing )return article? "nothing"      : "nothing";
+    return getClass().getSimpleName();
+  }
+  public abstract int hashCode();
   
 }

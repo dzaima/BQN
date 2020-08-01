@@ -174,7 +174,7 @@ public class Body {
     return true;
   }
   private boolean matches(Scope sc, Token t, Value g) {
-    if (t instanceof ConstTok) return ((ConstTok) t).val.equals(g); // 2, 'a', "ab"
+    if (t instanceof ConstTok) return ((ConstTok) t).val.eq(g); // 2, 'a', "ab"
     if (t instanceof LineTok) {
       if (((LineTok) t).tokens.size()!=1) throw new SyntaxError("Couldn't match "+t);
       return matches(sc, ((LineTok) t).tokens.get(0), g);
