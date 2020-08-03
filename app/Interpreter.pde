@@ -77,7 +77,7 @@ static class AppMap extends SimpleMap {
     this.it = it;
   }
   
-  void setv(String k, Obj v) {
+  void setv(String k, Value v) {
     String s = k.toLowerCase();
     switch (s) {
       case "update":

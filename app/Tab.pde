@@ -16,14 +16,13 @@ abstract static class Tab extends SimpleMap {
       default: return Null.NULL;
     }
   }
-  void setv(String k, Obj v) {
+  void setv(String k, Value v) {
     String s = k.toLowerCase();
     switch (k) {
       default: throw new DomainError("setting non-existing key "+s+" for tab");
     }
   }
   String toString() { return "tab["+name()+"]"; }
-  boolean equals(Object o) { return this == o; }
 }
 
 
@@ -73,7 +72,7 @@ static class REPL extends Tab {
     if (k.equals("eq")) return Main.toAPL(input.lns.get(0).toString());
     return super.getv(k);
   }
-  void setv(String k, Obj v) {
+  void setv(String k, Value v) {
     if (k.equals("eq")) { input.clear(); input.append(((Value) v).asString()); }
     else super.setv(k, v);
   }

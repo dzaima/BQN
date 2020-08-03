@@ -46,8 +46,8 @@ public abstract class Sys {
         break;
       case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
       case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
-      case "CLASS"       : var r = Main.exec(rest, csc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
-      case "UOPT"        : var e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
+      case "CLASS"       : Value r = Main.exec(rest, csc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
+      case "UOPT"        : Arr e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
       case "ATYPE"       : println(Main.exec(rest, csc).humanType(false)); break;
       case "JSTACK":
         if (lastError != null) {

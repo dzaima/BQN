@@ -29,4 +29,12 @@ public abstract class SimpleMap extends APLMap {
   public int size() {
     throw new SyntaxError("getting size of "+this);
   }
+  
+  public boolean eq(Value o) {
+    return this==o;
+  }
+  
+  public int hashCode() {
+    return 0;
+  }
 }
