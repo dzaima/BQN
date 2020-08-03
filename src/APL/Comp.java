@@ -1020,8 +1020,10 @@ public class Comp {
       String name = ((NameTok) tk).name;
       if (create) {
         if (m.vars.containsKey(name)) throw Local.redefine(name, tk);
-        m.vars.put(name, m.varnames.size());
-        m.varnames.add(name);
+        if (name.charAt(0)!='•') {
+          m.vars.put(name, m.varnames.size());
+          m.varnames.add(name);
+        }
       }
       m.var(tk, name, true);
       return;
