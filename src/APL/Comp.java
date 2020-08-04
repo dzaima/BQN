@@ -22,7 +22,7 @@ public class Comp {
   private final Token[] ref;
   private final Token tk;
   
-  public static int compileStart = 0; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
+  public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
   private int iter;
   private JFn gen;
   
