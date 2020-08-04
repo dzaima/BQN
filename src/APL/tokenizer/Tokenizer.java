@@ -115,36 +115,29 @@ public class Tokenizer {
         String cS = String.valueOf(c);
         if (c == '(' || c == '{' || c == '[' || c == '⟨') {
           char match;
-          switch (c) {
-            case '(':
-              match = ')';
-              break;
-            case '{':
-              match = '}';
-              break;
-            case '[':
-              match = ']';
-              break;
-            case '⟨':
-              match = '⟩';
-              break;
-            default:
-              throw new Error("this should really not happen");
-          }
-          levels.add(new Block(new ArrayList<>(), match, i));
+          levels.add(new Block(new ArrayList<>(), c, i));
           lines = levels.get(levels.size() - 1).a;
           lines.add(new Line(raw, i));
           
           i++;
         } else if (c == ')' || c == '}' || c == ']' || c == '⟩') {
+          char match;
+          switch (c) {
+            case ')': match = '('; break;
+            case '}': match = '{'; break;
+            case ']': match = '['; break;
+            case '⟩': match = '⟨'; break;
+            default:
+              throw new Error("this should really not happen");
+          }
           Block closed = levels.remove(levels.size() - 1);
-          if (c != closed.b) {
+          if (match != closed.b) {
             if (pointless) {
               levels.add(closed);
               tokens.add(new ErrTok(raw, i));
               // and leave running for quick exit
             }
-            throw new SyntaxError("mismatched parentheses of " + c + " and " + closed.b);
+            throw new SyntaxError("mismatched parentheses of " + closed.b + " and " + c);
           }
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
   
@@ -327,17 +320,17 @@ public class Tokenizer {
         for (Line ta : closed.a) lineTokens.add(ta.tok(true));
         Token r;
         switch (closed.b) {
-          case ')':
+          case '(':
             ArrayList<Token> ts = new ArrayList<>(lineTokens);
             r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts, '\0'));
             break;
-          case '}':
+          case '{':
             r = new DfnTok(raw, closed.pos, len, lineTokens, true);
             break;
-          case ']':
+          case '[':
             r = new BracketTok(raw, closed.pos, len, lineTokens);
             break;
-          case '⟩':
+          case '⟨':
             r = new ArrayTok(raw, closed.pos, len, lineTokens);
             break;
           default:

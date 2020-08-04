@@ -21,7 +21,7 @@ public class Body {
   public int start;
   public String[] vars;
   
-  public Body(DfnTok o, char type, boolean imm, int off, String[] vars) { // •COMPiled body
+  public Body(DfnTok o, char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
     this.o = o;
     this.lns = null;
     self = null;
@@ -29,7 +29,7 @@ public class Body {
     immediate = imm;
     noHeader = true;
     this.type = type;
-    arity = 'a';
+    this.arity = arity;
     start = off;
     this.vars = vars;
   }

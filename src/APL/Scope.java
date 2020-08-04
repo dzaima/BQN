@@ -3,6 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.DfnTok;
+import APL.tools.Body;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
@@ -242,21 +243,35 @@ public class Scope {
             DfnTok[] dfnp = new DfnTok[blocks.ia];
             for (int i = 0; i < dfnp.length; i++) {
               Value c = blocks.get(i);
-              if (c.ia!=4) throw new DomainError("•COMP: ¬∧´4 = ≠3⊑𝕩");
+              if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5");
               
               char type = ((Char) c.get(0)).chr;
               boolean imm = Main.bool(c.get(1));
-              int off = c.get(2).asInt();
               if (type=='a' || type=='f'&&imm) {
                 type = 'a';
                 imm = true;
               }
-              int lvarAm = c.get(3).ia;
-              String[] lvars = new String[lvarAm];
-              for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
-              
-              if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
-              dfnp[i] = new DfnTok(type, imm, off, lvars);
+              if (c.ia==4) {
+                int off = c.get(2).asInt();
+                int lvarAm = c.get(3).ia;
+                String[] lvars = new String[lvarAm];
+                for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
+                
+                if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
+                dfnp[i] = new DfnTok(type, imm, off, lvars);
+              } else {
+                DfnTok r = new DfnTok(type, imm);
+                ArrayList<Body> bs = r.bodies;
+                int[] offs = c.get(2).asIntVec();
+                for (int j = 0; j < offs.length; j++) {
+                  Value v = c.get(3).get(j);
+                  String[] lvars = new String[v.ia];
+                  for (int k = 0; k < lvars.length; k++) lvars[k] = v.get(k).asString();
+                  char a = ((Char) c.get(4).get(j)).chr;
+                  bs.add(new Body(r, type, imm, offs[j], lvars, a));
+                }
+                dfnp[i] = r;
+              }
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, Token.COMP);

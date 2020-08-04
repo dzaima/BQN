@@ -103,7 +103,13 @@ public class DfnTok extends TokArr<LineTok> {
     this.type = type;
     bodies = new ArrayList<>();
     immediate = imm;
-    bodies.add(new Body(this, type, imm, off, varNames));
+    bodies.add(new Body(this, type, imm, off, varNames, 'a'));
+  }
+  public DfnTok(char type, boolean imm) {
+    super(Token.COMP.raw, 0, 18, new ArrayList<>());
+    this.type = type;
+    bodies = new ArrayList<>();
+    immediate = imm;
   }
   
   public static boolean funType(Token t, DfnTok dt) { // returns if can be immediate, mutates dt's type

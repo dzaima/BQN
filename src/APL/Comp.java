@@ -392,7 +392,7 @@ public class Comp {
           b.append('\n');
         }
       }
-      // if (hl>=0) return b.toString();
+      if (hl>=0) return b.toString();
     } catch (Throwable t) {
       b.append("#ERR#\n");
     }
@@ -417,11 +417,11 @@ public class Comp {
             Body bd = bodies.get(k);
             b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.arity=='m'? "monadic" : bd.arity=='d'? "dyadic" : "ambivalent").append('\n');
             b.append("    start: ").append(bd.start).append('\n');
-            if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
-            if (bd.wM!=null) b.append("    𝕨: ").append(bd.wM.toRepr()).append('\n');
-            if (bd.xM!=null) b.append("    𝕩: ").append(bd.xM.toRepr()).append('\n');
-            if (bd.fM!=null) b.append("    𝕗: ").append(bd.fM.toRepr()).append('\n');
-            if (bd.gM!=null) b.append("    𝕘: ").append(bd.gM.toRepr()).append('\n');
+            // if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
+            // if (bd.wM!=null) b.append("    𝕨: ").append(bd.wM.toRepr()).append('\n');
+            // if (bd.xM!=null) b.append("    𝕩: ").append(bd.xM.toRepr()).append('\n');
+            // if (bd.fM!=null) b.append("    𝕗: ").append(bd.fM.toRepr()).append('\n');
+            // if (bd.gM!=null) b.append("    𝕘: ").append(bd.gM.toRepr()).append('\n');
             if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
           }
         }
