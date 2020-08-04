@@ -18,35 +18,20 @@ public class Dmop extends Mop {
   public Fun derive(Value f) { // ···𝕣𝕗·
     if (!code.immediate) return super.derive(f);
     Main.printdbg("dmop immediate call", f);
-    Scope nsc = new Scope(sc);
-    int s = code.find(nsc, null, f, null, null, this);
-    nsc.set(0, this);
-    nsc.set(1, f);
-    return code.comp.exec(nsc, s).asFun();
+    
+    return code.exec(sc, null, new Value[]{this, f}).asFun();
   }
   
   public Value call(Value f, Value x, DerivedMop derv) { // 𝕊𝕩𝕨𝕣𝕗·
     Main.printdbg("dmop call", x);
-    Scope nsc = new Scope(sc);
-    int s = code.find(nsc, null, f, null, x, this);
-    nsc.set(0, derv);
-    nsc.set(1, x);
-    nsc.set(2, Nothing.inst);
-    nsc.set(3, this);
-    nsc.set(4, f);
-    return code.comp.exec(nsc, s);
+    
+    return code.exec(sc, null, new Value[]{derv, x, Nothing.inst, this, f});
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) { // 𝕊𝕩𝕨𝕣𝕗·
     Main.printdbg("dmop call", w, x);
-    Scope nsc = new Scope(sc);
-    int s = code.find(nsc, w, f, null, x, this);
-    nsc.set(0, derv);
-    nsc.set(1, x);
-    nsc.set(2, w);
-    nsc.set(3, this);
-    nsc.set(4, f);
-    return code.comp.exec(nsc, s);
+    
+    return code.exec(sc, w, new Value[]{derv, x, w, this, f});
   }
   
   public String repr() {

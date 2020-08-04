@@ -53,6 +53,10 @@ public class MutByteArr {
     len+= e-s;
   }
   
+  public void s(byte v) {
+    if (len>=bs.length) dbl();
+    bs[len++] = v;
+  }
   public void s(int v) {
     assert (byte)v == v;
     if (len>=bs.length) dbl();

@@ -26,10 +26,18 @@ public class SettableArr extends Settable {
   }
   
   
-  public void set(Value w, boolean update, Scope sc, Callable blame) {
-    if (w.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", w);
-    if (w.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", w);
+  public void set(Value x, boolean update, Scope sc, Callable blame) {
+    if (x.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", x);
+    if (x.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", x);
     
-    for (int i = 0; i < ia; i++) arr[i].set(w.get(i), update, sc, null);
+    for (int i = 0; i < ia; i++) arr[i].set(x.get(i), update, sc, null);
+  }
+  
+  public boolean seth(Value x, Scope sc) {
+    if (x.rank != 1) return false;
+    if (x.ia != ia) return false;
+  
+    for (int i = 0; i < ia; i++) if (!arr[i].seth(x.get(i), sc)) return false;
+    return true;
   }
 }

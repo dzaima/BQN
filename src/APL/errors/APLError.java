@@ -40,7 +40,7 @@ public abstract class APLError extends RuntimeException {
   public static void println(List<Mg> gs, Sys s) {
     if (gs.size() == 2 && gs.get(0).eqSrc(gs.get(1))) printgr(gs, s);
     else for (Mg g : gs) {
-      ArrayList<Mg> l = new ArrayList<Mg>();
+      ArrayList<Mg> l = new ArrayList<>();
       l.add(g);
       printgr(l, s);
     }
@@ -67,6 +67,16 @@ public abstract class APLError extends RuntimeException {
       rl++;
     }
     s.println(new String(str, 0, rl));
+  }
+  
+  public void stack(Sys sys) {
+    for (int i = 0; i < trace.size(); i++) {
+      sys.println((trace.size()-i) + ":");
+      Frame f = trace.get(i);
+      APLError.println(f.msgs, sys);
+      //noinspection StringEquality
+      if (f.msgs.size()>0 && f.msgs.get(0).t.raw==Token.COMP.raw) sys.println(f.comp.fmt(f.idx));
+    }
   }
   
   public static class Mg {
@@ -111,11 +121,15 @@ public abstract class APLError extends RuntimeException {
   public static class Frame {
     public final Scope sc;
     public ArrayList<Mg> msgs;
-    
-    public Frame(Scope sc, ArrayList<Mg> msgs) {
+    public final Comp comp;
+    public final int idx;
+  
+    public Frame(Scope sc, ArrayList<Mg> msgs, Comp comp, int idx) {
       
       this.sc = sc;
       this.msgs = msgs;
+      this.comp = comp;
+      this.idx = idx;
     }
   }
 }

@@ -57,12 +57,8 @@ public abstract class Sys {
         } else println("no stack to view");
         break;
       case "STACK": {
-        if (lastError == null) { println("no stack to view"); break; }
-        ArrayList<APLError.Frame> trace = lastError.trace;
-        for (int i = 0; i < trace.size(); i++) {
-          println((trace.size()-i) + ":");
-          APLError.println(trace.get(i).msgs, this);
-        }
+        if (lastError != null) lastError.stack(this);
+        else println("no stack to view");
         break;
       }
       case "CS":

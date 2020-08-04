@@ -317,6 +317,24 @@ public class JComp {
             cstack--;
             break;
           }
+          case SETH: { Met.Lbl l = fn.lbl();
+            fn.swap(); // v k → k v
+            fn.aload(SC);
+            fn.invvirt(Settable.class, "seth", met(boolean.class, Value.class, Scope.class));
+            fn.ifne0(l); // if (!k.seth(v, sc)) {
+              fn.aconst_null();
+              fn.aret();
+            l.here();    // }
+            cstack-= 2;
+            break;
+          }
+          case VFYM: {
+            fn.new_(MatchSettable.class);
+            fn.dup_x1(); fn.swap(); // s s o
+            fn.invspec(MatchSettable.class, "<init>", met(void.class, Value.class));
+            mstack = Math.max(mstack, cstack+2);
+            break;
+          }
           case SETM: {
             // v f k     →
             // v k F K v

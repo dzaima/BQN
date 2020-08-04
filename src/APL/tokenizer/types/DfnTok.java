@@ -4,7 +4,7 @@ import APL.*;
 import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tools.Body;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.userDefined.*;
 
 import java.util.*;
@@ -61,11 +61,11 @@ public class DfnTok extends TokArr<LineTok> {
     }
     char htype = 0;
     for (Body b : bodies) {
-      if (b.otype != 0) {
-        if (b.otype=='a' && !canBeImmediate) throw new SyntaxError("Using function tokens in a value block", this);
-        if (b.otype=='a' && bodies.size()>1) throw new DomainError("Value blocks must contain only 1 body", this);
-        if (htype==0) htype = b.otype;
-        else if (b.otype != htype) throw new SyntaxError("Different type headers in one function", this);
+      if (b.type != 0) {
+        if (b.type=='a' && !canBeImmediate) throw new SyntaxError("Using function tokens in a value block", this);
+        if (b.type=='a' && bodies.size()>1) throw new DomainError("Value blocks must contain only 1 body", this);
+        if (htype==0) htype = b.type;
+        else if (b.type != htype) throw new SyntaxError("Different type headers in one function", this);
       }
     }
     if (htype != 0) {
@@ -85,12 +85,7 @@ public class DfnTok extends TokArr<LineTok> {
       immediate = false;
     }
     Comp.Mut mut = new Comp.Mut();
-    int[] offs = Comp.comp(mut, bodies);
-    for (int i = 0; i < bodies.size(); i++) {
-      Body b = bodies.get(i);
-      b.start = offs[i];
-    }
-    mut.register(this); mut.finish(this);
+    comp = Comp.comp(mut, bodies, this);
     this.bodies = bodies;
   }
   
@@ -103,28 +98,12 @@ public class DfnTok extends TokArr<LineTok> {
   }
   
   
-  public int find(Scope nsc, Value w, Value f, Value g, Value x, Value self) { // todo this is stupid
-    assert nsc.varAm == 0;
-    for (Body b : bodies) {
-      nsc.removeMap();
-      nsc.varNames = b.vars; // no cloning is suuuuurely fiiine
-      nsc.vars = new Value[b.vars.length];
-      nsc.varAm = b.vars.length;
-      if (b.match(nsc, w, f, g, x)) {
-        if (b.self != null) nsc.set(b.self, self);
-        return b.start;
-      }
-    }
-    throw new DomainError("No header matched", this);
-  }
-  
-  
   public DfnTok(char type, boolean imm, int off, String[] varNames) {
-    super("•COMPiled function", 0, 18, new ArrayList<>());
+    super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
     bodies = new ArrayList<>();
     immediate = imm;
-    bodies.add(new Body(this, imm, off, varNames));
+    bodies.add(new Body(this, type, imm, off, varNames));
   }
   
   public static boolean funType(Token t, DfnTok dt) { // returns if can be immediate, mutates dt's type
@@ -180,11 +159,24 @@ public class DfnTok extends TokArr<LineTok> {
       case 'm': return new Dmop(this, sc);
       case 'd': return new Ddop(this, sc);
       case 'a': {
-        Scope nsc = new Scope(sc);
-        int b = this.find(nsc, null, null, null, null, Nothing.inst);
-        return this.comp.exec(nsc, b);
+        Body b = bodies.get(0);
+        return comp.exec(new Scope(sc, b.vars), b.start);
       }
-      default : throw new IllegalStateException(this.type+"");
+      default: throw new IllegalStateException(this.type+"");
     }
+  }
+  
+  public Value exec(Scope psc, Value w, Value[] vb) {
+    Scope sc = new Scope(psc);
+    for (Body b : bodies) {
+      if (!b.matchArity(w)) continue;
+      sc.varNames = b.vars; // no cloning is suuuuurely fiiine
+      sc.vars = new Value[b.vars.length]; // TODO decide some nicer way than just creating a new array per header
+      System.arraycopy(vb, 0, sc.vars, 0, vb.length);
+      sc.varAm = b.vars.length;
+      Value res = comp.exec(sc, b.start);
+      if (res != null) return res;
+    }
+    throw new DomainError("No header matched", this);
   }
 }

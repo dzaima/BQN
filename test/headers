@@ -1,5 +1,7 @@
 # value block
 {v: 2+2} # 4
+a←1 ⋄ a+{v: a←2 ⋄ b←3 ⋄ a} # 3
+{v: b←5} ⋄ b # err
 # {2+2} # 4
 
 # functions

@@ -36,14 +36,14 @@ public class Scope {
   public int varAm;
   
   public Scope(Sys s) {
-    varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
+    varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = null;
     sys = s;
     args = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
     rnd = new Random();
   }
   public Scope(Scope p) {
-    varMap = new HashMap<>(); varNames = new String[1]; vars = new Value[1]; varAm = 0;
+    varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = p;
     sys = p.sys;
     args = p.args;
@@ -221,7 +221,6 @@ public class Scope {
           public Value call(Value x) {
             return call(Num.ONE, x);
           }
-          
           public Value call(Value w, Value x) {
             if (x.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, x);
             boolean allowImm = Main.bool(w);
@@ -260,7 +259,7 @@ public class Scope {
               dfnp[i] = new DfnTok(type, imm, off, lvars);
             }
             
-            Comp c = new Comp(bcp, objp, strp, dfnp, ref, null);
+            Comp c = new Comp(bcp, objp, strp, dfnp, ref, Token.COMP);
             for (DfnTok dfn : dfnp) dfn.comp = c;
             if (!allowImm) {
               DfnTok f = new DfnTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt(), null);

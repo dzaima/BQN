@@ -18,13 +18,18 @@ public class Variable extends Settable {
     return got;
   }
   
-  public void set(Value v, boolean update, Scope sc, Callable blame) {
+  public void set(Value x, boolean update, Scope sc, Callable blame) {
     if (update) {
-      sc.update(name, v);
+      sc.update(name, x);
     } else {
       if (sc.varMap().containsKey(name)) throw new SyntaxError("←: cannot redefine \""+name+"\"", blame, this);
-      sc.set(name, v);
+      sc.set(name, x);
     }
+  }
+  
+  public boolean seth(Value x, Scope sc) {
+    sc.set(name, x);
+    return true;
   }
   
   public String toString() {

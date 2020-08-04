@@ -1,6 +1,6 @@
 package APL.tools;
 
-import APL.*;
+import APL.Comp;
 import APL.errors.SyntaxError;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
@@ -11,8 +11,8 @@ import java.util.*;
 public class Body {
   public final DfnTok o;
   public final ArrayList<LineTok> lns;
-  public final char ftype; // one of [mda] - monadic, dyadic, ambivalent
-  public final char otype; // one of [afmd\0] - value, function, modifier, composition, unknown
+  public final char arity; // one of [mda] - monadic, dyadic, ambivalent
+  public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
   public final boolean noHeader;
   public final boolean immediate;
   public final Token wM, fM, gM, xM;
@@ -21,25 +21,25 @@ public class Body {
   public int start;
   public String[] vars;
   
-  public Body(DfnTok o, boolean imm, int off, String[] vars) { // •COMPiled body
+  public Body(DfnTok o, char type, boolean imm, int off, String[] vars) { // •COMPiled body
     this.o = o;
     this.lns = null;
     self = null;
     wM=fM=gM=xM=null;
     immediate = imm;
     noHeader = true;
-    otype = 0;
-    ftype = 'a';
-    this.start = off;
+    this.type = type;
+    arity = 'a';
+    start = off;
     this.vars = vars;
   }
   
-  public Body(DfnTok o, ArrayList<LineTok> lns, char ftype, boolean immediate) { // no header
+  public Body(DfnTok o, ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
     noHeader = true;
     this.o = o;
     this.lns = lns;
-    this.otype = 0;
-    this.ftype = ftype;
+    this.type = 0;
+    this.arity = arity;
     this.immediate = immediate;
     self=null;
     wM=fM=gM=xM=null;
@@ -59,20 +59,20 @@ public class Body {
       if (type == 'a') { // 1: or v:
         fM=gM=wM=null;
         if (a instanceof NameTok) { // v:
-          otype = 'a'; ftype = 'a';
+          this.type = 'a'; arity = 'a';
           immediate = true;
         
           xM=null;
           self = ((NameTok) a).name;
         } else { // 1:
-          otype = 'f'; ftype = 'm';
+          this.type = 'f'; arity = 'm';
           immediate = false;
         
           xM = a;
           self = null;
         }
       } else { // F: or _m: or _d_:
-        otype = type; ftype = 'a';
+        this.type = type; arity = 'a';
         // if (!imm) throw new SyntaxError("Using 𝕨/𝕩 in immediate definition", a);
         immediate = imm;
       
@@ -90,7 +90,7 @@ public class Body {
         if (dt == 'f' && ts.size()<=3) { // F 𝕩: or 𝕨 F 𝕩:
           if (ce && ct!='a' && ct!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
           boolean wo = ce && op(c, "𝕨");
-          otype = 'f'; ftype = wo? 'a' : ce? 'd' : 'm';
+          this.type = 'f'; arity = wo? 'a' : ce? 'd' : 'm';
           immediate = false;
         
           wM = op(c, "𝕨")? null : c; // no 𝕨 handled automatically
@@ -104,7 +104,7 @@ public class Body {
         } else if (dt == 'm') { // F _m 𝕩 or 𝕨 F _m 𝕩
           if (be && bt!='a' && bt!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
           boolean wo = be && op(b, "𝕨");
-          otype = 'm'; ftype = wo? 'a' : be? 'd' : 'm';
+          this.type = 'm'; arity = wo? 'a' : be? 'd' : 'm';
           immediate = false;
         
           wM = op(b, "𝕨")? null : b;
@@ -119,7 +119,7 @@ public class Body {
         } else if (ct == 'd') { // F _d_ G 𝕩: or 𝕨 F _d_ G 𝕩:
           if (ae && at!='a' && at!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
           boolean wo = ae && op(a, "𝕨");
-          otype = 'd'; ftype = wo? 'a' : ae? 'd' : 'm';
+          this.type = 'd'; arity = wo? 'a' : ae? 'd' : 'm';
           immediate = false;
         
           wM = op(a, "𝕨")? null : a;
@@ -136,7 +136,7 @@ public class Body {
         immediate = imm;
         wM=xM=null;
         if (et == 'm') { // F _m:
-          otype = 'm'; ftype = 'a';
+          this.type = 'm'; arity = 'a';
           fM = op(d, "𝔽")||op(d, "𝕗")? null : d;
           gM = null;
         
@@ -145,7 +145,7 @@ public class Body {
           else throw new SyntaxError(e.source()+" not allowed as self in function header", e);
         
         } else if (dt == 'd') { // F _d_ G:
-          otype = 'd'; ftype = 'a';
+          this.type = 'd'; arity = 'a';
           fM = op(c, "𝔽")||op(c, "𝕗")? null : c;
           gM = op(e, "𝔾")||op(e, "𝕘")? null : e;
         
@@ -161,47 +161,8 @@ public class Body {
   
   
   
-  
-  public boolean match(Scope sc, Value w, Value f, Value g, Value x) {
-    if (ftype != 'a' && (ftype=='m') != (w==null)) return false;
-    if (noHeader) return true;
-    
-    if (xM!=null) if (!matches(sc, xM, x)) return false;
-    if (gM!=null) if (!matches(sc, gM, g)) return false;
-    if (fM!=null) if (!matches(sc, fM, f)) return false;
-    if (wM!=null) if (!matches(sc, wM, w)) return false;
-    
-    return true;
-  }
-  private boolean matches(Scope sc, Token t, Value g) {
-    if (t instanceof ConstTok) return ((ConstTok) t).val.eq(g); // 2, 'a', "ab"
-    if (t instanceof LineTok) {
-      if (((LineTok) t).tokens.size()!=1) throw new SyntaxError("Couldn't match "+t);
-      return matches(sc, ((LineTok) t).tokens.get(0), g);
-    }
-    if (t instanceof ParenTok) {
-      return matches(sc, ((ParenTok) t).ln, g);
-    }
-    if (t instanceof NameTok) {
-      sc.set(((NameTok) t).name, g);
-      return true;
-    }
-    if (t instanceof ArrayTok) {
-      if (g.rank != 1) return false;
-      List<LineTok> ts = ((ArrayTok) t).tokens;
-      if (g.ia != ts.size()) return false;
-      for (int i = 0; i < g.ia; i++) if (!matches(sc, ts.get(i), g.get(i))) return false;
-      return true;
-    }
-    if (t instanceof StrandTok) {
-      if (g.rank != 1) return false;
-      List<Token> ts = ((StrandTok) t).tokens;
-      if (g.ia != ts.size()) return false;
-      for (int i = 0; i < g.ia; i++) if (!matches(sc, ts.get(i), g.get(i))) return false;
-      return true;
-    }
-    throw new SyntaxError("Couldn't match "+t.source(), t);
-    // throw new SyntaxError("Couldn't match "+t.getClass(), t);
+  public boolean matchArity(Value w) {
+    return arity=='a' || (arity=='m') == (w==null);
   }
   
   
@@ -226,5 +187,25 @@ public class Body {
   
   public String[] defNames() {
     return varnames(o.type, o.immediate || o.type=='a');
+  }
+  
+  public void addHeader(Comp.Mut m) {
+    addVar(m, xM, "𝕩");
+    addVar(m, gM, "𝕘");
+    if (self != null && type!='a') {
+      m.var(null, type=='f'? "𝕤" : "𝕣", false);
+      m.nvar(self);
+      m.var(null, self, true);
+      m.add(Comp.SETH);
+    }
+    addVar(m, fM, "𝕗");
+    addVar(m, wM, "𝕨");
+  }
+  
+  private void addVar(Comp.Mut m, Token k, String v) {
+    if (k==null) return;
+    m.var(k, v, false);
+    Comp.compM(m, k, true, true);
+    m.add(k, Comp.SETH);
   }
 }

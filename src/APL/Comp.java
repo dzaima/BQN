@@ -22,7 +22,7 @@ public class Comp {
   private final Token[] ref;
   private final Token tk;
   
-  public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
+  public static int compileStart = 0; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
   private int iter;
   private JFn gen;
   
@@ -58,6 +58,8 @@ public class Comp {
   public static final byte OP2H = 20; // derive composition to modifier
   public static final byte LOCO = 21; // B,N; push local object
   public static final byte LOCM = 22; // B,N; push mutable local object
+  public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value
+  public static final byte SETH = 24; // set header; acts like SETN, but instead of erroring in cases it would, it skips to the next body and doesn't keep the value in the stack
   public static final byte RETN = 25; // returns, giving ToS
   // public static final byte ____ = 6;
   
@@ -254,6 +256,17 @@ public class Comp {
           s.push(v);
           break;
         }
+        case SETH: {
+          Settable k = (Settable) s.pop();
+          Value    v = (Value   ) s.pop();
+          if (!k.seth(v, sc)) return null;
+          break;
+        }
+        case VFYM: {
+          Value x = (Value) s.pop();
+          s.push(new MatchSettable(x));
+          break;
+        }
         case POPS: {
           s.pop();
           break;
@@ -318,13 +331,17 @@ public class Comp {
         // }
         APLError.Mg.add(mgs, tk, '^');
       }
-      e.trace.add(new APLError.Frame(sc, mgs));
+      e.trace.add(new APLError.Frame(sc, mgs, this, pi));
       throw e;
     }
   }
   
   public String fmt() {
-    StringBuilder b = new StringBuilder("code:\n");
+    return fmt(-1);
+  }
+  
+  public String fmt(int hl) {
+    StringBuilder b = new StringBuilder(hl<0? "code:\n" : "");
     int i = 0;
     try {
       while (i != bc.length) {
@@ -332,44 +349,50 @@ public class Comp {
         i++;
         String cs;
         switch (bc[pi]) {
-          case PUSH: cs = " PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARO: cs = " VARO " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARM: cs = " VARM " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
-          case DFND: cs = " DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case ARRO: cs = " ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case ARRM: cs = " ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case FN1C: cs = " FN1C"; break;
-          case FN2C: cs = " FN2C"; break;
-          case OP1D: cs = " OP1D"; break;
-          case OP2D: cs = " OP2D"; break;
-          case TR2D: cs = " TR2D"; break;
-          case TR3D: cs = " TR3D"; break;
-          case SETN: cs = " SETN"; break;
-          case SETU: cs = " SETU"; break;
-          case SETM: cs = " SETM"; break;
-          case POPS: cs = " POPS"; break;
-          case FN1O: cs = " FN1O"; break;
-          case FN2O: cs = " FN2O"; break;
-          case CHKV: cs = " CHKV"; break;
-          case TR3O: cs = " TR3O"; break;
-          case OP2H: cs = " OP2H"; break;
-          case LOCO: cs = " LOCO " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
-          case LOCM: cs = " LOCM " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
-          case RETN: cs = " RETN"; break;
-          case SPEC: cs = " SPEC " + (bc[i++]&0xff); break;
-          default  : cs = " unknown";
+          case PUSH: cs = "PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARO: cs = "VARO " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARM: cs = "VARM " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
+          case DFND: cs = "DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case ARRO: cs = "ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case ARRM: cs = "ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case FN1C: cs = "FN1C"; break;
+          case FN2C: cs = "FN2C"; break;
+          case OP1D: cs = "OP1D"; break;
+          case OP2D: cs = "OP2D"; break;
+          case TR2D: cs = "TR2D"; break;
+          case TR3D: cs = "TR3D"; break;
+          case SETN: cs = "SETN"; break;
+          case SETU: cs = "SETU"; break;
+          case SETM: cs = "SETM"; break;
+          case SETH: cs = "SETH"; break;
+          case POPS: cs = "POPS"; break;
+          case FN1O: cs = "FN1O"; break;
+          case FN2O: cs = "FN2O"; break;
+          case CHKV: cs = "CHKV"; break;
+          case TR3O: cs = "TR3O"; break;
+          case OP2H: cs = "OP2H"; break;
+          case VFYM: cs = "VFYM"; break;
+          case LOCO: cs = "LOCO " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
+          case LOCM: cs = "LOCM " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
+          case RETN: cs = "RETN"; break;
+          case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
+          default  : cs = "unknown";
         }
-        b.append(' ');
-        for (int j = pi; j < i; j++) {
-          int c = bc[j]&0xff;
-          b.append(Integer.toHexString(c/16).toUpperCase());
-          b.append(Integer.toHexString(c%16).toUpperCase());
-          b.append(' ');
+        if (hl<0 || Math.abs(hl-pi) < 10 || Math.abs(hl-i) < 10) {
+          if (hl<0) b.append(' ');
+          else b.append(hl==pi? ">>" : "  ");
+          for (int j = pi; j < i; j++) {
+            int c = bc[j]&0xff;
+            b.append(Integer.toHexString(c/16).toUpperCase());
+            b.append(Integer.toHexString(c%16).toUpperCase());
+            if (j+1 != i) b.append(' ');
+          }
+          b.append(Main.repeat(" ", Math.max(1, (3-(i-pi))*3 + 1)));
+          b.append(cs);
+          b.append('\n');
         }
-        b.append(Main.repeat("   ", 3 - (i-pi))); // relies on this not erroring if the padding would need to be negative
-        b.append(cs);
-        b.append('\n');
       }
+      // if (hl>=0) return b.toString();
     } catch (Throwable t) {
       b.append("#ERR#\n");
     }
@@ -392,7 +415,7 @@ public class Comp {
           ArrayList<Body> bodies = dfn.bodies;
           for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
             Body bd = bodies.get(k);
-            b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.ftype=='m'? "monadic" : bd.ftype=='d'? "dyadic" : "ambivalent").append('\n');
+            b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.arity=='m'? "monadic" : bd.arity=='d'? "dyadic" : "ambivalent").append('\n');
             b.append("    start: ").append(bd.start).append('\n');
             if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
             if (bd.wM!=null) b.append("    𝕨: ").append(bd.wM.toRepr()).append('\n');
@@ -423,8 +446,8 @@ public class Comp {
       case FN1C: case FN2C: case FN1O: case FN2O:
       case OP1D: case OP2D: case OP2H:
       case TR2D: case TR3D: case TR3O:
-      case SETN: case SETU: case SETM:
-      case POPS: case CHKV: case RETN:
+      case SETN: case SETU: case SETM: case SETH:
+      case POPS: case CHKV: case RETN: case VFYM:
         return i+1;
       case SPEC: return i+2;
       case LOCO: case LOCM:
@@ -481,8 +504,7 @@ public class Comp {
     ArrayList<String> strs = new ArrayList<>();
     MutByteArr bc = new MutByteArr(10);
     ArrayList<Token> ref = new ArrayList<>();
-    ArrayList<DfnTok> registered = new ArrayList<>();
-  
+    
     HashMap<String, Integer> vars; // map of varName→index
     ArrayList<String> varnames;
     public void newBody(String[] preset) {
@@ -511,6 +533,10 @@ public class Comp {
       dfns.add(o);
     }
     
+    public void nvar(String name) {
+      vars.put(name, varnames.size());
+      varnames.add(name);
+    }
     public void var(Token t, String s, boolean mut) {
       Integer pos = vars.get(s);
       if (pos == null) {
@@ -524,14 +550,15 @@ public class Comp {
       }
     }
     
-    public void add(byte... nbc) {
-      for (byte b : nbc) {
-        bc.u(b); ref.add(null);
-      }
+    public void add(byte nbc) {
+      bc.s(nbc); ref.add(null);
+    }
+    public void add(Token tk, byte nbc) {
+      bc.s(nbc); ref.add(tk);
     }
     public void add(Token tk, byte... nbc) {
       for (byte b : nbc) {
-        bc.u(b); ref.add(tk);
+        bc.s(b); ref.add(tk);
       }
     }
     
@@ -544,17 +571,10 @@ public class Comp {
         ref.add(null);
       } while (n != 0);
     }
-  
+    
     public Comp finish(Token tk) {
       assert bc.len == ref.size() : bc.len +" "+ ref.size();
-      
-      Comp comp = new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
-      for (DfnTok c : registered) c.comp = comp;
-      return comp;
-    }
-  
-    public void register(DfnTok dfn) {
-      registered.add(dfn);
+      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
   
@@ -576,13 +596,12 @@ public class Comp {
     return mut.finish(lns);
   }
   
-  public static int[] comp(Mut mut, ArrayList<Body> parts) {
-    int[] offs = new int[parts.size()];
+  public static Comp comp(Mut mut, ArrayList<Body> parts, DfnTok tk) {
     for (int i = 0; i < parts.size(); i++) {
       Body b = parts.get(i);
-      offs[i] = mut.bc.len;
+      b.start = mut.bc.len;
       mut.newBody(b.defNames());
-      
+      b.addHeader(mut);
       int sz = b.lns.size();
       for (int j = 0; j < sz; j++) {
         LineTok ln = b.lns.get(j); typeof(ln); flags(ln);
@@ -593,7 +612,7 @@ public class Comp {
       b.vars = mut.getVars();
       if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
     }
-    return offs;
+    return mut.finish(tk);
   }
   
   private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a
@@ -682,7 +701,7 @@ public class Comp {
     }
     
     void add(Mut m) {
-      if (mut) compM(m, tk, create);
+      if (mut) compM(m, tk, create, false);
       else compO(m, tk);
     }
     
@@ -1014,39 +1033,36 @@ public class Comp {
     throw new ImplementationError("didn't check for "+t.getClass().getSimpleName());
   }
   
-  public static void compM(Mut m, Token tk, boolean create) {
+  public static void compM(Mut m, Token tk, boolean create, boolean header) {
     assert tk.type != 0;
     if (tk instanceof NameTok) {
       String name = ((NameTok) tk).name;
       if (create) {
         if (m.vars.containsKey(name)) throw Local.redefine(name, tk);
-        if (name.charAt(0)!='•') {
-          m.vars.put(name, m.varnames.size());
-          m.varnames.add(name);
-        }
+        if (name.charAt(0)!='•') m.nvar(name);
       }
       m.var(tk, name, true);
       return;
     }
     if (tk instanceof StrandTok) {
       List<Token> tks = ((StrandTok) tk).tokens;
-      for (Token c : tks) compM(m, c, create);
+      for (Token c : tks) compM(m, c, create, header);
       m.add(tk, ARRM); m.addNum(tks.size());
       return;
     }
     if (tk instanceof ArrayTok) {
       List<LineTok> tks = ((ArrayTok) tk).tokens;
-      for (LineTok c : tks) compM(m, c, create);
+      for (LineTok c : tks) compM(m, c, create, header);
       m.add(tk, ARRM); m.addNum(tks.size());
       return;
     }
     if (tk instanceof ParenTok) {
-      compM(m, ((ParenTok) tk).ln, create);
+      compM(m, ((ParenTok) tk).ln, create, header);
       return;
     }
     if (tk instanceof LineTok) {
       if (((LineTok) tk).tokens.size() == 1) {
-        compM(m, ((LineTok) tk).tokens.get(0), create);
+        compM(m, ((LineTok) tk).tokens.get(0), create, header);
         return;
       }
     }
@@ -1062,6 +1078,11 @@ public class Comp {
         m.var(tk, Tokenizer.surrogateOps.substring(aid, aid+2), true);
         return;
       }
+    }
+    if (header && tk instanceof ConstTok) {
+      m.push(((ConstTok) tk).val);
+      m.add(tk, VFYM);
+      return;
     }
     throw new SyntaxError(tk.toRepr()+" cannot be mutated", tk);
   }

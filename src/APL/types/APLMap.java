@@ -38,13 +38,17 @@ public abstract class APLMap extends Primitive {
       return map.getRaw(k);
     }
   
-    public void set(Value v, boolean update, Scope sc, Callable blame) {
+    public void set(Value x, boolean update, Scope sc, Callable blame) {
       boolean prev = map.getRaw(k) != Null.NULL;
       if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame, k);
       if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame, k);
-      map.set(k, v);
+      map.set(k, x);
     }
-    
+  
+    public boolean seth(Value x, Scope sc) {
+      throw new SyntaxError("map key cannot be a part of a header");
+    }
+  
     public String toString() {
       Value v = get(null);
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;

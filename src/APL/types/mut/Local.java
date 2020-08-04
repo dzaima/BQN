@@ -19,13 +19,18 @@ public class Local extends Settable {
     return got;
   }
   
-  public void set(Value v, boolean update, Scope sc, Callable blame) {
+  public void set(Value x, boolean update, Scope sc, Callable blame) {
     sc = sc.owner(depth);
     if (update ^ sc.vars[index]!=null) {
       if (update) throw new ValueError("no variable \""+name(sc)+"\" to update", blame);
       else        throw redefine(name(sc), blame);
     }
-    sc.vars[index] = v;
+    sc.vars[index] = x;
+  }
+  
+  public boolean seth(Value x, Scope sc) {
+    sc.owner(depth).vars[index] = x;
+    return true;
   }
   
   public static ValueError redefine(String name, Tokenable blame) {

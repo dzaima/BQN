@@ -25,4 +25,11 @@ public abstract class Token implements Tokenable {
   public String source() {
     return raw.substring(spos, epos);
   }
+  
+  
+  public static Token COMP = new Token("•COMPiled function", 0, 18) {
+    public String toRepr() {
+      return "•COMPiled function";
+    }
+  };
 }

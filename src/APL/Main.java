@@ -155,6 +155,8 @@ public class Main {
         }
       } catch (APLError e) {
         e.print(sys);
+        System.out.println("Stack:");
+        e.stack(sys);
         throw e;
       } catch (Throwable e) {
         e.printStackTrace();
