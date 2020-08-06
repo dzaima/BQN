@@ -207,14 +207,14 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   
   public /*open*/ Fun asFun() {
-    return new Fun() {
-      public String repr() {
-        return Value.this.toString();
-      }
-      
-      public Value call(         Value x) { return Value.this; }
-      public Value call(Value w, Value x) { return Value.this; }
-    };
+    return new ValFun(this);
+  }
+  public static class ValFun extends Fun {
+    public final Value v;
+    public ValFun(Value v) { this.v = v; }
+    public Value call(         Value x) { return v; }
+    public Value call(Value w, Value x) { return v; }
+    public String repr() { return v.toString(); }
   }
   
   public String humanType(boolean article) {

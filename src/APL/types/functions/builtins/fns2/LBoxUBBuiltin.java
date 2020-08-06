@@ -6,6 +6,7 @@ import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.dops.AtBuiltin;
 
 import java.util.Arrays;
 
@@ -49,6 +50,7 @@ public class LBoxUBBuiltin extends Builtin {
     if (w instanceof Primitive) {
       return x.get(Indexer.scal(w.asInt(), x.shape, blame));
     } else {
+      if (Main.vind) return on(Indexer.poss(w, x.shape, blame), x);
       return onArr(w, x, blame);
     }
   }
@@ -63,7 +65,6 @@ public class LBoxUBBuiltin extends Builtin {
     return x.get(Indexer.vec(w, x.shape, blame));
   }
   
-  // only used by AtBuiltin
   public static Value on(Indexer.PosSh poss, Value x) {
     if (x.quickDoubleArr()) {
       double[] res = new double[Arr.prod(poss.sh)];
@@ -85,12 +86,14 @@ public class LBoxUBBuiltin extends Builtin {
   
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
-    Value[] vs = x.valuesClone();
-    if (w instanceof Primitive) {
-      vs[Indexer.scal(w.asInt(), x.shape, this)] = v;
-    } else {
-      underWSub(v, w, vs, x.shape);
+    
+    if (Main.vind) {
+      return AtBuiltin.with(x, Indexer.poss(w, x.shape, this), v, this);
     }
+    
+    Value[] vs = x.valuesClone();
+    if (w instanceof Primitive) vs[Indexer.scal(w.asInt(), x.shape, this)] = v;
+    else underWSub(v, w, vs, x.shape);
     
     return Arr.create(vs, x.shape);
   }

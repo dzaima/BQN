@@ -8,6 +8,8 @@ import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 import APL.types.functions.builtins.mops.FoldBuiltin;
 
+import java.util.Arrays;
+
 public class SlashBuiltin extends Builtin {
   private static final Fun fn = new FoldBuiltin().derive(new CeilingBuiltin());
   
@@ -122,11 +124,19 @@ public class SlashBuiltin extends Builtin {
   //   }
   // }
   
-  private static final byte[] sbuf = new byte[256];
-  private static byte[] indbuf = new byte[256];
+  // private static final byte[] sbuf = new byte[256];
+  // private static byte[] indbuf = new byte[256];
   public static Value replicate(Value w, Value x, Callable blame) { // a lot of valuecopy
     if (x.rank==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame, x);
     int depth = MatchBuiltin.full(w);
+    if (w.rank > 1) {
+      if (!Main.vind) throw new DomainError(blame+": 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", blame);
+      if (w.rank != x.rank) throw new DomainError(blame+": if 1<=𝕨 then 𝕨 and 𝕩 must have equal ranks ("+w.rank+" vs "+x.rank+")", blame);
+      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError(blame+": if 1<=𝕨 then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+      int[] sh = {w.ia};
+      w = w.ofShape(sh);
+      x = x.ofShape(sh);
+    }
     int[][] am; // scalars are represented as 1-item int[]s
     if (w.ia == 0) { // TODO reduce empty dimensions as if it were replicated
       return x;
@@ -136,9 +146,9 @@ public class SlashBuiltin extends Builtin {
         BitArr wb = (BitArr) w;
         wb.setEnd(false);
         long[] wl = ((BitArr) w).arr;
-  
-  
-  
+        
+        
+        
         // ========================= BRANCHING PER-BIT =========================
         int sum = ((BitArr) w).isum();
         if (x.quickIntArr()) {
@@ -189,12 +199,12 @@ public class SlashBuiltin extends Builtin {
         //   last>>= 1;
         // }
         // return new HArr(res);
-  
-  
-  
-  
-  
-  
+        
+        
+        
+        
+        
+        
         // ========================= CUMULATIVE =========================
         // note: incomplete (doesn't handle runs of 0s with length>255)
         // if (indbuf.length<x.ia+1) indbuf = new byte[x.ia+1];
@@ -303,7 +313,6 @@ public class SlashBuiltin extends Builtin {
       }
     }
     
-    int rcam = 1; // result cell amount
     int[] rsh = new int[x.rank]; // result shape
     System.arraycopy(x.shape, am.length, rsh, am.length, x.shape.length-am.length);
     for (int i = 0; i < am.length; i++) {
@@ -311,11 +320,8 @@ public class SlashBuiltin extends Builtin {
       if (am[i].length == 1) s = am[i][0]*x.shape[i];
       else for (int k : am[i]) s+= k;
       rsh[i] = s;
-      rcam*= s;
     }
     
-    int csz = 1; // cell size to replicate
-    for (int i = am.length; i < x.shape.length; i++) csz*= x.shape[i];
     MutVal res = new MutVal(rsh, x);
     
     recReplicate(res, 0, 0, 0, x.ia, x, x.shape, am);
@@ -324,7 +330,6 @@ public class SlashBuiltin extends Builtin {
   
   private static int recReplicate(MutVal res, int rpos, int ipos, int d, int rsz, Value x, int[] xsh, int[][] am) {
     if (d==am.length) {
-      // System.arraycopy(x, ipos, res, rpos, rsz);
       res.copy(x, ipos, rpos, rsz);
       return rpos+rsz;
     } else {
@@ -353,7 +358,17 @@ public class SlashBuiltin extends Builtin {
   
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
-    if (MatchBuiltin.full(w)!=1) throw new DomainError("⌾/: 𝕨 of / must be a boolean vector", this, w);
+    if (MatchBuiltin.full(w)!=1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this, w);
+    int[] sh;
+    if (w.rank > 1) {
+      if (!Main.vind) throw new DomainError("⌾/: 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);
+      if (w.rank != x.rank) throw new DomainError("⌾/: if 1<=𝕨 then 𝕨 and 𝕩 must have equal ranks ("+w.rank+" vs "+x.rank+")", this);
+      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError("⌾/: if 1<=𝕨 then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+      sh = w.shape;
+      int[] fsh = {w.ia};
+      w = w.ofShape(fsh);
+      x = x.ofShape(fsh);
+    } else sh = w.shape;
     if (w.rank!=1 || x.rank!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, w.rank!=1? w : x);
     double asum = w.sum();
     if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, x);
@@ -370,7 +385,7 @@ public class SlashBuiltin extends Builtin {
         if (d == 1) res[i] = vi[ipos++];
         else res[i] = xi[i];
       }
-      return new IntArr(res);
+      return new IntArr(res, sh);
     }
     Value[] res = new Value[x.ia];
     for (int i = 0; i < wi.length; i++) {
@@ -379,6 +394,6 @@ public class SlashBuiltin extends Builtin {
       if (d == 1) res[i] = v.get(ipos++);
       else res[i] = x.get(i);
     }
-    return Arr.create(res);
+    return Arr.create(res, sh);
   }
 }
