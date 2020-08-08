@@ -1,5 +1,6 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -16,19 +17,35 @@ public class FloorBuiltin extends Builtin {
     return Num.POSINF;
   }
   
-  private static final NumMV NF = new NumMV() {
-    public Value call(Num x) {
-      return Num.of(Math.floor(x.num));
-    }
-    public void call(double[] res, double[] x) {
-      for (int i = 0; i < x.length; i++) res[i] = Math.floor(x[i]);
-    }
-    public Value call(int[] x, int[] sh) {
-      return new IntArr(x, sh);
-    }
-  };
   public Value call(Value x) {
-    return numChrM(NF, Char::lower, x);
+    if (x instanceof Arr) {
+      if (x.quickDoubleArr()) {
+        if (x.quickIntArr()) return x;
+        double[] xd = x.asDoubleArr();
+        ia: {
+          int[] res = new int[x.ia];
+          for (int i = 0; i < res.length; i++) {
+            double c = xd[i];
+            if (c>=Integer.MIN_VALUE && c<Integer.MAX_VALUE) {
+              int iv = (int) c;
+              res[i] = iv - (c<0 && c!=iv? 1 : 0);
+            } else break ia;
+          }
+          return new IntArr(res, x.shape);
+        }
+        double[] res = new double[x.ia];
+        for (int i = 0; i < res.length; i++) res[i] = Math.floor(xd[i]);
+        return new DoubleArr(res, x.shape);
+      }
+      if (x instanceof ChrArr) {
+        return new ChrArr(((ChrArr) x).s.toLowerCase(), x.shape);
+      }
+      Value[] vs = new Value[x.ia];
+      for (int i = 0; i < vs.length; i++) vs[i] = call(x.get(i));
+      return new HArr(vs, x.shape);
+    } else if (x instanceof Num) return new Num(Math.floor(((Num) x).num));
+      else if (x instanceof Char) return ((Char) x).lower();
+      else throw new DomainError("⌊: argument contained "+x.humanType(true), this);
   }
   
   public Pervasion.NN2N dyNum() { return DF; };

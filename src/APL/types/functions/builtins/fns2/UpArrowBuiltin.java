@@ -129,16 +129,6 @@ public class UpArrowBuiltin extends Builtin {
       }
       return new ChrArr(arr, sh);
     }
-    if (x.quickDoubleArr()) {
-      double[] arr = new double[ia];
-      double[] wd = x.asDoubleArr();
-      int i = 0;
-      for (int[] index : new Indexer(sh, off)) {
-        arr[i] = wd[Indexer.fromShape(x.shape, index)];
-        i++;
-      }
-      return new DoubleArr(arr, sh);
-    }
     if (x.quickIntArr()) {
       int[] arr = new int[ia];
       int[] wd = x.asIntArr();
@@ -148,6 +138,16 @@ public class UpArrowBuiltin extends Builtin {
         i++;
       }
       return new IntArr(arr, sh);
+    }
+    if (x.quickDoubleArr()) {
+      double[] arr = new double[ia];
+      double[] wd = x.asDoubleArr();
+      int i = 0;
+      for (int[] index : new Indexer(sh, off)) {
+        arr[i] = wd[Indexer.fromShape(x.shape, index)];
+        i++;
+      }
+      return new DoubleArr(arr, sh);
     }
     Value[] arr = new Value[ia];
     int i = 0;
