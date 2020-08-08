@@ -28,13 +28,12 @@ public class GradeDownBuiltin extends Builtin {
         return res;
       }
       if (x.quickIntArr()) {
-        int[] xi = x.asIntArr();
-        Integer[] na = new Integer[x.ia];
-        for (int i = 0; i < na.length; i++) na[i] = i;
-        Arrays.sort(na, (a, b) -> Integer.compare(xi[b], xi[a]));
-        int[] res = new int[na.length];
-        for (int i = 0; i < na.length; i++) res[i] = na[i];
-        return res;
+        int[] xi = x.asIntArrClone();
+        int[] ri = UDBuiltin.on(xi.length);
+        if (tmp.length < ri.length) tmp = new int[ri.length];
+        System.arraycopy(ri, 0, tmp, 0, ri.length);
+        rec(xi, tmp, ri, 0, ri.length);
+        return ri;
       }
     }
     
@@ -48,5 +47,22 @@ public class GradeDownBuiltin extends Builtin {
     int[] res = new int[na.length];
     for (int i = 0; i < na.length; i++) res[i] = na[i];
     return res;
+  }
+  private static int[] tmp = new int[100];
+  private static void rec(int[] b, int[] I, int[] O, int s, int e) {
+    if (e-s<=1) return;
+    int m = (s+e)/2;
+    rec(b, O, I, s, m);
+    rec(b, O, I, m, e);
+    
+    int i1 = s;
+    int i2 = m;
+    for (int i = s; i < e; i++) {
+      if (i1<m && (i2>=e || b[I[i1]]>=b[I[i2]])) {
+        O[i] = I[i1]; i1++;
+      } else {
+        O[i] = I[i2]; i2++;
+      }
+    }
   }
 }

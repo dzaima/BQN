@@ -18,9 +18,7 @@ public class UDBuiltin extends Builtin {
   public static Value on(Value x, Callable blame) {
     if (x instanceof Primitive) {
       if (x instanceof Num) {
-        int[] res = new int[x.asInt()];
-        for (int i = 0; i < res.length; i++) res[i] = i;
-        return new IntArr(res);
+        return new IntArr(on(x.asInt()));
       } else if (x instanceof BigValue) {
         Value[] res = new Value[x.asInt()];
         for (int i = 0; i < res.length; i++) {
@@ -65,6 +63,11 @@ public class UDBuiltin extends Builtin {
       }
       return new HArr(arr, shape);
     }
+  }
+  public static int[] on(int am) {
+    int[] res = new int[am];
+    for (int i = 0; i < am; i++) res[i] = i;
+    return res;
   }
   
   public Value call(Value w, Value x) {
