@@ -32,7 +32,7 @@ public class GroupBuiltin extends Builtin {
     int depth = MatchBuiltin.full(x);
     if (depth == 1) {
       int[] xi = x.asIntVec();
-      int sz = 0;
+      int sz = -1;
       for (int d : xi) sz = Math.max(sz, d);
       sz++;
       
