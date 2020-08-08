@@ -1,9 +1,11 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.Main;
 import APL.errors.DomainError;
 import APL.types.Value;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.dops.NCellBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.Arrays;
@@ -64,6 +66,34 @@ public class GradeUpBuiltin extends Builtin {
         O[i] = I[i2]; i2++;
       }
     }
+  }
+  
+  
+  
+  public Value call(Value w, Value x) {
+    if (w.rank > x.rank+1) throw new DomainError("⍋: =𝕨 cannot be greater than =𝕩 ("+Main.formatAPL(w.shape)+"≡≢𝕨; "+Main.formatAPL(x.shape)+"≡≢𝕩)", this);
+    if (w.rank==0) throw new DomainError("⍋: 𝕨 cannot be a scalar", this, w);
+    if (w.rank>1) {
+      int xr = x.rank-w.rank+1;
+      x = new HArr(NCellBuiltin.cells(x, xr), Arrays.copyOf(x.shape, xr));
+      w = new HArr(CellBuiltin.cells(w));
+    }
+    for (int i = 0; i < w.ia-1; i++) {
+      if (w.get(i).compareTo(w.get(i+1)) > 0) throw new DomainError("⍋: 𝕨 must be sorted", this);
+    }
+    Value[] wv = w.values();
+    int[] res = new int[x.ia];
+    for (int i = 0; i < res.length; i++) {
+      Value c = x.get(i);
+      int s = -1, e = wv.length;
+      while (e-s > 1) {
+        int m = (s+e) / 2;
+        if (c.compareTo(wv[m]) < 0) e = m;
+        else s = m;
+      }
+      res[i] = s+1;
+    }
+    return new IntArr(res, x.shape);
   }
 }
 

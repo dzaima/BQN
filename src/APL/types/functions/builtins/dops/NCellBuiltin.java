@@ -66,7 +66,7 @@ public class NCellBuiltin extends Dop {
   }
   
   
-  public static Value[] cells(Value x, int k) {
+  public static Value[] cells(Value x, int k) { // k is amount of leading dimensions to squash
     int cam = Arr.prod(x.shape, 0, k);
     int[] csh = Arrays.copyOfRange(x.shape, k, x.shape.length);
     int csz = Arr.prod(csh, 0, csh.length);
