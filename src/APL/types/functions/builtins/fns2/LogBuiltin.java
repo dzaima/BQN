@@ -25,9 +25,9 @@ public class LogBuiltin extends Builtin { // here only to serve as DNF/NF for *â
         if (x.i.signum() == -1) throw new DomainError("logarithm of negative number", x);
         return Num.NEGINF;
       }
-      if (x.i.bitLength()<1023) return new Num(Math.log(x.i.doubleValue())); // safe quick path
       int len = x.i.bitLength();
-      int shift = len > 64? len - 64 : 0; // 64 msb should be enough to get most out of log
+      if (len<1023) return new Num(Math.log(x.i.doubleValue())); // safe quick path
+      int shift = len-64; // 64 msb should be enough to get most out of log; safe quick path takes care of bitLength<64
       double d = x.i.shiftRight(shift).doubleValue();
       return new Num(Math.log(d) + LN2*shift);
     }

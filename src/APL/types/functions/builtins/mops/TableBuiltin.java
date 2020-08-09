@@ -64,7 +64,7 @@ public final class TableBuiltin extends Mop {
           }
         }
       }
-      if (allNums) return new DoubleArr(dres, sh);
+      if (allNums) return IntArr.maybe(dres, sh);
       // i points to the place the failure should be
       Value[] res = new Value[w.ia*x.ia];
       

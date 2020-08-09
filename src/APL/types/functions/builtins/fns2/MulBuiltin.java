@@ -4,7 +4,7 @@ import APL.Main;
 import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.arrs.BitArr;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
 import java.math.BigInteger;
@@ -28,6 +28,13 @@ public class MulBuiltin extends Builtin {
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = x[i]>0? 1 : x[i]<0? -1 : 0;
     }
+  
+    public Value call(int[] x, int[] sh) {
+      int[] res = new int[x.length];
+      for (int i = 0; i < x.length; i++) res[i] = x[i]>0? 1 : x[i]<0? -1 : 0;
+      return new IntArr(res, sh);
+    }
+  
     public Value call(BigValue x) {
       return Num.of(x.i.signum());
     }

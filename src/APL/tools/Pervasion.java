@@ -5,7 +5,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.builtins.fns2.NotBuiltin;
 
-public class Pervasion {
+public class Pervasion { // implementations must be okay with not being called on duplicate items!
   public static abstract class VV {
     public abstract Value on(Primitive w, Primitive x);
     
@@ -83,9 +83,12 @@ public class Pervasion {
     public Value scalarX(Value w, double x) {
       if (w.quickDoubleArr()) {
         if (w instanceof Num) return new Num(on(((Num) w).num, x));
-        if (Num.isInt(x) && w.quickIntArr()) {
-          int[] ri = on(w.asIntArr(), (int) x);
-          if (ri != null) return new IntArr(ri, w.shape);
+        if (w.quickIntArr()) {
+          if (w instanceof BitArr && mixed((BitArr) w)) return bits(on(0, x), on(1, x), (BitArr) w);
+          if (Num.isInt(x)) {
+            int[] ri = on(w.asIntArr(), (int) x);
+            if (ri != null) return new IntArr(ri, w.shape);
+          }
         }
         double[] rd = new double[w.ia];
         on(w.asDoubleArr(), x, rd);
@@ -104,9 +107,13 @@ public class Pervasion {
     public Value scalarW(double w, Value x) {
       if (x.quickDoubleArr()) {
         if (x instanceof Num) return new Num(on(w, ((Num) x).num));
-        if (Num.isInt(w) && x.quickIntArr()) {
-          int[] ri = on((int) w, x.asIntArr());
-          if (ri != null) return new IntArr(ri, x.shape);
+        if (x.quickIntArr()) {
+          if (x instanceof BitArr && mixed((BitArr) x)) return bits(on(w, 0), on(w, 1), (BitArr) x);
+          
+          if (Num.isInt(w)) {
+            int[] ri = on((int) w, x.asIntArr());
+            if (ri != null) return new IntArr(ri, x.shape);
+          }
         }
         double[] rd = new double[x.ia];
         on(w, x.asDoubleArr(), rd);
@@ -233,6 +240,30 @@ public class Pervasion {
     }
   }
   
+  public static boolean mixed(BitArr b) {
+    if (b.arr.length==0) return false;
+    b.setEnd(b.arr[0]!=0);
+    long[] arr = b.arr;
+    for (long c : arr) {
+      if (c!=0 & c!=-1) return true;
+    }
+    return false;
+  }
+  public static Value bits(double d0, double d1, BitArr a) {
+    BitArr.BR ar = a.read();
+    int i0 = (int) d0;
+    int i1 = (int) d1;
+    if (i0==d0 && i1==d1) {
+      // TODO bools
+      int[] is = new int[a.ia];
+      for (int i = 0; i < a.ia; i++) is[i] = ar.read()? i1 : i0;
+      return new IntArr(is, a.shape);
+    } else {
+      double[] ds = new double[a.ia];
+      for (int i = 0; i < a.ia; i++) ds[i] = ar.read()? d1 : d0;
+      return new DoubleArr(ds, a.shape);
+    }
+  }
   
   private Pervasion() { }
 }

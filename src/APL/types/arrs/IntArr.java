@@ -22,6 +22,16 @@ public class IntArr extends Arr {
     this.arr = a;
   }
   
+  public static Arr maybe(double[] ds, int[] sh) {
+    ia: {
+      for (double c : ds) if (c != (int)c) break ia;
+      int[] is = new int[ds.length];
+      for (int i = 0; i < ds.length; i++) is[i] = (int) ds[i];
+      return new IntArr(is, sh);
+    }
+    return new DoubleArr(ds, sh);
+  }
+  
   public Value get(int i) { return Num.of(arr[i]); }
   
   public Value[] valuesClone() {
