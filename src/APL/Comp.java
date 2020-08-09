@@ -86,57 +86,54 @@ public class Comp {
     }
   }
   
-  public static final boolean DBGPROG = true;
   public Value exec(Scope sc) {
     return exec(sc, 0);
   }
-  public Value exec(Scope sc, int spt) {
-    if (gen!=null) return gen.get(sc, spt);
+  public Value exec(Scope sc, int i) {
+    Value last = null;
+    try {
+    if (gen!=null) return gen.get(sc, i);
     if (iter++>=compileStart && compileStart>=0) {
       gen = new JComp(this).r;
-      return gen.get(sc, spt);
+      return gen.get(sc, i);
     }
-    Value last = null;
-    int pi = spt;
-    try {
-    int i = spt;
     Stk s = new Stk();
-    // Stack<Obj> s = new Stack<>();
-    exec: while (i != bc.length) {
-      pi = i;
-      i++;
-      switch (bc[pi]) {
+    exec: while (true) {
+      int c = i;
+      if (i >= bc.length) break;
+      c++;
+      switch (bc[i]) {
         case PUSH: {
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           s.push(objs[n]);
           break;
         }
         case VARO: {
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           Value got = sc.getC(strs[n]);
           s.push(got);
           break;
         }
         case VARM: {
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           s.push(new Variable(strs[n]));
           break;
         }
         case LOCO: {
-          int depth = bc[i++];
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int depth = bc[c++];
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           Value got = sc.getL(depth, n);
           s.push(got);
           break;
         }
         case LOCM: {
-          int depth = bc[i++];
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int depth = bc[c++];
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           s.push(new Local(depth, n));
           break;
         }
         case ARRO: {
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           Value[] vs = new Value[n];
           for (int j = 0; j < n; j++) {
             vs[n-j-1] = (Value) s.pop();
@@ -145,7 +142,7 @@ public class Comp {
           break;
         }
         case ARRM: {
-          int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           Settable[] vs = new Settable[n];
           for (int j = 0; j < n; j++) {
             vs[n-j-1] = (Settable) s.pop();
@@ -156,7 +153,6 @@ public class Comp {
         case FN1C: {
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = f; last = f; }
           s.push(f.asFun().call(x));
           break;
         }
@@ -164,14 +160,12 @@ public class Comp {
           Value w = (Value) s.pop();
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = f; last = f; }
           s.push(f.asFun().call(w, x));
           break;
         }
         case FN1O: {
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = f; last = f; }
           if (x instanceof Nothing) s.push(x);
           else s.push(f.asFun().call(x));
           break;
@@ -180,7 +174,6 @@ public class Comp {
           Value w = (Value) s.pop();
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = f; last = f; }
           if (x instanceof Nothing) s.push(x);
           else if (w instanceof Nothing) s.push(f.asFun().call(x));
           else s.push(f.asFun().call(w, x));
@@ -189,7 +182,6 @@ public class Comp {
         case OP1D: {
           Value f = (Value) s.pop();
           Mop   r = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
-          if (DBGPROG) { Main.faulty = f; last = f; }
           Fun d = r.derive(f); d.token = r.token;
           s.push(d);
           break;
@@ -198,7 +190,6 @@ public class Comp {
           Value f = (Value) s.pop();
           Dop   r = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = r; last = r; }
           Fun d = r.derive(f, g); d.token = r.token;
           s.push(d);
           break;
@@ -206,7 +197,6 @@ public class Comp {
         case OP2H: {
           Dop   r = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          if (DBGPROG) { Main.faulty = r; last = r; }
           Mop d = r.derive(g); d.token = r.token;
           s.push(d);
           break;
@@ -272,7 +262,7 @@ public class Comp {
           break;
         }
         case DFND: {
-          int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+          int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
           DfnTok dfn = dfns[n];
           s.push(dfn.eval(sc));
           break;
@@ -286,7 +276,7 @@ public class Comp {
           break exec;
         }
         case SPEC: {
-          switch(bc[i++]) {
+          switch(bc[c++]) {
             case EVAL:
               s.push(new EvalBuiltin(sc));
               break;
@@ -297,41 +287,22 @@ public class Comp {
               s.push(new Quad().get(sc));
               break;
             default:
-              throw new InternalError("Unknown special "+bc[i-1]);
+              throw new InternalError("Unknown special "+bc[c-1]);
           }
           break;
         }
-        default: throw new InternalError("Unknown bytecode "+bc[pi]);
+        default: throw new InternalError("Unknown bytecode "+bc[i]);
       }
+      i = c;
     }
     return (Value) s.peek();
     } catch (Throwable t) {
       APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
       ArrayList<APLError.Mg> mgs = new ArrayList<>();
       APLError.Mg.add(mgs, tk, '¯');
-      if (last != null) {
-        if (last.token == null) {
-          if (last instanceof DerivedDop) last = ((DerivedDop) last).op;
-          else if (last instanceof DerivedMop) last = ((DerivedMop) last).op;
-        }
-        Tokenable tk = last.getToken();
-        if (tk == null) {
-          int j  = pi;
-          // while (--j > 0 && tk==null) {
-          //   if (ref[j] != null) tk = ref[j];
-          // }
-          tk = ref[j];
-        }
-        // if (tk == null) {
-        //   tk = new Token("INS "+bc[pi], 0, 1) {
-        //     public String toRepr() {
-        //       return source();
-        //     }
-        //   };
-        // }
-        APLError.Mg.add(mgs, tk, '^');
-      }
-      e.trace.add(new APLError.Frame(sc, mgs, this, pi));
+      Tokenable tk = ref[i];
+      APLError.Mg.add(mgs, tk, '^');
+      e.trace.add(new APLError.Frame(sc, mgs, this, i));
       throw e;
     }
   }
@@ -1213,6 +1184,7 @@ public class Comp {
     if (t instanceof OpTok) {
       Value builtin = builtin((OpTok) t);
       if (builtin == null) throw new ImplementationError(t.source());
+      builtin.token = t;
       return builtin;
     }
     if (t instanceof NothingTok) return ((NothingTok) t).val;

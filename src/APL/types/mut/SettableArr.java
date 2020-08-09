@@ -14,7 +14,6 @@ public class SettableArr extends Settable {
   }
   
   public Arr get(Scope sc) {
-    if (this.token != null) Main.faulty = this;
     Value[] res = new Value[arr.length];
     for (int i = 0; i < ia; i++) res[i] = arr[i].get(sc);
     return Arr.create(res);
@@ -27,8 +26,8 @@ public class SettableArr extends Settable {
   
   
   public void set(Value x, boolean update, Scope sc, Callable blame) {
-    if (x.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", x);
-    if (x.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", x);
+    if (x.rank != 1) throw new LengthError((update?'↩':'←')+": scatter rank ≠1", this, x);
+    if (x.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", this, x);
     
     for (int i = 0; i < ia; i++) arr[i].set(x.get(i), update, sc, null);
   }

@@ -79,7 +79,7 @@ public class GradeDownBuiltin extends Builtin {
       w = new HArr(CellBuiltin.cells(w));
     }
     for (int i = 0; i < w.ia-1; i++) {
-      if (w.get(i).compareTo(w.get(i+1)) < 0) throw new DomainError("⍒: 𝕨 must be sorted", this);
+      if (w.get(i).compareTo(w.get(i+1)) < 0) throw new DomainError("⍒: 𝕨 must be sorted in descending order", this);
     }
     Value[] wv = w.values();
     int[] res = new int[x.ia];

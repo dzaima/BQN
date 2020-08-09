@@ -7,6 +7,7 @@ import APL.types.*;
 import java.util.*;
 
 public abstract class APLError extends RuntimeException {
+  public Tokenable blame;
   public Tokenable cause;
   public ArrayList<Frame> trace = new ArrayList<>();
   
@@ -16,12 +17,12 @@ public abstract class APLError extends RuntimeException {
   }
   protected APLError(String msg, Tokenable blame) {
     super(msg);
-    if (blame instanceof Callable) Main.faulty = blame;
-    else cause = blame;
+    if (blame instanceof Callable) this.blame = blame;
+    else this.cause = blame;
   }
-  protected APLError(String msg, Callable blame, Tokenable cause) {
+  protected APLError(String msg, Tokenable blame, Tokenable cause) {
     super(msg);
-    Main.faulty = blame;
+    this.blame = blame;
     this.cause = cause;
   }
   
@@ -32,8 +33,8 @@ public abstract class APLError extends RuntimeException {
     if (msg != null && msg.length() != 0) s.colorprint(type + ": " + msg, 246);
     else s.colorprint(type, 246);
     ArrayList<Mg> l = new ArrayList<>();
-    if (Main.faulty!=null) Mg.add(l, Main.faulty, '^');
-    if (cause      !=null) Mg.add(l, cause      , '¯');
+    if (blame!=null) Mg.add(l, blame, '^');
+    if (cause!=null) Mg.add(l, cause, '¯');
     println(l, s);
   }
   
@@ -58,15 +59,16 @@ public abstract class APLError extends RuntimeException {
     String ln = gs.get(0).raw.substring(lns, lne);
     s.println(ln);
     char[] str = new char[ln.length()];
-    int rl = 0;
-    for (int i = 0, j = 0; i < str.length; j++) {
+    int i = 0;
+    int o = 0;
+    while (i < str.length) {
       char c = ' ';
       for (Mg g : gs) if (i>=g.spos && i<g.epos) c = g.c;
-      str[j] = c;
-      i+= Character.charCount(ln.charAt(i));
-      rl++;
+      str[o] = c;
+      i+= Character.isHighSurrogate(ln.charAt(i))? 2 : 1;
+      o++;
     }
-    s.println(new String(str, 0, rl));
+    s.println(new String(str, 0, o));
   }
   
   public void stack(Sys sys) {

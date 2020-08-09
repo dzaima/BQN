@@ -3,13 +3,16 @@ package APL.errors;
 import APL.types.*;
 
 public class SyntaxError extends APLError {
+  
   public SyntaxError(String s) {
     super(s);
   }
-  public SyntaxError(String s, Tokenable fun) {
-    super(s, fun);
+  
+  public SyntaxError(String s, Tokenable blame) {
+    super(s, blame);
   }
-  public SyntaxError(String s, Callable fun, Tokenable cause) {
-    super(s, fun, cause);
+  
+  public SyntaxError(String s, Tokenable blame, Tokenable cause) {
+    super(s, blame, cause);
   }
 }

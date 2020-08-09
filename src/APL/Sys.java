@@ -116,7 +116,6 @@ public abstract class Sys {
   }
   
   public void line(String s) {
-    Main.faulty = null;
     if (s.startsWith(")")) {
       ucmd(s.substring(1));
     } else {
