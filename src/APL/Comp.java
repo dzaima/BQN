@@ -308,10 +308,10 @@ public class Comp {
   }
   
   public String fmt() {
-    return fmt(-1);
+    return fmt(-1, 10);
   }
   
-  public String fmt(int hl) {
+  public String fmt(int hl, int am) {
     StringBuilder b = new StringBuilder(hl<0? "code:\n" : "");
     int i = 0;
     try {
@@ -349,7 +349,7 @@ public class Comp {
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
           default  : cs = "unknown";
         }
-        if (hl<0 || Math.abs(hl-pi) < 10 || Math.abs(hl-i) < 10) {
+        if (hl<0 || Math.abs(hl-pi) < am || Math.abs(hl-i) < am) {
           if (hl<0) b.append(' ');
           else b.append(hl==pi? ">>" : "  ");
           for (int j = pi; j < i; j++) {

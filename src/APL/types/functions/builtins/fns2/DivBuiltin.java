@@ -28,6 +28,7 @@ public class DivBuiltin extends Builtin {
   }
   
   public Pervasion.NN2N dyNum() { return DF; };
+  @SuppressWarnings("UnnecessaryLocalVariable") // prettier this way
   public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public Value on(BigValue w, BigValue x) { return new BigValue(w.i.divide(x.i)); }
     public double on(double w, double x) { return w / x; }
@@ -35,9 +36,10 @@ public class DivBuiltin extends Builtin {
     public void on(double[] w, double   x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x   ; }
     public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = w[i] / x[i]; }
     
-    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i];int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
-    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ;int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
-    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i];int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res;}
+                                       // ↓ x=0 for ∞; x=¯1 for (-2*31)÷¯1
+    public int[] on(int   w, int[] x) {                     int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i];if(cx==-cx)return null;int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res; }
+    public int[] on(int[] w, int   x) {if(x==-x)return null;int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ;                       int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res; }
+    public int[] on(int[] w, int[] x) {                     int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i];if(cx==-cx)return null;int r=cw/cx,m=cw%cx;res[i]=r;if(m!=0)return null;}return res; }
     // public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}
     // public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}
     // public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i],r=cw/cx;res[i]=r;if(r*cx!=cw)return null;}return res;}

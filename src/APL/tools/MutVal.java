@@ -5,7 +5,7 @@ import APL.types.arrs.*;
 
 import java.util.Arrays;
 
-public class MutVal { // inserts can be in any order, but must not override previous ones
+public class MutVal { // inserts can be in any order (might change to a sequential requirement later), but must not override previous ones
   private final int[] sh;
   public final int ia;
   

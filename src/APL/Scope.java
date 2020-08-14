@@ -169,6 +169,7 @@ public class Scope {
         case "•map": case "•NS": return new MapGen();
         case "•dl": return new Delay();
         case "•dr": return new DR();
+        case "•as": return new AS();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
@@ -290,9 +291,14 @@ public class Scope {
           }
           
           public Value call(Value x) {
+            return call(Num.MINUS_ONE, x);
+          }
+          
+          public Value call(Value w, Value x) {
+            if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
             DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Ddop? ((Ddop) x).code : x instanceof Dmop? ((Dmop) x).code : null;
-            if (s != null) return Main.toAPL(s.comp.fmt());
-            return call(Scope.this.get("•comp").asFun().call(Num.ZERO, x));
+            if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
+            return call(w, Scope.this.get("•comp").asFun().call(Num.ZERO, x));
           }
           
         };
@@ -940,7 +946,32 @@ public class Scope {
     }
   }
   
-  private static class DR extends Builtin {
+  static class AS extends Builtin {
+    /*
+      0 - bit booleans
+      1 - 32-bit ints
+      2 - 64-bit float
+     */
+    public Value call(Value w, Value x) {
+      int t = w.asInt();
+      switch (t) { default: throw new DomainError("•AS: expected 𝕨∊↕3 (𝕨="+w+")", this);
+        case 0:
+          BitArr.BA ba = new BitArr.BA(x.shape);
+          for (int c : x.asIntArr()) ba.add(Main.bool(c));
+          return ba.finish();
+        case 1:
+          return new IntArr(x.asIntArr(), x.shape);
+        case 2:
+          return new DoubleArr(x.asDoubleArr(), x.shape);
+      }
+    }
+    
+    public String repr() {
+      return "•AS";
+    }
+  }
+  
+  static class DR extends Builtin {
     public String repr() { return "•DR"; }
     
     /*
@@ -970,7 +1001,7 @@ public class Scope {
     }
     public Value call(Value w, Value x) {
       int[] is = w.asIntVec();
-      if (is.length != 2) throw new DomainError("•DR expected 𝕨 to have 2 items", this);
+      if (is.length != 2) throw new DomainError("•DR: 𝕨 must have 2 items", this);
       int f = is[0];
       int t = is[1];
       if ((f==1 || f==3 || f==5)

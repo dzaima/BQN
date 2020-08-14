@@ -21,7 +21,7 @@ public final class TableBuiltin extends Mop {
     
     if (w.ia==0 || x.ia==0) return new EmptyArr(sh, w.safePrototype());
     
-    Fun ff = (Fun) f;
+    Fun ff = f.asFun();
     
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
       Pervasion.NN2N fd = ff.dyNum();
