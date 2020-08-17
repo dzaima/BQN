@@ -22,9 +22,9 @@ public class NCellBuiltin extends Dop {
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.rank);
     int[] rsh = Arrays.copyOf(x.shape, rx);
-    if (x.ia==0) return new EmptyArr(rsh, null);
     
     Value[] cs = cells(x, rx);
+    if (cs.length==0) return new EmptyArr(rsh, null);
     if (ff instanceof LTBuiltin) return Arr.create(cs, rsh);
     for (int i = 0; i < cs.length; i++) cs[i] = ff.call(cs[i]);
     return GTBuiltin.merge(cs, rsh, this);
@@ -46,10 +46,10 @@ public class NCellBuiltin extends Dop {
     boolean we = rw<rx; // w is expanded
     int ext = Arr.prod((we? x : w).shape, min, max);
     int[] rsh = Arrays.copyOf((we? x : w).shape, max);
-    if (w.ia==0 || x.ia==0) return new EmptyArr(rsh, null);
     
     int msz = Arr.prod(rsh, 0, min);
     Value[] n = new Value[msz*Arr.prod(rsh, min, max)];
+    if (n.length==0) return new EmptyArr(rsh, null);
     int r = 0;
     if (we) for (int i = 0; i < msz; i++) { Value c = wv[i]; for (int j = 0; j < ext; j++) { n[r] = ff.call(c, xv[r]); r++; } }
     else    for (int i = 0; i < msz; i++) { Value c = xv[i]; for (int j = 0; j < ext; j++) { n[r] = ff.call(wv[r], c); r++; } }
