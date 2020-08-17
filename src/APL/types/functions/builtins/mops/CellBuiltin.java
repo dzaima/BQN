@@ -4,6 +4,7 @@ import APL.Main;
 import APL.errors.LengthError;
 import APL.tools.MutVal;
 import APL.types.*;
+import APL.types.arrs.EmptyArr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
@@ -16,6 +17,7 @@ public class CellBuiltin extends Mop {
   }
   
   public Value call(Value f, Value x, DerivedMop derv) {
+    if (x.ia == 0) return new EmptyArr(new int[]{x.shape[0]}, null);
     Fun ff = f.asFun();
     if (x.rank == 0) return ff.call(x);
     //if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
@@ -37,6 +39,7 @@ public class CellBuiltin extends Mop {
     Value[] wc = w.rank==0? ext(w, x.shape[0]) : cells(w);
     Value[] xc = x.rank==0? ext(x, w.shape[0]) : cells(x);
     if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (w.ia==0 || x.ia==0) return new EmptyArr(new int[]{wc.length}, null);
     
     Value[] res = new Value[wc.length];
     for (int i = 0; i < res.length; i++) res[i] = ff.call(wc[i], xc[i]);

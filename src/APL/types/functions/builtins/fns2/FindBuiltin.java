@@ -1,6 +1,6 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.errors.RankError;
+import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -16,6 +16,12 @@ public class FindBuiltin extends Builtin {
   
   
   public Value call(Value x) {
+    if (x.shape.length==0) throw new DomainError("⍷: argument cannot be a scalar", this, x);
+    if (x.ia==0) {
+      int[] nsh = x.shape.clone();
+      nsh[0] = Math.min(nsh[0], 1);
+      return new EmptyArr(nsh, Num.ZERO);
+    }
     if (x.rank>1) {
       Value[] rcs = call(new HArr(CellBuiltin.cells(x))).values();
       return GTBuiltin.merge(rcs, new int[]{rcs.length}, this);

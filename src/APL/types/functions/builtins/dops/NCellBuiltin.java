@@ -4,6 +4,7 @@ import APL.Main;
 import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
+import APL.types.arrs.EmptyArr;
 import APL.types.functions.*;
 import APL.types.functions.builtins.fns2.*;
 
@@ -21,6 +22,7 @@ public class NCellBuiltin extends Dop {
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.rank);
     int[] rsh = Arrays.copyOf(x.shape, rx);
+    if (x.ia==0) return new EmptyArr(rsh, null);
     
     Value[] cs = cells(x, rx);
     if (ff instanceof LTBuiltin) return Arr.create(cs, rsh);
@@ -44,6 +46,8 @@ public class NCellBuiltin extends Dop {
     boolean we = rw<rx; // w is expanded
     int ext = Arr.prod((we? x : w).shape, min, max);
     int[] rsh = Arrays.copyOf((we? x : w).shape, max);
+    if (w.ia==0 || x.ia==0) return new EmptyArr(rsh, null);
+    
     int msz = Arr.prod(rsh, 0, min);
     Value[] n = new Value[msz*Arr.prod(rsh, min, max)];
     int r = 0;

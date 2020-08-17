@@ -17,14 +17,15 @@ public class GTBuiltin extends Builtin {
   
   
   public Value call(Value x) {
-    if (x instanceof Arr) {
-      if (x.quickDepth1()) return x;
+    if (x instanceof Arr && x.ia>0 && !x.quickDepth1()) {
       return merge(x.values(), x.shape, this);
-    } else return x;
+    }
+    return x;
   }
   
   public static Value merge(Value[] x, int[] sh, Callable blame) {
-    if (x.length == 0) return EmptyArr.SHAPE0N;
+    assert x.length != 0;
+    // if (x.length == 0) return new EmptyArr(sh, null);
     
     Value x0 = x[0];
     int[] sh0 = x0.shape;
