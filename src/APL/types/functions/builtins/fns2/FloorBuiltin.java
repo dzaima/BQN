@@ -48,7 +48,7 @@ public class FloorBuiltin extends Builtin {
       else throw new DomainError("⌊: argument contained "+x.humanType(true), this);
   }
   
-  public Pervasion.NN2N dyNum() { return DF; };
+  public Pervasion.NN2N dyNum() { return DF; }
   public static final Pervasion.NN2NpB DF = new Pervasion.NN2NpB() {
     public Value on(BigValue w, BigValue x) { return w.i.compareTo(x.i)>0? x : w; }
     public double on(double w, double x) { return Math.min(w, x); }

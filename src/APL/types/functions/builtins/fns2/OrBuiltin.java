@@ -33,7 +33,7 @@ public class OrBuiltin extends Builtin {
     return ReverseBuiltin.on(x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
   }
   
-  public Pervasion.NN2N dyNum() { return DF; };
+  public Pervasion.NN2N dyNum() { return DF; }
   public static final Pervasion.NN2N DF = new Pervasion.NN2NpB() {
     public Value on(BigValue w, BigValue x) {
       return new BigValue(w.i.gcd(x.i));

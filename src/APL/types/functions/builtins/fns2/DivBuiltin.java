@@ -27,7 +27,7 @@ public class DivBuiltin extends Builtin {
     return numM(NF, x);
   }
   
-  public Pervasion.NN2N dyNum() { return DF; };
+  public Pervasion.NN2N dyNum() { return DF; }
   @SuppressWarnings("UnnecessaryLocalVariable") // prettier this way
   public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public Value on(BigValue w, BigValue x) { return new BigValue(w.i.divide(x.i)); }

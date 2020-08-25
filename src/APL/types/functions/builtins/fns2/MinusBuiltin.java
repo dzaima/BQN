@@ -38,7 +38,7 @@ public class MinusBuiltin extends Builtin {
     return numChrM(NF, Char::swap, x);
   }
   
-  public Pervasion.NN2N dyNum() { return DF; };
+  public Pervasion.NN2N dyNum() { return DF; }
   public static final Pervasion.NN2N DF = new Pervasion.NN2N() {
     public Value on(BigValue w, BigValue x) { return new BigValue(w.i.subtract(x.i)); }
     public double on(double w, double x) { return w - x; }
