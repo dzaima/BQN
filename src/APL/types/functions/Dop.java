@@ -7,7 +7,7 @@ public abstract class Dop extends Callable {
   
   protected Dop() { }
   
-  public Fun derive(Value f, Value g) {
+  public Value derive(Value f, Value g) {
     return new DerivedDop(f, g, this);
   }
   public Mop derive(Value g) {

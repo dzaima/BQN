@@ -11,7 +11,7 @@ import APL.types.functions.builtins.mops.FoldBuiltin;
 import java.util.Arrays;
 
 public class SlashBuiltin extends Builtin {
-  private static final Fun fn = new FoldBuiltin().derive(new CeilingBuiltin());
+  private static final Fun fn = new FoldBuiltin().derive(new CeilingBuiltin()).asFun();
   
   public String repr() {
     return "/";

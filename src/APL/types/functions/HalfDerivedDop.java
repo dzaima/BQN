@@ -11,7 +11,7 @@ public class HalfDerivedDop extends Mop {
     this.op = op;
   }
   
-  public Fun derive(Value f) {
+  public Value derive(Value f) {
     return new DerivedDop(f, g, op);
   }
   

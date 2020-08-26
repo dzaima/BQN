@@ -182,7 +182,7 @@ public class Comp {
         case OP1D: {
           Value f = (Value) s.pop();
           Mop   r = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
-          Fun d = r.derive(f); d.token = r.token;
+          Value d = r.derive(f); d.token = r.token;
           s.push(d);
           break;
         }
@@ -190,7 +190,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Dop   r = (Dop  ) s.pop();
           Value g = (Value) s.pop();
-          Fun d = r.derive(f, g); d.token = r.token;
+          Value d = r.derive(f, g); d.token = r.token;
           s.push(d);
           break;
         }

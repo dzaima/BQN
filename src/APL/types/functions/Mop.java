@@ -8,7 +8,7 @@ public abstract class Mop extends Callable {
   protected Mop() { }
   
   
-  public Fun derive(Value f) {
+  public Value derive(Value f) {
     return new DerivedMop(f, this);
   }
   public Value call(Value f, Value x, DerivedMop derv) {

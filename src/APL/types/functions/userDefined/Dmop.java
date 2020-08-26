@@ -15,11 +15,11 @@ public class Dmop extends Mop {
     code = t;
   }
   
-  public Fun derive(Value f) { // ···𝕣𝕗·
+  public Value derive(Value f) { // ···𝕣𝕗·
     if (!code.immediate) return super.derive(f);
     Main.printdbg("dmop immediate call", f);
     
-    return code.exec(sc, null, new Value[]{this, f}).asFun();
+    return code.exec(sc, null, new Value[]{this, f});
   }
   
   public Value call(Value f, Value x, DerivedMop derv) { // 𝕊𝕩𝕨𝕣𝕗·

@@ -16,11 +16,11 @@ public class Ddop extends Dop {
     code = t;
   }
   
-  public Fun derive(Value f, Value g) { // ···𝕣𝕗𝕘
+  public Value derive(Value f, Value g) { // ···𝕣𝕗𝕘
     if (!code.immediate) return super.derive(f, g);
     Main.printdbg("ddop immediate call", f, g);
   
-    return code.exec(sc, null, new Value[]{this, f, g}).asFun();
+    return code.exec(sc, null, new Value[]{this, f, g});
   }
   
   public Mop derive(Value g) {
@@ -38,7 +38,7 @@ public class Ddop extends Dop {
       this.op = op;
     }
     
-    public Fun derive(Value f) {
+    public Value derive(Value f) {
       return op.derive(f, g);
     }
     
