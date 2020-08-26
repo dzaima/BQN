@@ -12,6 +12,7 @@ import java.util.*;
 public class DfnTok extends TokArr<LineTok> {
   public Comp comp;
   public final boolean immediate;
+  public final static boolean immBlock = true;
   public final ArrayList<Body> bodies;
   
   public DfnTok(String line, int spos, int epos, ArrayList<LineTok> tokens) {
@@ -75,14 +76,15 @@ public class DfnTok extends TokArr<LineTok> {
     }
     
     if (type=='m' || type=='d') {
-      if (bodies.size() < 2) {
+      if (bodies.size() == 1) {
         immediate = bodies.get(0).immediate;
       } else {
         immediate = false;
-        for (Body b : bodies) if (b.immediate) throw new SyntaxError("Immediate operator not allowed with multiple bodies", this);
+        for (Body b : bodies) if (b.immediate) throw new SyntaxError("Immediate operators cannot have multiple bodies", this);
       }
     } else {
-      immediate = false;
+      immediate = (immBlock && bodies.size()==1)? bodies.get(0).immediate : type=='a';
+      type = immediate? 'a' : 'f';
     }
     Comp.Mut mut = new Comp.Mut();
     comp = Comp.comp(mut, bodies, this);
@@ -164,6 +166,8 @@ public class DfnTok extends TokArr<LineTok> {
       case 'f': return new Dfn(this, sc);
       case 'm': return new Dmop(this, sc);
       case 'd': return new Ddop(this, sc);
+      case '?': if (Main.vind) return new Dfn(this, sc);
+        /* fallthrough */
       case 'a': {
         Body b = bodies.get(0);
         return comp.exec(new Scope(sc, b.vars), b.start);

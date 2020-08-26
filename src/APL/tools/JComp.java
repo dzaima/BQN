@@ -242,7 +242,7 @@ public class JComp {
           case OP1D: {
             fn.swap(); fn.cast(Mop.class); fn.swap();
             
-            fn.invvirt(Mop.class, "derive", met(Fun.class, Value.class));
+            fn.invvirt(Mop.class, "derive", met(Value.class, Value.class));
             cstack--;
             break;
           }
@@ -251,7 +251,7 @@ public class JComp {
             fn.cast(Dop.class);       // cast d to dop  ; g D
             fn.swap();                // place d below f; D g
             fn.aload(TMP); fn.swap(); // place g below f; D f g
-            fn.invvirt(Dop.class, "derive", met(Fun.class, Value.class, Value.class));
+            fn.invvirt(Dop.class, "derive", met(Value.class, Value.class, Value.class));
             cstack-= 2;
             break;
           }
