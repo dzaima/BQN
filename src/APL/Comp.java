@@ -153,21 +153,21 @@ public class Comp {
         case FN1C: {
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          s.push(f.asFun().call(x));
+          s.push(f.call(x));
           break;
         }
         case FN2C: {
           Value w = (Value) s.pop();
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
-          s.push(f.asFun().call(w, x));
+          s.push(f.call(w, x));
           break;
         }
         case FN1O: {
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
           if (x instanceof Nothing) s.push(x);
-          else s.push(f.asFun().call(x));
+          else s.push(f.call(x));
           break;
         }
         case FN2O: {
@@ -175,8 +175,8 @@ public class Comp {
           Value f = (Value) s.pop();
           Value x = (Value) s.pop();
           if (x instanceof Nothing) s.push(x);
-          else if (w instanceof Nothing) s.push(f.asFun().call(x));
-          else s.push(f.asFun().call(w, x));
+          else if (w instanceof Nothing) s.push(f.call(x));
+          else s.push(f.call(w, x));
           break;
         }
         case OP1D: {
@@ -204,7 +204,7 @@ public class Comp {
         case TR2D: {
           Value f = (Value) s.pop();
           Value g = (Value) s.pop();
-          Atop d = new Atop(f.asFun(), g.asFun()); d.token = f.token;
+          Atop d = new Atop(f, g); d.token = f.token;
           s.push(d);
           break;
         }
@@ -212,7 +212,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Value g = (Value) s.pop();
           Value h = (Value) s.pop();
-          Fork d = new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
+          Fork d = new Fork(f, g, h); d.token = f.token;
           s.push(d);
           break;
         }
@@ -220,7 +220,7 @@ public class Comp {
           Value f = (Value) s.pop();
           Value g = (Value) s.pop();
           Value h = (Value) s.pop();
-          Obj d = f instanceof Nothing? new Atop(g.asFun(), h.asFun()) : new Fork(f, g.asFun(), h.asFun()); d.token = f.token;
+          Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h); d.token = f.token;
           s.push(d);
           break;
         }
@@ -242,7 +242,7 @@ public class Comp {
           Settable k = (Settable) s.pop();
           Value    f = (Value   ) s.pop();
           Value    v = (Value   ) s.pop();
-          k.set(f.asFun().call(k.get(sc), v), true, sc, null);
+          k.set(f.call(k.get(sc), v), true, sc, null);
           s.push(v);
           break;
         }
@@ -790,8 +790,8 @@ public class Comp {
           Res g = tps.removeLast();
           Res f = tps.removeLast();
           if (h.c!=null && g.c!=null && f.c!=null) {
-            if (f.c instanceof Nothing) tps.addLast(new ResCf('f', new Atop(g.c.asFun(), h.c.asFun()), h.lastTok()));
-            else tps.addLast(new ResCf('f', new Fork(f.c, g.c.asFun(), h.c.asFun()), h.lastTok()));
+            if (f.c instanceof Nothing) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
+            else tps.addLast(new ResCf('f', new Fork(f.c, g.c, h.c), h.lastTok()));
           } else {
             tps.addLast(new ResMix('f', h, g, f, new ResBC(f.type=='A'? TR3O : TR3D) ));
           }
@@ -801,7 +801,7 @@ public class Comp {
           if (Main.debug) printlvl("match F F");
           Res h = tps.removeLast();
           Res g = tps.removeLast();
-          if (h.c!=null && g.c!=null) tps.addLast(new ResCf('f', new Atop(g.c.asFun(), h.c.asFun()), h.lastTok()));
+          if (h.c!=null && g.c!=null) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
           else tps.addLast(new ResMix('f', h, g, new ResBC(TR2D)));
           continue;
         }

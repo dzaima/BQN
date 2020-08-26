@@ -7,6 +7,9 @@ public abstract class Mop extends Callable {
   
   protected Mop() { }
   
+  public Value call(         Value x) { throw new SyntaxError("cannot interpret a 1-modifier as a function", this, x); }
+  public Value call(Value w, Value x) { throw new SyntaxError("cannot interpret a 1-modifier as a function", this, x); }
+  
   
   public Value derive(Value f) {
     return new DerivedMop(f, this);
@@ -28,15 +31,15 @@ public abstract class Mop extends Callable {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
   public Value under(Value f, Value o, Value x, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(f, x, derv)) : o;
+    Value v = o instanceof Fun? o.call(call(f, x, derv)) : o;
     return callInv(f, v);
   }
   public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(f, w, x, derv)) : o;
+    Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
     return callInvW(f, w, v);
   }
   public Value underA(Value f, Value o, Value w, Value x, DerivedMop derv) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(f, w, x, derv)) : o;
+    Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
     return callInvA(f, v, x);
   }
   
@@ -46,9 +49,6 @@ public abstract class Mop extends Callable {
   public abstract String repr();
   
   
-  public Fun asFun() {
-    throw new SyntaxError("Cannot interpret a modifier as a function");
-  }
   public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis

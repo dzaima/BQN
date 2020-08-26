@@ -2,49 +2,35 @@ package APL.types;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.Pervasion;
 import APL.types.arrs.*;
 
 import java.util.Iterator;
 
 public abstract class Fun extends Callable {
   
-  public Value identity() {
-    return null;
-  }
-  
   protected Fun() { }
   
   public Value call(Value x) {
     throw new IncorrectArgsError("function "+toString()+" called monadically", this, x);
   }
-  
-  
   public Value call(Value w, Value x) {
     throw new IncorrectArgsError("function "+toString()+" called dyadically", this, w);
   }
   
-  public Value callInv(Value x) {
-    throw new DomainError(this+" doesn't support monadic inverting", this, x);
-  }
-  public Value callInvW(Value w, Value x) {
-    throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x);
-  }
-  public Value callInvA(Value w, Value x) {
-    throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
-  }
-  
+  public Value callInv (         Value x) { throw new DomainError(this+" doesn't support monadic inverting", this, x); }
+  public Value callInvW(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x); }
+  public Value callInvA(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x); }
   
   public Value under(Value o, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value v = o instanceof Fun? o.call(call(x)) : o;
     return callInv(v);
   }
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     return callInvW(w, v);
   }
   public Value underA(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     return callInvA(v, x);
   }
   
@@ -245,9 +231,6 @@ public abstract class Fun extends Callable {
     }
   }
   
-  public /*open*/ Pervasion.NN2N dyNum() {
-    return null;
-  }
   
   public static abstract class D_NNeB extends D_NN { // dyadic number-number equals boolean
     public abstract boolean on(double w, double x);
@@ -565,16 +548,11 @@ public abstract class Fun extends Callable {
   
   
   
-  
   public abstract String repr();
-  
   public String toString() {
     return repr();
   }
   
-  public Fun asFun() {
-    return this;
-  }
   public boolean notIdentity() { return true; }
   
   // functions are equal on a per-object basis

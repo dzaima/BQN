@@ -3,9 +3,9 @@ package APL.types.functions.trains;
 import APL.types.*;
 
 public class Atop extends Fun {
-  private final Fun g;
-  private final Fun h;
-  public Atop(Fun g, Fun h) {
+  private final Value g;
+  private final Value h;
+  public Atop(Value g, Value h) {
     this.g = g;
     this.h = h;
   }

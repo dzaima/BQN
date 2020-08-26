@@ -19,7 +19,7 @@ public class AtBuiltin extends Dop {
   public static Value at(Value f, Value g, Value x, Callable blame) {
     int ia = x.ia;
     if (g instanceof Fun) {
-      Value vba = ((Fun) g).call(x);
+      Value vba = g.call(x);
       boolean[] ba = new boolean[ia];
       int matchingCount = 0;
       for (int i = 0; i < ia; i++) {
@@ -33,7 +33,7 @@ public class AtBuiltin extends Dop {
         for (int i = 0; i < ia; i++) {
           if (ba[i]) matching[ptr++] = x.get(i);
         }
-        fa = ((Fun) f).call(Arr.create(matching));
+        fa = f.call(Arr.create(matching));
       } else fa = f;
       Value[] ra = new Value[ia];
       if (fa.rank == 0) {
@@ -55,9 +55,8 @@ public class AtBuiltin extends Dop {
       Indexer.PosSh poss = Indexer.poss(g, x.shape, blame);
       Value repl;
       if (f instanceof Fun) {
-        Fun ff = ((Fun) f);
         Value arg = LBoxUBBuiltin.on(poss, x);
-        repl = ff.call(arg);
+        repl = f.call(arg);
       } else {
         repl = f;
       }

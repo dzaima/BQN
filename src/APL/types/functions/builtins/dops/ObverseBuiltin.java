@@ -10,25 +10,20 @@ public class ObverseBuiltin extends Dop {
   
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    return ff.call(x);
+    return f.call(x);
   }
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    return ff.call(w, x);
+    return f.call(w, x);
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    Fun gf = g.asFun();
-    return gf.call(x);
+    return g.call(x);
   }
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun gf = g.asFun();
-    return gf.call(w, x);
+    return g.call(w, x);
   }
   
   public Value callInvA(Value f, Value g, Value w, Value x) { // fall-back to 𝔽
-    Fun gf = f.asFun();
-    return gf.callInvA(w, x);
+    return f.callInvA(w, x);
   }
 }

@@ -105,7 +105,7 @@ public class LBoxBuiltin extends Builtin {
   
   public Value underW(Value o, Value w, Value x) {
     Value call = call(w, x);
-    Value v = o instanceof Fun? ((Fun) o).call(call) : o;
+    Value v = o instanceof Fun? o.call(call) : o;
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this, w);
     if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")");
     int[] is = w.asIntArr();

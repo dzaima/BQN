@@ -9,22 +9,17 @@ public class OverBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    return f.asFun().call(g.asFun().call(x));
+    return f.call(g.call(x));
   }
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = g.asFun();
-    return f.asFun().call(ff.call(w), ff.call(x));
+    return f.call(g.call(w), g.call(x));
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun();
-    Fun gf = g.asFun();
-    return gf.callInv(ff.callInvW(gf.call(w), x));
+    return g.callInv(f.callInvW(g.call(w), x));
   }
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun();
-    Fun gf = g.asFun();
-    return gf.callInv(ff.callInvA(w, gf.call(x)));
+    return g.callInv(f.callInvA(w, g.call(x)));
   }
   
 }

@@ -9,17 +9,14 @@ public class JotUBBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return gf.call(ff.call(w), x);
+    return g.call(f.call(w), x);
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return gf.callInvW(ff.call(w), x);
+    return g.callInvW(f.call(w), x);
   }
   
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return ff.callInv(gf.callInvA(w, x));
+    return f.callInv(g.callInvA(w, x));
   }
 }

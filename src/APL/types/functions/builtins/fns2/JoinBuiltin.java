@@ -228,7 +228,7 @@ public class JoinBuiltin extends Builtin {
   public Value under(Value o, Value x) {
     if (x.rank != 1) throw new NYIError("⌾∾ for rank>1", this, x); // doesn't work 
     Value joined = call(x);
-    Value v = o instanceof Fun? ((Fun) o).call(joined) : o;
+    Value v = o instanceof Fun? o.call(joined) : o;
     Arr.eqShapes(joined.shape, v.shape, this);
     Value[] res = new Value[x.ia];
     Value[] vv = v.values();

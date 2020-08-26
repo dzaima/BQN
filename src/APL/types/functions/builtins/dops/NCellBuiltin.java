@@ -16,8 +16,7 @@ public class NCellBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    Value ra = g.asFun().call(x);
+    Value ra = g.call(x);
     if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.rank);
@@ -25,14 +24,13 @@ public class NCellBuiltin extends Dop {
     
     Value[] cs = cells(x, rx);
     if (cs.length==0) return new EmptyArr(rsh, null);
-    if (ff instanceof LTBuiltin) return Arr.create(cs, rsh);
-    for (int i = 0; i < cs.length; i++) cs[i] = ff.call(cs[i]);
+    if (f instanceof LTBuiltin) return Arr.create(cs, rsh);
+    for (int i = 0; i < cs.length; i++) cs[i] = f.call(cs[i]);
     return GTBuiltin.merge(cs, rsh, this);
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    Value ra = g.asFun().call(w, x);
+    Value ra = g.call(w, x);
     if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
     int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.rank);
@@ -51,8 +49,8 @@ public class NCellBuiltin extends Dop {
     Value[] n = new Value[msz*Arr.prod(rsh, min, max)];
     if (n.length==0) return new EmptyArr(rsh, null);
     int r = 0;
-    if (we) for (int i = 0; i < msz; i++) { Value c = wv[i]; for (int j = 0; j < ext; j++) { n[r] = ff.call(c, xv[r]); r++; } }
-    else    for (int i = 0; i < msz; i++) { Value c = xv[i]; for (int j = 0; j < ext; j++) { n[r] = ff.call(wv[r], c); r++; } }
+    if (we) for (int i = 0; i < msz; i++) { Value c = wv[i]; for (int j = 0; j < ext; j++) { n[r] = f.call(c, xv[r]); r++; } }
+    else    for (int i = 0; i < msz; i++) { Value c = xv[i]; for (int j = 0; j < ext; j++) { n[r] = f.call(wv[r], c); r++; } }
     return GTBuiltin.merge(n, rsh, this);
   }
   

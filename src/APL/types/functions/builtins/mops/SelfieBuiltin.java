@@ -12,19 +12,19 @@ public class SelfieBuiltin extends Mop {
   
   
   public Value call(Value f, Value x, DerivedMop derv) {
-    return f.asFun().call(x, x);
+    return f.call(x, x);
   }
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
-    return f.asFun().call(x, w);
+    return f.call(x, w);
   }
   
   @Override public Value callInvW(Value f, Value w, Value x) {
-    if (f instanceof Fun) return ((Fun) f).callInvA(x, w);
+    if (f instanceof Fun) return f.callInvA(x, w);
     throw new DomainError("A˜ cannot be inverted", this);
   }
   
   @Override public Value callInvA(Value f, Value w, Value x) {
-    if (f instanceof Fun) return ((Fun) f).callInvW(x, w);
+    if (f instanceof Fun) return f.callInvW(x, w);
     throw new DomainError("A˜ cannot be inverted", this);
   }
 }

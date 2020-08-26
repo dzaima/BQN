@@ -86,10 +86,10 @@ public class UpArrowBuiltin extends Builtin {
       }
       return res.get();
     }
-    return on(sh, off, x, this);
+    return on(sh, off, x);
   }
   
-  public static Value on(int[] sh, int[] off, Value x, Callable blame) { // valuecopy
+  public static Value on(int[] sh, int[] off, Value x) { // valuecopy
     int rank = sh.length;
     assert rank==off.length && rank>=x.rank;
     if (rank > x.rank) {
@@ -103,7 +103,7 @@ public class UpArrowBuiltin extends Builtin {
       } else {
         int[] ssh  = new int[x.rank]; System.arraycopy(sh , d, ssh , 0, x.rank);
         int[] soff = new int[x.rank]; System.arraycopy(off, d, soff, 0, x.rank);
-        return on(ssh, soff, x, blame).ofShape(sh);
+        return on(ssh, soff, x).ofShape(sh);
       }
     }
     if (rank == 1) {
@@ -163,15 +163,15 @@ public class UpArrowBuiltin extends Builtin {
   
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     return undo(w.asIntVec(), v, x, this);
   }
   
   public static Value undo(int[] e, Value w, Value origW, Callable blame) {
     if (e.length==1 && w.rank==1) {
       int am = e[0];
-      if (am > 0) return JoinBuiltin.on(w, on(new int[]{origW.ia-am}, e, origW, blame), blame);
-      else return JoinBuiltin.on(on(new int[]{origW.ia+am}, new int[]{0}, origW, blame), w, blame);
+      if (am > 0) return JoinBuiltin.on(w, on(new int[]{origW.ia-am}, e, origW), blame);
+      else return JoinBuiltin.on(on(new int[]{origW.ia+am}, new int[]{0}, origW), w, blame);
     }
     chk: {
       fail: if (w.rank == e.length) {

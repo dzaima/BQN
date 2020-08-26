@@ -10,15 +10,14 @@ public class EachLeft extends Mop {
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
-    Fun ff = f.asFun();
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = ff.call(w.get(i), x).squeeze();
+      n[i] = f.call(w.get(i), x).squeeze();
     }
     return Arr.create(n, w.shape);
   }
   
   public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
-    return EachBuiltin.underW(f.asFun(), o, w, SingleItemArr.r0(x), this);
+    return EachBuiltin.underW(f, o, w, SingleItemArr.r0(x), this);
   }
 }

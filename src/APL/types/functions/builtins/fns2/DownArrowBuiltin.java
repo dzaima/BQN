@@ -49,11 +49,11 @@ public class DownArrowBuiltin extends Builtin {
       if (sh[i] < 0) sh[i] = 0;
       else if (am > 0) off[i] = am;
     }
-    return UpArrowBuiltin.on(sh, off, x, this);
+    return UpArrowBuiltin.on(sh, off, x);
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     int[] ls = w.asIntVec();
     int[] sh = x.shape;
     for (int i = 0; i < ls.length; i++) {

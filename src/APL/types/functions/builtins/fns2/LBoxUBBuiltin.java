@@ -24,7 +24,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   public Value under(Value o, Value x) {
     if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, x);
-    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value v = o instanceof Fun? o.call(call(x)) : o;
     MutVal m = new MutVal(x.shape);
     m.copy(x, 1, 1, x.ia-1);
     m.set(0, v);
@@ -85,7 +85,7 @@ public class LBoxUBBuiltin extends Builtin {
   
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     
     if (Main.vind) {
       return AtBuiltin.with(x, Indexer.poss(w, x.shape, this), v, this);

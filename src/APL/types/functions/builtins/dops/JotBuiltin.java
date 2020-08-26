@@ -13,24 +13,24 @@ public class JotBuiltin extends Dop {
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
     if (g instanceof Fun) {
       if (f instanceof Fun) {
-        return ((Fun) f).call(((Fun) g).call(x));
+        return f.call(g.call(x));
       } else {
-        return ((Fun) g).call(f, x);
+        return g.call(f, x);
       }
     } else {
-      if (f instanceof Fun) return ((Fun) f).call(x, g);
+      if (f instanceof Fun) return f.call(x, g);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
   public Value callInv(Value f, Value g, Value x) {
     if (g instanceof Fun) {
       if (f instanceof Fun) {
-        return ((Fun) g).callInv(((Fun) f).callInv(x));
+        return g.callInv(f.callInv(x));
       } else {
-        return ((Fun) g).callInvW(f, x);
+        return g.callInvW(f, x);
       }
     } else {
-      if (f instanceof Fun) return ((Fun) f).callInvA(x, g);
+      if (f instanceof Fun) return f.callInvA(x, g);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
@@ -41,35 +41,31 @@ public class JotBuiltin extends Dop {
     if (!(g instanceof Fun)) {
       throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔾 is "+g.humanType(true), this, g);
     }
-    return ((Fun) f).call(w, ((Fun) g).call(x));
+    return f.call(w, g.call(x));
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return gf.callInv(ff.callInvW(w, x));
+    return g.callInv(f.callInvW(w, x));
   }
   
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return ff.callInvA(w, gf.call(x));
+    return f.callInvA(w, g.call(x));
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
     if (g instanceof Fun) {
-      Fun gf = (Fun) g;
       if (f instanceof Fun) {
-        Fun ff = (Fun) f;
-        return gf.under(new Fun() { public String repr() { return ff.repr(); }
+        return g.under(new Fun() { public String repr() { return f.repr(); }
           public Value call(Value x) {
-            return ff.under(o, x);
+            return f.under(o, x);
           }
         }, x);
       } else {
-        return gf.underW(o, f, x);
+        return g.underW(o, f, x);
       }
     } else {
       if (f instanceof Fun) {
-        return ((Fun) f).underA(o, x, g);
+        return f.underA(o, x, g);
       } else {
         throw new SyntaxError("arr∘arr makes no sense", this);
       }

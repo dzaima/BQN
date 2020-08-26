@@ -60,6 +60,8 @@ public class DfnTok extends TokArr<LineTok> {
       }
       bodies.add(body);
     }
+    if (immBlock && canBeImmediate && type=='f' && bodies.size()==1) type = 'a';
+    
     char htype = 0;
     for (Body b : bodies) {
       if (b.type != 0) {
@@ -83,8 +85,7 @@ public class DfnTok extends TokArr<LineTok> {
         for (Body b : bodies) if (b.immediate) throw new SyntaxError("Immediate operators cannot have multiple bodies", this);
       }
     } else {
-      immediate = (immBlock && bodies.size()==1)? bodies.get(0).immediate : type=='a';
-      type = immediate? 'a' : 'f';
+      immediate = false;
     }
     Comp.Mut mut = new Comp.Mut();
     comp = Comp.comp(mut, bodies, this);

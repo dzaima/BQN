@@ -298,7 +298,7 @@ public class Scope {
             if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
             DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Ddop? ((Ddop) x).code : x instanceof Dmop? ((Dmop) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
-            return call(w, Scope.this.get("•comp").asFun().call(Num.ZERO, x));
+            return call(w, Scope.this.get("•comp").call(Num.ZERO, x));
           }
           
         };
@@ -837,7 +837,7 @@ public class Scope {
         Pr p = pfRes.get(s);
         if (p == null) {
           pfRes.put(s, p = new Pr(Main.comp(s, sc)));
-          p.fn = (Fun) p.c.exec(sc);
+          p.fn = p.c.exec(sc);
         }
         return p;
       }
@@ -871,18 +871,18 @@ public class Scope {
       ProfilerDop(Scope sc) { this.sc = sc; }
       
       public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-        Pr p = pr(g, null, sc); Fun ff = f.asFun(); p.start();
+        Pr p = pr(g, null, sc); p.start();
         long sns = System.nanoTime();
-        Value res = ff.call(w, x);
+        Value res = f.call(w, x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;
       }
       
       public Value call(Value f, Value g, Value x, DerivedDop derv) {
-        Pr p = pr(g, null, sc); Fun ff = f.asFun(); p.start();
+        Pr p = pr(g, null, sc); p.start();
         long sns = System.nanoTime();
-        Value res = ff.call(x);
+        Value res = f.call(x);
         long ens = System.nanoTime();
         p.end(ens-sns);
         return res;
@@ -894,7 +894,7 @@ public class Scope {
     private final Comp c;
     private int am;
     private double ms;
-    private Fun fn;
+    private Value fn;
     
     public Pr(Comp c) {
       this.c = c;

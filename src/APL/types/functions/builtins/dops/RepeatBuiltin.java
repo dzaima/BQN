@@ -10,51 +10,47 @@ public class RepeatBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    Value gf = g.asFun().call(x);
+    Value gf = g.call(x);
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
-    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = ff.callInv(nx);
-    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = ff.call   (px);
+    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = f.callInv(nx);
+    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = f.call   (px);
     return replace(gf, neg, x, pos);
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    Fun ff = f.asFun();
     if (g instanceof Fun) throw new DomainError("(f⌾g)A cannot be inverted", this);
     
     int am = g.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
-        x = ff.call(x);
+        x = f.call(x);
       }
     } else for (int i = 0; i < am; i++) {
-      x = ff.callInv(x);
+      x = f.callInv(x);
     }
     return x;
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
-    Value gf = g.asFun().call(w, x);
+    Value gf = g.call(w, x);
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
-    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = ff.callInvW(w, nx);
-    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = ff.call    (w, px);
+    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = f.callInvW(w, nx);
+    Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = f.call    (w, px);
     return replace(gf, neg, x, pos);
   }
   
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun();
     int am = g.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
-        x = ff.call(w, x);
+        x = f.call(w, x);
       }
     } else for (int i = 0; i < am; i++) {
-      x = ff.callInvW(w, x);
+      x = f.callInvW(w, x);
     }
     return x;
   }
@@ -80,23 +76,21 @@ public class RepeatBuiltin extends Dop {
   
   
   public Value callInvA(Value f, Value g, Value w, Value x) {
-    Fun ff = f.asFun();
     int am = g.asInt();
-    if (am== 1) return ff.callInvA(w, x);
-    if (am==-1) return ff.callInvA(x, w);
+    if (am== 1) return f.callInvA(w, x);
+    if (am==-1) return f.callInvA(x, w);
     
     throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, g);
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
     int n = g.asInt();
-    return repeat(ff, n, o, x);
+    return repeat(f, n, o, x);
   }
   
-  public Value repeat(Fun f, int n, Value o, Value x) { // todo don't do recursion?
+  public Value repeat(Value f, int n, Value o, Value x) { // todo don't do recursion?
     if (n==0) {
-      return o instanceof Fun? ((Fun) o).call(x) : o;
+      return o instanceof Fun? o.call(x) : o;
     }
     
     return repeat(f, n-1, new Fun() { public String repr() { return f.repr(); }

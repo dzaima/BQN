@@ -13,18 +13,17 @@ public class ScanBuiltin extends Mop {
   }
   
   public Value call(Value f, Value x, DerivedMop derv) {
-    Fun ff = f.asFun();
     if (x.ia == 0) return x;
     if (x.rank == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
     int l = Arr.prod(x.shape, 1, x.shape.length);
     if (x.quickDoubleArr()) {
-      Pervasion.NN2N fd = ff.dyNum();
+      Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         final double[] dres;
         int i = l;
         ia: if (x.quickIntArr()) {
           if (x.rank==1 && x instanceof BitArr) {
-            if (ff instanceof NEBuiltin) {
+            if (f instanceof NEBuiltin) {
               long[] xl = ((BitArr) x).arr;
               long[] res = new long[xl.length];
               long xor = 0;
@@ -79,12 +78,11 @@ public class ScanBuiltin extends Mop {
     Value[] res = new Value[x.ia];
     int i = 0;
     for (; i < l; i++) res[i] = x.get(i);
-    for (; i < x.ia; i++) res[i] = ff.call(res[i-l], x.get(i));
+    for (; i < x.ia; i++) res[i] = f.call(res[i-l], x.get(i));
     return Arr.create(res, x.shape);
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
-    Fun ff = f.asFun();
     int n = w.asInt();
     int len = x.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);
@@ -96,7 +94,7 @@ public class ScanBuiltin extends Mop {
       for (int i = 0; i < res.length; i++) {
         double[] curr = new double[n];
         System.arraycopy(xa, i, curr, 0, n);
-        res[i] = ff.call(new DoubleArr(curr));
+        res[i] = f.call(new DoubleArr(curr));
       }
       return Arr.create(res);
     }
@@ -107,7 +105,7 @@ public class ScanBuiltin extends Mop {
       Value[] curr = new Value[n];
       // for (int j = 0; j < n; j++) curr[j] = wa[i + j];
       System.arraycopy(xa, i, curr, 0, n);
-      res[i] = ff.call(Arr.create(curr));
+      res[i] = f.call(Arr.create(curr));
     }
     return Arr.create(res);
   }

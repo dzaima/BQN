@@ -17,10 +17,9 @@ public class FoldBuiltin extends Mop {
   
   
   public Value call(Value f, Value x, DerivedMop derv) {
-    Fun ff = f.asFun();
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
     if (x.ia==0) {
-      Value id = ff.identity();
+      Value id = f.identity();
       if (id == null) throw new DomainError("no identity defined for "+f, this, f);
       return id;
     }
@@ -68,7 +67,7 @@ public class FoldBuiltin extends Mop {
     }
     
     if (x.quickDoubleArr()) {
-      Pervasion.NN2N fd = ff.dyNum();
+      Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         if (x.quickIntArr()) {
           int[] xi = x.asIntArr();
@@ -83,15 +82,14 @@ public class FoldBuiltin extends Mop {
       }
     }
     Value[] a = x.values();
-    return foldr(ff, a, a[a.length-1], 1);
+    return foldr(f, a, a[a.length-1], 1);
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
-    Fun ff = f.asFun();
-    
+  
     if (x.quickDoubleArr() && w instanceof Num) {
-      Pervasion.NN2N fd = ff.dyNum();
+      Pervasion.NN2N fd = f.dyNum();
       double c = w.asDouble();
       if (fd != null) {
         if (x.quickIntArr()) {
@@ -109,12 +107,12 @@ public class FoldBuiltin extends Mop {
       }
     }
   
-    return foldr(ff, x.values(), w, 0);
+    return foldr(f, x.values(), w, 0);
   }
   
-  static Value foldr(Fun ff, Value[] a, Value init, int skip) {
+  static Value foldr(Value f, Value[] a, Value init, int skip) {
     for (int i = a.length-skip-1; i >= 0; i--) {
-      init = ff.call(a[i], init);
+      init = f.call(a[i], init);
     }
     return init;
   }

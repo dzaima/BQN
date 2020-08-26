@@ -32,13 +32,13 @@ public class OldCatBuiltin extends Builtin {
   
   
   public Value under(Value o, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value v = o instanceof Fun? o.call(call(x)) : o;
     if (v.ia != x.ia) throw new DomainError("⌾, expected equal amount of output & output items", this);
     return v.ofShape(x.shape);
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     if (w.rank>1) throw new NYIError(", inverted on rank "+w.rank+" 𝕨", this);
     if (v.rank>1) throw new NYIError(", inverted on rank "+v.rank+" 𝕩", this);
     for (int i = 0; i < w.ia; i++) {
@@ -48,6 +48,6 @@ public class OldCatBuiltin extends Builtin {
       if (w.ia+1 != v.ia) throw new DomainError("original 𝕩 was of rank 0, which is not satisfiable", this);
       return v.get(v.ia-1);
     }
-    return UpArrowBuiltin.on(new int[]{v.ia-w.ia}, new int[]{w.ia}, v, this);
+    return UpArrowBuiltin.on(new int[]{v.ia-w.ia}, new int[]{w.ia}, v);
   }
 }

@@ -39,7 +39,7 @@ public class OldUpArrowBuiltin extends Builtin {
         off[i] = x.shape[i]-sh[i];
       } else off[i] = 0;
     }
-    return UpArrowBuiltin.on(sh, off, x, this);
+    return UpArrowBuiltin.on(sh, off, x);
   }
   
   // public Value call(Value a, Value w, DervDimFn dims) {
@@ -59,7 +59,7 @@ public class OldUpArrowBuiltin extends Builtin {
   
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     return UpArrowBuiltin.undo(w.asIntVec(), v, x, this);
   }
 }

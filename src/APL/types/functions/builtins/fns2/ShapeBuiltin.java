@@ -116,7 +116,7 @@ public class ShapeBuiltin extends Builtin {
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     for (int i = 0; i < w.ia; i++) {
       Value c = w.get(i);
       if (!(c instanceof Num)) { // a‿⟨⟩‿b ⥊ w - must use all items
@@ -137,7 +137,7 @@ public class ShapeBuiltin extends Builtin {
   
   
   public Value under(Value o, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value v = o instanceof Fun? o.call(call(x)) : o;
     if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
     return v.ofShape(x.shape);
   }

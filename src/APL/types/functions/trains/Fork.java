@@ -4,9 +4,8 @@ import APL.errors.DomainError;
 import APL.types.*;
 
 public class Fork extends Fun {
-  private final Value f;
-  private final Fun g, h;
-  public Fork(Value f, Fun g, Fun h) {
+  private final Value f,  g, h;
+  public Fork(Value f, Value g, Value h) {
     this.f = f;
     this.g = g;
     this.h = h;
@@ -14,7 +13,7 @@ public class Fork extends Fun {
   
   public Value call(Value x) {
     Value r = h.call(x);
-    Value l = f.asFun().call(x);
+    Value l = f.call(x);
     return g.call(l, r);
   }
   public Value callInv(Value x) {
@@ -23,7 +22,7 @@ public class Fork extends Fun {
   }
   public Value call(Value w, Value x) {
     Value r = h.call(w, x);
-    Value l = f.asFun().call(w, x);
+    Value l = f.call(w, x);
     return g.call(l, r);
   }
   

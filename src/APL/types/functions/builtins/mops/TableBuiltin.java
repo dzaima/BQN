@@ -20,11 +20,9 @@ public final class TableBuiltin extends Mop {
     System.arraycopy(x.shape, 0, sh, w.rank, x.rank);
     
     if (w.ia==0 || x.ia==0) return new EmptyArr(sh, w.safePrototype());
-    
-    Fun ff = f.asFun();
-    
+  
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
-      Pervasion.NN2N fd = ff.dyNum();
+      Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         double[] arr = new double[w.ia*x.ia];
         int i = 0;
@@ -39,7 +37,7 @@ public final class TableBuiltin extends Mop {
     }
     
     int i = 0;
-    Value first = ff.call(w.first(), x.first());
+    Value first = f.call(w.first(), x.first());
     
     if (first instanceof Num) {
       double[] dres = new double[w.ia*x.ia];
@@ -50,7 +48,7 @@ public final class TableBuiltin extends Mop {
       numatt: for (Value na : w) {
         for (Value nw : x) {
           Value r;
-          if (firstSkipped) r = ff.call(na, nw);
+          if (firstSkipped) r = f.call(na, nw);
           else {
             firstSkipped = true;
             r = first;
@@ -74,12 +72,12 @@ public final class TableBuiltin extends Mop {
       if (i%x.ia != 0) { // finish the damn row..
         Value va = w.get(i / x.ia);
         for (int wi = i % x.ia; wi < x.ia; wi++) {
-          res[i++] = ff.call(va, x.get(wi));
+          res[i++] = f.call(va, x.get(wi));
         }
       }
       for (int ai = (i+x.ia-1) / x.ia; ai < w.ia; ai++) { // and do the rest, slowly and horribly
         Value va = w.get(ai);
-        for (Value vw : x) res[i++] = ff.call(va, vw);
+        for (Value vw : x) res[i++] = f.call(va, vw);
       }
       return Arr.create(res, sh);
     }
@@ -88,7 +86,7 @@ public final class TableBuiltin extends Mop {
     for (Value na : w) {
       for (Value nw : x) {
         if (firstSkipped) {
-          arr[i++] = ff.call(na, nw);
+          arr[i++] = f.call(na, nw);
         } else {
           firstSkipped = true;
           arr[i++] = first;

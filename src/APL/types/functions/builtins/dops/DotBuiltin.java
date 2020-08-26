@@ -10,6 +10,6 @@ public class DotBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    return new FoldBuiltin().derive(f).asFun().call(g.asFun().call(w, x)); // TODO not lazy
+    return new FoldBuiltin().derive(f).call(g.call(w, x)); // TODO not lazy
   }
 }

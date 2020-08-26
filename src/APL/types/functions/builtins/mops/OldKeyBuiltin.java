@@ -42,7 +42,7 @@ public class OldKeyBuiltin extends Mop {
       var res = new Value[order.size()];
       i = 0;
       for (Value c : order) {
-        res[i++] = ((Fun)f).call(c, Arr.create(vals.get(c)));
+        res[i++] = f.call(c, Arr.create(vals.get(c)));
       }
       return new HArr(res);
     }
@@ -55,7 +55,6 @@ public class OldKeyBuiltin extends Mop {
       return x;
     }
     if (f instanceof Fun) {
-      Fun ff = (Fun) f;
       if (!Arrays.equals(w.shape, x.shape)) {
         if (w.rank != x.rank) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.rank+" vs "+x.rank+")", derv, x);
         throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
@@ -78,7 +77,7 @@ public class OldKeyBuiltin extends Mop {
       for (int i = 0; i < order.size(); i++) {
         Value k = order.get(i);
         Value vs = Arr.create(vals.get(k));
-        res[i] = ff.call(k, vs);
+        res[i] = f.call(k, vs);
       }
       return Arr.create(res);
     }

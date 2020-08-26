@@ -9,10 +9,10 @@ public class AtopBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    return f.asFun().call(g.asFun().call(x));
+    return f.call(g.call(x));
   }
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    return f.asFun().call(g.asFun().call(w, x));
+    return f.call(g.call(w, x));
   }
   
   // +TODO inverses (from OldJotDiaeresisBuiltin)

@@ -12,18 +12,16 @@ public class CRepeatBuiltin extends Dop {
   }
   
   @Override public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun ff = f.asFun();
     if (g instanceof Fun) {
       ArrayList<Value> res = new ArrayList<>();
       Value prev = x;
       res.add(prev);
       
-      Value next = ff.call(prev);
+      Value next = f.call(prev);
       res.add(next);
-      Fun gf = (Fun) g;
-      while(!Main.bool(gf.call(prev, next))) {
+      while(!Main.bool(g.call(prev, next))) {
         prev = next;
-        next = ff.call(prev);
+        next = f.call(prev);
         res.add(next);
       }
       return Arr.create(res);
@@ -32,7 +30,7 @@ public class CRepeatBuiltin extends Dop {
       Value[] res = new Value[n];
       Value curr = x;
       for (int i = 0; i < n; i++) {
-        curr = ff.call(curr);
+        curr = f.call(curr);
         res[i] = curr;
       }
       return Arr.create(res);

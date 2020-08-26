@@ -105,7 +105,7 @@ public class StileBuiltin extends Builtin {
     }
   };
   public Value under(Value o, Value x) {
-    Value v = o.asFun().call(call(x));
+    Value v = o.call(call(x));
     return CPY_SGN.call(x, v);
   }
 }

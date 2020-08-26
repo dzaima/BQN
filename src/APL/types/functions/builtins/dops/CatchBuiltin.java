@@ -10,16 +10,16 @@ public class CatchBuiltin extends Dop {
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
     try {
-      return f.asFun().call(x);
+      return f.call(x);
     } catch (Throwable e) {
-      return g.asFun().call(x);
+      return g.call(x);
     }
   }
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
     try {
-      return f.asFun().call(w, x);
+      return f.call(w, x);
     } catch (Throwable e) {
-      return g.asFun().call(w, x);
+      return g.call(w, x);
     }
   }
 }

@@ -18,6 +18,9 @@ public abstract class Arr extends Value {
     super(shape, ia, rank);
   }
   
+  public Value call(         Value x) { return this; }
+  public Value call(Value w, Value x) { return this; }
+  
   public String basicFormat(boolean quote) {
     if (ia == 0) {
       String mr = safePrototype() instanceof Char? "\"\"" : "⟨⟩";

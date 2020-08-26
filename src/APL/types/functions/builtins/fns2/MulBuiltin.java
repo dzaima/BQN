@@ -124,7 +124,7 @@ public class MulBuiltin extends Builtin {
     }
   };
   public Value under(Value o, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(x)) : o;
+    Value v = o instanceof Fun? o.call(call(x)) : o;
     return SET_SGN.call(x, v);
   }
 }

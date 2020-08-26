@@ -1,6 +1,7 @@
 package APL.types;
 
 import APL.errors.*;
+import APL.tools.Pervasion;
 import APL.types.arrs.*;
 import APL.types.functions.*;
 
@@ -206,16 +207,21 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   }
   
   
-  public /*open*/ Fun asFun() {
-    return new ValFun(this);
-  }
-  public static class ValFun extends Fun {
-    public final Value v;
-    public ValFun(Value v) { this.v = v; }
-    public Value call(         Value x) { return v; }
-    public Value call(Value w, Value x) { return v; }
-    public String repr() { return v.toString(); }
-  }
+  
+  
+  public String repr() { return toString(); } // todo this is a stupid function
+  public abstract Value call(         Value x);
+  public abstract Value call(Value w, Value x);
+  public Value identity() { return null; }
+  public Pervasion.NN2N dyNum() { return null; }
+  
+  public Value callInv (         Value x) { throw new DomainError("Cannot invert "+humanType(true));}
+  public Value callInvW(Value w, Value x) { throw new DomainError("Cannot invert "+humanType(true));}
+  public Value callInvA(Value w, Value x) { throw new DomainError("Cannot invert "+humanType(true));}
+  
+  public Value under (Value o,          Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
+  public Value underW(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
+  public Value underA(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   
   public String humanType(boolean article) {
     if (this instanceof Arr     )return article? "an array"     : "array";

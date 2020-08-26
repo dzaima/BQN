@@ -14,16 +14,16 @@ public class BeforeBuiltin extends Dop {
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    return g.asFun().call(f.asFun().call(w), x);
+    return g.call(f.call(w), x);
   }
   
   public Value callInv(Value f, Value g, Value x) {
     if (f.notIdentity()) throw new DomainError("𝕗⊸𝔾⁼: 𝕗 cannot be a function", this, f);
-    return g.asFun().callInvW(f, x);
+    return g.callInvW(f, x);
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
     if (f.notIdentity()) throw new DomainError("⌾(𝕗⊸𝔾): 𝕗 cannot be a function", this, f);
-    return g.asFun().underW(o, f, x);
+    return g.underW(o, f, x);
   }
 }

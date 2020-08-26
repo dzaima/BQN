@@ -179,25 +179,21 @@ public class JComp {
             break;
           }
           case FN1C: {
-            fn.invvirt(Value.class, "asFun", met(Fun.class));
             fn.swap();
-            fn.invvirt(Fun.class, "call", met(Value.class, Value.class));
+            fn.invvirt(Value.class, "call", met(Value.class, Value.class));
             cstack--;
             break;
           }
-          case FN2C: {
-            fn.astore(TMP);
-            fn.invvirt(Value.class, "asFun", met(Fun.class));
-            fn.swap();
-            fn.aload(TMP);
-            fn.swap();
-            fn.invvirt(Fun.class, "call",  met(Value.class, Value.class, Value.class));
+          case FN2C: {      // x f w
+            fn.astore(TMP); // x f    w
+            fn.swap();      // f x    w
+            fn.aload(TMP);  // f x w
+            fn.swap();      // x f w
+            fn.invvirt(Value.class, "call",  met(Value.class, Value.class, Value.class));
             cstack-= 2;
             break;
           }
           case FN1O: { Met.Lbl l1 = fn.lbl(), l2 = fn.lbl();
-            
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); // note that this executes even when 𝕩 is ·; ¯\\_(ツ)_/¯
                        // x f
             fn.swap(); // f x
             fn.dup();  // f x x
@@ -207,7 +203,7 @@ public class JComp {
               fn.pop();  // x   aka   ·
               fn.goto_(l2);
             l1.here();    // } else {
-              fn.invvirt(Fun.class, "call", met(Value.class, Value.class));
+              fn.invvirt(Value.class, "call", met(Value.class, Value.class));
             l2.here();    // }
             mstack = Math.max(mstack, cstack+1);
             cstack--;
@@ -216,7 +212,6 @@ public class JComp {
           case FN2O: { Met.Lbl l1=fn.lbl(), l2=fn.lbl(), l3=fn.lbl();
             // x f w
             fn.astore(TMP); // x f
-            fn.invvirt(Value.class, "asFun", met(Fun.class));
             fn.swap(); // f x
             fn.dup();  // f x x
             fn.is(Nothing.class); // f x B
@@ -227,12 +222,12 @@ public class JComp {
               fn.aload(TMP);
               fn.is(Nothing.class);
               fn.ifeq0(l2); // if (w instanceof Nothing) {
-                fn.invvirt(Fun.class, "call", met(Value.class, Value.class));
+                fn.invvirt(Value.class, "call", met(Value.class, Value.class));
                 fn.goto_(l3);
               l2.here();    // } else {
                 fn.aload(TMP);
                 fn.swap();
-                fn.invvirt(Fun.class, "call", met(Value.class, Value.class, Value.class));
+                fn.invvirt(Value.class, "call", met(Value.class, Value.class, Value.class));
                             // }
             l3.here();    // }
             mstack = Math.max(mstack, cstack+1);
@@ -265,44 +260,36 @@ public class JComp {
             break;
           }
           case TR2D: {
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP );
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP2);
-            
+            fn.astore(TMP); fn.astore(TMP2);
             fn.new_(Atop.class); fn.dup();
-            fn.aload(TMP); fn.aload(TMP2);
-            fn.invspec(Atop.class, "<init>", met(void.class, Fun.class, Fun.class));
+            fn.aload (TMP); fn.aload (TMP2);
+            fn.invspec(Atop.class, "<init>", met(void.class, Value.class, Value.class));
             mstack = Math.max(mstack, cstack+2);
             cstack--;
             break;
           }
           case TR3D: {
-                                                              fn.astore(TMP ); // f
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP2); // g
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP3); // h
-  
+            fn.astore(TMP); fn.astore(TMP2); fn.astore(TMP3);
             fn.new_(Fork.class); fn.dup();
-            fn.aload(TMP); fn.aload(TMP2); fn.aload(TMP3);
-            fn.invspec(Fork.class, "<init>", met(void.class, Value.class, Fun.class, Fun.class));
+            fn.aload (TMP); fn.aload (TMP2); fn.aload (TMP3);
+            fn.invspec(Fork.class, "<init>", met(void.class, Value.class, Value.class, Value.class));
             mstack = Math.max(mstack, cstack+2);
             cstack-= 2;
             break;
           }
           case TR3O: { Met.Lbl l1 = fn.lbl(), l2 = fn.lbl();
-                                                              fn.astore(TMP ); // f
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP2); // g
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); fn.astore(TMP3); // h
-            
+            fn.astore(TMP); fn.astore(TMP2); fn.astore(TMP3);
             fn.aload(TMP);
             fn.is(Nothing.class);
             fn.ifeq0(l1); // if (f instanceof Nothing) {
               fn.new_(Atop.class); fn.dup();
               fn.aload(TMP2); fn.aload(TMP3); // g h
-              fn.invspec(Atop.class, "<init>", met(void.class, Fun.class, Fun.class));
+              fn.invspec(Atop.class, "<init>", met(void.class, Value.class, Value.class));
               fn.goto_(l2);
             l1.here();    // } else {
               fn.new_(Fork.class); fn.dup();
               fn.aload(TMP); fn.aload(TMP2); fn.aload(TMP3); // f g h
-              fn.invspec(Fork.class, "<init>", met(void.class, Value.class, Fun.class, Fun.class));
+              fn.invspec(Fork.class, "<init>", met(void.class, Value.class, Value.class, Value.class));
             l2.here();    // }
             mstack = Math.max(mstack, cstack+2);
             cstack-= 2;
@@ -337,20 +324,18 @@ public class JComp {
           }
           case SETM: {
             // v f k     →
-            // v k F K v
-            
+            // v k f K v
                             // v f k
             fn.swap();      // v k f
-            fn.invvirt(Value.class, "asFun", met(Fun.class)); // v k F
             fn.astore(TMP); // v k
             fn.dup2();      // v k v k
             fn.aload(SC);   // v k v k sc
             fn.invvirt(Settable.class, "get", met(Value.class, Scope.class)); // v k v K
-            fn.aload(TMP);  // v k v K F
-            fn.dup_x2();    // v k F v K F
-            fn.pop();       // v k F v K
-            fn.swap();      // v k F K v
-            fn.invvirt(Fun.class, "call",  met(Value.class, Value.class, Value.class)); // v k n
+            fn.aload(TMP);  // v k v K f
+            fn.dup_x2();    // v k f v K f
+            fn.pop();       // v k f v K
+            fn.swap();      // v k f K v
+            fn.invvirt(Value.class, "call",  met(Value.class, Value.class, Value.class)); // v k n
             fn.iconst(1); fn.aload(SC); fn.aconst_null(); // v k n true sc null
             fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class));
             mstack = Math.max(mstack, cstack+3);

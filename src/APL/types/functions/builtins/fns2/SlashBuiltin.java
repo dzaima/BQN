@@ -11,7 +11,7 @@ import APL.types.functions.builtins.mops.FoldBuiltin;
 import java.util.Arrays;
 
 public class SlashBuiltin extends Builtin {
-  private static final Fun fn = new FoldBuiltin().derive(new CeilingBuiltin()).asFun();
+  private static final Value fn = new FoldBuiltin().derive(new CeilingBuiltin());
   
   public String repr() {
     return "/";
@@ -357,7 +357,7 @@ public class SlashBuiltin extends Builtin {
   // }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? ((Fun) o).call(call(w, x)) : o;
+    Value v = o instanceof Fun? o.call(call(w, x)) : o;
     if (MatchBuiltin.full(w)!=1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this, w);
     int[] sh;
     if (w.rank > 1) {

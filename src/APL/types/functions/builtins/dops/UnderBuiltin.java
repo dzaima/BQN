@@ -13,28 +13,23 @@ public class UnderBuiltin extends Dop {
   
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
-    Fun gf = g.asFun();
-    return gf.under(f, x);
+    return g.under(f, x);
   }
   public Value callInv(Value f, Value g, Value x) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return gf.under(InvBuiltin.invertM(ff), x);
+    return g.under(InvBuiltin.invertM(f), x);
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
-    Fun ff = f.asFun(); Fun gf = g.asFun();
-    return gf.under(new BindA(gf.call(w), ff), x);
+    return g.under(new BindA(g.call(w), f), x);
   }
   public Value callInvW(Value f, Value g, Value w, Value x) {
-    Fun gf = g.asFun();
-    return gf.under(new BindA(gf.call(w), InvBuiltin.invertW(f.asFun())), x);
+    return g.under(new BindA(g.call(w), InvBuiltin.invertW(f)), x);
   }
   public Value callInvA(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
-    Fun gf = g.asFun();
-    Value w1 = gf.call(w);
-    Value x1 = gf.call(x);
+    Value w1 = g.call(w);
+    Value x1 = g.call(x);
     try {
-      return gf.callInv(f.asFun().callInvA(w1, x1));
+      return g.callInv(f.callInvA(w1, x1));
     } catch (DomainError e) { // but add a nice warning about it if a plausible error was received (todo better error management to not require parsing the message?)
       String msg = e.getMessage();
       if (msg.contains("doesn't support") && msg.contains("inverting")) {
@@ -45,8 +40,8 @@ public class UnderBuiltin extends Dop {
   
   public static class BindA extends Fun { // +todo think about merging with ⊸
     final Value w;
-    final Fun f;
-    public BindA(Value w, Fun f) {
+    final Value f;
+    public BindA(Value w, Value f) {
       this.w = w;
       this.f = f;
     }
