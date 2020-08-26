@@ -17,7 +17,7 @@ public class Fork extends Fun {
     return g.call(l, r);
   }
   public Value callInv(Value x) {
-    if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
+    if (f instanceof Callable) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.callInv(g.callInvW(f, x));
   }
   public Value call(Value w, Value x) {
@@ -27,12 +27,12 @@ public class Fork extends Fun {
   }
   
   @Override public Value callInvW(Value w, Value x) {
-    if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
+    if (f instanceof Callable) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
     return h.callInvW(w, g.callInvW(f, x));
   }
   
   @Override public Value callInvA(Value w, Value x) {
-    if (f.notIdentity()) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
+    if (f instanceof Callable) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
     return h.callInvA(g.callInvW(f, w), x);
   }
   
@@ -41,7 +41,7 @@ public class Fork extends Fun {
   }
   
   public Value under(Value o, Value x) {
-    if (f.notIdentity()) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
+    if (f instanceof Callable) throw new DomainError("(F G H)𝕩 cannot be inverted", this);
     return h.under(new Fun() { public String repr() { return g.repr(); }
       public Value call(Value x) {
         return g.underW(o, f, x);

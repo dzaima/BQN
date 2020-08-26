@@ -18,12 +18,12 @@ public class AfterBuiltin extends Dop {
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    if (f.notIdentity()) throw new DomainError("𝔽⟜𝕘⁼: 𝕘 cannot be a function", this, f);
+    if (f instanceof Callable) throw new DomainError("𝔽⟜𝕘⁼: 𝕘 cannot be a function", this, f);
     return f.callInvA(x, g);
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
-    if (f.notIdentity()) throw new DomainError("⌾(𝔽⟜𝕘): 𝕘 cannot be a function", this, f);
+    if (f instanceof Callable) throw new DomainError("⌾(𝔽⟜𝕘): 𝕘 cannot be a function", this, f);
     return f.underA(o, x, g);
   }
 }

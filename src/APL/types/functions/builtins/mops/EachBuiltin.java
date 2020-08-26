@@ -22,7 +22,13 @@ public class EachBuiltin extends Mop {
   
   public static Value on(Value f, Value x) {
     if (x.scalar()) return SingleItemArr.r0(f.call(x.first()));
-    if (!f.notIdentity()) {
+    if (f instanceof Callable) {
+      MutVal res = new MutVal(x.shape);
+      for (int i = 0; i < x.ia; i++) {
+        res.set(i, f.call(x.get(i)));
+      }
+      return res.get();
+    } else {
       if (f instanceof Num && Num.isBool(((Num) f).num)) { // bitarr code is very bad at respecting SingleItemArrs
         long[] ls = new long[BitArr.sizeof(x.ia)];
         if (((Num) f).num==1) Arrays.fill(ls, ~0L);
@@ -30,11 +36,6 @@ public class EachBuiltin extends Mop {
       }
       return new SingleItemArr(f, x.shape);
     }
-    MutVal res = new MutVal(x.shape);
-    for (int i = 0; i < x.ia; i++) {
-      res.set(i, f.call(x.get(i)));
-    }
-    return res.get();
   }
   
   public Value call(Value f, Value w, Value x, DerivedMop derv) {

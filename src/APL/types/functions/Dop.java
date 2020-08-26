@@ -52,7 +52,6 @@ public abstract class Dop extends Callable {
   public abstract String repr();
   
   
-  public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
   @Override public int hashCode() {

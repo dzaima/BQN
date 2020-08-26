@@ -49,7 +49,6 @@ public abstract class Mop extends Callable {
   public abstract String repr();
   
   
-  public boolean notIdentity() { return true; }
   
   // functions are equal per-object basis
   public int hashCode() {

@@ -553,7 +553,6 @@ public abstract class Fun extends Callable {
     return repr();
   }
   
-  public boolean notIdentity() { return true; }
   
   // functions are equal on a per-object basis
   public int hashCode() {
