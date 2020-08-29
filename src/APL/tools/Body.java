@@ -84,8 +84,8 @@ public class Body {
       boolean ae = ts.size()>4; Token a = ae? ts.get(ts.size()-5) : null; char at = ae? a.type : 0;
       boolean be = ts.size()>3; Token b = be? ts.get(ts.size()-4) : null; char bt = be? b.type : 0;
       boolean ce = ts.size()>2; Token c = ce? ts.get(ts.size()-3) : null; char ct = ce? c.type : 0;
-      Token d =     ts.get(ts.size()-2)       ; char dt =     d.type;
-      Token e =     ts.get(ts.size()-1)       ; char et =     e.type;
+      Token d =                               ts.get(ts.size()-2)       ; char dt =     d.type;
+      Token e =                               ts.get(ts.size()-1)       ; char et =     e.type;
       if (type == 'a') { // non-immediate definitions
         if (dt == 'f' && ts.size()<=3) { // F 𝕩: or 𝕨 F 𝕩:
           if (ce && ct!='a' && ct!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);

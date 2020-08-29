@@ -78,6 +78,6 @@ public class StarBuiltin extends Builtin {
     return LogBuiltin.DF.call(w, x);
   }
   public Value callInvA(Value w, Value x) {
-    return RootBuiltin.DF.call(w, x);
+    return RootBuiltin.DF.call(x, w);
   }
 }
