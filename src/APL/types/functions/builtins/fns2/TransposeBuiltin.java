@@ -1,9 +1,12 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.errors.*;
 import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.functions.Builtin;
+
+import java.util.Arrays;
 
 public class TransposeBuiltin extends Builtin {
   @Override public String repr() {
@@ -59,5 +62,51 @@ public class TransposeBuiltin extends Builtin {
       }
       return Arr.create(res, sh);
     }
+  }
+  
+  int posMin(int a, int b) {
+    return a<0 ? b : Math.min(a,b);
+  }
+  
+  public Value call(Value w, Value x) {
+    int[] ts = w.asIntVec();
+    int l = ts.length;
+    if (l == 0) return x.scalar() ? x.ofShape(new int[]{}) : x;
+    int r = x.rank;
+    if (l > r) throw new RankError("⍉: Length of 𝕨 ("+l+") exceeded rank of 𝕩 ("+r+")", this);
+    
+    // compute shape for the given axes
+    int[] t = new int[r];
+    System.arraycopy(ts, 0, t, 0, l);
+    int[] sh = new int[r];
+    for (int i = 0; i < r; i++) sh[i] = -1;
+    for (int i = 0; i < l; i++) {
+      int a = t[i];
+      if (a<0 || a>=r) throw new RankError("⍉: Axis "+a+" does not exist (rank of 𝕩 is "+r+")", this);
+      sh[a] = posMin(sh[a], x.shape[i]);
+    }
+    
+    // fill in remaining axes and check for missing ones
+    int k = 0;
+    for (int i = l; i < r; i++,k++) {
+      while (sh[k] >= 0) k++;
+      t[i] = k;
+      sh[k] = x.shape[i];
+    }
+    while (k<r && sh[k]>=0) k++;
+    for (int i = k; i < r; i++) {
+      if (sh[i] >= 0) throw new DomainError("⍉: Missing output axis "+k, this);
+    }
+    
+    sh = Arrays.copyOf(sh, k);
+    Value[] res = new Value[Arr.prod(sh)];
+    for (int[] c : new Indexer(sh)) {
+      int[] d = new int[r];
+      for (int i = 0; i < r; i++) {
+        d[i] = c[t[i]];
+      }
+      res[Indexer.fromShape(sh, c)] = x.simpleAt(d);
+    }
+    return Arr.create(res, sh);
   }
 }
