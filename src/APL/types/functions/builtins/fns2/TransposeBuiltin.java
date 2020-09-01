@@ -10,55 +10,54 @@ public class TransposeBuiltin extends Builtin {
     return "⍉";
   }
   
-  
-  
   public Value call(Value x) {
     if (x.scalar()) return x;
+    int r = x.rank;
+    int[] sh = new int[r];
+    int n = 1;
+    for (int i = 0; i < r-1; i++) {
+      n *= sh[i] = x.shape[i + 1];
+    }
+    int m = sh[r - 1] = x.shape[0];
+    return matTrans(x, m, n, sh);
+  }
+  public Value callInv(Value x) {
+    if (x.scalar()) return x;
+    int r = x.rank;
+    int[] sh = new int[r];
+    int n = sh[0] = x.shape[r - 1];
+    int m = 1;
+    for (int i = 1; i < r; i++) {
+      m *= sh[i] = x.shape[i - 1];
+    }
+    return matTrans(x, m, n, sh);
+  }
+  
+  static Value matTrans(Value x, int m, int n, int[] sh) {
+    if (m==0 || n==0) return x.ofShape(sh);
     if (x instanceof DoubleArr) {
       double[] dw = x.asDoubleArr();
       double[] res = new double[x.ia];
-      int[] sh = new int[x.rank];
-      for (int i = 0; i < x.rank; i++) {
-        sh[i] = x.shape[x.rank - i - 1];
-      }
-      if (x.rank == 2) {
-        int ww = x.shape[0];
-        int wh = x.shape[1];
-        int ip = 0;
-        for (int cx = 0; cx < ww; cx++) {
-          int op = cx;
-          for (int cy = 0; cy < wh; cy++) {
-            res[op] = dw[ip++];
-            op+= ww;
-          }
-        }
-      } else {
-        int ci = 0;
-        for (int[] c : new Indexer(x.shape)) {
-          int[] nc = new int[x.rank];
-          for (int i = 0; i < x.rank; i++) {
-            nc[i] = c[x.rank - i - 1];
-          }
-          res[Indexer.fromShape(sh, nc)] = dw[ci++];
+      int ip = 0;
+      for (int cx = 0; cx < m; cx++) {
+        int op = cx;
+        for (int cy = 0; cy < n; cy++) {
+          res[op] = dw[ip++];
+          op += m;
         }
       }
       return new DoubleArr(res, sh);
-    }
-    Value[] arr = new Value[x.ia];
-    int[] ns = new int[x.rank];
-    for (int i = 0; i < x.rank; i++) {
-      ns[i] = x.shape[x.rank - i - 1];
-    }
-    for (int[] c : new Indexer(x.shape)) {
-      int[] nc = new int[x.rank];
-      for (int i = 0; i < x.rank; i++) {
-        nc[i] = c[x.rank - i - 1];
+    } else {
+      Value[] res = new Value[x.ia];
+      int ip = 0;
+      for (int cx = 0; cx < m; cx++) {
+        int op = cx;
+        for (int cy = 0; cy < n; cy++) {
+          res[op] = x.get(ip++);
+          op += m;
+        }
       }
-      arr[Indexer.fromShape(ns, nc)] = x.simpleAt(c);
+      return Arr.create(res, sh);
     }
-    return Arr.create(arr, ns);
-  }
-  public Value callInv(Value x) {
-    return call(x);
   }
 }
