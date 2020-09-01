@@ -109,4 +109,42 @@ public class TransposeBuiltin extends Builtin {
     }
     return Arr.create(res, sh);
   }
+  
+  public Value callInvW(Value w, Value x) {
+    int[] ts = w.asIntVec();
+    int l = ts.length;
+    if (l == 0) {
+      if (x.scalar()) throw new DomainError("⍉⁼: Result of ⍉ must be an array");
+      return x;
+    }
+    int r = x.rank;
+    if (l > r) throw new RankError("⍉⁼: Length of 𝕨 ("+l+") exceeded rank of 𝕩 ("+r+")", this);
+    
+    // fill trailing axes
+    int[] t = new int[r];
+    System.arraycopy(ts, 0, t, 0, l);
+    boolean[] oc = new boolean[r];  // occupied
+    for (int i = 0; i < l; i++) {
+      int a = t[i];
+      if (a<0 || a>=r) throw new RankError("⍉: Axis "+a+" does not exist (rank of 𝕩 is "+r+")", this);
+      if (oc[a]) throw new RankError("⍉⁼: Repeated axis: "+a, this);
+      oc[a] = true;
+    }
+    for (int i=l,k=0; i < r; i++,k++) {
+      while (oc[k]) k++;
+      t[i] = k;
+    }
+
+    int[] sh = new int[r];
+    for (int i = 0; i < r; i++) sh[i] = x.shape[t[i]];
+    Value[] res = new Value[x.ia];
+    for (int[] c : new Indexer(sh)) {
+      int[] d = new int[r];
+      for (int i = 0; i < r; i++) {
+        d[t[i]] = c[i];
+      }
+      res[Indexer.fromShape(sh, c)] = x.simpleAt(d);
+    }
+    return Arr.create(res, sh);
+  }
 }
