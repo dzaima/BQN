@@ -1,9 +1,10 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.errors.RankError;
+import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.IntArr;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.HashMap;
 
@@ -11,6 +12,25 @@ public class RBoxBuiltin extends Builtin {
   public String repr() {
     return "⊐";
   }
+  
+  public Value call(Value x) {
+    HashMap<Value, Integer> map = new HashMap<>();
+    if (x.rank == 0) throw new DomainError("⊐: argument cannot be a scalar", this);
+    Value[] xv = x.rank==1? x.values() : CellBuiltin.cells(x);
+    int[] res = new int[xv.length];
+    int am = 0;
+    for (int i = 0; i < xv.length; i++) {
+      Value c = xv[i];
+      Integer prev = map.get(c);
+      if (prev == null) {
+        prev = am++;
+        map.put(c, prev);
+      }
+      res[i] = prev;
+    }
+    return new IntArr(res);
+  }
+  
   public Value call(Value w, Value x) {
     return on(w, x, this);
   }
