@@ -1212,6 +1212,7 @@ public class Comp {
   
   
       case '⍕': return new FormatBuiltin();
+      case '!': return new AssertBuiltin();
       case '⌽': return new ReverseBuiltin();
       case '+': return new PlusBuiltin();
       case '-': return new MinusBuiltin();
@@ -1300,7 +1301,7 @@ public class Comp {
       case 55349: // double-struck surrogate pair
         return null;
   
-      default: throw new ImplementationError("no built-in " + t.op + " defined in exec", t);
+      default: throw new ImplementationError("no built-in " + t.op + " defined in Comp", t);
     }
   }
 }
