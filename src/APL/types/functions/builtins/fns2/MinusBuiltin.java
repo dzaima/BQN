@@ -69,11 +69,14 @@ public class MinusBuiltin extends Builtin {
       return super.each(w, x);
     }
     public Value scalarX(Value w, double x) {
-      String ws = ((ChrArr) w).s;
-      int xi = Num.toInt(x);
-      char[] r = new char[ws.length()];
-      for (int i = 0; i < ws.length(); i++) r[i] = (char) (ws.charAt(i)-xi);
-      return new ChrArr(r, w.shape);
+      if (w instanceof ChrArr) {
+        String ws = ((ChrArr) w).s;
+        int xi = Num.toInt(x);
+        char[] r = new char[ws.length()];
+        for (int i = 0; i < ws.length(); i++) r[i] = (char) (ws.charAt(i)-xi);
+        return new ChrArr(r, w.shape);
+      }
+      return super.scalarX(w, x);
     }
     public Value on(Primitive w, Primitive x) {
       if (w instanceof Char || x instanceof Char) {
