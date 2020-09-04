@@ -2,9 +2,11 @@ package APL.types.functions.builtins.fns2;
 
 import APL.Main;
 import APL.errors.*;
+import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
+import APL.types.functions.builtins.dops.AtopBuiltin;
 
 import java.util.Arrays;
 
@@ -26,11 +28,12 @@ public class ShapeBuiltin extends Builtin {
   
   
   
-  public Value call(Value w, Value x) { // valuecopy
+  public Value call(Value w, Value x) {
     if (w.rank > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
     int[] sh;
     int ia;
-    Integer emptyPos = null;
+    int emptyPos = -1;
+    int emptyMode = 2; // 0-∘(exact); 1-⌊(discard); 2-⌽(recycle); 3-↑(pad)
     if (w.quickDoubleArr()) {
       sh = w.asIntVec();
       ia = Arr.prod(sh);
@@ -43,30 +46,51 @@ public class ShapeBuiltin extends Builtin {
           int c = v.asInt();
           sh[i] = c;
           ia*= c;
-        } else if (v.ia == 0) {
-          if (emptyPos == null) emptyPos = i;
-          else throw new DomainError("⥊: shape contained multiple ⟨⟩s", this, v);
-        } else throw new DomainError("⥊: shape contained "+v.humanType(true), this, v);
+        } else {
+          if (emptyPos!=-1) throw new DomainError("⥊: contained multiple specials", this);
+          emptyPos = i;
+               if (v instanceof    AtopBuiltin) emptyMode = 0;
+          else if (v instanceof   FloorBuiltin) emptyMode = 1;
+          else if (v instanceof ReverseBuiltin) emptyMode = 2;
+          else if (v instanceof UpArrowBuiltin) emptyMode = 3;
+          else throw new DomainError("⥊: shape contained "+v, this, v);
+        }
       }
     }
-    
-    if (emptyPos != null) {
-      if (x.ia % ia != 0) {
-        StringBuilder b = new StringBuilder();
-        for (Value v : w) b.append(v).append(' ');
-        b.deleteCharAt(b.length()-1);
-        throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+b+"; "+(x.ia)+" = ≢𝕩)", this, x);
+  
+    int mod = 0;
+    if (emptyPos!=-1) {
+      if (ia==0) throw new DomainError("⥊: cannot compute axis if the resulting array is empty", this);
+      int div = x.ia/ia;
+      mod = x.ia%ia;
+      int r = div;
+      if (emptyMode==0) {
+        if (mod != 0) throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+w.oneliner()+"; "+(x.ia)+" = ≢𝕩)", this);
+      } else if (emptyMode!=1) {
+        if (mod != 0) r++;
       }
-      sh[emptyPos] = x.ia/ia;
-      return x.ofShape(sh);
-    } else if (ia == x.ia) return x.ofShape(sh);
-    
+      sh[emptyPos] = r;
+      ia*= r;
+    }
+  
     if (x.ia == 0) {
-      return new SingleItemArr(x.prototype(), sh);
-      
-    } else if (x.scalar()) {
+      Value proto = x.safePrototype();
+      if (ia==0) return new EmptyArr(sh, proto);
+      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.oneliner(), this);
+      return new SingleItemArr(proto, sh);
+    }
+    if (ia == x.ia) return x.ofShape(sh);
+    
+    if (emptyMode==3) {
+      MutVal v = new MutVal(sh, x);
+      v.copy(x, 0, 0, x.ia);
+      if (mod != 0) v.fill(x.safePrototype(), x.ia, v.ia); // x won't be empty, so there must be a prototype
+      return v.get();
+    }
+    
+    
+    if (x.scalar()) {
       return new SingleItemArr(x.first(), sh);
-      
     } else if (x instanceof BitArr) {
       BitArr wb = (BitArr) x;
       BitArr.BA res = new BitArr.BA(sh);

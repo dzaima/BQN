@@ -1,5 +1,5 @@
 #!/usr/bin/env dbqn
-       (1≤≠)◶0     ‿(⍎ ⊑ )•args # evaluate 1st argument
+       (1≤≠)◶0       ‿(⍎ ⊑ )•args # evaluate 1st argument
 eval ← (2≤≠)◶{𝕩:{⍎𝕩}}‿{⍎1⊑𝕩}•args # use 2nd argument as the interpreter
 err←"err"
 { 𝕊path:
@@ -13,6 +13,6 @@ err←"err"
     exp ← ⍎(p+1)↓𝕩
     got ≡◶{⟨"`"∾src∾"`: got `"∾𝕨∾"`, expected `"∾𝕩∾"`"⟩}‿⟨⟩○⍕ exp
   }¨ lns
-  (0=≠)◶{•←path∾": "∾(⍕lns-○≠msgs)∾" / "∾⍕≠lns}‿{•←path∾": Passed all "∾(⍕≠lns)∾" tests"} msgs
+  (0=≠)◶{𝕩:•←path∾": "∾(⍕lns-○≠msgs)∾" / "∾⍕≠lns}‿{𝕩:•←path∾": Passed all "∾(⍕≠lns)∾" tests"} msgs
   {•←"   "∾𝕩}¨msgs
-}¨ •path⊸∾¨ "assignment"‿"headers"
+}¨ •path⊸∾¨ "assignment"‿"headers"‿"shape"
