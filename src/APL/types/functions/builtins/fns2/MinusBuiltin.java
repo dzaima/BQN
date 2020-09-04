@@ -1,8 +1,9 @@
 package APL.types.functions.builtins.fns2;
 
+import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.arrs.IntArr;
+import APL.types.arrs.*;
 import APL.types.functions.Builtin;
 
 public class MinusBuiltin extends Builtin {
@@ -49,6 +50,39 @@ public class MinusBuiltin extends Builtin {
     public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.subtractExact(w   ,x[i]);}return res;}catch(ArithmeticException e){return null;}}
     public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {res[i]=Math.subtractExact(w[i],x   );}return res;}catch(ArithmeticException e){return null;}}
     public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.subtractExact(w[i],x[i]);}return res;}catch(ArithmeticException e){return null;}}
+    
+    public Value each(Value w, Value x) {
+      if (w instanceof ChrArr && x.quickIntArr()) {
+        int[] xi = x.asIntArr();
+        String ws = ((ChrArr) w).s;
+        char[] r = new char[xi.length];
+        for (int i = 0; i < xi.length; i++) r[i] = (char) (ws.charAt(i)-xi[i]);
+        return new ChrArr(r, x.shape);
+      }
+      if (w instanceof ChrArr && x instanceof ChrArr) {
+        String ws = ((ChrArr) w).s;
+        String xs = ((ChrArr) x).s;
+        int[] d = new int[ws.length()];
+        for (int i = 0; i < d.length; i++) d[i] = ws.charAt(i)-xs.charAt(i);
+        return new IntArr(d, x.shape);
+      }
+      return super.each(w, x);
+    }
+    public Value scalarX(Value w, double x) {
+      String ws = ((ChrArr) w).s;
+      int xi = Num.toInt(x);
+      char[] r = new char[ws.length()];
+      for (int i = 0; i < ws.length(); i++) r[i] = (char) (ws.charAt(i)-xi);
+      return new ChrArr(r, w.shape);
+    }
+    public Value on(Primitive w, Primitive x) {
+      if (w instanceof Char || x instanceof Char) {
+        if (w instanceof Char && x instanceof Char) return new Num(((Char) w).chr-((Char) x).chr);
+        if (w instanceof Char && x instanceof Num) return Char.of((char) (((Char) w).chr-x.asInt()));
+        if (x instanceof Char) throw new DomainError("-: cannot operate on "+w.humanType(true)+" and "+x.humanType(false));
+      }
+      return super.on(w, x);
+    }
   };
   
   public Value call(Value w, Value x) {

@@ -35,7 +35,7 @@ public class Pervasion { // implementations must be okay with not being called o
       }
     }
     
-    public Value each(Value w, Value x) {
+    public Value each(Value w, Value x) { // w ≡○≢ x
       Value[] res = new Value[w.ia];
       for (int i = 0; i < w.ia; i++) res[i] = call(w.get(i), x.get(i));
       return Arr.create(res, x.shape);
