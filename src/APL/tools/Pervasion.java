@@ -1,6 +1,7 @@
 package APL.tools;
 
-import APL.errors.DomainError;
+import APL.Main;
+import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.builtins.fns2.NotBuiltin;
@@ -26,6 +27,7 @@ public class Pervasion { // implementations must be okay with not being called o
         boolean we = wr < xr; // w is expanded
         int max = Math.max(w.ia, x.ia);
         int min = Math.min(w.ia, x.ia);
+        if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", x);
         int ext = max/min;
         Value[] n = new Value[max];
         int r = 0;
