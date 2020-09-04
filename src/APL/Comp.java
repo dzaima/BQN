@@ -1268,6 +1268,7 @@ public class Comp {
       case '`': return new ScanBuiltin();
       case '¨': return new EachBuiltin();
       case '˜': return new SelfieBuiltin();
+      case '˙': return new ConstBultin();
       case '⌜': return new TableBuiltin();
       case '⁼': return new InvBuiltin();
       case '˘': return new CellBuiltin();
