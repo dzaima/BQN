@@ -1,6 +1,5 @@
 package APL.types.functions.builtins.fns2;
 
-import APL.Main;
 import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;

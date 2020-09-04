@@ -6,7 +6,6 @@ import APL.types.*;
 import APL.types.functions.Builtin;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class StarBuiltin extends Builtin {
   @Override public String repr() {

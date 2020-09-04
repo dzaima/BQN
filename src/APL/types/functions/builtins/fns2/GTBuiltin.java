@@ -4,7 +4,6 @@ import APL.Main;
 import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
-import APL.types.arrs.EmptyArr;
 import APL.types.functions.Builtin;
 
 import java.util.Arrays;

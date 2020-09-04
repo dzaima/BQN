@@ -1,6 +1,6 @@
 package APL.errors;
 
-import APL.types.*;
+import APL.types.Tokenable;
 
 public class RankError extends APLError {
   

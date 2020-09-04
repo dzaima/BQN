@@ -1,6 +1,6 @@
 package APL.types.mut;
 
-import APL.*;
+import APL.Scope;
 import APL.errors.LengthError;
 import APL.types.*;
 

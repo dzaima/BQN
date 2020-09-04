@@ -1,7 +1,7 @@
 package APL.types.functions.builtins.mops;
 
 import APL.errors.RankError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 
 public class InsertBuiltin extends Mop {
