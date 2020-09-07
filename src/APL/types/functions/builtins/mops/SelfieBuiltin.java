@@ -1,11 +1,12 @@
 package APL.types.functions.builtins.mops;
 
 import APL.errors.DomainError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
+import APL.types.functions.builtins.fns2.*;
 
 public class SelfieBuiltin extends Mop {
-  @Override public String repr() {
+  public String repr() {
     return "˜";
   }
   
@@ -18,13 +19,23 @@ public class SelfieBuiltin extends Mop {
     return f.call(x, w);
   }
   
-  @Override public Value callInvW(Value f, Value w, Value x) {
-    if (f instanceof Fun) return f.callInvA(x, w);
-    throw new DomainError("A˜ cannot be inverted", this);
+  public static RootBuiltin rb = new RootBuiltin();
+  public Value callInv(Value f, Value x) {
+    if (f instanceof PlusBuiltin) return DivBuiltin.DF.scalarX(x, 2);
+    if (f instanceof MulBuiltin || f instanceof AndBuiltin) {
+      rb.token = token; return rb.call(x);
+    }
+    if (f instanceof OrBuiltin) {
+      rb.token = token; return NotBuiltin.on(rb.call(NotBuiltin.on(x, this)), this);
+    }
+    throw new DomainError(f+"˜: cannot invert", this);
   }
   
-  @Override public Value callInvA(Value f, Value w, Value x) {
-    if (f instanceof Fun) return f.callInvW(x, w);
-    throw new DomainError("A˜ cannot be inverted", this);
+  public Value callInvW(Value f, Value w, Value x) {
+    return f.callInvA(x, w);
+  }
+  
+  public Value callInvA(Value f, Value w, Value x) {
+    return f.callInvW(x, w);
   }
 }

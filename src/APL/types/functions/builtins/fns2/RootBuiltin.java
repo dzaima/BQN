@@ -11,7 +11,7 @@ public class RootBuiltin extends Builtin {
   
   
   
-  private static final NumMV NF = new NumMV() {
+  public static final NumMV NF = new NumMV() {
     public Value call(Num x) {
       return new Num(Math.sqrt(x.num));
     }
@@ -19,7 +19,7 @@ public class RootBuiltin extends Builtin {
       for (int i = 0; i < x.length; i++) res[i] = Math.sqrt(x[i]);
     }
   };
-  private static final NumMV NFi = new NumMV() {
+  public static final NumMV NFi = new NumMV() {
     public Value call(Num x) {
       return Num.of(x.num*x.num);
     }

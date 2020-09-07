@@ -38,6 +38,12 @@ public class AndBuiltin extends Builtin {
     return MulBuiltin.DF.call(w, x);
   }
   
+  public Value callInvW(Value w, Value x) {
+    return DivBuiltin.DF.call(x, w);
+  }
+  public Value callInvA(Value w, Value x) {
+    return callInvW(x, w);
+  }
   
   public static Num reduce(BitArr x) {
     x.setEnd(true);

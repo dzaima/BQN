@@ -30,8 +30,8 @@ public class EQBuiltin extends Builtin {
     public void on(char[] w, char   x, BitArr.BA res) { for (char cw : w) { res.add(cw== x); } }
     public void on(char[] w, char[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i]==x[i]); } }
   
-    public Value on(boolean w, BitArr  x) { if(w)return x; return NotBuiltin.call(x); }
-    public Value on(BitArr  w, boolean x) { if(x)return w; return NotBuiltin.call(w); }
+    public Value on(boolean w, BitArr  x) { if(w)return x; return NotBuiltin.on(x); }
+    public Value on(BitArr  w, boolean x) { if(x)return w; return NotBuiltin.on(w); }
     public void  on(long[]  w, long[]  x, long[] res) { for (int i = 0; i < res.length; i++) res[i] = ~w[i]^x[i]; }
   };
   

@@ -11,14 +11,13 @@ public class NotBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    return rec(x);
+    return on(x, this);
   }
-  
   public Value callInv(Value x) {
-    return rec(x);
+    return on(x, this);
   }
   
-  private Value rec(Value x) {
+  public static Value on(Value x, Callable blame) {
     if (x instanceof Arr) {
       if (x instanceof BitArr) {
         BitArr wb = (BitArr) x;
@@ -50,15 +49,14 @@ public class NotBuiltin extends Builtin {
       Arr o = (Arr) x;
       Value[] arr = new Value[o.ia];
       for (int i = 0; i < o.ia; i++) {
-        arr[i] = rec(o.get(i));
+        arr[i] = on(o.get(i), blame);
       }
       return new HArr(arr, o.shape);
     } else if (x instanceof Num) return Num.of(1-((Num) x).num);
-    else throw new DomainError("Expected boolean, got "+x.humanType(false), this, x);
+    else throw new DomainError("Expected boolean, got "+x.humanType(false), blame, x);
   }
   
-  
-  public static BitArr call(BitArr x) {
+  public static BitArr on(BitArr x) {
     BitArr.BC bc = BitArr.create(x.shape);
     for (int i = 0; i < bc.arr.length; i++) {
       bc.arr[i] = ~x.arr[i];
@@ -68,5 +66,11 @@ public class NotBuiltin extends Builtin {
   
   public Value call(Value w, Value x) {
     return PlusBuiltin.DF.call(MinusBuiltin.DF.call(w, x), Num.ONE);
+  }
+  public Value callInvW(Value w, Value x) {
+    return call(w, x);
+  }
+  public Value callInvA(Value w, Value x) {
+    return MinusBuiltin.DF.scalarX(PlusBuiltin.DF.call(w,x), 1);
   }
 }

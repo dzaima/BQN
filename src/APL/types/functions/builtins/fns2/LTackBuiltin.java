@@ -18,7 +18,8 @@ public class LTackBuiltin extends Builtin {
     return x;
   }
   public Value callInvW(Value w, Value x) {
-    throw new DomainError("⊣⁼ is impossible", this);
+    if (w.eq(x)) return w;
+    throw new DomainError("⊣⁼: expected 𝕨 and 𝕩 to be equal", this);
   }
   public Value callInvA(Value w, Value x) {
     return w;

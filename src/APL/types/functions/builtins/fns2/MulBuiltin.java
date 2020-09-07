@@ -67,11 +67,7 @@ public class MulBuiltin extends Builtin {
     return DF.call(w, x);
   }
   public Value callInvW(Value w, Value x) {
-    try {
-      return new DivBuiltin().call(x, w);
-    } catch (DomainError e) {
-      throw new DomainError(e.getMessage(), this, e.cause);
-    }
+    return DivBuiltin.DF.call(x, w);
   }
   public Value callInvA(Value w, Value x) {
     return callInvW(x, w);

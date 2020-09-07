@@ -32,11 +32,11 @@ public class OldNEBuiltin extends Builtin {
   };
   private static final D_BB DBF = new D_BB() {
     @Override public Value call(boolean w, BitArr x) {
-      if (w) return NotBuiltin.call(x);
+      if (w) return NotBuiltin.on(x);
       return x;
     }
     @Override public Value call(BitArr w, boolean x) {
-      if (x) return NotBuiltin.call(w);
+      if (x) return NotBuiltin.on(w);
       return w;
     }
     @Override public Value call(BitArr w, BitArr x) {

@@ -35,32 +35,32 @@ public class Comp {
     this.tk = tk;
   }
   
-  public static final byte PUSH =  0; // N; 2
-  public static final byte VARO =  1; // N; x/𝕨/𝕏
-  public static final byte VARM =  2; // N; mutable x/𝕨/𝕏
-  public static final byte ARRO =  3; // N; 1‿2‿3 / ⟨1⋄2⋄3⟩
-  public static final byte ARRM =  4; // N; mutable x‿y‿z / ⟨x⋄y⋄z)
-  public static final byte FN1C =  5; // monadic call
-  public static final byte FN2C =  6; // dyadic call
-  public static final byte OP1D =  7; // derive modifier
-  public static final byte OP2D =  8; // derive composition
-  public static final byte TR2D =  9; // derive 2-train aka atop
-  public static final byte TR3D = 10; // derive 3-train aka fork
-  public static final byte SETN = 11; // set new; _  ←_;
-  public static final byte SETU = 12; // set upd; _  ↩_;
-  public static final byte SETM = 13; // set mod; _ F↩_;
+  public static final byte PUSH =  0; // N; push object from objs[N]
+  public static final byte VARO =  1; // N; push variable with name strs[N]
+  public static final byte VARM =  2; // N; push mutable variable with name strs[N]
+  public static final byte ARRO =  3; // N; create a vector of top N items
+  public static final byte ARRM =  4; // N; create a mutable vector of top N items
+  public static final byte FN1C =  5; // monadic function call ⟨…,x,f  ⟩ → F x
+  public static final byte FN2C =  6; //  dyadic function call ⟨…,x,f,w⟩ → w F x
+  public static final byte OP1D =  7; // derive 1-modifier to function; ⟨…,  _m,f⟩ → (f _m) 
+  public static final byte OP2D =  8; // derive 2-modifier to function; ⟨…,g,_m,f⟩ → (f _m_ g)
+  public static final byte TR2D =  9; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
+  public static final byte TR3D = 10; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
+  public static final byte SETN = 11; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
+  public static final byte SETU = 12; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
+  public static final byte SETM = 13; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
   public static final byte POPS = 14; // pop object from stack
-  public static final byte DFND = 15; // N; derive dfn with current scope; {𝕩}; {𝔽}; {𝔽𝔾}
-  public static final byte FN1O = 16; // optional monadic call
-  public static final byte FN2O = 17; // optional dyadic call
-  public static final byte CHKV = 18; // error if ToS is ·
-  public static final byte TR3O = 19; // derive 3-train aka fork, with optional 𝕨
-  public static final byte OP2H = 20; // derive composition to modifier
-  public static final byte LOCO = 21; // B,N; push local object
-  public static final byte LOCM = 22; // B,N; push mutable local object
-  public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value
-  public static final byte SETH = 24; // set header; acts like SETN, but instead of erroring in cases it would, it skips to the next body and doesn't keep the value in the stack
-  public static final byte RETN = 25; // returns, giving ToS
+  public static final byte DFND = 15; // N; push dfns[N], derived to current scope
+  public static final byte FN1O = 16; // optional monadic call (FN1C but checks for · at 𝕩)
+  public static final byte FN2O = 17; // optional  dyadic call (FN2C but checks for · at 𝕩 & 𝕨)
+  public static final byte CHKV = 18; // throw error if top of stack is ·
+  public static final byte TR3O = 19; // TR3D but creates an atop if F is ·
+  public static final byte OP2H = 20; // derive 2-modifier to 1-modifier ⟨…,g,_m_⟩ → (_m_ g)
+  public static final byte LOCO = 21; // B,N; push variable at depth B and position N
+  public static final byte LOCM = 22; // B,N; push mutable variable at depth B and position N
+  public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
+  public static final byte SETH = 24; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
+  public static final byte RETN = 25; // returns top of stack
   // public static final byte ____ = 6;
   
   public static final byte SPEC = 30; // special
@@ -612,8 +612,9 @@ public class Comp {
           if (t!='f' && t!='a') return false;
         } else if (c == ']') {
           boolean any = false;
-          do { pi--;
+          do {
             if (t == pt.charAt(pi)) any = true;
+            pi--;
           } while(pt.charAt(pi) != '['); pi--;
           if (!any) return false;
         } else {
@@ -758,6 +759,10 @@ public class Comp {
   
     public Token lastTok() {
       return last;
+    }
+  
+    public String toString() {
+      return "C"+c.toString();
     }
   }
   

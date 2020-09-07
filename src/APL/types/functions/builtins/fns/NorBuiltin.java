@@ -29,11 +29,11 @@ public class NorBuiltin extends Builtin {
   private static final D_BB DBF = new D_BB() {
     @Override public Value call(boolean w, BitArr x) {
       if (w) return BitArr.fill(x, false);
-      return NotBuiltin.call(x);
+      return NotBuiltin.on(x);
     }
     @Override public Value call(BitArr w, boolean x) {
       if (x) return BitArr.fill(w, false);
-      return NotBuiltin.call(w);
+      return NotBuiltin.on(w);
     }
     @Override public Value call(BitArr w, BitArr x) {
       BitArr.BC bc = new BitArr.BC(w.shape);

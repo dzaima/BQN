@@ -232,7 +232,7 @@ public class Pervasion { // implementations must be okay with not being called o
     }
     
     protected Value not(BitArr x) {
-      return NotBuiltin.call(x);
+      return NotBuiltin.on(x);
     }
     protected Value s0(BitArr x) {
       return new SingleItemArr(Num.ZERO, x.shape);

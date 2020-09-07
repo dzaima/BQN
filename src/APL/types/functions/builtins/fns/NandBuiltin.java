@@ -28,11 +28,11 @@ public class NandBuiltin extends Builtin {
   
   private static final D_BB DBF = new D_BB() {
     @Override public Value call(boolean w, BitArr x) {
-      if (w) return NotBuiltin.call(x);
+      if (w) return NotBuiltin.on(x);
       return BitArr.fill(x, true);
     }
     @Override public Value call(BitArr w, boolean x) {
-      if (x) return NotBuiltin.call(w);
+      if (x) return NotBuiltin.on(w);
       return BitArr.fill(w, true);
     }
     @Override public Value call(BitArr w, BitArr x) {
