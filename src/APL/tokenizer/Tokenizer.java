@@ -2,7 +2,7 @@ package APL.tokenizer;
 
 import APL.errors.SyntaxError;
 import APL.tokenizer.types.*;
-import APL.types.BigValue;
+import APL.types.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -93,11 +93,12 @@ public class Tokenizer {
     }
   }
   
-  public static BasicLines tokenize(String raw) {
-    return tokenize(raw, false);
+  public static BasicLines tokenize(String raw, Value[] args) {
+    return tokenize(raw, false, args);
   }
   
-  @SuppressWarnings("StringConcatenationInLoop") public static BasicLines tokenize(String raw, boolean pointless) { // pointless means unevaled things get tokens; mainly for syntax highlighting
+  @SuppressWarnings("StringConcatenationInLoop")
+  public static BasicLines tokenize(String raw, boolean pointless, Value[] args) { // pointless means unevaled things get tokens; mainly for syntax highlighting
     int li = 0;
     int len = raw.length();
     
@@ -170,12 +171,12 @@ public class Tokenizer {
         } else if (c=='_' && i+2<len && raw.codePointAt(i+1)=="𝕣".codePointAt(0)) { // +TODO handle more properly, make all 𝕨𝕩𝕎𝕏𝕗𝕘𝔽𝔾𝕤𝕊𝕣ℝ NameToks
           boolean cmp = i+3<len && raw.charAt(i+3) == '_';
           i+= cmp? 4 : 3;
-          tokens.add(new NameTok(raw, li, i, cmp? "_𝕣_" : "_𝕣"));
+          tokens.add(new NameTok(raw, li, i, cmp? "_𝕣_" : "_𝕣", args));
         } else if (validNameStart(c) || c == '•' && validNameStart(next)) {
           i++;
           while (i < len && validNameMid(raw.charAt(i))) i++;
           var name = raw.substring(li, i);
-          tokens.add(new NameTok(raw, li, i, name));
+          tokens.add(new NameTok(raw, li, i, name, args));
         } else if ("∞π".indexOf(c)!=-1  ||  c=='¯' && "∞π".indexOf(next)!=-1) {
           boolean neg = c=='¯';
           i+= neg? 2 : 1;

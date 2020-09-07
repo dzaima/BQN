@@ -48,13 +48,17 @@ public class JComp {
       
       
       MutIntArr offs = new MutIntArr(2); // todo store needed offsets in Comp
-      
+      boolean trailingRet = false;
       offs.add(0);
       {
         int i = 0;
-        while (i<comp.bc.length-1) {
+        while (i<comp.bc.length) {
           if (comp.bc[i]==RETN) offs.add(i+1);
           i = comp.next(i);
+        }
+        if (offs.is[offs.sz-1]==comp.bc.length) {
+          trailingRet = true;
+          offs.sz--;
         }
       }
       Met.Lbl[] bodyBlocks = new Met.Lbl[offs.sz];
@@ -82,7 +86,7 @@ public class JComp {
       byte[] bc = comp.bc;
       int i = 0;
       int cstack=0;
-      while (i != bc.length) {
+      while (i != bc.length-(trailingRet?1:0)) {
         int pi = i;
         i++;
         switch (bc[pi]) { default: throw new DomainError("Unsupported bytecode "+bc[pi]);

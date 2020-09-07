@@ -56,9 +56,6 @@ public class Main {
                   println("If given no arguments, an implicit -r will be added");
                   System.exit(0);
                   break;
-                case "--q":
-                  System.out.println(new JComp(comp(args[++i], sys.csc)).r.get(sys.csc, 0));
-                  break;
                 default:
                   throw new DomainError("Unknown command-line argument " + p);
               }
@@ -69,23 +66,23 @@ public class Main {
                     String name = args[++i]; i++;
                     Value[] gargs = new Value[args.length-i];
                     for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i + j]);
-                    sys.execFile(name, gargs);
+                    sys.execFile(name, gargs, sys.gsc);
                     i = args.length;
                     break;
                   case 'e':
                     String code = args[++i];
-                    exec(code, sys.gsc);
+                    exec(code, sys.gsc, null);
                     break;
                   case 'p':
                     code = args[++i];
-                    println(exec(code, sys.gsc).toString());
+                    println(exec(code, sys.gsc, null).toString());
                     break;
                   case 'i':
                     StringBuilder s = new StringBuilder();
                     while (console.hasNext()) {
                       s.append(console.nextLine()).append('\n');
                     }
-                    exec(s.toString(), sys.gsc);
+                    exec(s.toString(), sys.gsc, null);
                     break;
                   case 'r':
                     REPL = true;
@@ -131,7 +128,7 @@ public class Main {
                       for (byte b : bytes) {
                         res.append(CODEPAGE.charAt(b & 0xff));
                       }
-                      exec(res.toString(), sys.gsc);
+                      exec(res.toString(), sys.gsc, null);
                     } catch (IOException e) {
                       e.printStackTrace();
                       throw new DomainError("couldn't read file");
@@ -147,7 +144,7 @@ public class Main {
             if (si == -1) throw new DomainError("argument `"+p+"` didn't contain a `←`");
             String qk = p.substring(0, si);
             String qv = p.substring(si+1);
-            sys.gsc.set(qk, exec(qv, sys.gsc));
+            sys.gsc.set(qk, exec(qv, sys.gsc, null));
           } else {
             throw new DomainError("Unknown command-line argument " + p);
           }
@@ -227,11 +224,11 @@ public class Main {
     }
   }
   
-  public static Value exec(String s, Scope sc) {
-    return Comp.comp(Tokenizer.tokenize(s), sc).exec(sc);
+  public static Value exec(String s, Scope sc, Value[] args) {
+    return Comp.comp(Tokenizer.tokenize(s, args), sc).exec(sc);
   }
-  public static Comp comp(String s, Scope sc) {
-    return Comp.comp(Tokenizer.tokenize(s), sc);
+  public static Comp comp(String s, Scope sc, Value[] args) {
+    return Comp.comp(Tokenizer.tokenize(s, args), sc);
   }
   
   public static void printdbg(Object... args) {

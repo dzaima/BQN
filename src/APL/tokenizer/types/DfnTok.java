@@ -87,7 +87,7 @@ public class DfnTok extends TokArr<LineTok> {
     } else {
       immediate = false;
     }
-    Comp.Mut mut = new Comp.Mut();
+    Comp.Mut mut = new Comp.Mut(); // TODO why is this still a thing
     comp = Comp.comp(mut, bodies, this);
     this.bodies = bodies;
   }

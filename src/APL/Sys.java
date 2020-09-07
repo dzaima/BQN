@@ -17,6 +17,7 @@ public abstract class Sys {
   public Scope csc; // current scope in which things happen
   public boolean oneline;
   public APLError lastError = null;
+  public Value[] defArgs = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
   
   public Sys() {
     gsc = csc = new Scope(this);
@@ -29,11 +30,11 @@ public abstract class Sys {
     switch (t) {
       case "OFF": case "EXIT": case "STOP":
         if (rest.length()==0) off(0);
-        else off(Main.exec(rest, csc).asInt());
+        else off(Main.exec(rest, csc, defArgs).asInt());
         break;
       case "EX":
         String full = cr.substring(cr.indexOf(" ")+1);
-        execFile(full);
+        execFile(full, gsc);
         break;
       case "DEBUG":
         Main.debug = !Main.debug; // keeping these as static booleans to improve performance (plus getting Sys where needed might be extremely annoying)
@@ -44,11 +45,11 @@ public abstract class Sys {
       case "ONELINE":
         oneline = !oneline;
         break;
-      case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
-      case "TOKENIZEREPR": println(Tokenizer.tokenize(rest).toRepr()); break;
-      case "CLASS"       : Value r = Main.exec(rest, csc); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
+      case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest,defArgs); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
+      case "TOKENIZEREPR": println(Tokenizer.tokenize(rest,defArgs).toRepr()); break;
+      case "CLASS"       : Value r = Main.exec(rest, csc, defArgs); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : Arr e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
-      case "ATYPE"       : println(Main.exec(rest, csc).humanType(false)); break;
+      case "ATYPE"       : println(Main.exec(rest, csc, defArgs).humanType(false)); break;
       case "JSTACK":
         if (lastError != null) {
           ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -71,7 +72,7 @@ public abstract class Sys {
             ArrayList<APLError.Frame> trace = lastError.trace;
             csc = trace.get(trace.size()-Integer.parseInt(rest)).sc;
           } else {
-            Value v = Main.exec(rest, csc);
+            Value v = Main.exec(rest, csc, defArgs);
             if (v instanceof Callable) {
               Scope nsc = null;
               if (v instanceof Dfn ) nsc = ((Dfn ) v).sc;
@@ -87,39 +88,38 @@ public abstract class Sys {
         }
         break;
       case "BC":
-        println(Main.comp(rest, csc).fmt());
+        println(Main.comp(rest, csc, defArgs).fmt());
         break;
       case "BCE":
-        println(Main.comp(Main.exec(rest, csc).asString(), csc).fmt());
+        println(Main.comp(Main.exec(rest, csc, defArgs).asString(), csc, defArgs).fmt());
         break;
-      case "TYPE":
-        println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest).tokens.get(0))));
+      case "TOKTYPE":
+        println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest,defArgs).tokens.get(0))));
         break;
       case "JEVAL":
-        println(new JComp(Main.comp(rest, csc)).r.get(csc, 0));
+        println(new JComp(Main.comp(rest, csc, defArgs)).r.get(csc, 0));
         break;
       default:
         throw new SyntaxError("Undefined user command");
     }
   }
   
-  public Value execFile(String path, Value[] args) {
+  public Value execFile(String path, Value[] args, Scope sc) {
     int sl = path.lastIndexOf("/")+1;
     Value[] rargs = Arrays.copyOf(args, args.length+2);
     rargs[args.length  ] = Main.toAPL(path.substring(sl));
     rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
-    Scope sc = new Scope(gsc, rargs);
-    return Main.exec(Main.readFile(path), sc);
+    return Main.exec(Main.readFile(path), sc, rargs);
   }
-  public Value execFile(String path) {
-    return execFile(path, EmptyArr.NOVALUES);
+  public Value execFile(String path, Scope sc) {
+    return execFile(path, EmptyArr.NOVALUES, sc);
   }
   
   public void line(String s) {
     if (s.startsWith(")")) {
       ucmd(s.substring(1));
     } else {
-      Comp comp = Main.comp(s, csc);
+      Comp comp = Main.comp(s, csc, defArgs);
       if (comp.bc.length==0) return;
       int ci = 0;
       while (true) {

@@ -1134,7 +1134,9 @@ public class Comp {
       }
     }
     if (tk instanceof NameTok) {
-      m.var(tk, ((NameTok) tk).name, false);
+      String n = ((NameTok) tk).name;
+      if (((NameTok) tk).val != null) m.push(((NameTok) tk).val);
+      else m.var(tk, n, false);
       return;
     }
     if (tk instanceof StrandTok) { // +TODO (+↓) check for type A

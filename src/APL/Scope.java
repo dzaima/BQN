@@ -21,7 +21,6 @@ public class Scope {
   public final Scope parent;
   public final Sys sys;
   public Random rnd;
-  public final Value[] args;
   
   private HashMap<String, Integer> varMap;
   public Value[] vars;
@@ -40,28 +39,18 @@ public class Scope {
     varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = null;
     sys = s;
-    args = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
     rnd = new Random();
   }
   public Scope(Scope p) {
     varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = p;
     sys = p.sys;
-    args = p.args;
     rnd = p.rnd;
   }
   public Scope(Scope p, String[] varNames) {
     varMap = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
     parent = p;
     sys = p.sys;
-    args = p.args;
-    rnd = p.rnd;
-  }
-  public Scope(Scope p, Value[] args) { // TODO fix this
-    varMap = null; this.varNames = new String[1]; vars = new Value[1]; varAm = 0;
-    parent = p;
-    sys = p.sys;
-    this.args = args;
     rnd = p.rnd;
   }
   
@@ -157,9 +146,7 @@ public class Scope {
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
-        case "•args": return new HArr(Arrays.copyOf(args, args.length-2));
-        case "•path": return args[args.length-1];
-        case "•name": return args[args.length-2];
+        case "•args": case "•path": case "•name": throw new ImplementationError(name+": should've been handled at compile");
         case "•l":
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser();
@@ -396,7 +383,7 @@ public class Scope {
       int n = options[0];
       int mode = options.length>=2? options[1] : 0;
       String test = x.asString();
-      Comp testCompiled = Main.comp(test, sc);
+      Comp testCompiled = Main.comp(test, sc, null);
       
       if (mode==2) {
         double[] r = new double[n];
@@ -435,14 +422,14 @@ public class Scope {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          Main.comp(str, sc);
+          Main.comp(str, sc, null);
           long end = System.nanoTime();
           r[i] = end-start;
         }
         return new DoubleArr(r);
       } else {
         long sns = System.nanoTime();
-        for (int i = 0; i < n; i++) Main.comp(str, sc);
+        for (int i = 0; i < n; i++) Main.comp(str, sc, null);
         long ens = System.nanoTime();
         double ns = (ens-sns) / (double)n;
         if (mode==1) return new Num(ns);
@@ -578,7 +565,7 @@ public class Scope {
     public Value call(Value w, Value x) {
       String path = x.asString();
       if (w.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
-      return Scope.this.sys.execFile(path, w.values());
+      return Scope.this.sys.execFile(path, w.values(), new Scope(Scope.this));
     }
   }
   private static class Lns extends Builtin {
@@ -813,7 +800,7 @@ public class Scope {
     public static Pr pr(Value ko, Value vo, Scope sc) {
       String k = ko.asString();
       Pr p = pfRes.get(k);
-      if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString(), sc)));
+      if (p == null) pfRes.put(k, p = new Pr(vo==null? null : Main.comp(vo.asString(), sc, null)));
       return p;
     }
     
@@ -836,7 +823,7 @@ public class Scope {
         String s = f.asString();
         Pr p = pfRes.get(s);
         if (p == null) {
-          pfRes.put(s, p = new Pr(Main.comp(s, sc)));
+          pfRes.put(s, p = new Pr(Main.comp(s, sc, null)));
           p.fn = p.c.exec(sc);
         }
         return p;
