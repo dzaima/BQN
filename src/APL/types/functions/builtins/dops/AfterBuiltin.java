@@ -1,7 +1,6 @@
 package APL.types.functions.builtins.dops;
 
-import APL.errors.DomainError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.functions.*;
 
 public class AfterBuiltin extends Dop {
@@ -18,12 +17,10 @@ public class AfterBuiltin extends Dop {
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    if (g instanceof Callable) throw new DomainError("𝔽⟜𝕘⁼: 𝕘 cannot be a function", this, f);
-    return f.callInvA(x, g);
+    return f.callInvA(x, g.constant(this));
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
-    if (g instanceof Callable) throw new DomainError("⌾(𝔽⟜𝕘): 𝕘 cannot be a function", this, f);
-    return f.underA(o, x, g);
+    return f.underA(o, x, g.constant(this));
   }
 }
