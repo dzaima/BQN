@@ -60,7 +60,7 @@ public class ReverseBuiltin extends Builtin {
     }
   }
   
-  @Override public Value callInvW(Value w, Value x) {
+  @Override public Value callInvX(Value w, Value x) {
     return call(numM(MinusBuiltin.NF, w), x);
   }
   

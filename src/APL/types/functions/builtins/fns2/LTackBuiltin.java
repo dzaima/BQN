@@ -17,11 +17,11 @@ public class LTackBuiltin extends Builtin {
   public Value callInv(Value x) {
     return x;
   }
-  public Value callInvW(Value w, Value x) {
+  public Value callInvX(Value w, Value x) {
     if (w.eq(x)) return w;
     throw new DomainError("⊣⁼: expected 𝕨 and 𝕩 to be equal", this);
   }
-  public Value callInvA(Value w, Value x) {
+  public Value callInvW(Value w, Value x) {
     return w;
   }
 }

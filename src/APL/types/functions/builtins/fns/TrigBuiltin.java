@@ -87,7 +87,7 @@ public class TrigBuiltin extends Builtin {
       throw new DomainError("○⁼: 𝕩 must be in (+,-)1…3");
     }
   };
-  public Value callInvW(Value w, Value x) {
+  public Value callInvX(Value w, Value x) {
     return numD(DNFi, w, x);
   }
 }

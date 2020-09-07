@@ -27,10 +27,10 @@ public class JotBuiltin extends Dop {
       if (f instanceof Fun) {
         return g.callInv(f.callInv(x));
       } else {
-        return g.callInvW(f, x);
+        return g.callInvX(f, x);
       }
     } else {
-      if (f instanceof Fun) return f.callInvA(x, g);
+      if (f instanceof Fun) return f.callInvW(x, g);
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
@@ -44,12 +44,12 @@ public class JotBuiltin extends Dop {
     return f.call(w, g.call(x));
   }
   
-  public Value callInvW(Value f, Value g, Value w, Value x) {
-    return g.callInv(f.callInvW(w, x));
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInv(f.callInvX(w, x));
   }
   
-  public Value callInvA(Value f, Value g, Value w, Value x) {
-    return f.callInvA(w, g.call(x));
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    return f.callInvW(w, g.call(x));
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {

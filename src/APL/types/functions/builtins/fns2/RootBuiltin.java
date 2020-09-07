@@ -47,10 +47,10 @@ public class RootBuiltin extends Builtin {
     return DF.call(w, x);
   }
   
-  public Value callInvW(Value w, Value x) {
+  public Value callInvX(Value w, Value x) {
     return StarBuiltin.DF.call(x, w);
   }
-  public Value callInvA(Value w, Value x) {
+  public Value callInvW(Value w, Value x) {
     return LogBuiltin.DF.call(w, x);
   }
 }

@@ -13,16 +13,16 @@ public class InvBuiltin extends Mop {
     return f.callInv(x);
   }
   public Value call(Value f, Value w, Value x, DerivedMop derv) {
-    return f.callInvW(w, x);
+    return f.callInvX(w, x);
   }
   
   public Value callInv(Value f, Value x) {
     return f.call(x);
   }
-  public Value callInvW(Value f, Value w, Value x) {
+  public Value callInvX(Value f, Value w, Value x) {
     return f.call(w, x);
   }
-  public Value callInvA(Value f, Value w, Value x) {
+  public Value callInvW(Value f, Value w, Value x) {
     throw new NYIError("⁼ inverting 𝕨", this);
   }
   
@@ -42,10 +42,10 @@ public class InvBuiltin extends Mop {
     return new Fun() {
       public String repr() { return f.repr()+"⁼"; }
       public Value call(Value w, Value x) {
-        return f.callInvW(w, x);
+        return f.callInvX(w, x);
       }
       
-      public Value callInvW(Value w, Value x) {
+      public Value callInvX(Value w, Value x) {
         return f.call(w, x);
       }
     };
@@ -55,10 +55,10 @@ public class InvBuiltin extends Mop {
     return new Fun() {
       public String repr() { return f.repr()+"˜⁼˜"; }
       public Value call(Value w, Value x) {
-        return f.callInvA(w, x);
+        return f.callInvW(w, x);
       }
       
-      public Value callInvA(Value w, Value x) {
+      public Value callInvW(Value w, Value x) {
         return f.call(w, x);
       }
     };

@@ -17,7 +17,7 @@ public class Fork extends Fun {
     return g.call(l, r);
   }
   public Value callInv(Value x) {
-    return h.callInv(g.callInvW(f.constant(this), x));
+    return h.callInv(g.callInvX(f.constant(this), x));
   }
   public Value call(Value w, Value x) {
     Value r = h.call(w, x);
@@ -25,13 +25,13 @@ public class Fork extends Fun {
     return g.call(l, r);
   }
   
-  @Override public Value callInvW(Value w, Value x) {
-    return h.callInvW(w, g.callInvW(f.constant(this), x));
+  @Override public Value callInvX(Value w, Value x) {
+    return h.callInvX(w, g.callInvX(f.constant(this), x));
   }
   
-  @Override public Value callInvA(Value w, Value x) {
+  @Override public Value callInvW(Value w, Value x) {
     if (f instanceof Callable) throw new DomainError("𝕨(F G H)𝕩 cannot be inverted", this);
-    return h.callInvA(g.callInvW(f, w), x);
+    return h.callInvW(g.callInvX(f, w), x);
   }
   
   @Override public String repr() {

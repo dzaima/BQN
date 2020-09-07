@@ -38,19 +38,19 @@ public class RepeatBuiltin extends Dop {
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
-    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = f.callInvW(w, nx);
+    Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = f.callInvX(w, nx);
     Value px = x; Value[] pos = new Value[bs[1]]; for (int i = 0; i < bs[1]; i++) pos[i] = px = f.call    (w, px);
     return replace(gf, neg, x, pos);
   }
   
-  public Value callInvW(Value f, Value g, Value w, Value x) {
+  public Value callInvX(Value f, Value g, Value w, Value x) {
     int am = g.asInt();
     if (am < 0) {
       for (int i = 0; i < -am; i++) {
         x = f.call(w, x);
       }
     } else for (int i = 0; i < am; i++) {
-      x = f.callInvW(w, x);
+      x = f.callInvX(w, x);
     }
     return x;
   }
@@ -75,10 +75,10 @@ public class RepeatBuiltin extends Dop {
   
   
   
-  public Value callInvA(Value f, Value g, Value w, Value x) {
+  public Value callInvW(Value f, Value g, Value w, Value x) {
     int am = g.asInt();
-    if (am== 1) return f.callInvA(w, x);
-    if (am==-1) return f.callInvA(x, w);
+    if (am== 1) return f.callInvW(w, x);
+    if (am==-1) return f.callInvW(x, w);
     
     throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, g);
   }

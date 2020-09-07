@@ -20,12 +20,12 @@ public class Atop extends Fun {
     return g.call(h.call(w, x));
   }
   
-  public Value callInvW(Value w, Value x) {
-    return h.callInvW(w, g.callInv(x));
+  public Value callInvX(Value w, Value x) {
+    return h.callInvX(w, g.callInv(x));
   }
   
-  public Value callInvA(Value w, Value x) {
-    return h.callInvA(g.callInv(w), x);
+  public Value callInvW(Value w, Value x) {
+    return h.callInvW(g.callInv(w), x);
   }
   
   public Value under(Value o, Value x) {

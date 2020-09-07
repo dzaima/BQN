@@ -351,7 +351,7 @@ public class SlashBuiltin extends Builtin {
     }
   }
   
-  // public Value callInvW(Value a, Value w) {
+  // public Value callInvX(Value a, Value w) {
   //   if (a.rank!=1 || w.rank!=1) throw new DomainError("/⁼: dyadic inverting only possible on rank 1 arguments", this, a.rank!=1?a:w);
   //  
   // }

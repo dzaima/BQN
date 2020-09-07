@@ -19,11 +19,11 @@ public class ObverseBuiltin extends Dop {
   public Value callInv(Value f, Value g, Value x) {
     return g.call(x);
   }
-  public Value callInvW(Value f, Value g, Value w, Value x) {
+  public Value callInvX(Value f, Value g, Value w, Value x) {
     return g.call(w, x);
   }
   
-  public Value callInvA(Value f, Value g, Value w, Value x) { // fall-back to 𝔽
-    return f.callInvA(w, x);
+  public Value callInvW(Value f, Value g, Value w, Value x) { // fall-back to 𝔽
+    return f.callInvW(w, x);
   }
 }

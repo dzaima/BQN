@@ -67,10 +67,10 @@ public class NotBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     return PlusBuiltin.DF.call(MinusBuiltin.DF.call(w, x), Num.ONE);
   }
-  public Value callInvW(Value w, Value x) {
+  public Value callInvX(Value w, Value x) {
     return call(w, x);
   }
-  public Value callInvA(Value w, Value x) {
+  public Value callInvW(Value w, Value x) {
     return MinusBuiltin.DF.scalarX(PlusBuiltin.DF.call(w,x), 1);
   }
 }

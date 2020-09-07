@@ -22,14 +22,14 @@ public class UnderBuiltin extends Dop {
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
     return g.under(new BindA(g.call(w), f), x);
   }
-  public Value callInvW(Value f, Value g, Value w, Value x) {
+  public Value callInvX(Value f, Value g, Value w, Value x) {
     return g.under(new BindA(g.call(w), InvBuiltin.invertW(f)), x);
   }
-  public Value callInvA(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
+  public Value callInvW(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
     Value w1 = g.call(w);
     Value x1 = g.call(x);
     try {
-      return g.callInv(f.callInvA(w1, x1));
+      return g.callInv(f.callInvW(w1, x1));
     } catch (DomainError e) { // but add a nice warning about it if a plausible error was received (todo better error management to not require parsing the message?)
       String msg = e.getMessage();
       if (msg.contains("doesn't support") && msg.contains("inverting")) {
@@ -50,7 +50,7 @@ public class UnderBuiltin extends Dop {
       return f.call(w, x);
     }
     public Value callInv(Value x) {
-      return f.callInvW(w, x);
+      return f.callInvX(w, x);
     }
     
     public String repr() {

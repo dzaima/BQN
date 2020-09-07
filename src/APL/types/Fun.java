@@ -18,8 +18,8 @@ public abstract class Fun extends Callable {
   }
   
   public Value callInv (         Value x) { throw new DomainError(this+" doesn't support monadic inverting", this, x); }
-  public Value callInvW(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x); }
-  public Value callInvA(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x); }
+  public Value callInvX(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x); }
+  public Value callInvW(Value w, Value x) { throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x); }
   
   public Value under(Value o, Value x) {
     Value v = o instanceof Fun? o.call(call(x)) : o;
@@ -27,11 +27,11 @@ public abstract class Fun extends Callable {
   }
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? o.call(call(w, x)) : o;
-    return callInvW(w, v);
+    return callInvX(w, v);
   }
   public Value underA(Value o, Value w, Value x) {
     Value v = o instanceof Fun? o.call(call(w, x)) : o;
-    return callInvA(v, x);
+    return callInvW(v, x);
   }
   
   public static abstract class NumMV {

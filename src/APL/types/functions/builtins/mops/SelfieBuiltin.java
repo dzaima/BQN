@@ -31,11 +31,11 @@ public class SelfieBuiltin extends Mop {
     throw new DomainError(f+"˜: cannot invert", this);
   }
   
-  public Value callInvW(Value f, Value w, Value x) {
-    return f.callInvA(x, w);
+  public Value callInvX(Value f, Value w, Value x) {
+    return f.callInvW(x, w);
   }
   
-  public Value callInvA(Value f, Value w, Value x) {
-    return f.callInvW(x, w);
+  public Value callInvW(Value f, Value w, Value x) {
+    return f.callInvX(x, w);
   }
 }

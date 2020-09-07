@@ -50,9 +50,9 @@ public class DivBuiltin extends Builtin {
   }
   
   public Value callInv(Value x) { return call(x); }
-  public Value callInvW(Value w, Value x) { return call(w, x); }
+  public Value callInvX(Value w, Value x) { return call(w, x); }
   
-  public Value callInvA(Value w, Value x) {
+  public Value callInvW(Value w, Value x) {
     return MulBuiltin.DF.call(w, x);
   }
 }

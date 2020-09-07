@@ -12,11 +12,11 @@ public class JotUBBuiltin extends Dop {
     return g.call(f.call(w), x);
   }
   
-  public Value callInvW(Value f, Value g, Value w, Value x) {
-    return g.callInvW(f.call(w), x);
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInvX(f.call(w), x);
   }
   
-  public Value callInvA(Value f, Value g, Value w, Value x) {
-    return f.callInv(g.callInvA(w, x));
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    return f.callInv(g.callInvW(w, x));
   }
 }

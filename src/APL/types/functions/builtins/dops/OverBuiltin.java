@@ -15,11 +15,11 @@ public class OverBuiltin extends Dop {
     return f.call(g.call(w), g.call(x));
   }
   
-  public Value callInvW(Value f, Value g, Value w, Value x) {
-    return g.callInv(f.callInvW(g.call(w), x));
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInv(f.callInvX(g.call(w), x));
   }
-  public Value callInvA(Value f, Value g, Value w, Value x) {
-    return g.callInv(f.callInvA(w, g.call(x)));
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    return g.callInv(f.callInvW(w, g.call(x)));
   }
   
 }

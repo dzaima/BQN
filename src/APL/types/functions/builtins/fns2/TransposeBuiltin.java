@@ -110,7 +110,7 @@ public class TransposeBuiltin extends Builtin {
     return Arr.create(res, sh);
   }
   
-  public Value callInvW(Value w, Value x) {
+  public Value callInvX(Value w, Value x) {
     int[] ts = w.asIntVec();
     int l = ts.length;
     if (l == 0) {

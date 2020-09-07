@@ -216,8 +216,8 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Pervasion.NN2N dyNum() { return null; }
   
   public Value callInv (         Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to argument", this); }
-  public Value callInvW(Value w, Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to 𝕩", this); }
-  public Value callInvA(Value w, Value x) { if (eq(w))return this; throw new DomainError(this+"⁼: not equal to 𝕨", this); }
+  public Value callInvX(Value w, Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to 𝕩", this); }
+  public Value callInvW(Value w, Value x) { if (eq(w))return this; throw new DomainError(this+"⁼: not equal to 𝕨", this); }
   
   public Value under (Value o,          Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   public Value underW(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }

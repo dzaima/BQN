@@ -24,10 +24,10 @@ public abstract class Mop extends Callable {
   public Value callInv(Value f, Value x) {
     throw new DomainError(this+" doesn't support monadic inverting", this, x);
   }
-  public Value callInvW(Value f, Value w, Value x) {
+  public Value callInvX(Value f, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x);
   }
-  public Value callInvA(Value f, Value w, Value x) {
+  public Value callInvW(Value f, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
   public Value under(Value f, Value o, Value x, DerivedMop derv) {
@@ -36,11 +36,11 @@ public abstract class Mop extends Callable {
   }
   public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
     Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
-    return callInvW(f, w, v);
+    return callInvX(f, w, v);
   }
   public Value underA(Value f, Value o, Value w, Value x, DerivedMop derv) {
     Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
-    return callInvA(f, v, x);
+    return callInvW(f, v, x);
   }
   
   public String toString() {

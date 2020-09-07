@@ -17,7 +17,7 @@ public class AfterBuiltin extends Dop {
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    return f.callInvA(x, g.constant(this));
+    return f.callInvW(x, g.constant(this));
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {

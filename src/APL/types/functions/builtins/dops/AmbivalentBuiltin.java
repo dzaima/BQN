@@ -14,11 +14,11 @@ public class AmbivalentBuiltin extends Dop {
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
     return g.call(w, x);
   }
-  public Value callInvA(Value f, Value g, Value w, Value x) {
-    return g.callInvA(w, x);
-  }
   public Value callInvW(Value f, Value g, Value w, Value x) {
     return g.callInvW(w, x);
+  }
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInvX(w, x);
   }
   
   public String repr() {

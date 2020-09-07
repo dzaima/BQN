@@ -17,7 +17,7 @@ public class BeforeBuiltin extends Dop {
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    return g.callInvW(f.constant(this), x);
+    return g.callInvX(f.constant(this), x);
   }
   
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {

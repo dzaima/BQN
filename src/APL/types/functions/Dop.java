@@ -27,10 +27,10 @@ public abstract class Dop extends Callable {
   public Value callInv(Value f, Value g, Value x) {
     throw new DomainError(this+" doesn't support monadic inverting", this, x);
   }
-  public Value callInvW(Value f, Value g, Value w, Value x) {
+  public Value callInvX(Value f, Value g, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕩", this, x);
   }
-  public Value callInvA(Value f, Value g, Value w, Value x) {
+  public Value callInvW(Value f, Value g, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
   public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
@@ -39,11 +39,11 @@ public abstract class Dop extends Callable {
   }
   public Value underW(Value f, Value g, Value o, Value w, Value x, DerivedDop derv) {
     Value v = o instanceof Fun? o.call(call(f, g, w, x, derv)) : o;
-    return callInvW(f, g, w, v);
+    return callInvX(f, g, w, v);
   }
   public Value underA(Value f, Value g, Value o, Value w, Value x, DerivedDop derv) {
     Value v = o instanceof Fun? o.call(call(f, g, w, x, derv)) : o;
-    return callInvA(f, g, v, x);
+    return callInvW(f, g, v, x);
   }
   
   public String toString() {

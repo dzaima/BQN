@@ -23,11 +23,11 @@ public class OldJotDiaeresisBuiltin extends Dop {
     return f.call(g.call(x));
   }
   
-  public Value callInvW(Value f, Value g, Value w, Value x) {
-    return g.callInvW(w, f.callInv(x));
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInvX(w, f.callInv(x));
   }
   
-  public Value callInvA(Value f, Value g, Value w, Value x) {
-    return g.callInvA(f.callInv(w), x);
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    return g.callInvW(f.callInv(w), x);
   }
 }

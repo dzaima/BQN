@@ -1039,7 +1039,7 @@ public class Scope {
       }
       throw new NYIError(w+"•DR not implemented", this);
     }
-    public Value callInvW(Value w, Value x) {
+    public Value callInvX(Value w, Value x) {
       return call(ReverseBuiltin.on(w), x);
     }
   }
