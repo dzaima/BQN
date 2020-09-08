@@ -470,6 +470,9 @@ public class Comp {
   
   
   public static class Mut {
+    boolean topLvl;
+    public Mut(boolean topLvl) { this.topLvl = topLvl; }
+  
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<DfnTok> dfns = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
@@ -552,7 +555,7 @@ public class Comp {
   
   
   public static Comp comp(TokArr<LineTok> lns, Scope sc) {
-    Mut mut = new Mut();
+    Mut mut = new Mut(sc.parent==null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
     for (int i = 0; i < sz; i++) {
@@ -1014,7 +1017,7 @@ public class Comp {
     if (tk instanceof NameTok) {
       String name = ((NameTok) tk).name;
       if (create) {
-        if (m.vars.containsKey(name)) throw Local.redefine(name, tk);
+        if (m.vars.containsKey(name) && !m.topLvl) throw Local.redefine(name, tk);
         if (name.charAt(0)!='•') m.nvar(name);
       }
       m.var(tk, name, true);

@@ -294,7 +294,7 @@ static class Grapher extends Tab {
         if (it instanceof DzaimaBQN) {
           try {
             last = it.exec(lns.get(0).toString());
-            g.newFun(last.asFun());
+            g.newFun(last);
           } catch (Throwable e) {
             last = null;
           }

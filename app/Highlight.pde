@@ -31,7 +31,7 @@ static class SyntaxHighlight {
     }
     
     try {
-      BasicLines l = Tokenizer.tokenize(s, true);
+      BasicLines l = Tokenizer.tokenize(s, true, null);
       walk(l, -1);
     } catch(Throwable e) { e.printStackTrace();/* :/ */ } // {[(]j
   }

@@ -2,7 +2,7 @@ static class Graph extends Plane {
   LL<Point> points = new LL<Point>();
   PQ<Double, Point> pq = new PQ<Double, Point>();
   double[] b;
-  Fun fn;
+  Value fn;
   int pts = 1000;
   float ph = 3;
   int mul = 1;
@@ -13,7 +13,7 @@ static class Graph extends Plane {
   }
   
   
-  void newFun(Fun fn) {
+  void newFun(Value fn) {
     this.fn = fn;
     points.clear();
     pq.clear();

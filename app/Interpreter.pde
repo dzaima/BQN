@@ -163,7 +163,7 @@ static class DzaimaBQN extends Interpreter {
   }
   
   Value exec(String code) {
-    return Main.exec(code, sys.csc);
+    return Main.exec(code, sys.csc, sys.defArgs);
   }
   
   String[] repl(String ln) {
@@ -173,22 +173,25 @@ static class DzaimaBQN extends Interpreter {
   
   String[] get(String code) {
     try {
-      Obj v = Main.exec(code, dzaimaSC);
+      Obj v = Main.exec(code, dzaimaSC, sys.defArgs);
       if (v == null) return new String[0];
       return v.toString().split("\n");
     } catch (APLError e) {
       e.print(sys);
       return new String[0];
     } catch (Throwable e) {
-      ArrayList<String> lns = new ArrayList();
-      lns.add(e + ": " + e.getMessage());
-      if (Main.faulty != null && Main.faulty.getToken() != null) {
-        String s = repeat(" ", Main.faulty.getToken().spos);
-        lns.add(Main.faulty.getToken().raw);
-        lns.add(s + "^");
-      }
-      e.printStackTrace();
-      return lns.toArray(new String[0]);
+      //ArrayList<String> lns = new ArrayList();
+      //lns.add(e + ": " + e.getMessage());
+      //if (Main.faulty != null && Main.faulty.getToken() != null) {
+      //  String s = repeat(" ", Main.faulty.getToken().spos);
+      //  lns.add(Main.faulty.getToken().raw);
+      //  lns.add(s + "^");
+      //}
+      //e.printStackTrace();
+      //return lns.toArray(new String[0]);
+      APLError ae = e instanceof APLError? (APLError)e : new ImplementationError(e);
+      ae.print(sys);
+      return new String[0];
     }
   }
   String[] special(String ex) {
@@ -209,8 +212,8 @@ static class Ed extends Editor {
   void save(String val) {
     println(val);
     try {
-      println(name, Main.exec(val, sc));
-      sc.set(name, Main.exec(val, sc));
+      // println(name, Main.exec(val, sc, sc.sys.defArgs));
+      sc.set(name, Main.exec(val, sc, sc.sys.defArgs));
     } catch (Throwable t) {
       println(t.getMessage());
       glSys.lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);

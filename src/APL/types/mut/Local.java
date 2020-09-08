@@ -23,7 +23,9 @@ public class Local extends Settable {
     sc = sc.owner(depth);
     if (update ^ sc.vars[index]!=null) {
       if (update) throw new ValueError("no variable \""+name(sc)+"\" to update", blame);
-      else        throw redefine(name(sc), blame);
+      else {
+        if (sc.parent!=null) throw redefine(name(sc), blame); // allow top-level redeclarations 
+      }
     }
     sc.vars[index] = x;
   }

@@ -16,4 +16,8 @@ public class EvalBuiltin extends Builtin {
   public Value call(Value x) {
     return Main.exec(x.asString(), sc, null);
   }
+  
+  public Value call(Value w, Value x) {
+    return Main.exec(x.asString(), sc, w.values());
+  }
 }
