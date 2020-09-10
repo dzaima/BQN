@@ -55,18 +55,17 @@ public class UpArrowBuiltin extends Builtin {
     }
     if (overtake) {
       Value proto = x.prototype();
+      MutVal res = new MutVal(sh);
       if (x.rank<=1 && gsh.length==1) {
-        MutVal res = new MutVal(sh);
         if (off[0]==0) {
           res.copy(x, 0, 0, x.ia);
           res.fill(proto, x.ia, res.ia);
         } else {
           res.copy(x, 0, res.ia-x.ia, x.ia);
-          res.fill(proto, 0, res.ia);
+          res.fill(proto, 0, res.ia-x.ia);
         }
         return res.get();
       }
-      MutVal res = new MutVal(sh);
       int l = sh.length;
       int rp = 0;
       int[] xsh = x.shape;

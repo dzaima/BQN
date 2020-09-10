@@ -61,6 +61,9 @@ public class Scope {
     }
     return varMap;
   }
+  public boolean hasMap() {
+    return varMap!=null;
+  }
   
   public Scope owner(String name) {
     if (name.startsWith("•")) return this;

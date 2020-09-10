@@ -62,6 +62,26 @@ public abstract class Sys {
         else println("no stack to view");
         break;
       }
+      case "SCI": {
+        println("Variables:");
+        String[] names = csc.varNames;
+        for (int i = 0; i < names.length; i++) {
+          String s = names[i];
+          if (s!=null) {
+            Value val = csc.vars[i];
+            if (val == null) println("  "+s+": unset");
+            else {
+              String vs = val.toString();
+              println("  "+s+": "+(vs.length()<100 && !vs.contains("\n")? vs : val.humanType(false)));
+            }
+          } else println("  ("+i+") unused");
+        }
+        if (csc.hasMap()) println("hashmap initialized");
+        int d=0;Scope c = csc;
+        while (c.parent!=null) { d++; c=c.parent; }
+        println(d==0? "At global scope" : "At depth "+d);
+        break;
+      }
       case "CS":
         if (rest.length()==0) csc = gsc;
         else {
