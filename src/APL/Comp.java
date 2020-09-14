@@ -907,7 +907,7 @@ public class Comp {
           if (k=='A') k = 'a'; // 𝕨↩ is a possibility
           if (k==v) {
             if (Main.debug) printlvl(k+" "+a+" "+v);
-            tps.addLast(new ResMix(ov, // result is not v because typeof is stupid; +TODO
+            tps.addLast(new ResMix(v,
               tps.removeLast(),
               new ResBC(ov=='A'? CHKVBC : NOBYTES),
               tps.removeLast(), // empty
@@ -968,7 +968,10 @@ public class Comp {
         return t.type = 'm';
       } else {
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
-        if (last=='a' || last=='A') return t.type = last; // not as arg of dop/mop
+        if (last=='a' || last=='A') {
+          for (char tp : tps) if (tp=='←' || tp=='↩') return t.type = 'a'; // {x←𝕨} discards the optionality property
+          return t.type = last; // not as arg of dop/mop
+        }
         if (last == 'f') return t.type = 'f';
         
         if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
