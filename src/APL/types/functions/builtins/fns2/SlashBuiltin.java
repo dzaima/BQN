@@ -26,9 +26,9 @@ public class SlashBuiltin extends Builtin {
       int p = 0;
       
       if (x instanceof BitArr) {
-        BitArr.BR r = ((BitArr) x).read();
+        BitArr.BR xr = ((BitArr) x).read();
         for (int i = 0; i < x.ia; i++) {
-          if (r.read()) sub[p++] = i;
+          if (xr.read()) sub[p++] = i;
         }
       } else {
         if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError("/: 𝕩 contained "+v, this, x);

@@ -259,14 +259,14 @@ public abstract class Arr extends Value {
     da: if (v[0] instanceof Num) {
       ia: if (Num.isInt(((Num) v[0]).num)) {
         ba: if (Num.isBool(((Num) v[0]).num)) {
-          BitArr.BA ba = new BitArr.BA(sh);
+          BitArr.BA res = new BitArr.BA(sh);
           for (Value c : v) {
             if (!(c instanceof Num)) break da;
             double d = ((Num) c).num;
             if (d!=1 && Double.doubleToRawLongBits(d)!=0) break ba;
-            ba.add(d!=0);
+            res.add(d!=0);
           }
-          return ba.finish();
+          return res.finish();
         }
         int[] is = new int[v.length];
         for (int i = 0; i < v.length; i++) {

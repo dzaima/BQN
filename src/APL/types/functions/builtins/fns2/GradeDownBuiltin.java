@@ -23,10 +23,10 @@ public class GradeDownBuiltin extends Builtin {
   public static int[] gradeDown(Value x) {
     if (x.rank==1 && x.ia>0) {
       if (x instanceof BitArr) {
-        long[] xb = ((BitArr) x).arr;
+        long[] xl = ((BitArr) x).arr;
         int[] res = new int[x.ia]; int rp = 0;
-        for (int i = 0; i < res.length; i++) if ((xb[i>>6]>>(i&63)&1)!=0) res[rp++] = i;
-        for (int i = 0; i < res.length; i++) if ((xb[i>>6]>>(i&63)&1)==0) res[rp++] = i;
+        for (int i = 0; i < res.length; i++) if ((xl[i>>6]>>(i&63)&1)!=0) res[rp++] = i;
+        for (int i = 0; i < res.length; i++) if ((xl[i>>6]>>(i&63)&1)==0) res[rp++] = i;
         return res;
       }
       if (x.quickIntArr()) {

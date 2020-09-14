@@ -64,9 +64,9 @@ public class CeilingBuiltin extends Builtin {
     public Value on(boolean w, BitArr x) { return w? BitArr.fill(x, true) : x; }
     public Value on(BitArr w, boolean x) { return x? BitArr.fill(w, true) : w; }
     public Value on(BitArr w, BitArr x) {
-      BitArr.BC bc = new BitArr.BC(w.shape);
-      for (int i = 0; i < w.arr.length; i++) bc.arr[i] = w.arr[i] | x.arr[i];
-      return bc.finish();
+      BitArr.BC res = new BitArr.BC(w.shape);
+      for (int i = 0; i < w.arr.length; i++) res.arr[i] = w.arr[i] | x.arr[i];
+      return res.finish();
     }
   };
   public Value call(Value w, Value x) {

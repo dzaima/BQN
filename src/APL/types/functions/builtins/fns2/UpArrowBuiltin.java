@@ -109,9 +109,9 @@ public class UpArrowBuiltin extends Builtin {
       int s = off[0];
       int l = sh[0];
       if (x instanceof BitArr && s==0) { // todo this might be pointless later
-        BitArr wb = (BitArr) x;
+        BitArr xb = (BitArr) x;
         long[] ls = new long[BitArr.sizeof(l)];
-        System.arraycopy(wb.arr, 0, ls, 0, ls.length);
+        System.arraycopy(xb.arr, 0, ls, 0, ls.length);
         return new BitArr(ls, new int[]{l});
       }
       

@@ -64,9 +64,9 @@ public class FloorBuiltin extends Builtin {
     public Value on(boolean w, BitArr x) { return w? x : BitArr.fill(x, false); }
     public Value on(BitArr w, boolean x) { return x? w : BitArr.fill(w, false); }
     public Value on(BitArr w, BitArr x) {
-      BitArr.BC bc = new BitArr.BC(w.shape);
-      for (int i = 0; i < w.arr.length; i++) bc.arr[i] = w.arr[i] & x.arr[i];
-      return bc.finish();
+      BitArr.BC res = new BitArr.BC(w.shape);
+      for (int i = 0; i < w.arr.length; i++) res.arr[i] = w.arr[i] & x.arr[i];
+      return res.finish();
     }
   };
   public Value call(Value w, Value x) {

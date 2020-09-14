@@ -40,19 +40,19 @@ public class FindBuiltin extends Builtin {
   
   public Value call(Value w, Value x) {
     if (w.rank != x.rank) throw new RankError("⍷: argument ranks should be equal ("+w.rank+" ≠ "+x.rank+")", this, x);
-    BitArr.BC bc = new BitArr.BC(x.shape);
+    BitArr.BC res = new BitArr.BC(x.shape);
     if (w.rank == 1) {
       if (w instanceof BitArr && x instanceof BitArr) {
-        long[] ab = ((BitArr) w).arr;
-        long[] wb = ((BitArr) x).arr;
+        long[] al = ((BitArr) w).arr;
+        long[] wl = ((BitArr) x).arr;
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
             int iw = ia + ir;
-            long la = ab[ia>>6] >> (ia & 63);
-            long lw = wb[iw>>6] >> (iw & 63);
+            long la = al[ia>>6] >> (ia & 63);
+            long lw = wl[iw>>6] >> (iw & 63);
             if ((la&1) != (lw&1)) continue w;
           }
-          bc.set(ir);
+          res.set(ir);
         }
       } else if (w.quickDoubleArr() && x.quickDoubleArr()) {
         double[] wd = w.asDoubleArr();
@@ -61,14 +61,14 @@ public class FindBuiltin extends Builtin {
           for (int ia = 0; ia < w.ia; ia++) {
             if (wd[ia] != xd[ia + ir]) continue w;
           }
-          bc.set(ir);
+          res.set(ir);
         }
       } else {
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
             if (!w.get(ia).eq(x.get(ia + ir))) continue w;
           }
-          bc.set(ir);
+          res.set(ir);
         }
       }
     } else {
@@ -79,9 +79,9 @@ public class FindBuiltin extends Builtin {
           Value vW = x.simpleAt(Indexer.add(inA, inW));
           if (!vA.eq(vW)) continue w;
         }
-        bc.set(Indexer.fromShape(x.shape, inW));
+        res.set(Indexer.fromShape(x.shape, inW));
       }
     }
-    return bc.finish();
+    return res.finish();
   }
 }

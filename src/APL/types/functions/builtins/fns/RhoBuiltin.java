@@ -60,12 +60,12 @@ public class RhoBuiltin extends Builtin {
       return new SingleItemArr(x.first(), sh);
       
     } else if (x instanceof BitArr) {
-      BitArr wb = (BitArr) x;
+      BitArr xb = (BitArr) x;
       BitArr.BA res = new BitArr.BA(sh);
-      int full = ia/wb.ia;
-      int frac = ia%wb.ia;
-      for (int i = 0; i < full; i++) res.add(wb);
-      res.add(wb, 0, frac);
+      int full = ia/xb.ia;
+      int frac = ia%xb.ia;
+      for (int i = 0; i < full; i++) res.add(xb);
+      res.add(xb, 0, frac);
       return res.finish();
     } else if (x.quickDoubleArr()) {
       assert !(x instanceof Primitive);

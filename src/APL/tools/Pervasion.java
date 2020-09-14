@@ -219,9 +219,9 @@ public class Pervasion { // implementations must be okay with not being called o
     public Value each(Value w, Value x) {
       if (w.quickDoubleArr() && x.quickDoubleArr()) {
         if (w instanceof BitArr && x instanceof BitArr) {
-          long[] wa = ((BitArr) w).arr;
-          long[] res = new long[wa.length];
-          on(wa, ((BitArr) x).arr, res);
+          long[] wl = ((BitArr) w).arr;
+          long[] res = new long[wl.length];
+          on(wl, ((BitArr) x).arr, res);
           return new BitArr(res, x.shape);
         }
         BitArr.BA res = new BitArr.BA(x.shape);

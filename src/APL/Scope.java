@@ -946,9 +946,9 @@ public class Scope {
       int t = w.asInt();
       switch (t) { default: throw new DomainError("•AS: expected 𝕨∊↕3 (𝕨="+w+")", this);
         case 0:
-          BitArr.BA ba = new BitArr.BA(x.shape);
-          for (int c : x.asIntArr()) ba.add(Main.bool(c));
-          return ba.finish();
+          BitArr.BA res = new BitArr.BA(x.shape);
+          for (int c : x.asIntArr()) res.add(Main.bool(c));
+          return res.finish();
         case 1:
           return new IntArr(x.asIntArr(), x.shape);
         case 2:

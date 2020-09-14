@@ -44,11 +44,11 @@ public class EpsBuiltin extends Builtin {
       }
       return Num.ZERO;
     }
-    BitArr.BA ba = new BitArr.BA(w.shape);
+    BitArr.BA res = new BitArr.BA(w.shape);
     if (w.ia>20 && x.ia>20) { // TODO these (and in ⊐) shouldn't be random numbers
       HashSet<Value> vs = new HashSet<>();
       for (Value c : x) vs.add(c);
-      for (Value c : w) ba.add(vs.contains(c));
+      for (Value c : w) res.add(vs.contains(c));
     } else {
       Value[] xv = x.values();
       for (int i = 0; i < w.ia; i++) {
@@ -60,9 +60,9 @@ public class EpsBuiltin extends Builtin {
             break;
           }
         }
-        ba.add(b);
+        res.add(b);
       }
     }
-    return ba.finish();
+    return res.finish();
   }
 }

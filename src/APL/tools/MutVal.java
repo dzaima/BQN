@@ -151,8 +151,8 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
             Arrays.fill(is, rS, rS+len, (int) d);
             return;
           } else if (x instanceof BitArr) {
-            BitArr.BR xb = ((BitArr) x).read();
-            for (int i = 0; i < len; i++) is[rS + i] = xb.read()? 1 : 0;
+            BitArr.BR xr = ((BitArr) x).read();
+            for (int i = 0; i < len; i++) is[rS + i] = xr.read()? 1 : 0;
             return;
           }
         }

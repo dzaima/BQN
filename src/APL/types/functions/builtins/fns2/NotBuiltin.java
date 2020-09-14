@@ -20,9 +20,9 @@ public class NotBuiltin extends Builtin {
   public static Value on(Value x, Callable blame) {
     if (x instanceof Arr) {
       if (x instanceof BitArr) {
-        BitArr wb = (BitArr) x;
-        long[] res = new long[wb.arr.length];
-        for (int i = 0; i < res.length; i++) res[i] = ~wb.arr[i];
+        BitArr xb = (BitArr) x;
+        long[] res = new long[xb.arr.length];
+        for (int i = 0; i < res.length; i++) res[i] = ~xb.arr[i];
         return new BitArr(res, x.shape);
       }
       ia: if (x.quickIntArr()) {
@@ -57,11 +57,9 @@ public class NotBuiltin extends Builtin {
   }
   
   public static BitArr on(BitArr x) {
-    BitArr.BC bc = BitArr.create(x.shape);
-    for (int i = 0; i < bc.arr.length; i++) {
-      bc.arr[i] = ~x.arr[i];
-    }
-    return bc.finish();
+    BitArr.BC res = BitArr.create(x.shape);
+    for (int i = 0; i < res.arr.length; i++) res.arr[i] = ~x.arr[i];
+    return res.finish();
   }
   
   public Value call(Value w, Value x) {
