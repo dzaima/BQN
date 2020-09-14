@@ -142,6 +142,12 @@ public class Pervasion { // implementations must be okay with not being called o
     }
   }
   
+  public static abstract class NN2NDef extends NN2N { // num,num gives num
+    public void on(double   w, double[] x, double[] res) { for (int i = 0; i < res.length; i++) res[i] = on(w   , x[i]); }
+    public void on(double[] w, double   x, double[] res) { for (int i = 0; i < res.length; i++) res[i] = on(w[i], x   ); }
+    public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < res.length; i++) res[i] = on(w[i], x[i]); }
+  }
+  
   public static abstract class NN2NpB extends NN2N { // num,num gives num, plus bool,bool gives bool
     public abstract Value on(boolean w, BitArr  x);
     public abstract Value on(BitArr  w, boolean x);

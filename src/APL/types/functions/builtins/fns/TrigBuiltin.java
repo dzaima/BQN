@@ -1,6 +1,7 @@
 package APL.types.functions.builtins.fns;
 
 import APL.errors.*;
+import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
@@ -35,8 +36,8 @@ public class TrigBuiltin extends Builtin {
     return numM(NFi, x);
   }
   
-  static final D_NNeN DNF = new D_NNeN() {
-    @Override public double on(double w, double x) {
+  static final Pervasion.NN2NDef DF = new Pervasion.NN2NDef() {
+    public double on(double w, double x) {
       switch((int) w) {
         case  1: return Math.sin(x);
         case  2: return Math.cos(x);
@@ -69,11 +70,11 @@ public class TrigBuiltin extends Builtin {
     }
   };
   public Value call(Value w, Value x) {
-    return numD(DNF, w, x);
+    return DF.call(w, x);
   }
   
   
-  static final D_NNeN DNFi = new D_NNeN() {
+  static final Pervasion.NN2NDef DFi = new Pervasion.NN2NDef() {
     @Override public double on(double w, double x) {
       switch((int) w) {
         case  1: return Math.asin(x);
@@ -88,6 +89,6 @@ public class TrigBuiltin extends Builtin {
     }
   };
   public Value callInvX(Value w, Value x) {
-    return numD(DNFi, w, x);
+    return DFi.call(w, x);
   }
 }

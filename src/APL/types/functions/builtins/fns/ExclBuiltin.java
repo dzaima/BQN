@@ -1,6 +1,7 @@
 package APL.types.functions.builtins.fns;
 
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.functions.Builtin;
 
@@ -46,47 +47,52 @@ public class ExclBuiltin extends Builtin {
     return numM(NF, x);
   }
   
-  public Value call(Value w0, Value x0) {
-    return allD((w, x) -> {
-      if (w instanceof BigValue || x instanceof BigValue) {
-        
-        BigInteger res = BigInteger.ONE;
-        BigInteger al = BigValue.bigint(x);
-        BigInteger bl = BigValue.bigint(w);
-        if (al.compareTo(bl) < 0) return Num.ZERO;
   
-        if (bl.compareTo(al.subtract(bl)) > 0) bl = al.subtract(bl);
-        
-        if (bl.bitLength() > 30) throw new DomainError("!: arguments too big (𝕨 ≡ "+w+"; 𝕩 ≡ "+x+")", x);
-        int ri = bl.intValue();
-        
-        for (int i = 0; i < ri; i++) {
-          res = res.multiply(al.subtract(BigInteger.valueOf(i)));
-        }
-        for (int i = 0; i < ri; i++) {
-          res = res.divide(BigInteger.valueOf(i+1));
-        }
-        return new BigValue(res);
+  static Pervasion.NN2NDef DF = new Pervasion.NN2NDef() {
+    public Value on(BigValue w, BigValue x) {
+      BigInteger res = BigInteger.ONE;
+      BigInteger al = BigValue.bigint(x);
+      BigInteger bl = BigValue.bigint(w);
+      if (al.compareTo(bl) < 0) return Num.ZERO;
+  
+      if (bl.compareTo(al.subtract(bl)) > 0) bl = al.subtract(bl);
+  
+      if (bl.bitLength() > 30) throw new DomainError("!: arguments too big (𝕨 ≡ "+w+"; 𝕩 ≡ "+x+")", x);
+      int ri = bl.intValue();
+  
+      for (int i = 0; i < ri; i++) {
+        res = res.multiply(al.subtract(BigInteger.valueOf(i)));
       }
-      return binomial((Num) w, (Num) x);
-    }, w0, x0);
+      for (int i = 0; i < ri; i++) {
+        res = res.divide(BigInteger.valueOf(i+1));
+      }
+      return new BigValue(res);
+    }
+  
+    public double on(double w, double x) {
+      return binomial(w, x);
+    }
+  };
+  
+  public Value call(Value w, Value x) {
+    return DF.call(w, x);
   }
   
   
-  public Num binomial(Num w, Num x) {
-    if (x.num % 1 != 0) throw new DomainError("binomial of non-integer 𝕨", this);
-    if (w.num % 1 != 0) throw new DomainError("binomial of non-integer 𝕩", w);
-    if (w.num > x.num) return Num.ZERO;
+  public static double binomial(double w, double x) {
+    if (x % 1 != 0) throw new DomainError("binomial of non-integer 𝕨");
+    if (w % 1 != 0) throw new DomainError("binomial of non-integer 𝕩");
+    if (w > x) return 0;
     
     double res = 1;
-    double a = x.num;
-    double b = w.num;
+    double a = x;
+    double b = w;
     
     if (b > a-b) b = a-b;
     
     for (int i = 0; i < b; i++) {
-      res = res * (a-i) / (i+1);
+      res = res*(a-i) / (i+1);
     }
-    return new Num(res);
+    return res;
   }
 }
