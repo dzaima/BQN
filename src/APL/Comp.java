@@ -1226,7 +1226,6 @@ public class Comp {
   
       case '⍕': return new FormatBuiltin();
       case '!': return new AssertBuiltin();
-      case '⌽': return new ReverseBuiltin();
       case '+': return new PlusBuiltin();
       case '-': return new MinusBuiltin();
       case '×': return new MulBuiltin();
@@ -1251,6 +1250,9 @@ public class Comp {
       case '∾': return new JoinBuiltin();
       case '≍': return new LaminateBuiltin();
       case '⍉': return new TransposeBuiltin();
+      case '⌽': return new ReverseBuiltin();
+      case '»': return new ShBBuiltin();
+      case '«': return new ShABuiltin();
       
       case '/': return new SlashBuiltin();
       case '⊏': return new LBoxBuiltin();

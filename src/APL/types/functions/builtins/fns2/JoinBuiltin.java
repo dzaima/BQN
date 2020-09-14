@@ -152,15 +152,25 @@ public class JoinBuiltin extends Builtin {
   public Value call(Value w, Value x) {
     return on(w, x, this);
   }
+  
+  
+  public static void check(Value w, Value x, Callable blame) {
+    int a = w.rank, b = x.rank;
+    int c = Math.max(1,Math.max(a,b));
+    if (c-a > 1 || c-b > 1) throw new RankError(blame+": argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
+    for (int i = 1; i < c; i++) {
+      if (w.shape[i+a-c] != x.shape[i+b-c]) throw new LengthError(blame+": lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+    }
+  }
   public static Value on(Value w, Value x, Callable blame) {
     int a = w.rank, b = x.rank;
     int c = Math.max(1,Math.max(a,b));
-    if (c-a > 1 || c-b > 1) throw new RankError("∾: argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
+    if (c-a > 1 || c-b > 1) throw new RankError(blame+": argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
     
     int[] sh = new int[c];
     for (int i = 1; i < c; i++) {
       int s = x.shape[i+b-c];
-      if (w.shape[i+a-c] != s) throw new LengthError("∾: lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+      if (w.shape[i+a-c] != s) throw new LengthError(blame+": lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
       sh[i] = s;
     }
     sh[0] = (a==c? w.shape[0] : 1) + (b==c? x.shape[0] : 1);
