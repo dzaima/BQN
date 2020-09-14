@@ -604,8 +604,7 @@ public class Comp {
         if (last) qex = true;
       } else {
         if (ti==-1) return qex;
-        char t = tps.get(ti--).type;
-        if (t=='A') t = 'a';
+        char t = norm(tps.get(ti--).type);
         if (c=='!') {
           if (pt.charAt(pi) == ']') {
             do { pi--;
@@ -906,8 +905,8 @@ public class Comp {
           char p = tps.size()>=4? tps.get(tps.size()-4).type : 0;
           if (p=='d') break set;
           char ov = v;
-          if (v=='A') v = 'a';
-          if (k=='A') k = 'a'; // 𝕨↩ is a possibility
+          v = norm(v);
+          k = norm(k); // 𝕨↩ is a possibility
           if (k==v) {
             if (Main.debug) printlvl(k+" "+a+" "+v);
             tps.addLast(new ResMix(v,
@@ -1107,14 +1106,13 @@ public class Comp {
       
       if (tps.size()!=1) {
         Token t = null;
-        for (int i1 = tps.size()-1; i1 >= 0; i1--) {
-          Res tp = tps.get(i1);
-          if (tp.lastTok() != null) {
-            t = tp.lastTok();
-            break;
-          }
+        for (int j = 0; j < tps.size(); j++) {
+          Res tp = tps.get(j);
+          if (tp.lastTok() != null) t = tp.lastTok();
+          if (j>=1 && norm(tps.get(j).type)=='a' && norm(tps.get(j-1).type)=='a') throw new SyntaxError("failed to parse expression (found two adjacent values, missing `‿`?)", tps.get(j-1).lastTok());
+          if (j>=2 && "↩←".indexOf(tps.get(j-1).type)!=-1 && norm(tps.get(j).type)!=norm(tps.get(j-2).type)) throw new SyntaxError(tps.get(j-1)+": cannot assign with different types", tps.get(j-1).lastTok());
         }
-        throw new SyntaxError("couldn't join everything to a single expression", t);
+        throw new SyntaxError("failed to parse expression", t);
       }
       assert tps.get(0).type == tk.type : tps.get(0).type + "≠" + tk.type;
       tps.get(0).add(m);
@@ -1174,6 +1172,10 @@ public class Comp {
       return;
     }
     throw new ImplementationError("can't compile "+tk.getClass());
+  }
+  
+  public static char norm(char x) {
+    return x=='A'? 'a' : x;
   }
   
   public static Value constFold(Token t) {
