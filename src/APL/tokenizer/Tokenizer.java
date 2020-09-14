@@ -138,7 +138,7 @@ public class Tokenizer {
               tokens.add(new ErrTok(raw, i));
               // and leave running for quick exit
             }
-            throw new SyntaxError("mismatched parentheses of " + closed.b + " and " + c);
+            throw new SyntaxError("mismatched parentheses of " + closed.b + " and " + c, new ErrTok(raw, li));
           }
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
   
@@ -147,7 +147,7 @@ public class Tokenizer {
           Token r;
           switch (c) {
             case ')': if (pointless) { ArrayList<Token> ts = new ArrayList<>(lineTokens); r = new ParenTok(raw, closed.pos, i+1, new LineTok(raw, closed.pos, len, ts, '\0')); } else {
-              if (lineTokens.size()!=1) throw new SyntaxError("parenthesis should be a single expression");
+              if (lineTokens.size()!=1) throw new SyntaxError("parenthesis should be a single expression", new ErrTok(raw, li));
               r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0));
             }
             break;
@@ -202,7 +202,7 @@ public class Tokenizer {
           if (i < len) {
             c = raw.charAt(i);
             boolean hasE = c=='e' | c=='E';
-            if (hasE && i+1==len) throw new SyntaxError("unfinished number");
+            if (hasE && i+1==len) throw new SyntaxError("unfinished number", new ErrTok(raw, li));
             boolean hasExp = hasE && !validNameStart(raw.charAt(i+1));
             if (hasExp) {
               i++;
@@ -221,8 +221,8 @@ public class Tokenizer {
             }
             if (i<len && raw.charAt(i)=='L' && (i+1 == len || !validNameMid(raw.charAt(i+1)))) {
               if (hasExp || hasPoint) {
-                if (hasExp) throw new SyntaxError("biginteger literal with exponent");
-                throw new SyntaxError("biginteger literal with decimal part");
+                if (hasExp) throw new SyntaxError("biginteger literal with exponent", new ErrTok(raw, li));
+                throw new SyntaxError("biginteger literal with decimal part", new ErrTok(raw, li));
               }
               i++;
               BigInteger big = new BigInteger(raw.substring(si, i-1));
@@ -234,10 +234,10 @@ public class Tokenizer {
           tokens.add(new OpTok(raw, i, i+1, cS));
           i++;
         } else if (c == 55349) { // low surrogate pair of double-struck chars
-          if (i+1==len) throw new SyntaxError("expression ended with low surrogate \\uD835");
+          if (i+1==len) throw new SyntaxError("expression ended with low surrogate \\uD835", new ErrTok(raw, li));
           if (surrogateOps.indexOf(next) == -1) {
             String hex = Integer.toHexString(next).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
-            throw new SyntaxError("unknown token `\uD835" + next + "` (\\uD835\\u"+hex+")");
+            throw new SyntaxError("unknown token `\uD835" + next + "` (\\uD835\\u"+hex+")", new ErrTok(raw, li));
           }
           tokens.add(new OpTok(raw, i, i+2, raw.substring(i, i+2)));
           i+= 2;
@@ -254,16 +254,16 @@ public class Tokenizer {
           tokens.add(new StranderTok(raw, i, i+1));
           i++;
         } else if (c == '\'') {
-          if (i+2 >= len) throw new SyntaxError("unfinished character literal");
+          if (i+2 >= len) throw new SyntaxError("unfinished character literal", new ErrTok(raw, li));
           if (raw.charAt(i+2) != '\'') {
-            throw new SyntaxError("character literal must contain exactly 1"+(Character.isHighSurrogate(raw.charAt(i+1))?" UTF-16":"")+" character");
+            throw new SyntaxError("character literal must contain exactly 1"+(Character.isHighSurrogate(raw.charAt(i+1))?" UTF-16":"")+" character", new ErrTok(raw, li));
           }
           i+= 3;
           tokens.add(new ChrTok(raw, li, i, raw.charAt(i-2)+""));
         } else if (c == '"') {
           StringBuilder str = new StringBuilder();
           i++;
-          if (i == len) throw new SyntaxError("unfinished string literal");
+          if (i == len) throw new SyntaxError("unfinished string literal", new ErrTok(raw, li));
           while (true) {
             if (raw.charAt(i) == '"') {
               if (i+1==len) break;
@@ -274,7 +274,7 @@ public class Tokenizer {
               str.append(raw.charAt(i));
             }
             i++;
-            if (i >= len) throw new SyntaxError("unfinished string literal");
+            if (i >= len) throw new SyntaxError("unfinished string literal", new ErrTok(raw, li));
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
@@ -298,7 +298,7 @@ public class Tokenizer {
           if (pointless) tokens.add(new ErrTok(raw, i, i+1));
           else {
             String hex = Integer.toHexString(c).toUpperCase(); while(hex.length() < 4) hex = "0"+hex;
-            throw new SyntaxError("unknown token `" + c + "` (\\u"+hex+")");
+            throw new SyntaxError("unknown token `" + c + "` (\\u"+hex+")", new ErrTok(raw, li));
           }
           i++;
         }
@@ -315,7 +315,7 @@ public class Tokenizer {
       }
     }
     if (levels.size() != 1) {
-      if (!pointless) throw new SyntaxError("error matching parentheses"); // or too many
+      if (!pointless) throw new SyntaxError("error matching parentheses", new ErrTok(raw, li)); // or too many
       // else, attempt to recover
       while (levels.size() > 1) {
         Block closed = levels.remove(levels.size() - 1);
