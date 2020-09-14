@@ -327,20 +327,20 @@ public abstract class Arr extends Value {
     return new HArr(v, sh);
   }
   
-  public boolean eq(Value o) {
-    if (!(o instanceof Arr)) return false;
-    Arr a = (Arr) o;
-    if (!Arrays.equals(shape, a.shape)) return false;
-    if (hash!=0 && a.hash!=0 && hash != a.hash) return false;
+  public boolean eq(Value x) { // TODO non-virtual
+    if (!Arrays.equals(shape, x.shape)) return false;
+    int xh = ((Arr) x).hash;
+    if (hash!=0 && xh!=0 && hash!=xh) return false;
+    
     Value[] mvs = values();
-    Value[] ovs = a.values();
+    Value[] ovs = x.values();
     for (int i = 0; i < mvs.length; i++) {
       if (!mvs[i].eq(ovs[i])) return false;
     }
     return true;
   }
   
-  protected int hash;
+  public int hash; // 0 is uninitialized
   
   public int hashCode() {
     if (hash == 0) {

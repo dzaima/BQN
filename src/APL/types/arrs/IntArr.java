@@ -69,16 +69,22 @@ public class IntArr extends Arr {
   public Value squeeze() {
     return this;
   }
-  public boolean eq(Value o) {
-    if (o instanceof IntArr) {
-      IntArr da = (IntArr) o;
-      if ((hash!=0 && da.hash!=0 && hash != da.hash) || !Arrays.equals(shape, da.shape)) return false;
-      for (int i = 0; i < ia; i++) {
-        if (arr[i] != da.arr[i]) return false;
+  public boolean eq(Value x) {
+    if (x instanceof Arr && x.quickDoubleArr()) {
+      if (!Arrays.equals(shape, x.shape)) return false;
+      int xh = ((Arr) x).hash;
+      if (hash!=0 && xh!=0 && hash!=xh) return false;
+      
+      if (x.quickIntArr()) {
+        int[] xi = x.asIntArr();
+        for (int i = 0; i < ia; i++) if (arr[i]!=xi[i]) return false;
+      } else {
+        double[] xd = x.asDoubleArr();
+        for (int i = 0; i < ia; i++) if (arr[i]!=xd[i]) return false;
       }
       return true;
     }
-    return super.eq(o);
+    return super.eq(x);
   }
   
   public int hashCode() {

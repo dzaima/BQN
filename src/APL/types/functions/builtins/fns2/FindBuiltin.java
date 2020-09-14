@@ -26,7 +26,7 @@ public class FindBuiltin extends Builtin {
       Value[] rcs = call(new HArr(CellBuiltin.cells(x))).values();
       return GTBuiltin.merge(rcs, new int[]{rcs.length}, this);
     }
-    if (x instanceof IntArr) {
+    if (x.quickIntArr()) {
       HashSet<Integer> vals = new HashSet<>();
       MutIntArr res = new MutIntArr(10);
       for (int c : x.asIntArr()) if (vals.add(c)) res.add(c);

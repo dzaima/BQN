@@ -23,7 +23,7 @@ public class OrBuiltin extends Builtin {
   public Value call(Value x) { // TODO this isn't stable
     if (x.rank==0) throw new RankError("∨: argument cannot be scalar", this, x);
     if (x.ia==0) return x;
-    if (x instanceof IntArr && x.rank==1) {
+    if (x.quickIntArr() && x.rank==1) {
       int[] is = x.asIntArrClone();
       Arrays.sort(is); for (int i = 0; i < is.length>>1; i++) { int t = is[i]; is[i] = is[is.length-i-1]; is[is.length-i-1] = t; }
       return new IntArr(is, x.shape);

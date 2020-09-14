@@ -23,7 +23,7 @@ public class AndBuiltin extends Builtin {
   public Value call(Value x) {
     if (x.rank==0) throw new RankError("∧: argument cannot be scalar", this, x);
     if (x.ia==0) return x;
-    if (x instanceof IntArr && x.rank==1) {
+    if (x.quickIntArr() && x.rank==1) {
       int[] is = x.asIntArrClone();
       Arrays.sort(is);
       return new IntArr(is, x.shape);

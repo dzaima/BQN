@@ -71,16 +71,17 @@ public class DoubleArr extends Arr {
   
   
   
-  public boolean eq(Value o) {
-    if (o instanceof DoubleArr) {
-      DoubleArr da = (DoubleArr) o;
-      if ((hash!=0 && da.hash!=0 && hash != da.hash) || !Arrays.equals(shape, da.shape)) return false;
-      for (int i = 0; i < ia; i++) {
-        if (arr[i] != da.arr[i]) return false;
-      }
+  public boolean eq(Value x) {
+    if (x instanceof Arr && x.quickDoubleArr()) {
+      if (!Arrays.equals(shape, x.shape)) return false;
+      int xh = ((Arr) x).hash;
+      if (hash!=0 && xh!=0 && hash!=xh) return false;
+      
+      double[] xd = x.asDoubleArr();
+      for (int i = 0; i < ia; i++) if (arr[i]!=xd[i]) return false;
       return true;
     }
-    return super.eq(o);
+    return super.eq(x);
   }
   public int hashCode() {
     if (hash == 0) {

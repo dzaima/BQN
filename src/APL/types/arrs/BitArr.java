@@ -302,4 +302,18 @@ public final class BitArr extends Arr {
     if ((nl.length&1) != 0) nl[nl.length>>1] = Long.reverse(nl[nl.length>>1]);
     return new BitArr(nl, shape);
   }
+  
+  public boolean eq(Value x) {
+    if (x instanceof BitArr) {
+      if (!Arrays.equals(shape, x.shape)) return false;
+      int xh = ((Arr) x).hash;
+      if (hash!=0 && xh!=0 && hash!=xh) return false;
+      
+      BitArr xb = (BitArr) x;
+      setEnd(false); xb.setEnd(false);
+      for (int i = 0; i < arr.length; i++) if (arr[i] != xb.arr[i]) return false;
+      return true;
+    }
+    return super.eq(x);
+  }
 }

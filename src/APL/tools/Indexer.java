@@ -127,7 +127,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     if (Main.vind) { // •VI←1
       boolean deep = false;
       int[] rsh = null;
-      if (!(v instanceof DoubleArr || v instanceof ChrArr || v instanceof BitArr)) {
+      if (!(v.quickDepth1())) {
         for (Value c : v) {
           if (!(c instanceof Primitive)) {
             if (!deep) {

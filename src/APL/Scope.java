@@ -926,12 +926,10 @@ public class Scope {
     private Value recN(Value x) {
       if (x instanceof BigValue) return ((BigValue) x).num();
       if (x instanceof Primitive) return x;
-      if (x instanceof DoubleArr) return x;
+      if (x.quickDoubleArr()) return x;
       Value[] pa = x.values();
       Value[] va = new Value[pa.length];
-      for (int i = 0; i < pa.length; i++) {
-        va[i] = recN(pa[i]);
-      }
+      for (int i = 0; i < pa.length; i++) va[i] = recN(pa[i]);
       return HArr.create(va, x.shape);
     }
   }
