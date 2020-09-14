@@ -112,7 +112,7 @@ public class Scope {
           Main.vind = Main.bool(val);
           break;
         case "•compstart":
-          Comp.compileStart = val.asInt();
+          Comp.compileStart = Math.max(-1, val.asInt());
           break;
         case "•rl":
           rnd = new Random(val.asInt());

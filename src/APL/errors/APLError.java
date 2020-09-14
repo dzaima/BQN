@@ -8,7 +8,7 @@ import java.util.*;
 
 public abstract class APLError extends RuntimeException {
   public Tokenable blame;
-  public Tokenable cause;
+  public Tokenable obj;
   public ArrayList<Frame> trace = new ArrayList<>();
   
   
@@ -18,12 +18,12 @@ public abstract class APLError extends RuntimeException {
   protected APLError(String msg, Tokenable blame) {
     super(msg);
     if (blame instanceof Callable) this.blame = blame;
-    else this.cause = blame;
+    else this.obj = blame;
   }
-  protected APLError(String msg, Tokenable blame, Tokenable cause) {
+  protected APLError(String msg, Tokenable blame, Tokenable obj) {
     super(msg);
     this.blame = blame;
-    this.cause = cause;
+    this.obj = obj;
   }
   
   
@@ -34,7 +34,7 @@ public abstract class APLError extends RuntimeException {
     else s.colorprint(type, 246);
     ArrayList<Mg> l = new ArrayList<>();
     if (blame!=null) Mg.add(l, blame, '^');
-    if (cause!=null) Mg.add(l, cause, '¯');
+    if (obj!=null) Mg.add(l, obj, '¯');
     println(l, s);
   }
   

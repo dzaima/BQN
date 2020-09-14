@@ -450,6 +450,10 @@ public class JComp {
     res.u2(methods.size()); // method count
     for (Met c : methods) {
       c.finish();
+      if (c.len > 65500) {
+        r = null;
+        return;
+      }
       res.u2(c.acc);
       res.u2(c.name);
       res.u2(c.type);

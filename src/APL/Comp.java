@@ -90,12 +90,12 @@ public class Comp {
     return exec(sc, 0);
   }
   public Value exec(Scope sc, int i) {
-    Value last = null;
     try {
     if (gen!=null) return gen.get(sc, i);
     if (iter++>=compileStart && compileStart>=0) {
       gen = new JComp(this).r;
-      return gen.get(sc, i);
+      if (gen!=null) return gen.get(sc, i);
+      else iter = Integer.MIN_VALUE;
     }
     Stk s = new Stk();
     exec: while (true) {
@@ -298,10 +298,13 @@ public class Comp {
     return (Value) s.peek();
     } catch (Throwable t) {
       APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
+      Tokenable fn = gen!=null? null : ref[i];
+      if (e.blame == null) {
+        e.blame = fn!=null? fn : tk;
+      }
       ArrayList<APLError.Mg> mgs = new ArrayList<>();
       APLError.Mg.add(mgs, tk, '¯');
-      Tokenable tk = ref[i];
-      APLError.Mg.add(mgs, tk, '^');
+      APLError.Mg.add(mgs, fn, '^');
       e.trace.add(new APLError.Frame(sc, mgs, this, i));
       throw e;
     }
