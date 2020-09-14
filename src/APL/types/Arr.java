@@ -327,15 +327,31 @@ public abstract class Arr extends Value {
     return new HArr(v, sh);
   }
   
-  public boolean eq(Value x) { // TODO non-virtual
+  public boolean eq(Value x) {
     if (!Arrays.equals(shape, x.shape)) return false;
     int xh = ((Arr) x).hash;
     if (hash!=0 && xh!=0 && hash!=xh) return false;
     
-    Value[] mvs = values();
-    Value[] ovs = x.values();
-    for (int i = 0; i < mvs.length; i++) {
-      if (!mvs[i].eq(ovs[i])) return false;
+    if (quickDoubleArr() && x.quickDoubleArr()) {
+      int sm = (quickIntArr()?1:0)+(x.quickIntArr()?1:0);
+      if (sm==0) {
+        double[] wd =   asDoubleArr();
+        double[] xd = x.asDoubleArr();
+        for (int i = 0; i < ia; i++) if (wd[i]!=xd[i]) return false;
+      } else if (sm==1) {
+        boolean ti = quickIntArr();
+        int   [] _i = ti?   asIntArr()    : x.asIntArr();
+        double[] _d = ti? x.asDoubleArr() :   asDoubleArr();
+        for (int i = 0; i < ia; i++) if (_i[i]!=_d[i]) return false;
+      } else {
+        int[] wi =   asIntArr();
+        int[] xi = x.asIntArr();
+        for (int i = 0; i < ia; i++) if (wi[i]!=xi[i]) return false;
+      }
+    } else {
+      Value[] mvs =   values();
+      Value[] ovs = x.values();
+      for (int i = 0; i < mvs.length; i++) if (!mvs[i].eq(ovs[i])) return false;
     }
     return true;
   }

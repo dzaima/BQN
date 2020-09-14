@@ -3,6 +3,8 @@ package APL.types.arrs;
 import APL.errors.DomainError;
 import APL.types.*;
 
+import java.util.Arrays;
+
 public class ChrArr extends Arr {
   public String s;
   
@@ -55,5 +57,14 @@ public class ChrArr extends Arr {
       hash = shapeHash(hash);
     }
     return hash;
+  }
+  public boolean eq(Value x) {
+    if (x instanceof ChrArr) {
+      if (!Arrays.equals(shape, x.shape)) return false;
+      int xh = ((Arr) x).hash;
+      if (hash!=0 && xh!=0 && hash!=xh) return false;
+      return s.equals(((ChrArr) x).s);
+    }
+    return super.eq(x);
   }
 }

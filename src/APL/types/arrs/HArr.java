@@ -51,12 +51,6 @@ public class HArr extends Arr {
   
   
   
-  public boolean eq(Value x) {
-    if (!Arrays.equals(shape, x.shape)) return false;
-    assert ia == x.ia;
-    for (int i = 0; i < ia; i++) if (!arr[i].eq(x.get(i))) return false;
-    return true;
-  }
   public String asString() {
     StringBuilder r = new StringBuilder(ia);
     for (Value v : arr) {
