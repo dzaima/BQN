@@ -61,9 +61,9 @@ public class FoldBuiltin extends Mop {
         return new Num(r);
       }
     }
-    if (f instanceof JoinBuiltin) {
-      Value joined = JoinBuiltin.joinVec(x);
-      if (joined != null) return joined;
+    join: if (f instanceof JoinBuiltin) {
+      for (Value c : x) if (c.rank!=1) break join;
+      return JoinBuiltin.joinVec(x);
     }
     
     if (x.quickDoubleArr()) {

@@ -388,4 +388,26 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
     v.copy(src, sP, 0, len);
     return v.get();
   }
+  
+  public void copy(Value x, int[] pos) { // multi-dimensional insert x at pos; assumes rank of this and x is equal
+    assert x.rank == sh.length;
+    // TODO optimize for when x.shape[x.rank-1] is small
+    int[] csh = new int[x.shape.length-1]; System.arraycopy(x.shape, 0, csh, 0, x.shape.length-1);
+    
+    int i = 0;
+    int csz = x.shape[x.shape.length-1];
+    // System.out.println("  "+Arrays.toString(pos)+" "+Arrays.toString(sh)+" "+Arrays.toString(x.shape)+":");
+    int  toff = pos[pos.length-1];
+    for (int[] p : new Indexer(csh, pos)) {
+      int cp = 0;
+      for (int j = 0; j < p.length; j++) {
+        cp+= p[j];
+        cp*= sh[j+1];
+      }
+      cp+= toff;
+      // System.out.println(Arrays.toString(p)+" "+cp+" "+csz+" "+i+" ");
+      copy(x, i, cp, csz);
+      i+= csz;
+    }
+  }
 }

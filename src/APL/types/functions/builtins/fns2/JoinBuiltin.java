@@ -2,7 +2,7 @@ package APL.types.functions.builtins.fns2;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.Builtin;
@@ -16,14 +16,65 @@ public class JoinBuiltin extends Builtin {
   }
   
   public Value call(Value x) {
-    if (x.rank == 1) {
+    simple: if (x.rank == 1) {
+      for (Value c : x) if (c.rank!=1) break simple;
       Value joined = JoinBuiltin.joinVec(x);
       if (joined != null) return joined;
     }
-    throw new NYIError("monadic ∾ on rank>1", this, x);
+    
+    Value[] vs = x.values();
+    if (vs.length==0) return x;
+    int[] sh0 = vs[0].shape;
+    int ir = sh0.length;
+    for (Value v : vs) {
+      if (ir!=v.shape.length) throw new RankError("∾: expected all items to have equal rank", this, v);
+    }
+    int or = x.shape.length;
+    if (ir < or) throw new RankError("∾: rank of items must be at least the total rank", this);
+  
+    int[] fsh = new int[ir];
+    System.arraycopy(sh0, or, fsh, or, ir-or);
+    
+    int[][] l = new int[or][];
+    int[][] lc = new int[or][];
+    int d = 1;
+    for (int i = or-1; i>=0; i--) {
+      int cl = x.shape[i];
+      l [i] = new int[cl];
+      lc[i] = new int[cl];
+      for (int j=0, q=0; j < cl; j++,q+=d) l[i][j] = vs[q].shape[i];
+      int c=0;
+      for (int j=0; j < cl; j++) {
+        lc[i][j] = c;
+        c+= l[i][j];
+      }
+      fsh[i] = c;
+      d*= cl;
+    }
+    // System.out.println(Arrays.deepToString(l));
+    // System.out.println(Arrays.deepToString(lc));
+    // System.out.println(Arrays.toString(fsh));
+    MutVal res = new MutVal(fsh, vs[0]);
+    int i = 0;
+    int[] off = new int[ir];
+    for (int[] pos : new Indexer(x.shape)) {
+      Value val = vs[i++];
+      int[] sh = val.shape;
+      for (int j = 0; j < or; j++) if (sh[j] != l[j][pos[j]]) throw new DomainError("∾: item shapes must be compatible", this);
+      for (int j = or; j < ir; j++) if (sh[j]!=sh0[j]) throw new LengthError("∾: item trailing shapes must be equal", this);
+      for (int j = 0; j < or; j++) {
+        off[j] = lc[j][pos[j]];
+      }
+      res.copy(val, off);
+    }
+    
+    
+    
+    
+    return res.get();
   }
   
-  public static Value joinVec(Value x) { // returns null if contents weren't rank 1; valuecopy
+  public static Value joinVec(Value x) { // joins all vertically or something; doesn't check anything
     assert x.rank == 1;
     if (x.ia == 0) return x;
     Value first = x.first();
@@ -32,7 +83,6 @@ public class JoinBuiltin extends Builtin {
     typed: {
       if (first instanceof ChrArr) {
         for (Value v : x) {
-          if (v.rank != 1) return null;
           if (!(v instanceof ChrArr)) break typed;
           am+= v.ia;
           chki++;
@@ -51,7 +101,6 @@ public class JoinBuiltin extends Builtin {
       } else {
         ia: if (first.quickIntArr()) {
           for (Value v : x) {
-            if (v.rank != 1) return null;
             if (!v.quickIntArr()) if (v.quickDoubleArr()) break ia; else break typed;
             am+= v.ia;
             chki++;
@@ -69,7 +118,6 @@ public class JoinBuiltin extends Builtin {
         if (first.quickDoubleArr()) {
           for (int i = chki; i < x.ia; i++) {
             Value v = x.get(i);
-            if (v.rank != 1) return null;
             if (!v.quickDoubleArr()) break typed;
             am += v.ia;
             chki++;
@@ -89,7 +137,6 @@ public class JoinBuiltin extends Builtin {
     
     for (; chki < x.ia; chki++) {
       Value v = x.get(chki);
-      if (v.rank != 1) return null;
       am+= v.ia;
     }
     

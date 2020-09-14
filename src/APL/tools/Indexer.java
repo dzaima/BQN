@@ -6,36 +6,32 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
 
-import java.util.Iterator;
+import java.util.*;
 
 public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   private final int[] shape;
   private final int rank;
   private final int[] c;
-  private int ia = 1;
+  private final int ia;
   private int ci = 0;
-  private final int[] offsets;
   
-  public Indexer(int[] sh, int[] offsets) {
+  private final int[] offsets;
+  private static int[] zeroOffsets = new int[4];
+  
+  public Indexer(int[] sh, int[] offsets) { // offsets can be larger than sh 
     shape = sh;
     rank = sh.length;
-    c = new int[sh.length];
     this.offsets = offsets;
-    for (int i = 0; i < sh.length; i++) {
-      ia*= sh[i];
-      c[i] = offsets[i];
-    }
+    c = Arrays.copyOf(offsets, sh.length);
+    int tia = 1; for (int i : sh) tia*= i; ia = tia;
   }
   public Indexer(int[] sh) {
     shape = sh;
     rank = sh.length;
     c = new int[sh.length];
-    this.offsets = new int[sh.length];
-    for (int i = 0; i < sh.length; i++) {
-      ia*= sh[i];
-      // offsets[i] = 0; \\ default
-      c[i] = offsets[i];
-    }
+    if (sh.length < zeroOffsets.length) offsets = zeroOffsets;
+    else zeroOffsets = this.offsets = new int[sh.length];
+    int tia = 1; for (int i : sh) tia*= i; ia = tia;
   }
   
   public int pos() {
