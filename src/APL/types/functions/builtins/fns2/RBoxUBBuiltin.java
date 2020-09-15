@@ -4,11 +4,11 @@ import APL.errors.*;
 import APL.tools.MutIntArr;
 import APL.types.Value;
 import APL.types.arrs.IntArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.HashMap;
 
-public class RBoxUBBuiltin extends Builtin {
+public class RBoxUBBuiltin extends FnBuiltin {
   public String repr() {
     return "⊒";
   }

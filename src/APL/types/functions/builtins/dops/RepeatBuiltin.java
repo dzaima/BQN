@@ -2,9 +2,10 @@ package APL.types.functions.builtins.dops;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 
-public class RepeatBuiltin extends Dop {
+public class RepeatBuiltin extends DopBuiltin {
   @Override public String repr() {
     return "⍟";
   }

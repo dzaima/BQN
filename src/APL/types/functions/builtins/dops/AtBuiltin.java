@@ -4,10 +4,11 @@ import APL.Main;
 import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
-public class AtBuiltin extends Dop {
+public class AtBuiltin extends DopBuiltin {
   @Override public String repr() {
     return "@";
   }

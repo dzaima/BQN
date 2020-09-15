@@ -2,9 +2,9 @@ package APL.types.functions.builtins.fns;
 
 import APL.errors.*;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class  ExpandBuiltin extends Builtin {
+public class  ExpandBuiltin extends FnBuiltin {
   public String repr() {
     return "⍀";
   }

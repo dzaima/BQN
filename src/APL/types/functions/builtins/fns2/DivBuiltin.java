@@ -3,9 +3,9 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class DivBuiltin extends Builtin {
+public class DivBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "÷";
   }

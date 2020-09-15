@@ -4,11 +4,11 @@ import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.IntArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 
-public class StileBuiltin extends Builtin {
+public class StileBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "|";
   }

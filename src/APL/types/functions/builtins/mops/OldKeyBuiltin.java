@@ -4,11 +4,12 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.HArr;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 
 import java.util.*;
 
-public class OldKeyBuiltin extends Mop {
+public class OldKeyBuiltin extends MopBuiltin {
   @Override public String repr() {
     return "⌸";
   }

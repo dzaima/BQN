@@ -4,12 +4,12 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
-public class OldDownArrowBuiltin extends Builtin {
+public class OldDownArrowBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "↓";
   }

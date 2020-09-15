@@ -5,9 +5,9 @@ import APL.errors.*;
 import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class UDBuiltin extends Builtin {
+public class UDBuiltin extends FnBuiltin {
   public String repr() {
     return "↕";
   }

@@ -3,10 +3,11 @@ package APL.types.functions.builtins.mops;
 import APL.errors.*;
 import APL.types.Value;
 import APL.types.arrs.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 import APL.types.functions.builtins.fns2.GTBuiltin;
 
-public class ObliqueBuiltin extends Mop {
+public class ObliqueBuiltin extends MopBuiltin {
   @Override public String repr() {
     return "⍁";
   }

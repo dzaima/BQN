@@ -1,12 +1,12 @@
 package APL.types.functions.builtins.fns;
 
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.*;
 
 @SuppressWarnings("Convert2Diamond") // convert.py chokes if not
-public class DShoeBuiltin extends Builtin {
+public class DShoeBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "∪";
   }

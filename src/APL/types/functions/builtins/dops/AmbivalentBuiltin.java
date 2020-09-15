@@ -1,9 +1,14 @@
 package APL.types.functions.builtins.dops;
 
 import APL.types.Value;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 
-public class AmbivalentBuiltin extends Dop {
+public class AmbivalentBuiltin extends DopBuiltin {
+  public String repr() {
+    return "⊘";
+  }
+  
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
     return f.call(x);
   }
@@ -19,9 +24,5 @@ public class AmbivalentBuiltin extends Dop {
   }
   public Value callInvX(Value f, Value g, Value w, Value x) {
     return g.callInvX(w, x);
-  }
-  
-  public String repr() {
-    return "⊘";
   }
 }

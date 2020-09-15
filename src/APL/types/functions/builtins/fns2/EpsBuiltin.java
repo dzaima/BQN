@@ -3,12 +3,12 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.BitArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.HashSet;
 
-public class EpsBuiltin extends Builtin {
+public class EpsBuiltin extends FnBuiltin {
   public String repr() {
     return "∊";
   }

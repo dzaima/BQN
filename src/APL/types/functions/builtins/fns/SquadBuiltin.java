@@ -2,9 +2,9 @@ package APL.types.functions.builtins.fns;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class SquadBuiltin extends Builtin {
+public class SquadBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⌷";
   }

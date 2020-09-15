@@ -5,12 +5,12 @@ import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.FoldBuiltin;
 
 import java.util.Arrays;
 
-public class SlashBuiltin extends Builtin {
+public class SlashBuiltin extends FnBuiltin {
   private static final Value fn = new FoldBuiltin().derive(new CeilingBuiltin());
   
   public String repr() {

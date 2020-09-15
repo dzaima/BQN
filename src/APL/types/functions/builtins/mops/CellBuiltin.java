@@ -5,12 +5,13 @@ import APL.errors.LengthError;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
-public class CellBuiltin extends Mop {
+public class CellBuiltin extends MopBuiltin {
   
   public String repr() {
     return "˘";

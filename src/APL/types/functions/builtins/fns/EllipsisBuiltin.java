@@ -3,11 +3,11 @@ package APL.types.functions.builtins.fns;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 
-public class EllipsisBuiltin extends Builtin {
+public class EllipsisBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "…";
   }

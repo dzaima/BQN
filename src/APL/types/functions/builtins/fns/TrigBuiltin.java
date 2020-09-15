@@ -3,9 +3,9 @@ package APL.types.functions.builtins.fns;
 import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class TrigBuiltin extends Builtin {
+public class TrigBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "○";
   }

@@ -3,10 +3,10 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.RankError;
 import APL.tools.MutVal;
 import APL.types.Value;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
-public class ShABuiltin extends Builtin {
+public class ShABuiltin extends FnBuiltin {
   public String repr() {
     return "«";
   }

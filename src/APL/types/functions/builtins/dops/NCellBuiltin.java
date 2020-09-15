@@ -5,12 +5,13 @@ import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
 import java.util.Arrays;
 
-public class NCellBuiltin extends Dop {
+public class NCellBuiltin extends DopBuiltin {
   public String repr() {
     return "⎉";
   }

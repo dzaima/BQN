@@ -2,9 +2,13 @@ package APL.types.functions.builtins.mops;
 
 import APL.errors.RankError;
 import APL.types.Value;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 
-public class InsertBuiltin extends Mop {
+public class InsertBuiltin extends MopBuiltin {
+  public String repr() {
+    return "˝";
+  }
   
   public Value call(Value f, Value x, DerivedMop derv) {
     if (x.rank==0) throw new RankError("˝: argument cannot be a scalar", this, x);
@@ -20,9 +24,5 @@ public class InsertBuiltin extends Mop {
     Value c = w;
     for (int i = vs.length-1; i >= 0; i--) c = f.call(vs[i], c);
     return c;
-  }
-  
-  public String repr() {
-    return "˝";
   }
 }

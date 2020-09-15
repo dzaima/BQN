@@ -4,10 +4,10 @@ import APL.errors.RankError;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
-public class DownArrowBuiltin extends Builtin {
+public class DownArrowBuiltin extends FnBuiltin {
   public String repr() {
     return "↓";
   }

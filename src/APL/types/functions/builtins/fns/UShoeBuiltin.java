@@ -1,11 +1,11 @@
 package APL.types.functions.builtins.fns;
 
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.*;
 
-public class UShoeBuiltin extends Builtin {
+public class UShoeBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "∩";
   }

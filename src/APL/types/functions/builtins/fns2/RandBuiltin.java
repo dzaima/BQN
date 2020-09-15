@@ -4,12 +4,12 @@ import APL.Scope;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 import java.util.*;
 
-public class RandBuiltin extends Builtin {
+public class RandBuiltin extends FnBuiltin {
   private final Scope sc;
   
   public String repr() {

@@ -10,6 +10,7 @@ public abstract class Dop extends Callable {
   public Value call(         Value x) { throw new SyntaxError("cannot interpret a 2-modifier as a function", this, x); }
   public Value call(Value w, Value x) { throw new SyntaxError("cannot interpret a 2-modifier as a function", this, x); }
   
+  
   public Value derive(Value f, Value g) {
     return new DerivedDop(f, g, this);
   }
@@ -54,10 +55,10 @@ public abstract class Dop extends Callable {
   
   
   // functions are equal per-object basis
-  @Override public int hashCode() {
+  public int hashCode() {
     return actualHashCode();
   }
-  @Override public boolean eq(Value o) {
+  public boolean eq(Value o) {
     return this == o;
   }
 }

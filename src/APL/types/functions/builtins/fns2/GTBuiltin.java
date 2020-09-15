@@ -4,12 +4,12 @@ import APL.Main;
 import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
 
-public class GTBuiltin extends Builtin {
+public class GTBuiltin extends FnBuiltin {
   @Override public String repr() {
     return ">";
   }

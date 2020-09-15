@@ -4,11 +4,11 @@ import APL.errors.*;
 import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
-public class TransposeBuiltin extends Builtin {
+public class TransposeBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍉";
   }

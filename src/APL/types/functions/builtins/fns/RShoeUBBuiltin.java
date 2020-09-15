@@ -2,10 +2,10 @@ package APL.types.functions.builtins.fns;
 
 import APL.tools.Indexer;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
-public class RShoeUBBuiltin extends Builtin {
+public class RShoeUBBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊇";
   }

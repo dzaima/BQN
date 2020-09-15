@@ -47,6 +47,15 @@ public class Ddop extends Dop {
       if (!(g instanceof Arr) && gs.length() != 1) gs = "("+gs+")";
       return op.repr()+gs;
     }
+    
+    public boolean eq(Value o) { // reminder: there's a separate HalfDerivedDop
+      if (!(o instanceof HalfDerivedDdop)) return false;
+      HalfDerivedDdop that = (HalfDerivedDdop) o;
+      return g.eq(that.g) && op.eq(that.op);
+    }
+    public int hashCode() {
+      return 31*g.hashCode() + op.hashCode();
+    }
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘

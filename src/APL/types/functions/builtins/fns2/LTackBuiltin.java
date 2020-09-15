@@ -2,9 +2,9 @@ package APL.types.functions.builtins.fns2;
 
 import APL.errors.DomainError;
 import APL.types.Value;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class LTackBuiltin extends Builtin {
+public class LTackBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊣";
   }

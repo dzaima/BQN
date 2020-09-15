@@ -20,4 +20,12 @@ public class HalfDerivedDop extends Mop {
     if (!(g instanceof Arr) && gs.length() != 1) gs = "("+gs+")";
     return op.repr()+gs;
   }
+  public boolean eq(Value o) { // reminder: Ddop has its own HalfDerivedDdop
+    if (!(o instanceof HalfDerivedDop)) return false;
+    HalfDerivedDop that = (HalfDerivedDop) o;
+    return g.eq(that.g) && op.eq(that.op);
+  }
+  public int hashCode() {
+    return 31*g.hashCode() + op.hashCode();
+  }
 }

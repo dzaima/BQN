@@ -4,10 +4,10 @@ import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
-public class OldUpArrowBuiltin extends Builtin {
+public class OldUpArrowBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "↑";
   }

@@ -5,12 +5,12 @@ import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.dops.AtBuiltin;
 
 import java.util.Arrays;
 
-public class LBoxUBBuiltin extends Builtin {
+public class LBoxUBBuiltin extends FnBuiltin {
   public String repr() {
     return "⊑";
   }

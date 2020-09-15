@@ -3,12 +3,12 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 import java.util.*;
 
-public class DTackBuiltin extends Builtin {
+public class DTackBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊤";
   }

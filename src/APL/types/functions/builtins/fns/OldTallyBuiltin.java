@@ -1,9 +1,9 @@
 package APL.types.functions.builtins.fns;
 
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class OldTallyBuiltin extends Builtin {
+public class OldTallyBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "≢";
   }

@@ -4,9 +4,9 @@ import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class CeilingBuiltin extends Builtin {
+public class CeilingBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⌈";
   }

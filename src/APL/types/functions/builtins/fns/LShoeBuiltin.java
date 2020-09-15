@@ -4,11 +4,11 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.ArrayList;
 
-public class LShoeBuiltin extends Builtin {
+public class LShoeBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊂";
   }

@@ -3,11 +3,11 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 
-public class StarBuiltin extends Builtin {
+public class StarBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⋆";
   }

@@ -4,12 +4,12 @@ import APL.errors.RankError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.Arrays;
 
-public class AndBuiltin extends Builtin {
+public class AndBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "∧";
   }

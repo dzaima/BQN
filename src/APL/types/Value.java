@@ -176,6 +176,8 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return obj instanceof Value && eq((Value) obj);
   }
   public abstract boolean eq(Value o);
+  public abstract int hashCode();
+  
   public int compareTo(Value x) {
     Value w = this;
     
@@ -243,6 +245,4 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     if (this instanceof Nothing )return article? "nothing"      : "nothing";
     return getClass().getSimpleName();
   }
-  public abstract int hashCode();
-  
 }

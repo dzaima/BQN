@@ -4,12 +4,12 @@ import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.*;
 
-public class FindBuiltin extends Builtin {
+public class FindBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍷";
   }

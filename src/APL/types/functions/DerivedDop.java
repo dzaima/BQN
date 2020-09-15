@@ -27,11 +27,6 @@ public class DerivedDop extends Fun {
   public Value callInvW(Value w, Value x) {
     return op.callInvW(f, g, w, x);
   }
-  @Override public String repr() {
-    String wws = g.oneliner();
-    if (!(g instanceof Arr) && wws.length() != 1) wws = "("+wws+")";
-    return f.oneliner()+op.repr()+wws;
-  }
   
   public Value under(Value o, Value x) {
     return op.under(f, g, o, x, this);
@@ -41,5 +36,22 @@ public class DerivedDop extends Fun {
   }
   public Value underA(Value o, Value w, Value x) {
     return op.underA(f, g, o, w, x, this);
+  }
+  
+  public String repr() {
+    String wws = g.oneliner();
+    if (!(g instanceof Arr) && wws.length() != 1) wws = "("+wws+")";
+    return f.oneliner()+op.repr()+wws;
+  }
+  public boolean eq(Value o) {
+    if (!(o instanceof DerivedDop)) return false;
+    DerivedDop that = (DerivedDop) o;
+    return this.op.eq(that.op) && this.f.eq(that.f) && this.g.eq(that.g);
+  }
+  public int hashCode() {
+    int res =     op.hashCode();
+    res = 31*res + f.hashCode();
+    res = 31*res + g.hashCode();
+    return res;
   }
 }

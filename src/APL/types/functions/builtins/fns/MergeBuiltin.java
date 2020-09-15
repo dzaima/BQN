@@ -4,11 +4,11 @@ import APL.Main;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
-public class MergeBuiltin extends Builtin {
+public class MergeBuiltin extends FnBuiltin {
   
   @Override public Value call(Value w, Value x) {
     if (x.rank != 1) throw new DomainError("%: 𝕩 must be a vector", this, x);

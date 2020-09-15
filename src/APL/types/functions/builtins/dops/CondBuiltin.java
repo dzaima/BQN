@@ -2,10 +2,14 @@ package APL.types.functions.builtins.dops;
 
 import APL.errors.*;
 import APL.types.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 import APL.types.functions.builtins.fns2.LBoxUBBuiltin;
 
-public class CondBuiltin extends Dop {
+public class CondBuiltin extends DopBuiltin {
+  public String repr() {
+    return "◶";
+  }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) {
     return get(f.call(x), g).call(x);
@@ -22,9 +26,5 @@ public class CondBuiltin extends Dop {
       return g.get(f);
     }
     return LBoxUBBuiltin.on(F, g, this);
-  }
-  
-  public String repr() {
-    return "◶";
   }
 }

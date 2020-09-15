@@ -5,11 +5,11 @@ import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
-public class JoinBuiltin extends Builtin {
+public class JoinBuiltin extends FnBuiltin {
   
   public String repr() {
     return "∾";

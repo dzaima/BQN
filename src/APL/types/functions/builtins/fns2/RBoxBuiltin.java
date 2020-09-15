@@ -3,12 +3,12 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.IntArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.HashMap;
 
-public class RBoxBuiltin extends Builtin {
+public class RBoxBuiltin extends FnBuiltin {
   public String repr() {
     return "⊐";
   }

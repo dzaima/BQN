@@ -5,11 +5,12 @@ import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 
 import java.util.Arrays;
 
-public class EachBuiltin extends Mop {
+public class EachBuiltin extends MopBuiltin {
   @Override public String repr() {
     return "¨";
   }

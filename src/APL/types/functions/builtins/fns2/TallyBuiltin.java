@@ -3,9 +3,9 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.IntArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class TallyBuiltin extends Builtin {
+public class TallyBuiltin extends FnBuiltin {
   
   public String repr() {
     return "≢";

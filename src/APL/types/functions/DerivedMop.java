@@ -27,10 +27,6 @@ public class DerivedMop extends Fun {
     return op.callInvW(f, w, x);
   }
   
-  @Override public String repr() {
-    return f.oneliner()+op.repr();
-  }
-  
   public Value under(Value o, Value x) {
     return op.under(f, o, x, this);
   }
@@ -39,5 +35,18 @@ public class DerivedMop extends Fun {
   }
   public Value underA(Value o, Value w, Value x) {
     return op.underA(f, o, w, x, this);
+  }
+  
+  
+  public String repr() {
+    return f.oneliner()+op.repr();
+  }
+  public boolean eq(Value o) {
+    if (!(o instanceof DerivedMop)) return false;
+    DerivedMop that = (DerivedMop) o;
+    return this.op.eq(that.op) && this.f.eq(that.f);
+  }
+  public int hashCode() {
+    return 31*f.hashCode() + op.hashCode();
   }
 }

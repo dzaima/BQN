@@ -7,6 +7,7 @@ import APL.tools.Body;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.functions.*;
+import APL.types.functions.builtins.*;
 import APL.types.functions.builtins.dops.DepthBuiltin;
 import APL.types.functions.builtins.fns2.*;
 import APL.types.functions.userDefined.*;
@@ -171,7 +172,7 @@ public class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
-        case "•ia": return new Builtin() {
+        case "•ia": return new FnBuiltin() {
           public String repr() { return "•IA"; }
 
           public Value call(Value x) {
@@ -180,7 +181,7 @@ public class Scope {
             return new IntArr(is, x.shape);
           }
         };
-        case "•rand": return new Builtin() {
+        case "•rand": return new FnBuiltin() {
           public Value call(Value x) {
             return RandBuiltin.on(x, Scope.this);
           }
@@ -189,14 +190,14 @@ public class Scope {
             return "•RAND";
           }
         };
-        case "•r": return new Dop() {
+        case "•r": return new DopBuiltin() {
           public String repr() { return "•_R_"; }
   
           public Value call(Value f, Value g, Value x, DerivedDop derv) {
             return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
-        case "•u": return new Builtin() {
+        case "•u": return new FnBuiltin() {
           public String repr() { return "•U"; }
   
           public Value call(Value x) {
@@ -204,7 +205,7 @@ public class Scope {
             return null;
           }
         };
-        case "•comp": return new Builtin() {
+        case "•comp": return new FnBuiltin() {
           
           public String repr() {
             return "•COMP";
@@ -338,7 +339,7 @@ public class Scope {
     return owner(depth).vars[n];
   }
   
-  static class GCLog extends Builtin {
+  static class GCLog extends Fun {
     public String repr() {
       return "•GCLOG";
     }
@@ -369,10 +370,10 @@ public class Scope {
       }
   
       public boolean eq(Value o) { return this == o; }
-      public int hashCode() { return 0; }
+      public int hashCode() { return actualHashCode(); }
     }
   }
-  static class Timer extends Builtin {
+  static class Timer extends Fun {
     public String repr() { return "•TIME"; }
     
     private final Scope sc;
@@ -409,7 +410,7 @@ public class Scope {
   }
   
   
-  static class CompTimer extends Builtin {
+  static class CompTimer extends Fun {
     public String repr() { return "•CTIME"; }
     
     private final Scope sc;
@@ -448,7 +449,7 @@ public class Scope {
   }
   
   
-  class Eraser extends Builtin { // leaves a hole in the local variable map and probably breaks many things; TODO should maybe be a ucmd?
+  class Eraser extends FnBuiltin { // leaves a hole in the local variable map and probably breaks many things; TODO should maybe be a ucmd?
     public String repr() { return "•ERASE"; }
     
     public Value call(Value x) {
@@ -460,7 +461,7 @@ public class Scope {
       return Num.ONE;
     }
   }
-  static class Delay extends Builtin {
+  static class Delay extends FnBuiltin {
     public String repr() {
       return "•DL";
     }
@@ -475,7 +476,7 @@ public class Scope {
       return new Num((System.nanoTime() - nsS) / 1000000000d);
     }
   }
-  static class UCS extends Builtin {
+  static class UCS extends FnBuiltin {
     public String repr() {
       return "•UCS";
     }
@@ -499,7 +500,7 @@ public class Scope {
     }
   }
   
-  private static class MapGen extends Builtin {
+  private static class MapGen extends FnBuiltin {
     public String repr() { return "•MAP"; }
     
     public Value call(Value x) {
@@ -538,7 +539,7 @@ public class Scope {
     }
   }
   
-  private class Optimizer extends Builtin {
+  private class Optimizer extends FnBuiltin {
     public String repr() { return "•OPT"; }
     
     public Value call(Value x) {
@@ -550,7 +551,7 @@ public class Scope {
       return Num.ONE;
     }
   }
-  private static class ClassGetter extends Builtin {
+  private static class ClassGetter extends FnBuiltin {
     public String repr() { return "•CLASS"; }
     
     public Value call(Value x) {
@@ -558,7 +559,7 @@ public class Scope {
     }
   }
   
-  private class Ex extends Builtin {
+  private class Ex extends FnBuiltin {
     public String repr() { return "•EX"; }
     
     public Value call(Value x) {
@@ -571,7 +572,7 @@ public class Scope {
       return Scope.this.sys.execFile(path, w.values(), new Scope(Scope.this));
     }
   }
-  private static class Lns extends Builtin {
+  private static class Lns extends FnBuiltin {
     public String repr() { return "•LNS"; }
     
     public Value call(Value x) {
@@ -651,7 +652,7 @@ public class Scope {
   }
   
   
-  private static class Shell extends Builtin {
+  private static class Shell extends FnBuiltin {
     public String repr() { return "•SH"; }
     
     public Value call(Value x) {
@@ -730,7 +731,7 @@ public class Scope {
   }
   
   
-  private class NC extends Builtin {
+  private class NC extends FnBuiltin {
     public String repr() { return "•NC"; }
     
     public Value call(Value x) {
@@ -744,14 +745,14 @@ public class Scope {
   }
   
   
-  private static class Hasher extends Builtin {
+  private static class Hasher extends FnBuiltin {
     public String repr() { return "•HASH"; }
     
     public Value call(Value x) {
       return Num.of(x.hashCode());
     }
   }
-  private static class Stdin extends Builtin {
+  private static class Stdin extends FnBuiltin {
     public String repr() { return "•STDIN"; }
     public Value call(Value x) {
       if (x instanceof Num) {
@@ -769,7 +770,7 @@ public class Scope {
     }
   }
   
-  public static class Profiler extends Builtin {
+  public static class Profiler extends Fun {
     public String repr() { return "•PFX"; }
     
     private final Scope sc;
@@ -903,7 +904,7 @@ public class Scope {
     }
   }
   
-  private static class Big extends Builtin {
+  private static class Big extends FnBuiltin {
     public String repr() { return "•BIG"; }
     
     public Value call(Value x) {
@@ -934,7 +935,7 @@ public class Scope {
     }
   }
   
-  static class AS extends Builtin {
+  static class AS extends FnBuiltin {
     /*
       0 - bit booleans
       1 - 32-bit ints
@@ -959,7 +960,7 @@ public class Scope {
     }
   }
   
-  static class DR extends Builtin {
+  static class DR extends FnBuiltin {
     public String repr() { return "•DR"; }
     
     /*

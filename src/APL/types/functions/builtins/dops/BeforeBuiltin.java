@@ -1,9 +1,10 @@
 package APL.types.functions.builtins.dops;
 
 import APL.types.Value;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 
-public class BeforeBuiltin extends Dop {
+public class BeforeBuiltin extends DopBuiltin {
   public String repr() {
     return "⊸";
   }

@@ -2,9 +2,9 @@ package APL.types.functions.builtins.fns2;
 
 import APL.Main;
 import APL.types.Value;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class FormatBuiltin extends Builtin {
+public class FormatBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍕";
   }

@@ -4,10 +4,11 @@ import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
-public class ScanBuiltin extends Mop {
+public class ScanBuiltin extends MopBuiltin {
   @Override public String repr() {
     return "`";
   }

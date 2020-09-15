@@ -3,11 +3,11 @@ package APL.types.functions.builtins.fns;
 import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 
-public class ExclBuiltin extends Builtin {
+public class ExclBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "!";
   }

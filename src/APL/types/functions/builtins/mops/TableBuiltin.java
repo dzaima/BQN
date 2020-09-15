@@ -3,9 +3,10 @@ package APL.types.functions.builtins.mops;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 
-public final class TableBuiltin extends Mop {
+public final class TableBuiltin extends MopBuiltin {
   @Override public String repr() {
     return "⌜";
   }

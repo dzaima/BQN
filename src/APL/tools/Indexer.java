@@ -4,7 +4,7 @@ package APL.tools;
 import APL.Main;
 import APL.errors.*;
 import APL.types.*;
-import APL.types.arrs.*;
+import APL.types.arrs.EmptyArr;
 
 import java.util.*;
 

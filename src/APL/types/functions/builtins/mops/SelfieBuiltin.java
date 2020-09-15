@@ -2,10 +2,11 @@ package APL.types.functions.builtins.mops;
 
 import APL.errors.DomainError;
 import APL.types.Value;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 import APL.types.functions.builtins.fns2.*;
 
-public class SelfieBuiltin extends Mop {
+public class SelfieBuiltin extends MopBuiltin {
   public String repr() {
     return "˜";
   }

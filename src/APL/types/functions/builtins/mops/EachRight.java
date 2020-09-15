@@ -2,9 +2,10 @@ package APL.types.functions.builtins.mops;
 
 import APL.types.*;
 import APL.types.arrs.SingleItemArr;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
+import APL.types.functions.builtins.MopBuiltin;
 
-public class EachRight extends Mop {
+public class EachRight extends MopBuiltin {
   @Override public String repr() {
     return "ᑈ";
   }

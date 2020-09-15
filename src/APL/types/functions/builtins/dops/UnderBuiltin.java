@@ -2,10 +2,11 @@ package APL.types.functions.builtins.dops;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 import APL.types.functions.builtins.mops.InvBuiltin;
 
-public class UnderBuiltin extends Dop {
+public class UnderBuiltin extends DopBuiltin {
   @Override public String repr() {
     return "⌾";
   }
@@ -55,6 +56,14 @@ public class UnderBuiltin extends Dop {
     
     public String repr() {
       return f.repr();
+    }
+    public boolean eq(Value o) {
+      if (!(o instanceof BindA)) return false;
+      BindA that = (BindA) o;
+      return this.w.eq(that.w) && this.f.eq(that.f);
+    }
+    public int hashCode() {
+      return 31*w.hashCode() + f.hashCode();
     }
   }
 }

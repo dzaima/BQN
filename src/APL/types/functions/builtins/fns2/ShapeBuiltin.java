@@ -5,12 +5,12 @@ import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.dops.AtopBuiltin;
 
 import java.util.Arrays;
 
-public class ShapeBuiltin extends Builtin {
+public class ShapeBuiltin extends FnBuiltin {
   public String repr() {
     return "⥊";
   }

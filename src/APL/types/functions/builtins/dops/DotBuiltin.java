@@ -1,10 +1,11 @@
 package APL.types.functions.builtins.dops;
 
 import APL.types.Value;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 import APL.types.functions.builtins.mops.FoldBuiltin;
 
-public class DotBuiltin extends Dop {
+public class DotBuiltin extends DopBuiltin {
   @Override public String repr() {
     return ".";
   }

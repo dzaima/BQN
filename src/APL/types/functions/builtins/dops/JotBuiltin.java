@@ -2,9 +2,10 @@ package APL.types.functions.builtins.dops;
 
 import APL.errors.SyntaxError;
 import APL.types.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
+import APL.types.functions.builtins.DopBuiltin;
 
-public class JotBuiltin extends Dop {
+public class JotBuiltin extends DopBuiltin {
   @Override public String repr() {
     return "∘";
   }

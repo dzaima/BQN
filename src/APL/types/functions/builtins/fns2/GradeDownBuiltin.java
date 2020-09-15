@@ -4,13 +4,13 @@ import APL.Main;
 import APL.errors.DomainError;
 import APL.types.Value;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.dops.NCellBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
 import java.util.Arrays;
 
-public class GradeDownBuiltin extends Builtin {
+public class GradeDownBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍒";
   }

@@ -3,11 +3,11 @@ package APL.types.functions.builtins.fns2;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.math.BigInteger;
 
-public class UTackBuiltin extends Builtin {
+public class UTackBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊥";
   }

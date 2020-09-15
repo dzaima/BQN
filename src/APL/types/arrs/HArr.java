@@ -3,7 +3,7 @@ package APL.types.arrs;
 import APL.errors.DomainError;
 import APL.types.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class HArr extends Arr {
   private final Value[] arr;

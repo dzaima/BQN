@@ -39,4 +39,14 @@ public class Atop extends Fun {
   public String repr() {
     return "("+g+" "+h+")";
   }
+  
+  
+  public boolean eq(Value o) {
+    if (!(o instanceof Atop)) return false;
+    Atop that = (Atop) o;
+    return this.g.eq(that.g) && this.h.eq(that.h);
+  }
+  public int hashCode() {
+    return 31*g.hashCode() + h.hashCode();
+  }
 }

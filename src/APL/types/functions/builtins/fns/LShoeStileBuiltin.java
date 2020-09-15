@@ -3,11 +3,11 @@ package APL.types.functions.builtins.fns;
 import APL.errors.RankError;
 import APL.types.Value;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.*;
 
-public class LShoeStileBuiltin extends Builtin {
+public class LShoeStileBuiltin extends FnBuiltin {
   
   @Override public Value call(Value w, Value x) {
     HashMap<Value, Integer> counts = new HashMap<>();

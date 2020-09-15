@@ -4,12 +4,12 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
 
-public class RhoBuiltin extends Builtin {
+public class RhoBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍴";
   }

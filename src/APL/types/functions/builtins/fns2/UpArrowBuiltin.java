@@ -5,10 +5,10 @@ import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.mops.CellBuiltin;
 
-public class UpArrowBuiltin extends Builtin {
+public class UpArrowBuiltin extends FnBuiltin {
   
   public String repr() {
     return "↑";

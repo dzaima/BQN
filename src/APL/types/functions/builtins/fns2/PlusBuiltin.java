@@ -4,10 +4,10 @@ import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.ChrArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 
-public class PlusBuiltin extends Builtin {
+public class PlusBuiltin extends FnBuiltin {
   public String repr() {
     return "+";
   }

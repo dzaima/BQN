@@ -3,10 +3,10 @@ package APL.types.functions.builtins.fns2;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
 
-public class LTBuiltin extends Builtin {
+public class LTBuiltin extends FnBuiltin {
   public String repr() {
     return "<";
   }

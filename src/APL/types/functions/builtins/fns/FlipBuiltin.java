@@ -1,10 +1,10 @@
 package APL.types.functions.builtins.fns;
 
 import APL.types.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.fns2.MinusBuiltin;
 
-public class FlipBuiltin extends Builtin {
+public class FlipBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⊖";
   }

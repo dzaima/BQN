@@ -3,9 +3,9 @@ package APL.types.functions.builtins.fns;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 
-public class SemiUBBuiltin extends Builtin {
+public class SemiUBBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍮";
   }

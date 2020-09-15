@@ -2,10 +2,10 @@ package APL.types.functions.builtins.fns;
 
 import APL.types.Value;
 import APL.types.arrs.EmptyArr;
-import APL.types.functions.Builtin;
+import APL.types.functions.builtins.FnBuiltin;
 import APL.types.functions.builtins.fns2.JoinBuiltin;
 
-public class CommaBarBuiltin extends Builtin {
+public class CommaBarBuiltin extends FnBuiltin {
   @Override public String repr() {
     return "⍪";
   }
