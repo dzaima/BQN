@@ -9,13 +9,13 @@ import APL.types.callable.blocks.*;
 
 import java.util.*;
 
-public class DfnTok extends TokArr<LineTok> {
+public class BlockTok extends TokArr<LineTok> {
   public Comp comp;
   public final boolean immediate;
   public final static boolean immBlock = true;
   public final ArrayList<Body> bodies;
   
-  public DfnTok(String line, int spos, int epos, ArrayList<LineTok> tokens) {
+  public BlockTok(String line, int spos, int epos, ArrayList<LineTok> tokens) {
     super(line, spos, epos, tokens);
     type = 'f'; boolean canBeImmediate = funType(tokens, this);
     ArrayList<ArrayList<LineTok>> parts = new ArrayList<>();
@@ -92,7 +92,7 @@ public class DfnTok extends TokArr<LineTok> {
     this.bodies = bodies;
   }
   
-  public DfnTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) {
+  public BlockTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) {
     super(line, spos, epos, tokens);
     assert pointless;
     comp = null;
@@ -101,23 +101,23 @@ public class DfnTok extends TokArr<LineTok> {
   }
   
   
-  public DfnTok(char type, boolean imm, int off, String[] varNames) {
+  public BlockTok(char type, boolean imm, int off, String[] varNames) {
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
     bodies = new ArrayList<>();
     immediate = imm;
     bodies.add(new Body(this, type, imm, off, varNames, 'a'));
   }
-  public DfnTok(char type, boolean imm) {
+  public BlockTok(char type, boolean imm) {
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
     bodies = new ArrayList<>();
     immediate = imm;
   }
   
-  public static boolean funType(Token t, DfnTok dt) { // returns if can be immediate, mutates dt's type
+  public static boolean funType(Token t, BlockTok dt) { // returns if can be immediate, mutates dt's type
     if (t instanceof TokArr<?>) {
-      if (!(t instanceof DfnTok)) {
+      if (!(t instanceof BlockTok)) {
         boolean imm = true;
         for (Token c : ((TokArr<?>) t).tokens) imm&= funType(c, dt);
         return imm;
@@ -142,7 +142,7 @@ public class DfnTok extends TokArr<LineTok> {
     } else return true;
   }
   
-  private boolean funType(List<LineTok> lns, DfnTok dfn) { // TODO split up into separate thing getting immediate and type
+  private boolean funType(List<LineTok> lns, BlockTok dfn) { // TODO split up into separate thing getting immediate and type
     boolean imm = true;
     for (LineTok ln : lns) imm&= funType(ln, dfn);
     return imm;

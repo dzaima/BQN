@@ -17,7 +17,7 @@ public class Comp {
   public final byte[] bc;
   public final Value[] objs;
   public final String[] strs;
-  public final DfnTok[] dfns;
+  public final BlockTok[] dfns;
   private final Token[] ref;
   private final Token tk;
   
@@ -25,7 +25,7 @@ public class Comp {
   private int iter;
   private JFn gen;
   
-  public Comp(byte[] bc, Value[] objs, String[] strs, DfnTok[] dfns, Token[] ref, Token tk) {
+  public Comp(byte[] bc, Value[] objs, String[] strs, BlockTok[] dfns, Token[] ref, Token tk) {
     this.bc = bc;
     this.objs = objs;
     this.strs = strs;
@@ -262,7 +262,7 @@ public class Comp {
         }
         case DFND: {
           int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          DfnTok dfn = dfns[n];
+          BlockTok dfn = dfns[n];
           s.push(dfn.eval(sc));
           break;
         }
@@ -380,7 +380,7 @@ public class Comp {
     if (dfns.length > 0) {
       b.append("dfns:\n");
       for (int j = 0; j < dfns.length; j++) {
-        DfnTok dfn = dfns[j];
+        BlockTok dfn = dfns[j];
         b.append(' ').append(j).append(": ").append(dfn.type=='f'? "function" : dfn.type=='d'? "2-modifier" : dfn.type=='m'? "1-modifier" : dfn.type=='a'? "immediate block" : String.valueOf(dfn.type)).append(" \n");
         b.append("  flags: ").append(dfn.flags).append('\n');
         Body b0 = dfn.bodies.get(0);
@@ -476,7 +476,7 @@ public class Comp {
     public Mut(boolean topLvl) { this.topLvl = topLvl; }
   
     ArrayList<Value> objs = new ArrayList<>();
-    ArrayList<DfnTok> dfns = new ArrayList<>();
+    ArrayList<BlockTok> dfns = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
     MutByteArr bc = new MutByteArr(10);
     ArrayList<Token> ref = new ArrayList<>();
@@ -503,7 +503,7 @@ public class Comp {
       objs.add(o);
     }
     
-    public void push(DfnTok o) {
+    public void push(BlockTok o) {
       add(o, DFND);
       addNum(dfns.size());
       dfns.add(o);
@@ -550,7 +550,7 @@ public class Comp {
     
     public Comp finish(Token tk) {
       assert bc.len == ref.size() : bc.len +" "+ ref.size();
-      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new DfnTok[0]), ref.toArray(new Token[0]), tk);
+      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
   
@@ -572,7 +572,7 @@ public class Comp {
     return mut.finish(lns);
   }
   
-  public static Comp comp(Mut mut, ArrayList<Body> parts, DfnTok tk) {
+  public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) {
     for (int i = 0; i < parts.size(); i++) {
       Body b = parts.get(i);
       b.start = mut.bc.len;
@@ -1003,7 +1003,7 @@ public class Comp {
         t.flags = 7;
       } else t.flags = 6;
       for (Token c : ts) {
-        if (c instanceof DfnTok) t.flags&= ~2;
+        if (c instanceof BlockTok) t.flags&= ~2;
         t.flags&= flags(c);
       }
       return t.flags;
@@ -1166,8 +1166,8 @@ public class Comp {
     if (tk instanceof SetTok || tk instanceof ModTok) {
       return;
     }
-    if (tk instanceof DfnTok) {
-      m.push((DfnTok) tk);
+    if (tk instanceof BlockTok) {
+      m.push((BlockTok) tk);
       return;
     }
     throw new ImplementationError("can't compile "+tk.getClass());

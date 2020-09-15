@@ -9,7 +9,7 @@ import APL.types.Value;
 import java.util.*;
 
 public class Body {
-  public final DfnTok o;
+  public final BlockTok o;
   public final ArrayList<LineTok> lns;
   public final char arity; // one of [mda] - monadic, dyadic, ambivalent
   public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
@@ -21,7 +21,7 @@ public class Body {
   public int start;
   public String[] vars;
   
-  public Body(DfnTok o, char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
+  public Body(BlockTok o, char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
     this.o = o;
     this.lns = null;
     self = null;
@@ -34,7 +34,7 @@ public class Body {
     this.vars = vars;
   }
   
-  public Body(DfnTok o, ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
+  public Body(BlockTok o, ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
     noHeader = true;
     this.o = o;
     this.lns = lns;
@@ -47,7 +47,7 @@ public class Body {
   
   
   
-  public Body(DfnTok o, LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
+  public Body(BlockTok o, LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
     this.o = o;
     this.lns = lns;
     noHeader = false;

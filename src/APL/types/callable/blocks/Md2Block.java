@@ -1,17 +1,17 @@
 package APL.types.callable.blocks;
 
 import APL.*;
-import APL.tokenizer.types.DfnTok;
+import APL.tokenizer.types.BlockTok;
 import APL.types.*;
 import APL.types.callable.Md2Derv;
 
 
 
 public class Md2Block extends Md2 {
-  public final DfnTok code;
+  public final BlockTok code;
   public final Scope sc;
   
-  public Md2Block(DfnTok t, Scope sc) {
+  public Md2Block(BlockTok t, Scope sc) {
     this.sc = sc;
     code = t;
   }

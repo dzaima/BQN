@@ -2,7 +2,7 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.Token;
-import APL.tokenizer.types.DfnTok;
+import APL.tokenizer.types.BlockTok;
 import APL.tools.Body;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -232,7 +232,7 @@ public class Scope {
             String[] strp = new String[str.ia];
             for (int i = 0; i < strp.length; i++) strp[i] = str.get(i).asString();
             
-            DfnTok[] dfnp = new DfnTok[blocks.ia];
+            BlockTok[] dfnp = new BlockTok[blocks.ia];
             for (int i = 0; i < dfnp.length; i++) {
               Value c = blocks.get(i);
               if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5");
@@ -250,9 +250,9 @@ public class Scope {
                 for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
                 
                 if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
-                dfnp[i] = new DfnTok(type, imm, off, lvars);
+                dfnp[i] = new BlockTok(type, imm, off, lvars);
               } else {
-                DfnTok r = new DfnTok(type, imm);
+                BlockTok r = new BlockTok(type, imm);
                 ArrayList<Body> bs = r.bodies;
                 int[] offs = c.get(2).asIntVec();
                 for (int j = 0; j < offs.length; j++) {
@@ -267,9 +267,9 @@ public class Scope {
             }
             
             Comp c = new Comp(bcp, objp, strp, dfnp, ref, Token.COMP);
-            for (DfnTok dfn : dfnp) dfn.comp = c;
+            for (BlockTok dfn : dfnp) dfn.comp = c;
             if (!allowImm) {
-              DfnTok f = new DfnTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt(), null);
+              BlockTok f = new BlockTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt(), null);
               f.comp = c;
               return f.eval(Scope.this);
             }
@@ -287,7 +287,7 @@ public class Scope {
           
           public Value call(Value w, Value x) {
             if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
-            DfnTok s = x instanceof FunBlock? ((FunBlock) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
+            BlockTok s = x instanceof FunBlock? ((FunBlock) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
             return call(w, Scope.this.get("•comp").call(Num.ZERO, x));
           }

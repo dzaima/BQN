@@ -152,8 +152,8 @@ public class Tokenizer {
             }
             break;
             case '}':
-              if (pointless) r = new DfnTok(raw, closed.pos, i+1, lineTokens, true);
-              else r = new DfnTok(raw, closed.pos, i+1, lineTokens);
+              if (pointless) r = new BlockTok(raw, closed.pos, i+1, lineTokens, true);
+              else r = new BlockTok(raw, closed.pos, i+1, lineTokens);
               break;
             case ']':
               r = new BracketTok(raw, closed.pos, i+1, lineTokens);
@@ -329,7 +329,7 @@ public class Tokenizer {
             r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts, '\0'));
             break;
           case '{':
-            r = new DfnTok(raw, closed.pos, len, lineTokens, true);
+            r = new BlockTok(raw, closed.pos, len, lineTokens, true);
             break;
           case '[':
             r = new BracketTok(raw, closed.pos, len, lineTokens);

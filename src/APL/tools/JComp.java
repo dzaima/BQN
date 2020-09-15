@@ -2,7 +2,7 @@ package APL.tools;
 
 import APL.*;
 import APL.errors.*;
-import APL.tokenizer.types.DfnTok;
+import APL.tokenizer.types.BlockTok;
 import APL.types.*;
 import APL.types.callable.builtins.fns.EvalBuiltin;
 import APL.types.callable.trains.*;
@@ -353,11 +353,11 @@ public class JComp {
           case DFND: {
             int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(0);
-            fn.getfield(JFn.class, "dfns", DfnTok[].class);
+            fn.getfield(JFn.class, "dfns", BlockTok[].class);
             fn.iconst(n);
             fn.aaload();
             fn.aload(SC);
-            fn.invvirt(DfnTok.class, "eval", met(Value.class, Scope.class));
+            fn.invvirt(BlockTok.class, "eval", met(Value.class, Scope.class));
             mstack = Math.max(mstack, cstack+3);
             cstack++;
             break;
