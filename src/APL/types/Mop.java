@@ -1,7 +1,7 @@
-package APL.types.functions;
+package APL.types;
 
 import APL.errors.*;
-import APL.types.*;
+import APL.types.functions.DerivedMop;
 
 public abstract class Mop extends Callable {
   

@@ -3,7 +3,7 @@ package APL.types.functions.userDefined;
 import APL.*;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedDop;
 
 
 

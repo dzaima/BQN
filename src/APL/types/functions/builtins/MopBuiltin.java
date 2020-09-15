@@ -1,7 +1,6 @@
 package APL.types.functions.builtins;
 
-import APL.types.Value;
-import APL.types.functions.Mop;
+import APL.types.*;
 
 public abstract class MopBuiltin extends Mop {
   public boolean eq(Value o) {

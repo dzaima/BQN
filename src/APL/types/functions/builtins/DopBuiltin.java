@@ -1,7 +1,6 @@
 package APL.types.functions.builtins;
 
-import APL.types.Value;
-import APL.types.functions.Dop;
+import APL.types.*;
 
 public abstract class DopBuiltin extends Dop {
   public boolean eq(Value o) {

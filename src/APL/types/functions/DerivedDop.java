@@ -5,7 +5,7 @@ import APL.types.*;
 public class DerivedDop extends Fun {
   public final Value f, g;
   public final Dop op;
-  DerivedDop(Value f, Value g, Dop op) {
+  public DerivedDop(Value f, Value g, Dop op) {
     this.f = f;
     this.g = g;
     this.op = op;

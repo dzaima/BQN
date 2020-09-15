@@ -5,7 +5,6 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.functions.*;
 import APL.types.functions.builtins.dops.*;
 import APL.types.functions.builtins.fns2.*;
 import APL.types.functions.builtins.mops.*;

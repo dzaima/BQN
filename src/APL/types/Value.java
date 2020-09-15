@@ -3,7 +3,7 @@ package APL.types;
 import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.arrs.*;
-import APL.types.functions.*;
+import APL.types.functions.DerivedMop;
 import APL.types.functions.builtins.mops.ConstBultin;
 
 import java.util.Iterator;

@@ -1,7 +1,7 @@
-package APL.types.functions;
+package APL.types;
 
 import APL.errors.*;
-import APL.types.*;
+import APL.types.functions.*;
 
 public abstract class Dop extends Callable {
   
