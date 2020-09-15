@@ -193,7 +193,7 @@ public class Scope {
         case "•r": return new Md2Builtin() {
           public String repr() { return "•_R_"; }
   
-          public Value call(Value f, Value g, Value x, DerivedDop derv) {
+          public Value call(Value f, Value g, Value x, Md2Derv derv) {
             return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
@@ -861,7 +861,7 @@ public class Scope {
       private final Scope sc;
       ProfilerMd2(Scope sc) { this.sc = sc; }
       
-      public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+      public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
         Pr p = pr(g, null, sc); p.start();
         long sns = System.nanoTime();
         Value res = f.call(w, x);
@@ -870,7 +870,7 @@ public class Scope {
         return res;
       }
       
-      public Value call(Value f, Value g, Value x, DerivedDop derv) {
+      public Value call(Value f, Value g, Value x, Md2Derv derv) {
         Pr p = pr(g, null, sc); p.start();
         long sns = System.nanoTime();
         Value res = f.call(x);

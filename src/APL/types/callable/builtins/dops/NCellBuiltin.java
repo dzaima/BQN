@@ -5,7 +5,7 @@ import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.fns.*;
 
@@ -16,7 +16,7 @@ public class NCellBuiltin extends Md2Builtin {
     return "⎉";
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value ra = g.call(x);
     if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
@@ -30,7 +30,7 @@ public class NCellBuiltin extends Md2Builtin {
     return GTBuiltin.merge(cs, rsh, this);
   }
   
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value ra = g.call(w, x);
     if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);

@@ -1,7 +1,7 @@
 package APL.types.callable.builtins.dops;
 
 import APL.types.Value;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 
 public class ObverseBuiltin extends Md2Builtin {
@@ -10,10 +10,10 @@ public class ObverseBuiltin extends Md2Builtin {
   }
   
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     return f.call(x);
   }
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     return f.call(w, x);
   }
   

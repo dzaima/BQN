@@ -246,7 +246,7 @@ public class JComp {
           }
           case OP2D: {                //                ; g d f
             fn.astore(TMP);           // store f        ; g d
-            fn.cast(Md2.class);       // cast d to dop  ; g D
+            fn.cast(Md2.class);       // cast d to 2-mod; g D
             fn.swap();                // place d below f; D g
             fn.aload(TMP); fn.swap(); // place g below f; D f g
             fn.invvirt(Md2.class, "derive", met(Value.class, Value.class, Value.class));

@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.errors.SyntaxError;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 
 public class JotBuiltin extends Md2Builtin {
@@ -11,7 +11,7 @@ public class JotBuiltin extends Md2Builtin {
   }
   
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     if (g instanceof Fun) {
       if (f instanceof Fun) {
         return f.call(g.call(x));
@@ -35,7 +35,7 @@ public class JotBuiltin extends Md2Builtin {
       throw new SyntaxError("arr∘arr makes no sense", this);
     }
   }
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     if (!(f instanceof Fun)) {
       throw new SyntaxError("operands of dyadically applied ∘ must be functions, but 𝔽 is "+f.humanType(true), this, f);
     }
@@ -53,7 +53,7 @@ public class JotBuiltin extends Md2Builtin {
     return f.callInvW(w, g.call(x));
   }
   
-  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
+  public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
     if (g instanceof Fun) {
       if (f instanceof Fun) {
         return g.under(new Fun() { public String repr() { return f.repr(); }

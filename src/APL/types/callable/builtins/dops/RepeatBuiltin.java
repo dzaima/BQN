@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 
 public class RepeatBuiltin extends Md2Builtin {
@@ -10,7 +10,7 @@ public class RepeatBuiltin extends Md2Builtin {
     return "⍟";
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value gf = g.call(x);
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
@@ -34,7 +34,7 @@ public class RepeatBuiltin extends Md2Builtin {
     return x;
   }
   
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value gf = g.call(w, x);
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
@@ -84,7 +84,7 @@ public class RepeatBuiltin extends Md2Builtin {
     throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, g);
   }
   
-  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
+  public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
     int n = g.asInt();
     return repeat(f, n, o, x);
   }

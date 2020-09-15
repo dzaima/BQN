@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.errors.DomainError;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.mops.InvBuiltin;
 
@@ -13,14 +13,14 @@ public class UnderBuiltin extends Md2Builtin {
   
   
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     return g.under(f, x);
   }
   public Value callInv(Value f, Value g, Value x) {
     return g.under(InvBuiltin.invertM(f), x);
   }
   
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     return g.under(new BindA(g.call(w), f), x);
   }
   public Value callInvX(Value f, Value g, Value w, Value x) {

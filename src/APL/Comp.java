@@ -459,8 +459,8 @@ public class Comp {
     a - array
     A - array or ·
     f - function
-    d - dop
-    m - mop
+    d - 2-modifier
+    m - 1-modifier
     
     ← - new var
     ↩ - upd var
@@ -971,7 +971,7 @@ public class Comp {
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
         if (last=='a' || last=='A') {
           for (char tp : tps) if (tp=='←' || tp=='↩') return t.type = 'a'; // {x←𝕨} discards the optionality property
-          return t.type = last; // not as arg of dop/mop
+          return t.type = last; // not as arg of modifier
         }
         if (last == 'f') return t.type = 'f';
         
@@ -1282,7 +1282,7 @@ public class Comp {
       case '>': return new GTBuiltin();
       case '≠': return new NEBuiltin();
       
-      // mops
+      // 1-modifiers
       case '´': return new FoldBuiltin();
       case '˝': return new InsertBuiltin();
       case '`': return new ScanBuiltin();
@@ -1296,7 +1296,7 @@ public class Comp {
       // case 'ᐵ': return new EachLeft();
       // case 'ᑈ': return new EachRight();
       
-      // dops
+      // 2-modifiers
       // case '.': return new DotBuiltin();
       // case '⍡': return new CRepeatBuiltin(sc);
       case '○': return new OverBuiltin();

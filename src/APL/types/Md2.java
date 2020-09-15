@@ -12,16 +12,16 @@ public abstract class Md2 extends Callable {
   
   
   public Value derive(Value f, Value g) {
-    return new DerivedDop(f, g, this);
+    return new Md2Derv(f, g, this);
   }
   public Md1 derive(Value g) {
-    return new HalfDerivedDop(g, this);
+    return new Md2HalfDerv(g, this);
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     throw new IncorrectArgsError(repr()+" can't be called monadically", derv, x);
   }
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     throw new IncorrectArgsError(repr()+" can't be called dyadically", derv, w);
   }
   
@@ -34,15 +34,15 @@ public abstract class Md2 extends Callable {
   public Value callInvW(Value f, Value g, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
-  public Value under(Value f, Value g, Value o, Value x, DerivedDop derv) {
+  public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, g, x, derv)) : o;
     return callInv(f, g, v);
   }
-  public Value underW(Value f, Value g, Value o, Value w, Value x, DerivedDop derv) {
+  public Value underW(Value f, Value g, Value o, Value w, Value x, Md2Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, g, w, x, derv)) : o;
     return callInvX(f, g, w, v);
   }
-  public Value underA(Value f, Value g, Value o, Value w, Value x, DerivedDop derv) {
+  public Value underA(Value f, Value g, Value o, Value w, Value x, Md2Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, g, w, x, derv)) : o;
     return callInvW(f, g, v, x);
   }

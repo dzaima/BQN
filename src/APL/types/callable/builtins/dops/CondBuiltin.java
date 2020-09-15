@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.errors.*;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.fns.LBoxUBBuiltin;
 
@@ -11,10 +11,10 @@ public class CondBuiltin extends Md2Builtin {
     return "◶";
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     return get(f.call(x), g).call(x);
   }
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     return get(f.call(w, x), g).call(w, x);
   }
   

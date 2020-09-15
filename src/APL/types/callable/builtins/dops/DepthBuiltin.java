@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.errors.*;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.fns.MatchBuiltin;
 
@@ -11,7 +11,7 @@ public class DepthBuiltin extends Md2Builtin {
     return "⚇";
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  public Value call(Value f, Value g, Value x, Md2Derv derv) {
     int d = g.asInt();
     if (d < 0) throw new NYIError("negative 𝕘 for ⚇", this, g);
     return on(f, d, x, derv);

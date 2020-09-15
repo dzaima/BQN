@@ -2,7 +2,7 @@ package APL.types.callable.builtins.dops;
 
 import APL.Main;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class CRepeatBuiltin extends Md2Builtin {
     return "⍡";
   }
   
-  @Override public Value call(Value f, Value g, Value x, DerivedDop derv) {
+  @Override public Value call(Value f, Value g, Value x, Md2Derv derv) {
     if (g instanceof Fun) {
       ArrayList<Value> res = new ArrayList<>();
       Value prev = x;

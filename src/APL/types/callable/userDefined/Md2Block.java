@@ -3,7 +3,7 @@ package APL.types.callable.userDefined;
 import APL.*;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
-import APL.types.callable.DerivedDop;
+import APL.types.callable.Md2Derv;
 
 
 
@@ -26,14 +26,14 @@ public class Md2Block extends Md2 {
   public Md1 derive(Value g) {
     if (!code.immediate) return super.derive(g);
     Main.printdbg("Md2Block immediate half-derive", g);
-    return new HalfDerivedDdop(g, this);
+    return new Md2BlockHalfDerv(g, this);
   }
   
-  public static class HalfDerivedDdop extends Md1 {
+  public static class Md2BlockHalfDerv extends Md1 {
     public final Value g;
     public final Md2Block op;
     
-    public HalfDerivedDdop(Value g, Md2Block op) {
+    public Md2BlockHalfDerv(Value g, Md2Block op) {
       this.g = g;
       this.op = op;
     }
@@ -48,9 +48,9 @@ public class Md2Block extends Md2 {
       return op.repr()+gs;
     }
     
-    public boolean eq(Value o) { // reminder: there's a separate HalfDerivedDop
-      if (!(o instanceof HalfDerivedDdop)) return false;
-      HalfDerivedDdop that = (HalfDerivedDdop) o;
+    public boolean eq(Value o) { // reminder: there's a separate Md2HalfDerv
+      if (!(o instanceof Md2BlockHalfDerv)) return false;
+      Md2BlockHalfDerv that = (Md2BlockHalfDerv) o;
       return g.eq(that.g) && op.eq(that.op);
     }
     public int hashCode() {
@@ -58,13 +58,13 @@ public class Md2Block extends Md2 {
     }
   }
   
-  public Value call(Value f, Value g, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
+  public Value call(Value f, Value g, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
     Main.printdbg("Md2Block call", x);
     
     return code.exec(sc, null, new Value[]{derv, x, Nothing.inst, this, f, g});
   }
   
-  public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
     Main.printdbg("Md2Block call", w, x);
     
     return code.exec(sc, w, new Value[]{derv, x, w, this, f, g});
