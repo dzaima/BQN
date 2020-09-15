@@ -2,10 +2,10 @@ package APL.types.callable;
 
 import APL.types.*;
 
-public class DerivedMop extends Fun {
+public class Md1Derv extends Fun {
   public final Value f;
   public final Md1 op;
-  public DerivedMop(Value f, Md1 op) {
+  public Md1Derv(Value f, Md1 op) {
     this.f = f;
     this.op = op;
     token = op.token;
@@ -42,8 +42,8 @@ public class DerivedMop extends Fun {
     return f.oneliner()+op.repr();
   }
   public boolean eq(Value o) {
-    if (!(o instanceof DerivedMop)) return false;
-    DerivedMop that = (DerivedMop) o;
+    if (!(o instanceof Md1Derv)) return false;
+    Md1Derv that = (Md1Derv) o;
     return this.op.eq(that.op) && this.f.eq(that.f);
   }
   public int hashCode() {

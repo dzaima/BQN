@@ -5,7 +5,7 @@ import APL.errors.LengthError;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.*;
 
@@ -17,7 +17,7 @@ public class CellBuiltin extends Md1Builtin {
     return "˘";
   }
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     if (x.rank == 0) return f.call(x);
     //if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     if (x.shape[0] == 0) return EmptyArr.SHAPE0Q;
@@ -29,7 +29,7 @@ public class CellBuiltin extends Md1Builtin {
     return GTBuiltin.merge(cells, new int[]{cells.length}, this);
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     // if (a.rank == 0) throw new RankError(f+"˘: scalar 𝕨 isn't allowed", this, w);
     // if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     // Value[] ac = cells(a);

@@ -3,7 +3,7 @@ package APL.types.callable.builtins.md1;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public final class TableBuiltin extends Md1Builtin {
@@ -11,11 +11,11 @@ public final class TableBuiltin extends Md1Builtin {
     return "⌜";
   }
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     return EachBuiltin.on(f, x);
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) { // TODO use valuecopy
+  public Value call(Value f, Value w, Value x, Md1Derv derv) { // TODO use valuecopy
     int[] sh = new int[w.rank+x.rank];
     System.arraycopy(w.shape, 0, sh, 0, w.rank);
     System.arraycopy(x.shape, 0, sh, w.rank, x.rank);

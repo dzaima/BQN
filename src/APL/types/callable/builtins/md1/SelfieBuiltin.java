@@ -2,7 +2,7 @@ package APL.types.callable.builtins.md1;
 
 import APL.errors.DomainError;
 import APL.types.Value;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.*;
 
@@ -13,10 +13,10 @@ public class SelfieBuiltin extends Md1Builtin {
   
   
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     return f.call(x, x);
   }
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     return f.call(x, w);
   }
   

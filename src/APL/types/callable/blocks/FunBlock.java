@@ -1,15 +1,15 @@
-package APL.types.callable.userDefined;
+package APL.types.callable.blocks;
 
 import APL.*;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
 
 
-public class Dfn extends Fun {
+public class FunBlock extends Fun {
   public final DfnTok code;
   public final Scope sc;
   
-  public Dfn(DfnTok t, Scope sc) {
+  public FunBlock(DfnTok t, Scope sc) {
     this.sc = sc;
     code = t;
   }

@@ -5,7 +5,7 @@ import APL.errors.DomainError;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.BitArr;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.*;
 
@@ -17,7 +17,7 @@ public class FoldBuiltin extends Md1Builtin {
   
   
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
     if (x.ia==0) {
       Value id = f.identity();
@@ -86,7 +86,7 @@ public class FoldBuiltin extends Md1Builtin {
     return foldr(f, a, a[a.length-1], 1);
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
   
     if (x.quickDoubleArr() && w instanceof Num) {

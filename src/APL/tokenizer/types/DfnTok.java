@@ -5,7 +5,7 @@ import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tools.Body;
 import APL.types.Value;
-import APL.types.callable.userDefined.*;
+import APL.types.callable.blocks.*;
 
 import java.util.*;
 
@@ -164,10 +164,10 @@ public class DfnTok extends TokArr<LineTok> {
   
   public Value eval(Scope sc) {
     switch (this.type) {
-      case 'f': return new Dfn(this, sc);
+      case 'f': return new FunBlock(this, sc);
       case 'm': return new Md1Block(this, sc);
       case 'd': return new Md2Block(this, sc);
-      case '?': if (Main.vind) return new Dfn(this, sc);
+      case '?': if (Main.vind) return new FunBlock(this, sc);
         /* fallthrough */
       case 'a': {
         Body b = bodies.get(0);

@@ -3,7 +3,7 @@ package APL.types;
 import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.arrs.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.md1.ConstBultin;
 
 import java.util.Iterator;
@@ -226,7 +226,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Value underA(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   public Value constant(Callable blame) {
     if (this instanceof Callable) {
-      if (this instanceof DerivedMop && ((DerivedMop) this).op instanceof ConstBultin) return ((DerivedMop) this).f;
+      if (this instanceof Md1Derv && ((Md1Derv) this).op instanceof ConstBultin) return ((Md1Derv) this).f;
       throw new DomainError(blame+": cannot interpret "+humanType(true)+" as a constant", blame, this);
     }
     return this;

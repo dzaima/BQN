@@ -5,7 +5,7 @@ import APL.errors.*;
 import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class EachBuiltin extends Md1Builtin {
   
   
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     return on(f, x);
   }
   
@@ -39,7 +39,7 @@ public class EachBuiltin extends Md1Builtin {
     }
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     if (x.scalar()) {
       if (w.scalar()) return SingleItemArr.r0(f.call(w.first(), x.first()));
       Value[] n = new Value[w.ia];
@@ -84,7 +84,7 @@ public class EachBuiltin extends Md1Builtin {
     return Arr.create(n, x.shape);
   }
   
-  public Value under(Value f, Value o, Value x, DerivedMop derv) {
+  public Value under(Value f, Value o, Value x, Md1Derv derv) {
     Value[] res2 = new Value[x.ia];
     rec(f, o, x, 0, new Value[x.ia], new Value[1], res2);
     return Arr.create(res2, x.shape);
@@ -106,7 +106,7 @@ public class EachBuiltin extends Md1Builtin {
   }
   
   
-  public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
+  public Value underW(Value f, Value o, Value w, Value x, Md1Derv derv) {
     return underW(f, o, w, x, this);
   }
   

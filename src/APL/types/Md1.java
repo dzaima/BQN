@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.errors.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 
 public abstract class Md1 extends Callable {
   
@@ -12,12 +12,12 @@ public abstract class Md1 extends Callable {
   
   
   public Value derive(Value f) {
-    return new DerivedMop(f, this);
+    return new Md1Derv(f, this);
   }
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     throw new IncorrectArgsError(repr()+" can't be called monadically", derv, x);
   }
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     throw new IncorrectArgsError(repr()+" can't be called dyadically", derv, w);
   }
   
@@ -30,15 +30,15 @@ public abstract class Md1 extends Callable {
   public Value callInvW(Value f, Value w, Value x) {
     throw new DomainError(this+" doesn't support dyadic inverting of 𝕨", this, x);
   }
-  public Value under(Value f, Value o, Value x, DerivedMop derv) {
+  public Value under(Value f, Value o, Value x, Md1Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, x, derv)) : o;
     return callInv(f, v);
   }
-  public Value underW(Value f, Value o, Value w, Value x, DerivedMop derv) {
+  public Value underW(Value f, Value o, Value w, Value x, Md1Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
     return callInvX(f, w, v);
   }
-  public Value underA(Value f, Value o, Value w, Value x, DerivedMop derv) {
+  public Value underA(Value f, Value o, Value w, Value x, Md1Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, w, x, derv)) : o;
     return callInvW(f, v, x);
   }

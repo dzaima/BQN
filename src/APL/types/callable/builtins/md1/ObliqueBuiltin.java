@@ -3,7 +3,7 @@ package APL.types.callable.builtins.md1;
 import APL.errors.*;
 import APL.types.Value;
 import APL.types.arrs.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.GTBuiltin;
 
@@ -14,7 +14,7 @@ public class ObliqueBuiltin extends Md1Builtin {
   
   
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     if (x.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, x);
     int[] sz = x.shape;
     int H = sz[0];

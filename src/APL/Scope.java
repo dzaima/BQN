@@ -10,7 +10,7 @@ import APL.types.callable.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.md2.DepthBuiltin;
 import APL.types.callable.builtins.fns.*;
-import APL.types.callable.userDefined.*;
+import APL.types.callable.blocks.*;
 
 import java.io.*;
 import java.net.*;
@@ -287,7 +287,7 @@ public class Scope {
           
           public Value call(Value w, Value x) {
             if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
-            DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
+            DfnTok s = x instanceof FunBlock? ((FunBlock) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
             return call(w, Scope.this.get("•comp").call(Num.ZERO, x));
           }
@@ -833,7 +833,7 @@ public class Scope {
         return p;
       }
       
-      public Value call(Value f, Value x, DerivedMop derv) {
+      public Value call(Value f, Value x, Md1Derv derv) {
         Pr p = pr(f); p.start();
         long sns = System.nanoTime();
         Value r = p.fn.call(x);
@@ -842,7 +842,7 @@ public class Scope {
         return r;
       }
       
-      public Value call(Value f, Value w, Value x, DerivedMop derv) {
+      public Value call(Value f, Value w, Value x, Md1Derv derv) {
         Pr p = pr(f); p.start();
         long sns = System.nanoTime();
         Value r = p.fn.call(w, x);

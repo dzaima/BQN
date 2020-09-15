@@ -180,7 +180,7 @@ public class Comp {
         }
         case OP1D: {
           Value f = (Value) s.pop();
-          Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
+          Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to modifier for stuff like F←+ ⋄ 1_f
           Value d = r.derive(f); d.token = r.token;
           s.push(d);
           break;

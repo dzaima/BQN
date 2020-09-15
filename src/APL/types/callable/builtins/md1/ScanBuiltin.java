@@ -4,7 +4,7 @@ import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.*;
 
@@ -13,7 +13,7 @@ public class ScanBuiltin extends Md1Builtin {
     return "`";
   }
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     if (x.ia == 0) return x;
     if (x.rank == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
     int l = Arr.prod(x.shape, 1, x.shape.length);
@@ -83,7 +83,7 @@ public class ScanBuiltin extends Md1Builtin {
     return Arr.create(res, x.shape);
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     int n = w.asInt();
     int len = x.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);

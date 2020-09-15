@@ -4,7 +4,7 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.HArr;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 import java.util.*;
@@ -14,7 +14,7 @@ public class OldKeyBuiltin extends Md1Builtin {
     return "⌸";
   }
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     if (f instanceof APLMap) {
       if (x.rank > 1) {
         Value[] arr = new Value[x.ia];
@@ -50,7 +50,7 @@ public class OldKeyBuiltin extends Md1Builtin {
     throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv, f);
   }
   
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     if (f instanceof APLMap) {
       ((APLMap) f).set(w, x);
       return x;

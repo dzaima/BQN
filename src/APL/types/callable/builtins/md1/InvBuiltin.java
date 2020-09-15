@@ -2,7 +2,7 @@ package APL.types.callable.builtins.md1;
 
 import APL.errors.NYIError;
 import APL.types.*;
-import APL.types.callable.DerivedMop;
+import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public class InvBuiltin extends Md1Builtin {
@@ -10,10 +10,10 @@ public class InvBuiltin extends Md1Builtin {
     return "⁼";
   }
   
-  public Value call(Value f, Value x, DerivedMop derv) {
+  public Value call(Value f, Value x, Md1Derv derv) {
     return f.callInv(x);
   }
-  public Value call(Value f, Value w, Value x, DerivedMop derv) {
+  public Value call(Value f, Value w, Value x, Md1Derv derv) {
     return f.callInvX(w, x);
   }
   

@@ -7,7 +7,7 @@ import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.fns.EvalBuiltin;
-import APL.types.callable.userDefined.*;
+import APL.types.callable.blocks.*;
 
 import java.io.*;
 import java.util.*;
@@ -95,7 +95,7 @@ public abstract class Sys {
             Value v = Main.exec(rest, csc, defArgs);
             if (v instanceof Callable) {
               Scope nsc = null;
-              if (v instanceof Dfn ) nsc = ((Dfn ) v).sc;
+              if (v instanceof FunBlock) nsc = ((FunBlock) v).sc;
               if (v instanceof Md1Block) nsc = ((Md1Block) v).sc;
               if (v instanceof Md2Block) nsc = ((Md2Block) v).sc;
               if (v instanceof EvalBuiltin) nsc = ((EvalBuiltin) v).sc;
