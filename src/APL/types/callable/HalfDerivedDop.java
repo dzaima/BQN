@@ -2,11 +2,11 @@ package APL.types.callable;
 
 import APL.types.*;
 
-public class HalfDerivedDop extends Mop {
+public class HalfDerivedDop extends Md1 {
   public final Value g;
-  public final Dop op;
+  public final Md2 op;
   
-  public HalfDerivedDop(Value g, Dop op) {
+  public HalfDerivedDop(Value g, Md2 op) {
     this.g = g;
     this.op = op;
   }

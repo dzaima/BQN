@@ -6,11 +6,11 @@ import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
 import java.util.Arrays;
 
-public class EachBuiltin extends MopBuiltin {
+public class EachBuiltin extends Md1Builtin {
   @Override public String repr() {
     return "¨";
   }

@@ -3,11 +3,11 @@ package APL.types.callable.builtins.dops;
 import APL.Main;
 import APL.types.*;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
 
 import java.util.ArrayList;
 
-public class CRepeatBuiltin extends DopBuiltin {
+public class CRepeatBuiltin extends Md2Builtin {
   @Override public String repr() {
     return "⍡";
   }

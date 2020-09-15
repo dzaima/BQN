@@ -7,33 +7,33 @@ import APL.types.callable.DerivedDop;
 
 
 
-public class Ddop extends Dop {
+public class Md2Block extends Md2 {
   public final DfnTok code;
   public final Scope sc;
   
-  public Ddop(DfnTok t, Scope sc) {
+  public Md2Block(DfnTok t, Scope sc) {
     this.sc = sc;
     code = t;
   }
   
   public Value derive(Value f, Value g) { // ···𝕣𝕗𝕘
     if (!code.immediate) return super.derive(f, g);
-    Main.printdbg("ddop immediate call", f, g);
+    Main.printdbg("Md2Block immediate call", f, g);
   
     return code.exec(sc, null, new Value[]{this, f, g});
   }
   
-  public Mop derive(Value g) {
+  public Md1 derive(Value g) {
     if (!code.immediate) return super.derive(g);
-    Main.printdbg("ddop immediate half-derive", g);
+    Main.printdbg("Md2Block immediate half-derive", g);
     return new HalfDerivedDdop(g, this);
   }
   
-  public static class HalfDerivedDdop extends Mop {
+  public static class HalfDerivedDdop extends Md1 {
     public final Value g;
-    public final Ddop op;
+    public final Md2Block op;
     
-    public HalfDerivedDdop(Value g, Ddop op) {
+    public HalfDerivedDdop(Value g, Md2Block op) {
       this.g = g;
       this.op = op;
     }
@@ -59,13 +59,13 @@ public class Ddop extends Dop {
   }
   
   public Value call(Value f, Value g, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
-    Main.printdbg("ddop call", x);
+    Main.printdbg("Md2Block call", x);
     
     return code.exec(sc, null, new Value[]{derv, x, Nothing.inst, this, f, g});
   }
   
   public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
-    Main.printdbg("ddop call", w, x);
+    Main.printdbg("Md2Block call", w, x);
     
     return code.exec(sc, w, new Value[]{derv, x, w, this, f, g});
   }

@@ -3,10 +3,10 @@ package APL.types.callable.builtins.dops;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
-import APL.types.callable.builtins.fns2.MatchBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
+import APL.types.callable.builtins.fns.MatchBuiltin;
 
-public class DepthBuiltin extends DopBuiltin {
+public class DepthBuiltin extends Md2Builtin {
   public String repr() {
     return "⚇";
   }

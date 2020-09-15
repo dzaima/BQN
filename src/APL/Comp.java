@@ -6,7 +6,7 @@ import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.callable.builtins.dops.*;
-import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.fns.*;
 import APL.types.callable.builtins.mops.*;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
@@ -180,23 +180,23 @@ public class Comp {
         }
         case OP1D: {
           Value f = (Value) s.pop();
-          Mop   r = (Mop  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
+          Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to Mop/Dop for stuff like F←+ ⋄ 1_f
           Value d = r.derive(f); d.token = r.token;
           s.push(d);
           break;
         }
         case OP2D: {
           Value f = (Value) s.pop();
-          Dop   r = (Dop  ) s.pop();
+          Md2   r = (Md2  ) s.pop();
           Value g = (Value) s.pop();
           Value d = r.derive(f, g); d.token = r.token;
           s.push(d);
           break;
         }
         case OP2H: {
-          Dop   r = (Dop  ) s.pop();
+          Md2   r = (Md2  ) s.pop();
           Value g = (Value) s.pop();
-          Mop d = r.derive(g); d.token = r.token;
+          Md1 d = r.derive(g); d.token = r.token;
           s.push(d);
           break;
         }
@@ -846,7 +846,7 @@ public class Comp {
           Res c=tps.remove(i+1);
           Res f=tps.remove(i  );
           if (c.c!=null && f.c!=null) {
-            tps.add(i, new ResCf('f', ((Mop) c.c).derive(f.c), c.lastTok()));
+            tps.add(i, new ResCf('f', ((Md1) c.c).derive(f.c), c.lastTok()));
           } else tps.add(i, new ResMix('f', c, f,
             new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
             new ResBC(c.lastTok(), OP1D)
@@ -860,7 +860,7 @@ public class Comp {
           Res f=tps.remove(i  );
           if (g.c!=null && c.c!=null && f.c!=null) {
             if (g.c instanceof Nothing || f.c instanceof Nothing) throw new SyntaxError("didn't expect · here", g.c instanceof Nothing? g.lastTok() : f.lastTok() );
-            tps.add(i, new ResCf('f', ((Dop) c.c).derive(f.c, g.c), f.lastTok()));
+            tps.add(i, new ResCf('f', ((Md2) c.c).derive(f.c, g.c), f.lastTok()));
           } else tps.add(i, new ResMix('f',
             g, new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOBYTES),
             c,
@@ -949,7 +949,7 @@ public class Comp {
           default: throw new ImplementationError("Undefined unknown built-in "+s, op);
         }
       } else {
-        return t.type = b instanceof Fun? 'f' : b instanceof Mop? 'm' : b instanceof Dop? 'd' : 'a';
+        return t.type = b instanceof Fun? 'f' : b instanceof Md1? 'm' : b instanceof Md2? 'd' : 'a';
       }
     } else if (t instanceof LineTok) {
       List<Token> tks = ((LineTok) t).tokens;

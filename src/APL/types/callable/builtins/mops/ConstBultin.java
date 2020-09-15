@@ -2,9 +2,9 @@ package APL.types.callable.builtins.mops;
 
 import APL.types.Value;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
-public class ConstBultin extends MopBuiltin {
+public class ConstBultin extends Md1Builtin {
   public String repr() {
     return "˙";
   }

@@ -5,10 +5,10 @@ import APL.tools.Indexer;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
-import APL.types.callable.builtins.fns2.LBoxUBBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
+import APL.types.callable.builtins.fns.LBoxUBBuiltin;
 
-public class AtBuiltin extends DopBuiltin {
+public class AtBuiltin extends Md2Builtin {
   @Override public String repr() {
     return "@";
   }

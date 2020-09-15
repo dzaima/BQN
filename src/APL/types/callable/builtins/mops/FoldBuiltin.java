@@ -6,10 +6,10 @@ import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
-import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.Md1Builtin;
+import APL.types.callable.builtins.fns.*;
 
-public class FoldBuiltin extends MopBuiltin {
+public class FoldBuiltin extends Md1Builtin {
   @Override public String repr() {
     return "´";
   }

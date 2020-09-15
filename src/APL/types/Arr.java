@@ -3,7 +3,7 @@ package APL.types;
 import APL.Main;
 import APL.errors.*;
 import APL.types.arrs.*;
-import APL.types.callable.builtins.fns2.LBoxBuiltin;
+import APL.types.callable.builtins.fns.LBoxBuiltin;
 
 import java.util.*;
 

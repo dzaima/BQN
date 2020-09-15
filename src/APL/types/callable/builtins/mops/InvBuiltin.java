@@ -3,9 +3,9 @@ package APL.types.callable.builtins.mops;
 import APL.errors.NYIError;
 import APL.types.*;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
-public class InvBuiltin extends MopBuiltin {
+public class InvBuiltin extends Md1Builtin {
   public String repr() {
     return "⁼";
   }

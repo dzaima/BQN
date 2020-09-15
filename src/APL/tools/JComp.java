@@ -4,7 +4,7 @@ import APL.*;
 import APL.errors.*;
 import APL.tokenizer.types.DfnTok;
 import APL.types.*;
-import APL.types.callable.builtins.fns2.EvalBuiltin;
+import APL.types.callable.builtins.fns.EvalBuiltin;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
 
@@ -238,26 +238,26 @@ public class JComp {
             break;
           }
           case OP1D: {
-            fn.swap(); fn.cast(Mop.class); fn.swap();
+            fn.swap(); fn.cast(Md1.class); fn.swap();
             
-            fn.invvirt(Mop.class, "derive", met(Value.class, Value.class));
+            fn.invvirt(Md1.class, "derive", met(Value.class, Value.class));
             cstack--;
             break;
           }
           case OP2D: {                //                ; g d f
             fn.astore(TMP);           // store f        ; g d
-            fn.cast(Dop.class);       // cast d to dop  ; g D
+            fn.cast(Md2.class);       // cast d to dop  ; g D
             fn.swap();                // place d below f; D g
             fn.aload(TMP); fn.swap(); // place g below f; D f g
-            fn.invvirt(Dop.class, "derive", met(Value.class, Value.class, Value.class));
+            fn.invvirt(Md2.class, "derive", met(Value.class, Value.class, Value.class));
             cstack-= 2;
             break;
           }
           case OP2H: {
             // g d
-            fn.cast(Dop.class);
+            fn.cast(Md2.class);
             fn.swap();
-            fn.invvirt(Dop.class, "derive", met(Mop.class, Value.class));
+            fn.invvirt(Md2.class, "derive", met(Md1.class, Value.class));
 
             cstack--;
             break;

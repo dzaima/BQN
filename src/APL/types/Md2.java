@@ -3,9 +3,9 @@ package APL.types;
 import APL.errors.*;
 import APL.types.callable.*;
 
-public abstract class Dop extends Callable {
+public abstract class Md2 extends Callable {
   
-  protected Dop() { }
+  protected Md2() { }
   
   public Value call(         Value x) { throw new SyntaxError("cannot interpret a 2-modifier as a function", this, x); }
   public Value call(Value w, Value x) { throw new SyntaxError("cannot interpret a 2-modifier as a function", this, x); }
@@ -14,7 +14,7 @@ public abstract class Dop extends Callable {
   public Value derive(Value f, Value g) {
     return new DerivedDop(f, g, this);
   }
-  public Mop derive(Value g) {
+  public Md1 derive(Value g) {
     return new HalfDerivedDop(g, this);
   }
   

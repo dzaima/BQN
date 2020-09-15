@@ -9,7 +9,7 @@ import APL.types.arrs.*;
 import APL.types.callable.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.dops.DepthBuiltin;
-import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.fns.*;
 import APL.types.callable.userDefined.*;
 
 import java.io.*;
@@ -168,7 +168,7 @@ public class Scope {
         case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•pfx": return new Profiler(this);
         case "•pfo": return new Profiler.ProfilerOp(this);
-        case "•pfc": return new Profiler.ProfilerDop(this);
+        case "•pfc": return new Profiler.ProfilerMd2(this);
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
@@ -190,7 +190,7 @@ public class Scope {
             return "•RAND";
           }
         };
-        case "•r": return new DopBuiltin() {
+        case "•r": return new Md2Builtin() {
           public String repr() { return "•_R_"; }
   
           public Value call(Value f, Value g, Value x, DerivedDop derv) {
@@ -287,7 +287,7 @@ public class Scope {
           
           public Value call(Value w, Value x) {
             if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
-            DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Ddop? ((Ddop) x).code : x instanceof Dmop? ((Dmop) x).code : null;
+            DfnTok s = x instanceof Dfn? ((Dfn) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
             if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
             return call(w, Scope.this.get("•comp").call(Num.ZERO, x));
           }
@@ -738,8 +738,8 @@ public class Scope {
       Value o = Scope.this.get(x.asString());
       if (o == null) return Num.ZERO;
       if (o instanceof Fun) return Num.NUMS[3];
-      if (o instanceof Dop) return Num.NUMS[4];
-      if (o instanceof Mop) return Num.NUMS[5];
+      if (o instanceof Md2) return Num.NUMS[4];
+      if (o instanceof Md1) return Num.NUMS[5];
       return Num.NUMS[2];
     }
   }
@@ -817,7 +817,7 @@ public class Scope {
       return res;
     }
     
-    static class ProfilerOp extends Mop {
+    static class ProfilerOp extends Md1 {
       Scope sc;
       public ProfilerOp(Scope sc) {
         this.sc = sc;
@@ -855,11 +855,11 @@ public class Scope {
         return "•_PFO";
       }
     }
-    public static class ProfilerDop extends Dop {
+    public static class ProfilerMd2 extends Md2 {
       public String repr() { return "•_PFC_"; }
       
       private final Scope sc;
-      ProfilerDop(Scope sc) { this.sc = sc; }
+      ProfilerMd2(Scope sc) { this.sc = sc; }
       
       public Value call(Value f, Value g, Value w, Value x, DerivedDop derv) {
         Pr p = pr(g, null, sc); p.start();

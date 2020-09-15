@@ -6,12 +6,12 @@ import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
-import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.Md2Builtin;
+import APL.types.callable.builtins.fns.*;
 
 import java.util.Arrays;
 
-public class NCellBuiltin extends DopBuiltin {
+public class NCellBuiltin extends Md2Builtin {
   public String repr() {
     return "⎉";
   }

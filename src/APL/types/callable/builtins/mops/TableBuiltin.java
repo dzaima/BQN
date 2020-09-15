@@ -4,9 +4,9 @@ import APL.tools.Pervasion;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
-public final class TableBuiltin extends MopBuiltin {
+public final class TableBuiltin extends Md1Builtin {
   @Override public String repr() {
     return "⌜";
   }

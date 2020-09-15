@@ -3,10 +3,10 @@ package APL.types.callable.builtins.dops;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.mops.InvBuiltin;
 
-public class UnderBuiltin extends DopBuiltin {
+public class UnderBuiltin extends Md2Builtin {
   @Override public String repr() {
     return "⌾";
   }

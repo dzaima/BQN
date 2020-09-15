@@ -3,10 +3,10 @@ package APL.types.callable.builtins.mops;
 import APL.errors.DomainError;
 import APL.types.Value;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
-import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.Md1Builtin;
+import APL.types.callable.builtins.fns.*;
 
-public class SelfieBuiltin extends MopBuiltin {
+public class SelfieBuiltin extends Md1Builtin {
   public String repr() {
     return "˜";
   }

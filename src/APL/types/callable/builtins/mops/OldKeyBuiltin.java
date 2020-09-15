@@ -5,11 +5,11 @@ import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.HArr;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
 import java.util.*;
 
-public class OldKeyBuiltin extends MopBuiltin {
+public class OldKeyBuiltin extends Md1Builtin {
   @Override public String repr() {
     return "⌸";
   }

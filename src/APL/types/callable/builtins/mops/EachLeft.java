@@ -3,9 +3,9 @@ package APL.types.callable.builtins.mops;
 import APL.types.*;
 import APL.types.arrs.SingleItemArr;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
-public class EachLeft extends MopBuiltin {
+public class EachLeft extends Md1Builtin {
   @Override public String repr() {
     return "ᐵ";
   }

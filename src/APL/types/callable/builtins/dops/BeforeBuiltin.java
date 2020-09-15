@@ -2,9 +2,9 @@ package APL.types.callable.builtins.dops;
 
 import APL.types.Value;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
 
-public class BeforeBuiltin extends DopBuiltin {
+public class BeforeBuiltin extends Md2Builtin {
   public String repr() {
     return "⊸";
   }

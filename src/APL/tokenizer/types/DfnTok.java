@@ -165,8 +165,8 @@ public class DfnTok extends TokArr<LineTok> {
   public Value eval(Scope sc) {
     switch (this.type) {
       case 'f': return new Dfn(this, sc);
-      case 'm': return new Dmop(this, sc);
-      case 'd': return new Ddop(this, sc);
+      case 'm': return new Md1Block(this, sc);
+      case 'd': return new Md2Block(this, sc);
       case '?': if (Main.vind) return new Dfn(this, sc);
         /* fallthrough */
       case 'a': {

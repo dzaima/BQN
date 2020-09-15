@@ -1,4 +1,4 @@
-package APL.types.callable.builtins.fns2;
+package APL.types.callable.builtins.fns;
 
 import APL.types.Value;
 import APL.types.callable.builtins.FnBuiltin;

@@ -4,10 +4,10 @@ import APL.errors.*;
 import APL.types.Value;
 import APL.types.arrs.*;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
-import APL.types.callable.builtins.fns2.GTBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
+import APL.types.callable.builtins.fns.GTBuiltin;
 
-public class ObliqueBuiltin extends MopBuiltin {
+public class ObliqueBuiltin extends Md1Builtin {
   @Override public String repr() {
     return "⍁";
   }

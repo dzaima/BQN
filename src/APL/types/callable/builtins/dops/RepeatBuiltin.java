@@ -3,9 +3,9 @@ package APL.types.callable.builtins.dops;
 import APL.errors.DomainError;
 import APL.types.*;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
 
-public class RepeatBuiltin extends DopBuiltin {
+public class RepeatBuiltin extends Md2Builtin {
   @Override public String repr() {
     return "⍟";
   }

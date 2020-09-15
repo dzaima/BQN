@@ -4,8 +4,8 @@ import APL.types.*;
 
 public class DerivedMop extends Fun {
   public final Value f;
-  public final Mop op;
-  public DerivedMop(Value f, Mop op) {
+  public final Md1 op;
+  public DerivedMop(Value f, Md1 op) {
     this.f = f;
     this.op = op;
     token = op.token;

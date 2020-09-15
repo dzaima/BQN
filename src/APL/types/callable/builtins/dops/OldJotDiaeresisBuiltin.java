@@ -2,9 +2,9 @@ package APL.types.callable.builtins.dops;
 
 import APL.types.Value;
 import APL.types.callable.DerivedDop;
-import APL.types.callable.builtins.DopBuiltin;
+import APL.types.callable.builtins.Md2Builtin;
 
-public class OldJotDiaeresisBuiltin extends DopBuiltin {
+public class OldJotDiaeresisBuiltin extends Md2Builtin {
   @Override public String repr() {
     return "⍤";
   }

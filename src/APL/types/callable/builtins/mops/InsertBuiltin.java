@@ -3,9 +3,9 @@ package APL.types.callable.builtins.mops;
 import APL.errors.RankError;
 import APL.types.Value;
 import APL.types.callable.DerivedMop;
-import APL.types.callable.builtins.MopBuiltin;
+import APL.types.callable.builtins.Md1Builtin;
 
-public class InsertBuiltin extends MopBuiltin {
+public class InsertBuiltin extends Md1Builtin {
   public String repr() {
     return "˝";
   }
