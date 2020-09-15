@@ -142,9 +142,9 @@ public class BlockTok extends TokArr<LineTok> {
     } else return true;
   }
   
-  private boolean funType(List<LineTok> lns, BlockTok dfn) { // TODO split up into separate thing getting immediate and type
+  private boolean funType(List<LineTok> lns, BlockTok block) { // TODO split up into separate thing getting immediate and type
     boolean imm = true;
-    for (LineTok ln : lns) imm&= funType(ln, dfn);
+    for (LineTok ln : lns) imm&= funType(ln, block);
     return imm;
   }
   

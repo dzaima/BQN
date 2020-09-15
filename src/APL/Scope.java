@@ -220,7 +220,7 @@ public class Scope {
             Value bc = x.get(0);
             Value obj = x.get(1);
             Value str = x.get(2);
-            Value blocks = x.get(3);
+            Value blk = x.get(3);
             
             byte[] bcp = new byte[bc.ia];
             for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bc.get(i).asInt();
@@ -232,9 +232,9 @@ public class Scope {
             String[] strp = new String[str.ia];
             for (int i = 0; i < strp.length; i++) strp[i] = str.get(i).asString();
             
-            BlockTok[] dfnp = new BlockTok[blocks.ia];
-            for (int i = 0; i < dfnp.length; i++) {
-              Value c = blocks.get(i);
+            BlockTok[] blkp = new BlockTok[blk.ia];
+            for (int i = 0; i < blkp.length; i++) {
+              Value c = blk.get(i);
               if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5");
               
               char type = ((Char) c.get(0)).chr;
@@ -250,7 +250,7 @@ public class Scope {
                 for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
                 
                 if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
-                dfnp[i] = new BlockTok(type, imm, off, lvars);
+                blkp[i] = new BlockTok(type, imm, off, lvars);
               } else {
                 BlockTok r = new BlockTok(type, imm);
                 ArrayList<Body> bs = r.bodies;
@@ -262,18 +262,18 @@ public class Scope {
                   char a = ((Char) c.get(4).get(j)).chr;
                   bs.add(new Body(r, type, imm, offs[j], lvars, a));
                 }
-                dfnp[i] = r;
+                blkp[i] = r;
               }
             }
             
-            Comp c = new Comp(bcp, objp, strp, dfnp, ref, Token.COMP);
-            for (BlockTok dfn : dfnp) dfn.comp = c;
+            Comp c = new Comp(bcp, objp, strp, blkp, ref, Token.COMP);
+            for (BlockTok block : blkp) block.comp = c;
             if (!allowImm) {
-              BlockTok f = new BlockTok(((Char) blocks.get(0).get(0)).chr, false, blocks.get(0).get(2).asInt(), null);
+              BlockTok f = new BlockTok(((Char) blk.get(0).get(0)).chr, false, blk.get(0).get(2).asInt(), null);
               f.comp = c;
               return f.eval(Scope.this);
             }
-            return dfnp[0].eval(Scope.this);
+            return blkp[0].eval(Scope.this);
           }
         };
         case "•bc": return new Fun() {

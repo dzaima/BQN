@@ -353,7 +353,7 @@ public class JComp {
           case DFND: {
             int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(0);
-            fn.getfield(JFn.class, "dfns", BlockTok[].class);
+            fn.getfield(JFn.class, "blocks", BlockTok[].class);
             fn.iconst(n);
             fn.aaload();
             fn.aload(SC);
@@ -483,7 +483,7 @@ public class JComp {
     try {
       JFn o = (JFn) def.getDeclaredConstructor().newInstance();
       o.vals = comp.objs;
-      o.dfns = comp.dfns;
+      o.blocks = comp.blocks;
       // Method get = o.getClass().getDeclaredMethod("get", Scope.class);
       // System.out.println(get.invoke(o, new Object[]{null}));
       r = o;

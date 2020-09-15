@@ -17,7 +17,7 @@ public class Comp {
   public final byte[] bc;
   public final Value[] objs;
   public final String[] strs;
-  public final BlockTok[] dfns;
+  public final BlockTok[] blocks;
   private final Token[] ref;
   private final Token tk;
   
@@ -25,11 +25,11 @@ public class Comp {
   private int iter;
   private JFn gen;
   
-  public Comp(byte[] bc, Value[] objs, String[] strs, BlockTok[] dfns, Token[] ref, Token tk) {
+  public Comp(byte[] bc, Value[] objs, String[] strs, BlockTok[] blocks, Token[] ref, Token tk) {
     this.bc = bc;
     this.objs = objs;
     this.strs = strs;
-    this.dfns = dfns;
+    this.blocks = blocks;
     this.ref = ref;
     this.tk = tk;
   }
@@ -262,8 +262,7 @@ public class Comp {
         }
         case DFND: {
           int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          BlockTok dfn = dfns[n];
-          s.push(dfn.eval(sc));
+          s.push(blocks[n].eval(sc));
           break;
         }
         case CHKV: {
@@ -377,15 +376,16 @@ public class Comp {
       b.append("strs:\n");
       for (int j = 0; j < strs.length; j++) b.append(' ').append(j).append(": ").append(strs[j]).append('\n');
     }
-    if (dfns.length > 0) {
-      b.append("dfns:\n");
-      for (int j = 0; j < dfns.length; j++) {
-        BlockTok dfn = dfns[j];
-        b.append(' ').append(j).append(": ").append(dfn.type=='f'? "function" : dfn.type=='d'? "2-modifier" : dfn.type=='m'? "1-modifier" : dfn.type=='a'? "immediate block" : String.valueOf(dfn.type)).append(" \n");
-        b.append("  flags: ").append(dfn.flags).append('\n');
-        Body b0 = dfn.bodies.get(0);
-        if (dfn.bodies.size()>1 || b0.start!=0 || !b0.noHeader || b0.vars.length!=0) {
-          ArrayList<Body> bodies = dfn.bodies;
+    if (blocks.length > 0) {
+      b.append("blocks:\n");
+      for (int j = 0; j < blocks.length; j++) {
+        BlockTok blk = blocks[j];
+        char tp = blk.type;
+        b.append(' ').append(j).append(": ").append(tp=='f'? "function" : tp=='d'? "2-modifier" : tp=='m'? "1-modifier" : tp=='a'? "immediate block" : String.valueOf(tp)).append(" \n");
+        b.append("  flags: ").append(blk.flags).append('\n');
+        Body b0 = blk.bodies.get(0);
+        if (blk.bodies.size()>1 || b0.start!=0 || !b0.noHeader || b0.vars.length!=0) {
+          ArrayList<Body> bodies = blk.bodies;
           for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
             Body bd = bodies.get(k);
             b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.arity=='m'? "monadic" : bd.arity=='d'? "dyadic" : "ambivalent").append('\n');
@@ -398,9 +398,9 @@ public class Comp {
             if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
           }
         }
-        if (dfn.comp != this) {
+        if (blk.comp != this) {
           b.append("  ");
-          b.append(dfn.comp.fmt().replace("\n", "\n  "));
+          b.append(blk.comp.fmt().replace("\n", "\n  "));
           b.append('\n');
         }
       }
@@ -476,7 +476,7 @@ public class Comp {
     public Mut(boolean topLvl) { this.topLvl = topLvl; }
   
     ArrayList<Value> objs = new ArrayList<>();
-    ArrayList<BlockTok> dfns = new ArrayList<>();
+    ArrayList<BlockTok> blocks = new ArrayList<>();
     ArrayList<String> strs = new ArrayList<>();
     MutByteArr bc = new MutByteArr(10);
     ArrayList<Token> ref = new ArrayList<>();
@@ -505,8 +505,8 @@ public class Comp {
     
     public void push(BlockTok o) {
       add(o, DFND);
-      addNum(dfns.size());
-      dfns.add(o);
+      addNum(blocks.size());
+      blocks.add(o);
     }
     
     public void nvar(String name) {
@@ -550,7 +550,7 @@ public class Comp {
     
     public Comp finish(Token tk) {
       assert bc.len == ref.size() : bc.len +" "+ ref.size();
-      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), dfns.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
+      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), blocks.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
   
