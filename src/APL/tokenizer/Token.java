@@ -4,7 +4,7 @@ import APL.types.Tokenable;
 
 public abstract class Token implements Tokenable {
   public char type; // \0 by default
-  public byte flags = -1; // 1 - is constant; 2 - has no inner dfns; 4 - is safe for variable renaming
+  public byte flags = -1; // 1 - is constant; 2 - has no inner blocks; 4 - is safe for variable renaming
   public final String raw;
   public final int spos; // incl
   public final int epos; // excl
