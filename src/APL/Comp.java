@@ -5,10 +5,10 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.functions.builtins.dops.*;
-import APL.types.functions.builtins.fns2.*;
-import APL.types.functions.builtins.mops.*;
-import APL.types.functions.trains.*;
+import APL.types.callable.builtins.dops.*;
+import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.builtins.mops.*;
+import APL.types.callable.trains.*;
 import APL.types.mut.*;
 
 import java.util.*;

@@ -6,11 +6,11 @@ import APL.tokenizer.types.DfnTok;
 import APL.tools.Body;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.*;
-import APL.types.functions.builtins.*;
-import APL.types.functions.builtins.dops.DepthBuiltin;
-import APL.types.functions.builtins.fns2.*;
-import APL.types.functions.userDefined.*;
+import APL.types.callable.*;
+import APL.types.callable.builtins.*;
+import APL.types.callable.builtins.dops.DepthBuiltin;
+import APL.types.callable.builtins.fns2.*;
+import APL.types.callable.userDefined.*;
 
 import java.io.*;
 import java.net.*;

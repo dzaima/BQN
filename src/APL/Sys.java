@@ -6,8 +6,8 @@ import APL.tokenizer.types.BasicLines;
 import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.functions.builtins.fns2.EvalBuiltin;
-import APL.types.functions.userDefined.*;
+import APL.types.callable.builtins.fns2.EvalBuiltin;
+import APL.types.callable.userDefined.*;
 
 import java.io.*;
 import java.util.*;
