@@ -5,7 +5,7 @@ import APL.tools.MutVal;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.mops.CellBuiltin;
+import APL.types.callable.builtins.md1.CellBuiltin;
 
 public class DownArrowBuiltin extends FnBuiltin {
   public String repr() {

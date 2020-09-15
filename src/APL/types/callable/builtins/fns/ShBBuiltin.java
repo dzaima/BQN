@@ -4,7 +4,7 @@ import APL.errors.RankError;
 import APL.tools.MutVal;
 import APL.types.Value;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.mops.CellBuiltin;
+import APL.types.callable.builtins.md1.CellBuiltin;
 
 public class ShBBuiltin extends FnBuiltin {
   public String repr() {

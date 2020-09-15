@@ -8,7 +8,7 @@ import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.*;
 import APL.types.callable.builtins.*;
-import APL.types.callable.builtins.dops.DepthBuiltin;
+import APL.types.callable.builtins.md2.DepthBuiltin;
 import APL.types.callable.builtins.fns.*;
 import APL.types.callable.userDefined.*;
 

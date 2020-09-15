@@ -5,8 +5,8 @@ import APL.errors.DomainError;
 import APL.types.Value;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.dops.NCellBuiltin;
-import APL.types.callable.builtins.mops.CellBuiltin;
+import APL.types.callable.builtins.md2.NCellBuiltin;
+import APL.types.callable.builtins.md1.CellBuiltin;
 
 import java.util.Arrays;
 

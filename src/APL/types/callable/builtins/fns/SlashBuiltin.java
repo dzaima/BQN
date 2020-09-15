@@ -6,7 +6,7 @@ import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.mops.FoldBuiltin;
+import APL.types.callable.builtins.md1.FoldBuiltin;
 
 import java.util.Arrays;
 

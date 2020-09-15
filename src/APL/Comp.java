@@ -5,9 +5,9 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.callable.builtins.dops.*;
+import APL.types.callable.builtins.md2.*;
 import APL.types.callable.builtins.fns.*;
-import APL.types.callable.builtins.mops.*;
+import APL.types.callable.builtins.md1.*;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
 

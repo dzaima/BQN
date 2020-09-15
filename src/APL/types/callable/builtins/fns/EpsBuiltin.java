@@ -4,7 +4,7 @@ import APL.errors.RankError;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.mops.CellBuiltin;
+import APL.types.callable.builtins.md1.CellBuiltin;
 
 import java.util.HashSet;
 
