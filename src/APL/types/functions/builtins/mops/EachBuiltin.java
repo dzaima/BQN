@@ -30,9 +30,9 @@ public class EachBuiltin extends Mop {
       return res.get();
     } else {
       if (f instanceof Num && Num.isBool(((Num) f).num)) { // bitarr code is very bad at respecting SingleItemArrs
-        long[] ls = new long[BitArr.sizeof(x.ia)];
-        if (((Num) f).num==1) Arrays.fill(ls, ~0L);
-        return new BitArr(ls, x.shape);
+        long[] res = new long[BitArr.sizeof(x.ia)];
+        if (((Num) f).num==1) Arrays.fill(res, ~0L);
+        return new BitArr(res, x.shape);
       }
       return new SingleItemArr(f, x.shape);
     }

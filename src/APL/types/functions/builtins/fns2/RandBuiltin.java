@@ -54,11 +54,11 @@ public class RandBuiltin extends Builtin {
     if (x instanceof SingleItemArr) {
       Value f = x.first();
       if (f instanceof Num && ((Num) f).num==2) {
-        long[] ls = new long[BitArr.sizeof(x.ia)];
-        for (int i = 0; i < ls.length; i++) {
-          ls[i] = sc.randLong();
+        long[] res = new long[BitArr.sizeof(x.ia)];
+        for (int i = 0; i < res.length; i++) {
+          res[i] = sc.randLong();
         }
-        return new BitArr(ls, x.shape);
+        return new BitArr(res, x.shape);
       }
     }
     return numM(nf, x);
