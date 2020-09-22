@@ -1,6 +1,5 @@
 #!/usr/bin/env dbqn
-       (1≤≠)◶0       ‿(⍎ ⊑ )•args # evaluate 1st argument
-eval ← (2≤≠)◶{𝕩:{⍎𝕩}}‿{⍎1⊑𝕩}•args # use 2nd argument as the interpreter
+eval ← (1≤≠)◶{𝕩:{⍎𝕩}}‿{⍎⊑𝕩}•args # use 1st argument as the interpreter
 err←"err"
 { 𝕊path:
   lns ← (('#'⊸∊¨∧'#'≠⊑¨)/⊢) •LNS path

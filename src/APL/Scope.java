@@ -235,24 +235,23 @@ public class Scope {
             BlockTok[] blkp = new BlockTok[blk.ia];
             for (int i = 0; i < blkp.length; i++) {
               Value c = blk.get(i);
-              if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5");
+              if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5", this);
               
-              char type = ((Char) c.get(0)).chr;
+              int type = c.get(0).asInt();
               boolean imm = Main.bool(c.get(1));
-              if (type=='a' || type=='f'&&imm) {
-                type = 'a';
-                imm = true;
-              }
+              
+              if (type<0 || type>2) throw new DomainError("•COMP: ⊑𝕨 must be one 0, 1 or 2", this);
+              char typec = type==0? (imm?'a':'f') : type==1? 'm' : 'd';
+              
               if (c.ia==4) {
                 int off = c.get(2).asInt();
                 int lvarAm = c.get(3).ia;
                 String[] lvars = new String[lvarAm];
                 for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
                 
-                if (type!='a' && type!='f' && type!='m' && type!='d') throw new DomainError("•COMP: ⊑𝕨 must be one of \"fdma\"");
-                blkp[i] = new BlockTok(type, imm, off, lvars);
+                blkp[i] = new BlockTok(typec, imm, off, lvars);
               } else {
-                BlockTok r = new BlockTok(type, imm);
+                BlockTok r = new BlockTok(typec, imm);
                 ArrayList<Body> bs = r.bodies;
                 int[] offs = c.get(2).asIntVec();
                 for (int j = 0; j < offs.length; j++) {
@@ -260,7 +259,7 @@ public class Scope {
                   String[] lvars = new String[v.ia];
                   for (int k = 0; k < lvars.length; k++) lvars[k] = v.get(k).asString();
                   char a = ((Char) c.get(4).get(j)).chr;
-                  bs.add(new Body(r, type, imm, offs[j], lvars, a));
+                  bs.add(new Body(r, typec, imm, offs[j], lvars, a));
                 }
                 blkp[i] = r;
               }
