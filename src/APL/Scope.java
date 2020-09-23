@@ -268,7 +268,7 @@ public class Scope {
             Comp c = new Comp(bcp, objp, strp, blkp, ref, Token.COMP);
             for (BlockTok block : blkp) block.comp = c;
             if (!allowImm) {
-              BlockTok f = new BlockTok(((Char) blk.get(0).get(0)).chr, false, blk.get(0).get(2).asInt(), null);
+              BlockTok f = new BlockTok(blkp[0].type=='a'?'f':blkp[0].type, false, 0, new String[0]);
               f.comp = c;
               return f.eval(Scope.this);
             }
