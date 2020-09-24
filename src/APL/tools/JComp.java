@@ -554,6 +554,11 @@ public class JComp {
     u2(bs, 3, CONSTANT_NameAndType(name, type));
     return get(bs);
   }
+  public int CONSTANT_Integer(int i) {
+    byte[] bs = new byte[5]; bs[0] = 3; // tag
+    u4(bs, 1, i);
+    return get(bs);
+  }
   
   public int get(byte[] bs) {
     Const o = new Const(bs);
@@ -681,10 +686,11 @@ public class JComp {
       if (i>=-1 && i<=5) u(3+i);
       else if (( byte)i == i) { u(16); s (i); }
       else if ((short)i == i) { u(17); s2(i); }
-      // else if (constants.size()<254) {
-      //   b(18); b()
-      // }
-      else throw new NYIError("iconst outside short range");
+      else {
+        int pos = CONSTANT_Integer(i);
+        if (pos<255) { u(18); u (pos); }
+        else {         u(19); u2(pos); }
+      }
     }
     public void ldc(String str) {
       byte[] bs = new byte[3]; bs[0] = 8;
