@@ -36,20 +36,26 @@ public class LBoxBuiltin extends FnBuiltin {
       System.arraycopy(w.shape, 0, sh, 0, wr);
       System.arraycopy(x.shape, 1, sh, wr, xr-1);
       int[] wi = w.asIntArr();
-      if (w.rank==1 && x.rank==1) {
-        if (x.quickIntArr()) {
-          int[] xi = x.asIntArr();
-          int[] res = new int[w.ia];
-          for (int i = 0; i < wi.length; i++) {
-            res[i] = xi[wi[i]];
-          }
-          return new IntArr(res, sh);
-        }
+      spec: if (w.rank==1 && x.rank==1) {
         if (x.quickDoubleArr()) {
+          if (x.quickIntArr()) {
+            int[] xi = x.asIntArr();
+            int[] res = new int[w.ia];
+            for (int i = 0; i < wi.length; i++) {
+              int c = wi[i];
+              if (c<0) c+= xi.length;
+              if (c<0 || c>=xi.length) break spec;
+              res[i] = xi[c];
+            }
+            return new IntArr(res, sh);
+          }
           double[] xd = x.asDoubleArr();
           double[] res = new double[w.ia];
           for (int i = 0; i < wi.length; i++) {
-            res[i] = xd[wi[i]];
+            int c = wi[i];
+            if (c<0) c+= xd.length;
+            if (c<0 || c>=xd.length) break spec;
+            res[i] = xd[c];
           }
           return new DoubleArr(res, sh);
         }
