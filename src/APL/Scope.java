@@ -259,7 +259,7 @@ public class Scope {
                   String[] lvars = new String[v.ia];
                   for (int k = 0; k < lvars.length; k++) lvars[k] = v.get(k).asString();
                   char a = ((Char) c.get(4).get(j)).chr;
-                  bs.add(new Body(r, typec, imm, offs[j], lvars, a));
+                  bs.add(new Body(typec, imm, offs[j], lvars, a));
                 }
                 blkp[i] = r;
               }
@@ -386,8 +386,7 @@ public class Scope {
       int n = options[0];
       int mode = options.length>=2? options[1] : 0;
       String test = x.asString();
-      Comp testCompiled = Main.comp(test, sc, null);
-      
+      Comp.SingleComp testCompiled = Main.comp(test, sc, null);
       if (mode==2) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
@@ -881,12 +880,12 @@ public class Scope {
   }
   
   public static class Pr {
-    private final Comp c;
+    private final APL.Comp.SingleComp c;
     private int am;
     private double ms;
     private Value fn;
     
-    public Pr(Comp c) {
+    public Pr(Comp.SingleComp c) {
       this.c = c;
     }
     

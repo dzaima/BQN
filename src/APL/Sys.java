@@ -116,9 +116,6 @@ public abstract class Sys {
       case "TOKTYPE":
         println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest,defArgs).tokens.get(0))));
         break;
-      case "JEVAL":
-        println(new JComp(Main.comp(rest, csc, defArgs)).r.get(csc, 0));
-        break;
       default:
         throw new SyntaxError("Undefined user command");
     }
@@ -139,15 +136,15 @@ public abstract class Sys {
     if (s.startsWith(")")) {
       ucmd(s.substring(1));
     } else {
-      Comp comp = Main.comp(s, csc, defArgs);
-      if (comp.bc.length==0) return;
+      Comp.SingleComp comp = Main.comp(s, csc, defArgs);
+      if (comp.c.bc.length==0) return;
       int ci = 0;
       while (true) {
-        int ni = comp.next(ci);
-        if (ni == comp.bc.length) break;
+        int ni = comp.c.next(ci);
+        if (ni == comp.c.bc.length) break;
         ci = ni;
       }
-      byte lins = comp.bc[ci];
+      byte lins = comp.c.bc[ci];
       Value r = comp.exec(csc);
       if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
         println(r);

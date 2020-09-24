@@ -52,11 +52,11 @@ public class BlockTok extends TokArr<LineTok> {
       Body body;
       if (part.get(0).end == ':') {
         List<LineTok> src = part.subList(1, part.size());
-        body = new Body(this, part.get(0), new ArrayList<>(src), funType(src, this));
+        body = new Body(part.get(0), new ArrayList<>(src), funType(src, this));
       } else {
         assert tail != 0;
         int rid = parts.size()-i;
-        body = new Body(this, part, tail==1? 'a' : rid==1? 'd' : 'm', funType(part, this));
+        body = new Body(part, tail==1? 'a' : rid==1? 'd' : 'm', funType(part, this));
       }
       bodies.add(body);
     }
@@ -101,12 +101,12 @@ public class BlockTok extends TokArr<LineTok> {
   }
   
   
-  public BlockTok(char type, boolean imm, int off, String[] varNames) {
+  public BlockTok(char type, boolean imm, int off, String[] varNames) { // for •COMP
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
     bodies = new ArrayList<>();
     immediate = imm;
-    bodies.add(new Body(this, type, imm, off, varNames, 'a'));
+    bodies.add(new Body(type, imm, off, varNames, 'a'));
   }
   public BlockTok(char type, boolean imm) {
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
@@ -161,6 +161,23 @@ public class BlockTok extends TokArr<LineTok> {
   }
   
   
+  public static String[] varnames(char t, boolean imm) {
+    assert "fmda".indexOf(t)!=-1;
+    switch ((t=='d'? 2 : t=='m'? 1 : 0) + (imm? 3 : 0)) { default: throw new IllegalStateException();
+      //    𝕊𝕩𝕨𝕣𝕗𝕘 | 012345
+      case 0: return new String[]{"𝕤","𝕩","𝕨"            }; // f  012··· | 𝕊𝕩𝕨···
+      case 1: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗"    }; // m  01234· | 𝕊𝕩𝕨𝕣𝕗·
+      case 2: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗","𝕘"}; // d  012345 | 𝕊𝕩𝕨𝕣𝕗𝕘
+      case 3: return new String[]{                       }; // fi ······ | ······
+      case 4: return new String[]{            "𝕣","𝕗"    }; // mi ···01· | 𝕣𝕗····
+      case 5: return new String[]{            "𝕣","𝕗","𝕘"}; // di ···012 | 𝕣𝕗𝕘···
+    }
+  }
+  public String[] defNames() {
+    return varnames(type, immediate || type=='a');
+  }
+  
+  
   
   public Value eval(Scope sc) {
     switch (this.type) {
@@ -171,7 +188,7 @@ public class BlockTok extends TokArr<LineTok> {
         /* fallthrough */
       case 'a': {
         Body b = bodies.get(0);
-        return comp.exec(new Scope(sc, b.vars), b.start);
+        return comp.exec(new Scope(sc, b.vars), b);
       }
       default: throw new IllegalStateException(this.type+"");
     }
@@ -185,7 +202,7 @@ public class BlockTok extends TokArr<LineTok> {
       sc.vars = new Value[b.vars.length]; // TODO decide some nicer way than just creating a new array per header
       System.arraycopy(vb, 0, sc.vars, 0, vb.length);
       sc.varAm = b.vars.length;
-      Value res = comp.exec(sc, b.start);
+      Value res = comp.exec(sc, b);
       if (res != null) return res;
     }
     throw new DomainError("No header matched", this);

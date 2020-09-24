@@ -22,8 +22,6 @@ public class Comp {
   private final Token tk;
   
   public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
-  private int iter;
-  private JFn gen;
   
   public Comp(byte[] bc, Value[] objs, String[] strs, BlockTok[] blocks, Token[] ref, Token tk) {
     this.bc = bc;
@@ -85,16 +83,14 @@ public class Comp {
     }
   }
   
-  public Value exec(Scope sc) {
-    return exec(sc, 0);
-  }
-  public Value exec(Scope sc, int i) {
+  public Value exec(Scope sc, Body body) {
+    int i = body.start;
     try {
-    if (gen!=null) return gen.get(sc, i);
-    if (iter++>=compileStart && compileStart>=0) {
-      gen = new JComp(this).r;
-      if (gen!=null) return gen.get(sc, i);
-      else iter = Integer.MIN_VALUE;
+    if (body.gen!=null) return body.gen.get(sc);
+    if (body.iter++>=compileStart && compileStart>=0) {
+      body.gen = new JComp(this, body.start).r;
+      if (body.gen!=null) return body.gen.get(sc);
+      else body.iter = Integer.MIN_VALUE;
     }
     Stk s = new Stk();
     exec: while (true) {
@@ -296,14 +292,14 @@ public class Comp {
     return (Value) s.peek();
     } catch (Throwable t) {
       APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
-      Tokenable fn = gen!=null? null : ref[i];
+      Tokenable fn = body.gen!=null? null : ref[i];
       if (e.blame == null) {
         e.blame = fn!=null? fn : tk;
       }
       ArrayList<APLError.Mg> mgs = new ArrayList<>();
       APLError.Mg.add(mgs, tk, '¯');
       APLError.Mg.add(mgs, fn, '^');
-      e.trace.add(new APLError.Frame(sc, mgs, this, i));
+      e.trace.add(new APLError.Frame(sc, mgs, this, body.start));
       throw e;
     }
   }
@@ -555,8 +551,13 @@ public class Comp {
   }
   
   
-  
-  public static Comp comp(TokArr<LineTok> lns, Scope sc) {
+  public static class SingleComp {
+    public final Comp c; public final Body b;
+    public SingleComp(Comp c, Body b) { this.c = c; this.b = b; }
+    public Value exec(Scope sc) { return c.exec(sc, b); }
+    public String fmt() { return c.fmt(); }
+  }
+  public static SingleComp comp(TokArr<LineTok> lns, Scope sc) { // non-block
     Mut mut = new Mut(sc.parent==null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
@@ -569,14 +570,14 @@ public class Comp {
     sc.varAm = sc.varNames.length;
     if (sc.vars.length < sc.varAm) sc.vars = Arrays.copyOf(sc.vars, sc.varAm);
     sc.removeMap();
-    return mut.finish(lns);
+    return new SingleComp(mut.finish(lns), new Body(new ArrayList<>(lns.tokens), 'a', false));
   }
   
-  public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) {
+  public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) { // block
     for (int i = 0; i < parts.size(); i++) {
       Body b = parts.get(i);
       b.start = mut.bc.len;
-      mut.newBody(b.defNames());
+      mut.newBody(tk.defNames());
       b.addHeader(mut);
       int sz = b.lns.size();
       for (int j = 0; j < sz; j++) {

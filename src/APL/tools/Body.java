@@ -1,6 +1,6 @@
 package APL.tools;
 
-import APL.Comp;
+import APL.*;
 import APL.errors.SyntaxError;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
@@ -9,7 +9,6 @@ import APL.types.Value;
 import java.util.*;
 
 public class Body {
-  public final BlockTok o;
   public final ArrayList<LineTok> lns;
   public final char arity; // one of [mda] - monadic, dyadic, ambivalent
   public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
@@ -21,8 +20,10 @@ public class Body {
   public int start;
   public String[] vars;
   
-  public Body(BlockTok o, char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
-    this.o = o;
+  public JFn gen;
+  public int iter;
+  
+  public Body(char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
     this.lns = null;
     self = null;
     wM=fM=gM=xM=null;
@@ -34,9 +35,8 @@ public class Body {
     this.vars = vars;
   }
   
-  public Body(BlockTok o, ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
+  public Body(ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
     noHeader = true;
-    this.o = o;
     this.lns = lns;
     this.type = 0;
     this.arity = arity;
@@ -47,8 +47,7 @@ public class Body {
   
   
   
-  public Body(BlockTok o, LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
-    this.o = o;
+  public Body(LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
     this.lns = lns;
     noHeader = false;
     char type = Comp.typeof(hdr);
@@ -171,22 +170,6 @@ public class Body {
   }
   public static boolean name(Token tk, String str) {
     return tk instanceof NameTok && ((NameTok) tk).name.equals(str);
-  }
-  public static String[] varnames(char t, boolean imm) {
-    assert "fmda".indexOf(t)!=-1;
-    switch ((t=='d'? 2 : t=='m'? 1 : 0) + (imm? 3 : 0)) { default: throw new IllegalStateException();
-      //    𝕊𝕩𝕨𝕣𝕗𝕘 | 012345
-      case 0: return new String[]{"𝕤","𝕩","𝕨"            }; // f  012··· | 𝕊𝕩𝕨···
-      case 1: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗"    }; // m  01234· | 𝕊𝕩𝕨𝕣𝕗·
-      case 2: return new String[]{"𝕤","𝕩","𝕨","𝕣","𝕗","𝕘"}; // d  012345 | 𝕊𝕩𝕨𝕣𝕗𝕘
-      case 3: return new String[]{                       }; // fi ······ | ······
-      case 4: return new String[]{            "𝕣","𝕗"    }; // mi ···01· | 𝕣𝕗····
-      case 5: return new String[]{            "𝕣","𝕗","𝕘"}; // di ···012 | 𝕣𝕗𝕘···
-    }
-  }
-  
-  public String[] defNames() {
-    return varnames(o.type, o.immediate || o.type=='a');
   }
   
   public void addHeader(Comp.Mut m) {

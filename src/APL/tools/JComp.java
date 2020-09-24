@@ -16,7 +16,7 @@ public class JComp {
   public final JFn r;
   HashMap<Const, Integer> constants = new HashMap<>();
   static int ctr = 0;
-  public JComp(Comp comp) {
+  public JComp(Comp comp, int start) {
     
     
     
@@ -36,56 +36,22 @@ public class JComp {
     {
       
       
-      Met fn = new Met(0x0001, "get", met(Value.class, Scope.class, int.class), 3);
-      // aload 0 - this (JFn); 1 - scope; 2 - offset; 3,4,5 - temp values
+      Met fn = new Met(0x0001, "get", met(Value.class, Scope.class), 3);
+      // aload 0 - this (JFn); 1 - scope; 2,3,4 - temp values
       int SC   = 1;
-      int OFF  = 2;
-      int TMP  = 3;
-      int TMP2 = 4;
-      int TMP3 = 5;
+      int TMP  = 2;
+      int TMP2 = 3;
+      int TMP3 = 4;
       // fields.add(new Fld(0x0009, "vals", name(Value[].class))); // ACC_PUBLIC ACC_STATIC ACC_FINAL
-      
-      
-      MutIntArr offs = new MutIntArr(2); // todo store needed offsets in Comp
-      boolean trailingRet = false;
-      offs.add(0);
-      {
-        int i = 0;
-        while (i<comp.bc.length) {
-          if (comp.bc[i]==RETN) offs.add(i+1);
-          i = comp.next(i);
-        }
-        if (offs.is[offs.sz-1]==comp.bc.length) {
-          trailingRet = true;
-          offs.sz--;
-        }
-      }
-      Met.Lbl[] bodyBlocks = new Met.Lbl[offs.sz];
-      for (int i = 0; i < bodyBlocks.length; i++) bodyBlocks[i] = fn.lbl();
-      int cbody = 0;
-      int mstack;
-      
-      if (offs.sz!=1) {
-        Met.Lbl def = fn.lbl();
-        fn.iload(OFF);
-        fn.lookupswitch(def, bodyBlocks.length);
-        for (int i = 0; i < bodyBlocks.length; i++) fn.lookup(offs.is[i], bodyBlocks[i]);
-        
-        def.here();
-        fn.new_(ImplementationError.class);
-        fn.dup();
-        fn.ldc("function offset must be either 0 or right after RETN");
-        fn.invspec(ImplementationError.class, "<init>", met(void.class, String.class));
-        fn.athrow();
-        mstack = 3;
-        bodyBlocks[cbody++].here();
-      } else mstack = 0;
+  
+  
+      int mstack = 0;
       
       
       byte[] bc = comp.bc;
-      int i = 0;
+      int i = start;
       int cstack=0;
-      while (i != bc.length-(trailingRet?1:0)) {
+      loop: while (i != bc.length) {
         int pi = i;
         i++;
         switch (bc[pi]) { default: throw new DomainError("Unsupported bytecode "+bc[pi]);
@@ -376,11 +342,7 @@ public class JComp {
             break;
           }
           case RETN: {
-            if (cstack!=1) throw new ImplementationError("stack size at RETN was "+cstack); // not an absolute requirement, can be removed if need be
-            cstack = 0;
-            fn.aret();
-            bodyBlocks[cbody++].here();
-            break;
+            break loop;
           }
           case SPEC: {
             switch(bc[i++]) {

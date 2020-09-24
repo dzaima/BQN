@@ -226,7 +226,7 @@ public class Main {
   public static Value exec(String s, Scope sc, Value[] args) {
     return Comp.comp(Tokenizer.tokenize(s, args), sc).exec(sc);
   }
-  public static Comp comp(String s, Scope sc, Value[] args) {
+  public static Comp.SingleComp comp(String s, Scope sc, Value[] args) {
     return Comp.comp(Tokenizer.tokenize(s, args), sc);
   }
   
