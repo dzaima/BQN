@@ -86,210 +86,210 @@ public class Comp {
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
-    if (body.gen!=null) return body.gen.get(sc);
-    if (body.iter++>=compileStart && compileStart>=0) {
-      body.gen = new JComp(this, body.start).r;
       if (body.gen!=null) return body.gen.get(sc);
-      else body.iter = Integer.MIN_VALUE;
-    }
-    Stk s = new Stk();
-    exec: while (true) {
-      int c = i;
-      if (i >= bc.length) break;
-      c++;
-      switch (bc[i]) {
-        case PUSH: {
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          s.push(objs[n]);
-          break;
-        }
-        case VARO: {
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          Value got = sc.getC(strs[n]);
-          s.push(got);
-          break;
-        }
-        case VARM: {
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          s.push(new Variable(strs[n]));
-          break;
-        }
-        case LOCO: {
-          int depth = bc[c++];
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          Value got = sc.getL(depth, n);
-          s.push(got);
-          break;
-        }
-        case LOCM: {
-          int depth = bc[c++];
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          s.push(new Local(depth, n));
-          break;
-        }
-        case ARRO: {
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          Value[] vs = new Value[n];
-          for (int j = 0; j < n; j++) {
-            vs[n-j-1] = (Value) s.pop();
-          }
-          s.push(Arr.create(vs));
-          break;
-        }
-        case ARRM: {
-          int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          Settable[] vs = new Settable[n];
-          for (int j = 0; j < n; j++) {
-            vs[n-j-1] = (Settable) s.pop();
-          }
-          s.push(new SettableArr(vs));
-          break;
-        }
-        case FN1C: {
-          Value f = (Value) s.pop();
-          Value x = (Value) s.pop();
-          s.push(f.call(x));
-          break;
-        }
-        case FN2C: {
-          Value w = (Value) s.pop();
-          Value f = (Value) s.pop();
-          Value x = (Value) s.pop();
-          s.push(f.call(w, x));
-          break;
-        }
-        case FN1O: {
-          Value f = (Value) s.pop();
-          Value x = (Value) s.pop();
-          if (x instanceof Nothing) s.push(x);
-          else s.push(f.call(x));
-          break;
-        }
-        case FN2O: {
-          Value w = (Value) s.pop();
-          Value f = (Value) s.pop();
-          Value x = (Value) s.pop();
-          if (x instanceof Nothing) s.push(x);
-          else if (w instanceof Nothing) s.push(f.call(x));
-          else s.push(f.call(w, x));
-          break;
-        }
-        case OP1D: {
-          Value f = (Value) s.pop();
-          Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to modifier for stuff like F←+ ⋄ 1_f
-          Value d = r.derive(f); d.token = r.token;
-          s.push(d);
-          break;
-        }
-        case OP2D: {
-          Value f = (Value) s.pop();
-          Md2   r = (Md2  ) s.pop();
-          Value g = (Value) s.pop();
-          Value d = r.derive(f, g); d.token = r.token;
-          s.push(d);
-          break;
-        }
-        case OP2H: {
-          Md2   r = (Md2  ) s.pop();
-          Value g = (Value) s.pop();
-          Md1 d = r.derive(g); d.token = r.token;
-          s.push(d);
-          break;
-        }
-        case TR2D: {
-          Value f = (Value) s.pop();
-          Value g = (Value) s.pop();
-          Atop d = new Atop(f, g); d.token = f.token;
-          s.push(d);
-          break;
-        }
-        case TR3D: {
-          Value f = (Value) s.pop();
-          Value g = (Value) s.pop();
-          Value h = (Value) s.pop();
-          Fork d = new Fork(f, g, h); d.token = f.token;
-          s.push(d);
-          break;
-        }
-        case TR3O: {
-          Value f = (Value) s.pop();
-          Value g = (Value) s.pop();
-          Value h = (Value) s.pop();
-          Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h); d.token = f.token;
-          s.push(d);
-          break;
-        }
-        case SETN: {
-          Settable k = (Settable) s.pop();
-          Value    v = (Value   ) s.pop();
-          k.set(v, false, sc, null);
-          s.push(v);
-          break;
-        }
-        case SETU: {
-          Settable k = (Settable) s.pop();
-          Value    v = (Value   ) s.pop();
-          k.set(v, true, sc, null);
-          s.push(v);
-          break;
-        }
-        case SETM: {
-          Settable k = (Settable) s.pop();
-          Value    f = (Value   ) s.pop();
-          Value    v = (Value   ) s.pop();
-          k.set(f.call(k.get(sc), v), true, sc, null);
-          s.push(v);
-          break;
-        }
-        case SETH: {
-          Settable k = (Settable) s.pop();
-          Value    v = (Value   ) s.pop();
-          if (!k.seth(v, sc)) return null;
-          break;
-        }
-        case VFYM: {
-          Value x = (Value) s.pop();
-          s.push(new MatchSettable(x));
-          break;
-        }
-        case POPS: {
-          s.pop();
-          break;
-        }
-        case DFND: {
-          int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-          s.push(blocks[n].eval(sc));
-          break;
-        }
-        case CHKV: {
-          Obj v = s.peek();
-          if (v instanceof Nothing) throw new SyntaxError("didn't expect · here", v);
-          break;
-        }
-        case RETN: {
-          break exec;
-        }
-        case SPEC: {
-          switch(bc[c++]) {
-            case EVAL:
-              s.push(new EvalBuiltin(sc));
-              break;
-            case STDOUT:
-              s.push(new Quad());
-              break;
-            case STDIN:
-              s.push(new Quad().get(sc));
-              break;
-            default:
-              throw new InternalError("Unknown special "+bc[c-1]);
-          }
-          break;
-        }
-        default: throw new InternalError("Unknown bytecode "+bc[i]);
+      if (body.iter++>=compileStart && compileStart>=0) {
+        body.gen = new JComp(this, body.start).r;
+        if (body.gen!=null) return body.gen.get(sc);
+        else body.iter = Integer.MIN_VALUE;
       }
-      i = c;
-    }
-    return (Value) s.peek();
+      Stk s = new Stk();
+      exec: while (true) {
+        int c = i;
+        if (i >= bc.length) break;
+        c++;
+        switch (bc[i]) {
+          case PUSH: {
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            s.push(objs[n]);
+            break;
+          }
+          case VARO: {
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Value got = sc.getC(strs[n]);
+            s.push(got);
+            break;
+          }
+          case VARM: {
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            s.push(new Variable(strs[n]));
+            break;
+          }
+          case LOCO: {
+            int depth = bc[c++];
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Value got = sc.getL(depth, n);
+            s.push(got);
+            break;
+          }
+          case LOCM: {
+            int depth = bc[c++];
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            s.push(new Local(depth, n));
+            break;
+          }
+          case ARRO: {
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Value[] vs = new Value[n];
+            for (int j = 0; j < n; j++) {
+              vs[n-j-1] = (Value) s.pop();
+            }
+            s.push(Arr.create(vs));
+            break;
+          }
+          case ARRM: {
+            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Settable[] vs = new Settable[n];
+            for (int j = 0; j < n; j++) {
+              vs[n-j-1] = (Settable) s.pop();
+            }
+            s.push(new SettableArr(vs));
+            break;
+          }
+          case FN1C: {
+            Value f = (Value) s.pop();
+            Value x = (Value) s.pop();
+            s.push(f.call(x));
+            break;
+          }
+          case FN2C: {
+            Value w = (Value) s.pop();
+            Value f = (Value) s.pop();
+            Value x = (Value) s.pop();
+            s.push(f.call(w, x));
+            break;
+          }
+          case FN1O: {
+            Value f = (Value) s.pop();
+            Value x = (Value) s.pop();
+            if (x instanceof Nothing) s.push(x);
+            else s.push(f.call(x));
+            break;
+          }
+          case FN2O: {
+            Value w = (Value) s.pop();
+            Value f = (Value) s.pop();
+            Value x = (Value) s.pop();
+            if (x instanceof Nothing) s.push(x);
+            else if (w instanceof Nothing) s.push(f.call(x));
+            else s.push(f.call(w, x));
+            break;
+          }
+          case OP1D: {
+            Value f = (Value) s.pop();
+            Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to modifier for stuff like F←+ ⋄ 1_f
+            Value d = r.derive(f); d.token = r.token;
+            s.push(d);
+            break;
+          }
+          case OP2D: {
+            Value f = (Value) s.pop();
+            Md2   r = (Md2  ) s.pop();
+            Value g = (Value) s.pop();
+            Value d = r.derive(f, g); d.token = r.token;
+            s.push(d);
+            break;
+          }
+          case OP2H: {
+            Md2   r = (Md2  ) s.pop();
+            Value g = (Value) s.pop();
+            Md1 d = r.derive(g); d.token = r.token;
+            s.push(d);
+            break;
+          }
+          case TR2D: {
+            Value f = (Value) s.pop();
+            Value g = (Value) s.pop();
+            Atop d = new Atop(f, g); d.token = f.token;
+            s.push(d);
+            break;
+          }
+          case TR3D: {
+            Value f = (Value) s.pop();
+            Value g = (Value) s.pop();
+            Value h = (Value) s.pop();
+            Fork d = new Fork(f, g, h); d.token = f.token;
+            s.push(d);
+            break;
+          }
+          case TR3O: {
+            Value f = (Value) s.pop();
+            Value g = (Value) s.pop();
+            Value h = (Value) s.pop();
+            Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h); d.token = f.token;
+            s.push(d);
+            break;
+          }
+          case SETN: {
+            Settable k = (Settable) s.pop();
+            Value    v = (Value   ) s.pop();
+            k.set(v, false, sc, null);
+            s.push(v);
+            break;
+          }
+          case SETU: {
+            Settable k = (Settable) s.pop();
+            Value    v = (Value   ) s.pop();
+            k.set(v, true, sc, null);
+            s.push(v);
+            break;
+          }
+          case SETM: {
+            Settable k = (Settable) s.pop();
+            Value    f = (Value   ) s.pop();
+            Value    v = (Value   ) s.pop();
+            k.set(f.call(k.get(sc), v), true, sc, null);
+            s.push(v);
+            break;
+          }
+          case SETH: {
+            Settable k = (Settable) s.pop();
+            Value    v = (Value   ) s.pop();
+            if (!k.seth(v, sc)) return null;
+            break;
+          }
+          case VFYM: {
+            Value x = (Value) s.pop();
+            s.push(new MatchSettable(x));
+            break;
+          }
+          case POPS: {
+            s.pop();
+            break;
+          }
+          case DFND: {
+            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            s.push(blocks[n].eval(sc));
+            break;
+          }
+          case CHKV: {
+            Obj v = s.peek();
+            if (v instanceof Nothing) throw new SyntaxError("didn't expect · here", v);
+            break;
+          }
+          case RETN: {
+            break exec;
+          }
+          case SPEC: {
+            switch(bc[c++]) {
+              case EVAL:
+                s.push(new EvalBuiltin(sc));
+                break;
+              case STDOUT:
+                s.push(new Quad());
+                break;
+              case STDIN:
+                s.push(new Quad().get(sc));
+                break;
+              default:
+                throw new InternalError("Unknown special "+bc[c-1]);
+            }
+            break;
+          }
+          default: throw new InternalError("Unknown bytecode "+bc[i]);
+        }
+        i = c;
+      }
+      return (Value) s.peek();
     } catch (Throwable t) {
       APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
       Tokenable fn = body.gen!=null? null : ref[i];
