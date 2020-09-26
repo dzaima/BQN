@@ -228,13 +228,6 @@ public final class BitArr extends Arr {
     // System.out.println("  before:");
     // for (long l : src) System.out.print(str64(l)+"  "); System.out.println();
     // for (long l : dst) System.out.print(str64(l)+"  "); System.out.println();
-    if (o == 0 && (s&63) == 0) {
-      int sp =  s   >>6; // incl
-      int ep = (e-1)>>6; // incl
-      System.arraycopy(src, sp, dst, sI, ep-sp+1);
-      dst[eI] = (eV&eM) | (dst[eI]&~eM);
-      return;
-    }
     int shl = o-(s&63);
     // System.out.println("oshl="+shl);
     if (shl==0) {
