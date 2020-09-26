@@ -14,7 +14,7 @@ Tps ← {
   r ← ⟨2•AS 𝕩⟩
   r∾↩ 𝕨◶{<1•AS 𝕩}‿{<1•AS 𝕩}‿{(∧´0=1|𝕩)◶⟨⟩‿{<1•AS 𝕩}𝕩} 𝕩
   r∾↩ 𝕨◶⟨⟩       ‿{<0•AS 𝕩}‿{(∧´ 𝕩∊↕2)◶⟨⟩‿{<0•AS 𝕩}𝕩} 𝕩
-  (⊢≡1⌽⊢)◶{•←"failed type conversion"}‿⟨⟩ r
+  (⊢≡1⌽⊢)◶{𝕩:•←"failed type conversion"}‿⟨⟩ r
   r
 }
 
@@ -46,7 +46,7 @@ _err ← { Fn _𝕣:
     { 𝕊s:
       { 𝕊ca:
         a ← (≠ca) ⥊ s
-        (a EQ○(ca⊸Fc) s)◶{•←(⍕f)∾": failed scalar "∾(dir⊑"𝕩"‿"𝕨")∾" ≡ "∾⍕s}‿⟨⟩ 0
+        (a EQ○(ca⊸Fc) s)◶{𝕩:•←(⍕f)∾": failed scalar "∾(dir⊑"𝕩"‿"𝕨")∾" ≡ "∾⍕s}‿⟨⟩ 0
       }¨ ta
     }¨ 0‿1‿2‿2.5
   }¨ 0‿1
@@ -59,7 +59,7 @@ _err ← { Fn _𝕣:
     ma { a 𝕊 s:
       r ← a Fc¨ s
       c ← r EQ¨ <⊑r
-      ∧´◶{•←(⍕f)∾": failed scalar "∾(dir⊑"𝕩"‿"𝕨")∾" ≡ "∾(⍕s)∾"; "∾(dir⊑"𝕨"‿"𝕩")∾" is"∾ ∾' '∾¨ c ¬⊸/ CL¨ a}‿1 c
+      ∧´◶{𝕩:•←(⍕f)∾": failed scalar "∾(dir⊑"𝕩"‿"𝕨")∾" ≡ "∾(⍕s)∾"; "∾(dir⊑"𝕨"‿"𝕩")∾" is"∾ ∾' '∾¨ c ¬⊸/ CL¨ a}‿1 c
     }⌜ 0‿1‿2‿2.5
   }¨ 0‿1
 }¨⍎¨ scd
@@ -68,7 +68,7 @@ _err ← { Fn _𝕣:
 { 𝕊 f:
   Fc ← F _err
   { 𝕊 a:
-    (a EQ○Fc 2•AS a)◶{•←(⍕f)∾": failed monadic "∾CL a}‿⟨⟩ 0
+    (a EQ○Fc 2•AS a)◶{𝕩:•←(⍕f)∾": failed monadic "∾CL a}‿⟨⟩ 0
   }¨ ta
 }¨⟨
   9⊸↑, 1000⊸↑  ⋄  ¯9⊸↑, ¯1000⊸↑
