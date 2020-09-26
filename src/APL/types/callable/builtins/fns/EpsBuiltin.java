@@ -2,7 +2,7 @@ package APL.types.callable.builtins.fns;
 
 import APL.errors.RankError;
 import APL.types.*;
-import APL.types.arrs.BitArr;
+import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 import APL.types.callable.builtins.md1.CellBuiltin;
 
@@ -50,17 +50,33 @@ public class EpsBuiltin extends FnBuiltin {
       for (Value c : x) vs.add(c);
       for (Value c : w) res.add(vs.contains(c));
     } else {
-      Value[] xv = x.values();
-      for (int i = 0; i < w.ia; i++) {
-        Value cw = w.get(i);
-        boolean b = false;
-        for (Value v : xv) {
-          if (v.eq(cw)) {
-            b = true;
-            break;
+      if (x.quickIntArr() && w.quickIntArr()) {
+        int[] xi = x.asIntArr();
+        int[] wi = w.asIntArr();
+        for (int i = 0; i < w.ia; i++) {
+          int cw = wi[i];
+          boolean b = false;
+          for (int v : xi) {
+            if (v == cw) {
+              b = true;
+              break;
+            }
           }
+          res.add(b);
         }
-        res.add(b);
+      } else {
+        Value[] xv = x.values();
+        for (int i = 0; i < w.ia; i++) {
+          Value cw = w.get(i);
+          boolean b = false;
+          for (Value v : xv) {
+            if (v.eq(cw)) {
+              b = true;
+              break;
+            }
+          }
+          res.add(b);
+        }
       }
     }
     return res.finish();

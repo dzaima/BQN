@@ -64,7 +64,6 @@ public class ScanBuiltin extends Md1Builtin {
             }
           }
           int[] res = new int[x.ia];
-          if (x instanceof BitArr) System.out.println(f);
           int[] xi = x.asIntArr();
           System.arraycopy(xi, 0, res, 0, l);
           while (i < x.ia) {

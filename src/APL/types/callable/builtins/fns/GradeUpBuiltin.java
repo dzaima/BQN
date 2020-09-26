@@ -2,7 +2,7 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.DomainError;
-import APL.types.Value;
+import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 import APL.types.callable.builtins.md2.NCellBuiltin;
@@ -21,7 +21,8 @@ public class GradeUpBuiltin extends FnBuiltin {
   
   
   public static int[] gradeUp(Value x) {
-    if (x.rank==1 && x.ia>0) {
+    if (x.ia==0) return EmptyArr.NOINTS;
+    if (x.rank==1) {
       if (x instanceof BitArr) {
         long[] xl = ((BitArr) x).arr;
         int[] res = new int[x.ia]; int rp = 0;
@@ -78,6 +79,29 @@ public class GradeUpBuiltin extends FnBuiltin {
       x = new HArr(NCellBuiltin.cells(x, xr), Arrays.copyOf(x.shape, xr));
       w = new HArr(CellBuiltin.cells(w));
     }
+    
+    if (w.quickIntArr() && x.quickIntArr()) {
+      int[] wi = w.asIntArr();
+      int[] xi = x.asIntArr();
+  
+      for (int i = 0; i < w.ia-1; i++) {
+        if (wi[i] > wi[i+1]) throw new DomainError("⍋: 𝕨 must be sorted", this);
+      }
+      
+      int[] res = new int[x.ia];
+      for (int i = 0; i < res.length; i++) {
+        int c = xi[i];
+        int s = -1, e = wi.length;
+        while (e-s > 1) {
+          int m = (s+e) / 2;
+          if (c < wi[m]) e = m;
+          else s = m;
+        }
+        res[i] = s+1;
+      }
+      return new IntArr(res, x.shape);
+    }
+    
     for (int i = 0; i < w.ia-1; i++) {
       if (w.get(i).compareTo(w.get(i+1)) > 0) throw new DomainError("⍋: 𝕨 must be sorted", this);
     }
