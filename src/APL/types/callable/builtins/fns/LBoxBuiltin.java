@@ -39,8 +39,20 @@ public class LBoxBuiltin extends FnBuiltin {
       spec: if (w.rank==1 && x.rank==1) {
         if (x.quickDoubleArr()) {
           if (x.quickIntArr()) {
+            if (x instanceof BitArr) {
+              long[] xl = ((BitArr) x).arr;
+              int xa = x.ia;
+              long[] res = new long[BitArr.sizeof(wi.length)];
+              for (int i = 0; i < wi.length; i++) {
+                int c = wi[i];
+                if (c<0) c+= xa;
+                if (c<0 || c>=xa) break spec;
+                res[i>>6]|= (xl[c>>6]>>(c&63) & 1) << (i&63);
+              }
+              return new BitArr(res, sh);
+            }
             int[] xi = x.asIntArr();
-            int[] res = new int[w.ia];
+            int[] res = new int[wi.length];
             for (int i = 0; i < wi.length; i++) {
               int c = wi[i];
               if (c<0) c+= xi.length;
@@ -50,7 +62,7 @@ public class LBoxBuiltin extends FnBuiltin {
             return new IntArr(res, sh);
           }
           double[] xd = x.asDoubleArr();
-          double[] res = new double[w.ia];
+          double[] res = new double[wi.length];
           for (int i = 0; i < wi.length; i++) {
             int c = wi[i];
             if (c<0) c+= xd.length;
