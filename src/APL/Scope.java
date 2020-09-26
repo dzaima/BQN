@@ -223,7 +223,8 @@ public class Scope {
             Value blk = x.get(3);
             
             byte[] bcp = new byte[bc.ia];
-            for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bc.get(i).asInt();
+            int[] bcis = bc.asIntVec();
+            for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bcis[i];
             Token[] ref = new Token[bcp.length]; // keep as nulls for now
             
             Value[] objp = new Value[obj.ia];
