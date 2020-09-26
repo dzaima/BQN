@@ -52,8 +52,19 @@ public class ScanBuiltin extends Md1Builtin {
               }
               return new SingleItemArr(Num.ZERO, x.shape);
             }
+            if (f instanceof PlusBuiltin) {
+              int[] res = new int[x.ia];
+              BitArr.BR xr = ((BitArr) x).read();
+              int sum = 0;
+              for (int j = 0; j < x.ia; j++) {
+                sum+= xr.read()? 1 : 0;
+                res[j] = sum;
+              }
+              return new IntArr(res, x.shape);
+            }
           }
           int[] res = new int[x.ia];
+          if (x instanceof BitArr) System.out.println(f);
           int[] xi = x.asIntArr();
           System.arraycopy(xi, 0, res, 0, l);
           while (i < x.ia) {

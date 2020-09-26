@@ -20,7 +20,7 @@ public class IntArr extends Arr {
     this.arr = a;
   }
   
-  public static Arr maybe(double[] ds, int[] sh) {
+  public static Arr maybe(double[] ds, int[] sh) { // TODO not use
     ia: {
       for (double c : ds) if (c != (int)c) break ia;
       int[] is = new int[ds.length];
