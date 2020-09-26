@@ -197,11 +197,100 @@ public final class BitArr extends Arr {
   }
   
   public static void copy(long[] src, int srcS, long[] dst, int dstS, int len) {
-    for (int i = 0; i < len; i++) {
-      int si = i+srcS;
-      int di = i+dstS;
-      dst[di>>6]|= (src[si>>6]>>(si&63)&1) << (di&63);
+  //   for (int i = 0; i < len; i++) {
+  //     int si = i+srcS;
+  //     int di = i+dstS;
+  //     dst[di>>6]|= (src[si>>6]>>(si&63)&1) << (di&63);
+  //   }
+  // }
+  // public static void copyn(long[] src, int srcS, long[] dst, int dstS, int len) {
+    int s = srcS;
+    int e = srcS+len;
+    if (len==0) return;
+    int o = dstS&63;
+    
+    // System.out.println();
+    // System.out.println("copy "+s+"-"+e+"  to  "+dstS+"-"+(dstS+len));
+    // System.out.println("srclen = "+src.length+"; dstlen = "+dst.length);
+    // System.out.println("decision on "+o+" "+s);
+    
+    int sI = dstS>>6;                // first index of where to batch insert; included
+    long sV = dst[sI];               // first long
+    long sM = (1L<<o) - 1;           // mask of what's already written
+    
+    int eI = (dstS+len-1) >> 6;      // last index of where to batch insert; included
+    long eV = dst[eI];               // last long
+    long eM = -(1L << (o+len & 63)); // mask of what's already written
+    if (eM==~0L) eM=0;
+    // System.out.println("  masks:");
+    // System.out.println(str64(sM) + " of "+str64(sV)+" @ "+sI);
+    // System.out.println(str64(eM) + " of "+str64(eV)+" @ "+eI);
+    // System.out.println("  before:");
+    // for (long l : src) System.out.print(str64(l)+"  "); System.out.println();
+    // for (long l : dst) System.out.print(str64(l)+"  "); System.out.println();
+    if (o == 0 && (s&63) == 0) {
+      int sp =  s   >>6; // incl
+      int ep = (e-1)>>6; // incl
+      System.arraycopy(src, sp, dst, sI, ep-sp+1);
+      dst[eI] = (eV&eM) | (dst[eI]&~eM);
+      return;
     }
+    int shl = o-(s&63);
+    // System.out.println("oshl="+shl);
+    if (shl==0) {
+      int sp =  s   >>6; // incl
+      int ep = (e-1)>>6; // incl
+      System.arraycopy(src, sp, dst, sI, ep-sp+1);
+    } else {
+      int pG = s >> 6;
+      if (shl < 0) {
+        shl+= 64;
+        pG++;
+      }
+      int shr = 64-shl;
+      // System.out.println("shl="+shl+"; shr="+shr);
+      // System.out.println(i+"…"+Li+": s="+s+" o="+o+" e="+e+" pG="+pG+" shl="+shl);
+        
+        /* some unrolling of
+              for (int pT = i; pT <= Li; pT++) {
+                if (pG<garr.length) a[pT]|= garr[pG]<<shl;
+                if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
+                pG++;
+              }
+        */
+      {
+        int pT = sI;
+        if (pG< src.length) dst[pT]|= src[pG]<<shl;
+        if (pG-1>=0) dst[pT]|= src[pG-1]>>>shr;
+        // System.out.println(pT+": "+(pG< src.length)+" "+(pG-1>=0));
+        pG++;
+      }
+      for (int pT = sI+1; pT < eI; pT++) {
+        dst[pT]|= src[pG]<<shl;
+        dst[pT]|= src[pG-1]>>>shr;
+        // System.out.println(pT+": dbl");
+        pG++;
+      }
+      if (sI+1<=eI) {
+        int pT = eI;
+        if (pG< src.length) dst[pT]|= src[pG]<<shl;
+        dst[pT]|= src[pG-1]>>>shr;
+        // System.out.println(pT+": "+(pG< src.length));
+        pG++;
+      }
+    }
+    
+    if (sI == eI) {
+      long written = sM|eM;
+      dst[sI] = (sV&written) | (dst[sI] & ~written);
+    } else {
+      dst[sI] = (sV&sM) | (dst[sI]&~sM);
+      dst[eI] = (eV&eM) | (dst[eI]&~eM);
+    }
+    
+    // System.out.println("  after:");
+    // for (long l : dst) System.out.print(str64(l)+"  ");
+    // System.out.println();
   }
   
   public static String str64(long l) {
