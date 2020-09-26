@@ -71,6 +71,26 @@ public class LBoxBuiltin extends FnBuiltin {
           }
           return new DoubleArr(res, sh);
         }
+        if (x instanceof ChrArr) {
+          String xs = ((ChrArr) x).s;
+          char[] res = new char[wi.length];
+          for (int i = 0; i < wi.length; i++) {
+            int c = wi[i];
+            if (c<0) c+= xs.length();
+            if (c<0 || c>=xs.length()) break spec;
+            res[i] = xs.charAt(c);
+          }
+          return new ChrArr(res, sh);
+        }
+        Value[] xv = x.values();
+        Value[] res = new Value[wi.length];
+        for (int i = 0; i < wi.length; i++) {
+          int c = wi[i];
+          if (c<0) c+= xv.length;
+          if (c<0 || c>=xv.length) break spec;
+          res[i] = xv[c];
+        }
+        return Arr.create(res, sh);
       }
       MutVal res = new MutVal(sh);
       int csz = CellBuiltin.csz(x);

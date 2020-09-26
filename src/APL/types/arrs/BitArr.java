@@ -242,7 +242,7 @@ public final class BitArr extends Arr {
   public static BC create(int[] sh) {
     return new BC(sh);
   }
-  public class BR { // boolean read
+  public final class BR { // boolean read
     private int i, o = 0;
     public boolean read() {
       boolean r = (arr[i] & 1L<<o) != 0;
