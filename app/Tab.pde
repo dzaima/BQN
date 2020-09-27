@@ -185,9 +185,9 @@ static class REPL extends Tab {
             sc = sc.owner(vn);
             if (sc == null) { textln("variable "+vn+" didn't exist"); return; }
             Value o = sc.get(vn);
-                 if (o instanceof Dfn ) topbar.toNew(new Ed(sc, vn, ((Dfn ) o).code.source()));
-            else if (o instanceof Dmop) topbar.toNew(new Ed(sc, vn, ((Dmop) o).code.source()));
-            else if (o instanceof Ddop) topbar.toNew(new Ed(sc, vn, ((Ddop) o).code.source()));
+                 if (o instanceof FunBlock) topbar.toNew(new Ed(sc, vn, ((FunBlock) o).code.source()));
+            else if (o instanceof Md1Block) topbar.toNew(new Ed(sc, vn, ((Md1Block) o).code.source()));
+            else if (o instanceof Md2Block) topbar.toNew(new Ed(sc, vn, ((Md2Block) o).code.source()));
             else textln("cannot edit type "+(o instanceof Fun? o.getClass().getSimpleName() : o.humanType(false)));
           } else textln("Command "+nm+" not found");
           //else if (nm.equals(""))

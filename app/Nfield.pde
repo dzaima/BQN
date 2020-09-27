@@ -82,7 +82,7 @@ static class Nfield extends Drawable implements TextReciever {
       for (Line l : lns) max = max(max, l.len);
       float maxx = (max - 2)*chrW;
       if (xoff < -maxx) xoff = (int) -maxx;
-      if (w > max*chrW*2) xoff = 0;
+      if (w > max*chrW*2) xoff = lnOff;
       xoff = Math.min(xoff, lnOff);
       
       float maxy = chrH * (lns.size() - 2);

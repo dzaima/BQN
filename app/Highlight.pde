@@ -144,7 +144,7 @@ static class SyntaxHighlight {
         pairs[t.epos-1] = t.spos  ;
       }
     }
-    if (t instanceof DfnTok) {
+    if (t instanceof BlockTok) {
       int ncol = dlvl+1 >= th.dfn.length? th.dfn[0] : th.dfn[dlvl+1];
       if (t.raw.charAt(t.epos-1) != '}') {
         err(t.spos);
@@ -156,7 +156,7 @@ static class SyntaxHighlight {
       }
     }
     if (t instanceof TokArr) {
-      int ndlvl = t instanceof DfnTok? dlvl+1 : dlvl;
+      int ndlvl = t instanceof BlockTok? dlvl+1 : dlvl;
       for (Token c : ((TokArr<?>)t).tokens) {
         walk(c, ndlvl);
       }
