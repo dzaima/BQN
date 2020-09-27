@@ -119,7 +119,7 @@ static class AppMap extends SimpleMap {
       case "cpy": return new Fun() {
         public String repr() { return "app.cpy"; }
         public Value call(Value w) {
-          if (w.rank == 1) {
+          if (w.r() == 1) {
             w = w.squeeze();
             if (w instanceof ChrArr) {
               a.copy(w.asString());
