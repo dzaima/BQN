@@ -1,7 +1,6 @@
 static class ROText extends Drawable {
   float tsz, chw;
-  ROText(int x, int y, int w, int h) {
-    super(x, y, w, h);
+  ROText() {
     s = new ArrayList();
     setSize(scale);
   }
@@ -31,7 +30,7 @@ static class ROText extends Drawable {
     endClip(d);
     redraw = false;
   }
-  void tick() {
+  void draw() {
     if (!visible) return;
     if (a.mousePressed && smouseIn() && (a.mouseY!=a.pmouseY || a.mouseX!=a.pmouseX)) {
       redraw = true;

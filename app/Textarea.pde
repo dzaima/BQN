@@ -8,11 +8,10 @@ static class APLTextarea extends Drawable implements TextReciever {
   SyntaxHighlight hl;
   Theme th = new Theme();
 
-  APLTextarea(int x, int y, int w, int h) {
-    super(x, y, w, h);
+  APLTextarea() {
     lines = new ArrayList();
     lines.add("");
-    setsz(scale);
+    setsz(isz);
   }
   int tt = 0; // caret flicker timer
   int xoff = 0; // scroll
@@ -27,8 +26,7 @@ static class APLTextarea extends Drawable implements TextReciever {
   final int hsz = 300;
   final State[] history = new State[hsz];
   int hptr = 0; // points to the current modification
-  void tick() {
-    if (!visible) return;
+  void draw() {
     if (a.mousePressed && !pmousePressed && smouseIn()) {
       textInput = this;
     }

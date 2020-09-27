@@ -20,7 +20,6 @@ void psDraw() {
   if (mousePressed) touches = new FakeTouch[] { new FakeTouch(mouseX, mouseY) };
   else touches = new FakeTouch[0];
   if (pw!=width || ph!=height) {
-    println(pw, ph);
     redrawAll();
     pw = width;
     ph = height;
@@ -43,7 +42,7 @@ void paste(Drawable d) {
   }
 }
 void mouseWheel(MouseEvent e) {
-  if (topbar != null && topbar.ctab != null) topbar.ctab.mouseWheel(e.getCount());
+  if (all!=null && all.ctab!=null) all.ctab.vw.mouseWheel(e.getCount());
 }
 void openKeyboard() {};
 

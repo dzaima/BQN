@@ -12,8 +12,7 @@ static class Nfield extends Drawable implements TextReciever {
   boolean lineNumbering = false; // should line numbers be written on the left
   
   int tt; // caret flicker timer
-  Nfield(int x, int y, int w, int h) {
-    super(x, y, w, h);
+  Nfield() {
     sx = sy = ex = ey = 0;
     lns = new ArrayList();
     lns.add(new Line(""));
@@ -37,9 +36,13 @@ static class Nfield extends Drawable implements TextReciever {
   int lnTapMode = 0; // 0 - none; 1 - tapped; 2 - dragged
   int lnTapTime = -100; // last millis() when a line was tapped
   int prevDigam = 0;
-  void tick() {
+  void redraw() {
+    // TODO be efficient
+    if (hl!=null) hl.g = d;
+    draw();
+  }
+  void draw() {
     //println(allText(), sx,sy,ex,ey,lns.size(),len(0));
-    if (!visible) return;
     if (a.mousePressed && !pmousePressed && smouseIn() && a.mouseButton!=CENTER) textInput = this;
     d.textSize(chrH);
     if (a.mousePressed && smouseIn() && (MOBILE || a.mouseButton==CENTER)) {
@@ -218,10 +221,6 @@ static class Nfield extends Drawable implements TextReciever {
     return new PVector(posx(cx), posy(cy));
   }
   
-  void redraw() {
-    if (hl!=null) hl.g = d;
-    tick();
-  }
   
   boolean sel() {
     return sx!=ex || sy!=ey;

@@ -7,8 +7,9 @@ static class Keyboard extends Drawable {
   int shiftMode; // 0 = none, 1 = temp, 2 = hold;
   Key[][] keys;
   String layout;
-  Keyboard(int x, int y, int w, int h, int xam, int yam, JSONObject data) {
-    super(x, y, w, h); // don't draw by default
+  Keyboard(int w, int h, int xam, int yam, JSONObject data) {
+    this.w = w; // TODO not need this
+    this.h = h;
     this.data = data;
     this.xam = xam;
     this.yam = yam;
@@ -38,14 +39,12 @@ static class Keyboard extends Drawable {
   }
   void redraw() {
     if (w==0||h==0) return;
-    if (visible) {
-      for (Key[] row : keys) for (Key k : row) k.redraw();
-    }
+    for (Key[] row : keys) for (Key k : row) k.redraw();
   }
   
   Key start;
   
-  void tick() {
+  void draw() {
     if (w==0||h==0) return;
     if (!pmousePressed && a.mousePressed && smouseIn()) {
       int mx = (a.mouseX-x) / kw;
@@ -94,13 +93,10 @@ static class Keyboard extends Drawable {
   }
 }
 
-void keyboard(int x, int y, int w, int h, String file) {
-  if (kb != null) kb.delete();
+void keyboard(int w, int h, String file) {
   JSONObject o = loadJSONObject(file);
   JSONArray main = o.getJSONArray(o.getString("mainName"));
-  kb = new Keyboard(x, y, w, h, main.getJSONArray(0).size(), main.size(), o);
-  kb.align(BOTTOM);
-  kb.show();
+  kb = new Keyboard(w, h, main.getJSONArray(0).size(), main.size(), o);
 }
 
 static final String[] dirs = new String[]{"def", "up", "down", "left", "right"};
@@ -119,15 +115,18 @@ static final float[][] corners = {
   {1, 0, 1, 1},
 };
 
-static class Key extends Drawable {
+static class Key {
   Keyboard b;
   
   int col = #222222;
   Action[] actions = new Action[5]; // C U D L R
-  
+  int x, y, w, h;
   Key(int x, int y, Keyboard b) {
-    super(x, y, b.kw, b.kh);
     this.b = b;
+    this.x = x;
+    this.y = y;
+    this.w = b.kw;
+    this.h = b.kh;
   }
   
   void redraw() {

@@ -1,10 +1,37 @@
-static class TopBar extends Drawable {
+static class TabSelect extends Drawable {
+  int tsz;
+  TopBar tb;
   Tab ctab;
-  ArrayList<Tab> tabs = new ArrayList();
-  TopBar(int x, int y, int w, int h) {
-    super(x, y, w, h);
+  TabSelect() {
+    tsz = MOBILE? scale*3/2 : scale;
+    tb = new TopBar(this);
   }
-  void tick() {
+  void setTsz(int ntsz) {
+    tsz = ntsz;
+    redraw();
+  }
+  void redraw() {
+    tb.upd(x, y, w, tsz);
+    redrawTab();
+  }
+  void redrawTab() {
+    ctab.vw.upd(x, y+tsz, w, h-tsz);
+  }
+  void draw() {
+    tb.draw();
+    ctab.vw.draw();
+  }
+  void mouseWheel(int am) {
+    ctab.vw.mouseWheel(am);
+  }
+}
+static class TopBar extends Drawable {
+  ArrayList<Tab> tabs = new ArrayList();
+  TabSelect ts;
+  TopBar(TabSelect ts) {
+    this.ts = ts;
+  }
+  void draw() {
     if (smouseIn() && a.mousePressed && !pmousePressed) {
       d.textSize(h*.8);
       int cx = x;
@@ -13,13 +40,11 @@ static class TopBar extends Drawable {
         int dx = max(2*h, ceil(d.textWidth(n)) + h/2);
         if (a.mouseX > cx && a.mouseX < cx + dx) to(t);
         cx+= dx;
-        redraw();
       }
     }
   }
   void redraw() {
     d.textSize(h*.8);
-    if (!visible) return;
     d.rectMode(CORNER);
     d.fill(#222222);
     d.noStroke();
@@ -29,7 +54,7 @@ static class TopBar extends Drawable {
     for (Tab t : tabs) {
       String n = t.name();
       int dx = max(2*h, ceil(d.textWidth(n)) + h/2);
-      if (t == ctab) {
+      if (t == ts.ctab) {
         d.fill(#333333);
         d.rect(cx, y, dx, h);
       }
@@ -47,43 +72,50 @@ static class TopBar extends Drawable {
     }
   }
   void to(Tab t) {
-    if (ctab != null) ctab.hide();
-    ctab = t;
-    ctab.show();
-    redraw();
+    if (ts.ctab!=null) ts.ctab.vw.setVisible(false);
+    ts.ctab = t;
+    t.vw.setVisible(true);
+    ts.redraw();
   }
   void move(int d) {
-    int i = tabs.indexOf(ctab) + d;
+    int i = tabs.indexOf(ts.ctab) + d;
     i%= tabs.size();
     if (i < 0) i+= tabs.size();
     to(tabs.get(i));
   }
   void toNew(Tab t) {
-    add(t);
+    tabs.add(t);
     to(t);
   }
   void add(Tab t) {
     tabs.add(t);
     redraw();
   }
-  void resized() {
-    if (ctab != null) ctab.show();
-  }
+  
   void close() {
-    if (tabs.size() == 1) return;
-    int i = tabs.indexOf(ctab);
-    tabs.remove(i);
-    i--;
-    if (i < 0) i = 0;
-    to(tabs.get(i));
+    close(ts.ctab);
   }
   void close(Tab t) {
     if (tabs.size() == 1) return;
     int i = tabs.indexOf(t);
     tabs.remove(i);
-    i--;
-    if (i < 0) i = 0;
-    if (t==ctab) to(tabs.get(i));
-    else redraw();
+    if (t==ts.ctab) to(tabs.get(Math.max(0, i-1)));
+    else ts.redraw();
   }
+}
+
+
+static class KBView extends Drawable {
+  Drawable ct;
+  KBView(Drawable ct) {
+    this.ct = ct;
+  }
+  void redraw() {
+    ct.upd(x, y       , w, h-kb.h);
+    kb.upd(x, y+h-kb.h, w, kb.h  );
+  }
+  void mouseWheel(int am) {
+    ct.mouseWheel(am);
+  }
+  void draw() { ct.draw(); kb.draw(); }
 }

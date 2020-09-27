@@ -1,8 +1,11 @@
 abstract static class Tab extends SimpleMap {
-  abstract void show();
-  abstract void hide();
+  
   abstract String name();
-  void mouseWheel(int dir) { }
+  
+  String toString() { return "tab["+name()+"]"; }
+  
+  Drawable vw;
+  
   Value getv(String k) {
     switch (k) {
       case "name": return Main.toAPL(name());
@@ -22,62 +25,57 @@ abstract static class Tab extends SimpleMap {
       default: throw new DomainError("setting non-existing key "+s+" for tab");
     }
   }
-  String toString() { return "tab["+name()+"]"; }
+  
 }
 
 
 static class REPL extends Tab {
   
-  final HView historyView;
-  final IField input;
-  final Drawable line = new Drawable(0, 0, 0, 0) {
-    void redraw() {
-      d.stroke(0x80D2D2D2);
-      d.strokeWeight(1);
-      d.line(historyView.x+4, historyView.y+historyView.h+2, historyView.x+historyView.w-4, historyView.y+historyView.h+2);
-    }
-  };
+  final HView hist = new HView();
+  final IField inp = new IField();
+  
+  REPL() {
+    vw = new KBView(new Drawable() {
+      void redraw() {
+        int lnh = 4;
+        d.fill(#101010);
+        d.noStroke();
+        d.rectMode(CORNER);
+        d.rect(x, y, w, h);
+        hist.upd(x, y, w, h-isz-lnh);
+        inp.upd(x, y+h-isz, w, isz);
+        textInput = inp;
+        
+        d.stroke(0x80D2D2D2);
+        d.strokeWeight(1);
+        d.line(hist.x+4, hist.y+hist.h+lnh/2, hist.x+hist.w-4, hist.y+hist.h+lnh/2);
+        
+      }
+      void draw() {
+        hist.draw();
+        inp.draw();
+      }
+      void mouseWheel(int am) {
+        if (hist.mouseInMe()) hist.mouseWheel(am);
+      }
+    });
+  }
+  
   Interpreter it = new DzaimaBQN();
   ArrayList<String> inputs = new ArrayList();
   String tmpSaved;
   int iptr = 0; // can be ==input.size()
-  REPL() {
-    historyView = new HView(0, top, a.width, 340-top); // new ROText(0, top, a.width, 340-top);
-    input = new IField(0, 350, a.width, 40);
-  }
-  void show() {
-    int ih = int(input.chrH*1.2);
-    d.noStroke();
-    d.fill(#101010);
-    d.rectMode(CORNER);
-    d.rect(0, top, d.width, freey()-top-ih);
-    input.move(0, freey()-ih, d.width, ih);
-    historyView.move(0, top, d.width, freey()-top-ih-6);
-    historyView.end();
-    input.show();
-    historyView.show();
-    line.show();
-    textInput = input;
-  }
-  void hide() {
-    input.hide();
-    historyView.hide();
-    line.hide();
-    if (textInput == input) textInput = null;
-  }
-  String name() {
-    return "REPL";
-  }
+  String name() { return "REPL"; }
   Value getv(String k) {
-    if (k.equals("eq")) return Main.toAPL(input.lns.get(0).toString());
+    if (k.equals("eq")) return Main.toAPL(inp.lns.get(0).toString());
     return super.getv(k);
   }
   void setv(String k, Value v) {
-    if (k.equals("eq")) { input.clear(); input.append(((Value) v).asString()); }
+    if (k.equals("eq")) { inp.clear(); inp.append(((Value) v).asString()); }
     else super.setv(k, v);
   }
   void mouseWheel(int dir) {
-    historyView.mouseWheel(dir);
+    hist.mouseWheel(dir);
   }
   
   
@@ -85,8 +83,7 @@ static class REPL extends Tab {
   
   
   class HView extends Nfield {
-    HView(int x, int y, int w, int h) {
-      super(x, y, w, h);
+    HView() {
       bottom = true;
       editable = false;
     }
@@ -97,22 +94,21 @@ static class REPL extends Tab {
       allE();
       dyoff = yoff = h-chrH*lns.size()-chrH;
     }
-    void tick() {
+    void draw() {
       // if (textInput == this) textInput = input;
-      super.tick();
+      super.draw();
     }
     void lnDTapped(int y) {
       String l = lns.get(y).toString();
-      if (l.startsWith("   ")) input.setln(l.substring(3));
-      textInput = input;
+      if (l.startsWith("   ")) inp.setln(l.substring(3));
+      textInput = inp;
     }
-    void lnTapped(int y) { textInput = input; }
-    void dragged()       { textInput = input; }
+    void lnTapped(int y) { textInput = inp; }
+    void dragged()       { textInput = inp; }
   }
   
   class IField extends Nfield {
-    IField(int x, int y, int w, int h) {
-      super(x, y, w, h);
+    IField() {
       multiline = false;
     }
     Line ln() {
@@ -124,6 +120,9 @@ static class REPL extends Tab {
     boolean highlight() {
       Line ln = ln();
       return ln.len>0 && ln.ints[0]!=':' && ln.ints[0]!=')';
+    }
+    void redraw() { super.redraw();
+      setsz(isz*.8);
     }
     void eval() {
       try {
@@ -140,19 +139,19 @@ static class REPL extends Tab {
           String nm = i==-1? cmd : cmd.substring(0, i);
           final String arg = i==-1? "" : cmd.substring(i+1);
           String argl = arg.toLowerCase();
-          if (nm.equals("hsz")) historyView.setsz(int(arg));
+          if (nm.equals("hsz")) hist.setsz(int(arg));
           else if (nm.equals("isz")) {
-            input.setsz(isz = int(arg));
+            isz = ceil(Float.parseFloat(arg)/.8);
             redrawAll();
           } else if (nm.equals("i")) {
             if (argl.equals("dyalog")) it = new Dyalog();
             if (argl.equals("dzaima")) it = new DzaimaBQN();
           } else if (nm.equals("clear")) {
-            historyView.clear();
+            hist.clear();
           } else if (nm.equals("g")) {
             topbar.toNew(new Grapher(it, arg));
           } else if (nm.equals("tsz")) {
-            top = int(arg);
+            all.tsz = int(arg);
             redrawAll();
           } else if (nm.equals("f") || nm.equals("fx")) {
             final boolean ex = nm.equals("fx");
@@ -226,13 +225,13 @@ static class REPL extends Tab {
       } else if (s.equals("newline")) {
         eval();
         clear();
-        historyView.end();
+        hist.end();
       } else if (s.equals("pgup") || s.equals("pgdn") || s.equals("home") || s.equals("end")) {
-        historyView.special(s);
+        hist.special(s);
       }
     }
     void textln(String ln) {
-      historyView.appendLns(ln);
+      hist.appendLns(ln);
     }
   }
   
@@ -242,34 +241,31 @@ static class REPL extends Tab {
 
 abstract static class Editor extends Tab {
   String name;
-  Nfield ta;
+  Nfield ta = new Nfield() {
+    void eval() {
+      save(ta.allText());
+    }
+    void extraSpecial(String s) {
+      if (s.equals("close")) {
+        eval();
+        topbar.close();
+      } else println("unknown special " + s);
+    }
+    void redraw() { super.redraw();
+      textInput = ta; // TODO think about whether there's a better place to place this
+    }
+  };
+  
   Editor(String name, String val) {
     this.name = name;
-    ta = new Nfield(0, 0, 10, 10) {
-      void eval() {
-        save(ta.allText());
-      }
-      void extraSpecial(String s) {
-        if (s.equals("close")) {
-          eval();
-          topbar.close();
-        } else println("unknown special " + s);
-      }
-    };
     ta.lineNumbering = true;
     ta.xoff = -1;
     ta.append(val);
     ta.setE(0, 0); ta.allE();
+    
+    vw = new KBView(ta);
   }
   abstract void save(String val);
-  void show() {
-    ta.move(0, top, d.width, freey()-top);
-    ta.show();
-    textInput = ta;
-  }
-  void hide() {
-    ta.hide();
-  }
   String name() {
     return name;
   }
@@ -280,56 +276,59 @@ abstract static class Editor extends Tab {
 
 
 static class Grapher extends Tab {
-  Graph g;
-  final Nfield input;
-  Value last;
+  Graph g = new Graph();
   Interpreter it;
-  Grapher(final Interpreter it, String def) {
-    g = new Graph(0, top, d.width, freey()-top-isz);
-    input = new Nfield(0, 350, d.width, 40) {
-      void eval() {
-        modified();
-      }
-      void modified() {
-        if (it instanceof DzaimaBQN) {
-          try {
-            last = it.exec(lns.get(0).toString());
-            g.newFun(last);
-          } catch (Throwable e) {
-            last = null;
-          }
+  
+  final Nfield input = new Nfield() {
+    void eval() {
+      modified();
+    }
+    void redraw() { super.redraw();
+      setsz(isz*.8);
+    }
+    void modified() {
+      if (it instanceof DzaimaBQN) {
+        try {
+          last = it.exec(lns.get(0).toString());
+          g.newFun(last);
+        } catch (Throwable e) {
+          last = null;
         }
       }
-      void extraSpecial(String s) {
-        if (s.equals("close")) {
-          eval();
-          topbar.close();
-        } else if (s.equals("newline")) {
-          eval();
-        } else println("unknown special " + s);
-      }
-    };
+    }
+    void extraSpecial(String s) {
+      if (s.equals("close")) {
+        eval();
+        topbar.close();
+      } else if (s.equals("newline")) {
+        eval();
+      } else println("unknown special " + s);
+    }
+  };
+  Value last;
+  
+  Grapher(Interpreter it, String def) {
+    this.it = it;
     input.multiline = false;
     input.append(def);
-  }
-  
-  void show() {
-    int ih = int(input.chrH*1.2);
-    g.move(0, top, d.width, freey()-top-ih);
-    g.show();
-    input.move(0, freey()-ih, d.width, ih);
-    input.show();
-    textInput = input;
-  }
-  void hide() {
-    g.hide();
-    input.hide();
+    
+    vw = new KBView(new Drawable() {
+      void redraw() {
+        g.upd(x, y, w, h-isz);
+        input.upd(x, y+h-isz, w, isz);
+        textInput = input;
+      }
+      void draw() {
+        g.draw();
+        input.draw();
+      }
+      void mouseWheel(int dir) {
+        g.mouseWheel(dir);
+      }
+    });
   }
   String name() {
     return "grapher";
-  }
-  void mouseWheel(int dir) {
-    g.mouseWheel(dir);
   }
   Value getv(String k) {
     if (k.equals("eq")) return Main.toAPL(input.lns.get(0).toString());

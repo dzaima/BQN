@@ -136,7 +136,7 @@ static class AppMap extends SimpleMap {
         for (int i = 0; i < vs.length; i++) vs[i] = topbar.tabs.get(i);
         return new HArr(vs);
       }
-      case "t": return topbar.ctab;
+      case "t": return all.ctab;
       default: return Null.NULL;
     }
   }
@@ -153,8 +153,8 @@ static class DzaimaBQN extends Interpreter {
     }
     void println(String s) {
       System.out.println(s);
-      mainREPL.historyView.appendLns(s);
-      mainREPL.historyView.end();
+      mainREPL.hist.appendLns(s);
+      mainREPL.hist.end();
     }
   };
   

@@ -6,11 +6,10 @@ static class APLField extends Drawable implements TextReciever {
   float extraH = 1.2;
   float xoff = 0;
   
-  APLField(int x, int y, int w, int h) {
-    this(x, y, w, h, "");
+  APLField() {
+    this("");
   }
-  APLField(int x, int y, int w, int h, String text) {
-    super(x, y, w, h);
+  APLField(String text) {
     line = text;
   }
   int tt = 0; // caret flicker timer
@@ -28,7 +27,7 @@ static class APLField extends Drawable implements TextReciever {
   final int hsz = 300;
   final State[] history = new State[hsz];
   int hptr = 0; // points to the current modification
-  void tick() {
+  void draw() {
     if (!visible) return;
     if (a.mousePressed && !pmousePressed && smouseIn()) {
       textInput = this;

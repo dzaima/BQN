@@ -13,58 +13,44 @@ import java.util.Optional;
 static PGraphics d;
 static app a;
 
-
-static ArrayList<Drawable> screen;
+static TabSelect all;
 
 static TextReciever textInput;
 static Keyboard kb;
 
 static TopBar topbar;
-static int top = 30;
-static int isz = 30;
 static int scale;
-static int freey() { // y position of keyboard start
-  return a.height-kb.h;
-}
-//static StrOS os;
 static REPL mainREPL;
 
+static int isz;
 
 
 void setup() {
   d = g;
   a = this;
   psSetup();
-  if (screen==null) screen = new ArrayList();
   background(#0a0a0a);
   textFont(createFont("BQN386.ttf", 48));
   int max = max(displayWidth, displayHeight);
   scale = (int)(max/(MOBILE? 50 : 86));
-  println(scale);
-  top = MOBILE? scale*3/2 : scale;
+  println("scale: "+scale);
   
+  isz = ceil(scale/.8);
   
   newKb();
-  if (topbar==null) { // don't reset variables if orientation has changed
-    //os = new StrOS();
-    topbar = new TopBar(0, 0, width, top);
+  if (all==null) { // don't reset variables if orientation has changed
+    all = new TabSelect();
+    topbar = all.tb;
     topbar.toNew(mainREPL = new REPL());
-    topbar.show();
   }
   redrawAll();
 }
 static boolean redraw;
 void newKb() {
   if (MOBILE) {
-    if (width>height) keyboard(0, 0, width, width/3, "L.json");
-    else              keyboard(0, 0, width, (int)(width*.8), "P.json");
-  } else keyboard(0, 0, 0, 0, "L.json");
-}
-static void redrawAll() {
-  //if (width != w || h != height) surface.setSize(w, h);
-  redraw = true;
-  a.newKb();
-  topbar.resize(d.width, top);
+    if (width>height) keyboard(width, width/3, "L.json");
+    else              keyboard(width, (int)(width*.8), "P.json");
+  } else keyboard(0, 0, "L.json");
 }
 static boolean pmousePressed;
 static int smouseX, smouseY;
@@ -77,16 +63,8 @@ void draw() {
   }
   psDraw();
   
-  for (int i = screen.size()-1; i >= 0; i--) {
-    screen.get(i).tick();
-  }
-  if (redraw) {
-    background(#101010);
-    for (Drawable d : screen) {
-      d.redraw();
-    }
-    redraw = false;
-  }
+  all.draw();
+  
   //String s = os.get();
   //if (s.length() != 0) {
   //  if (mainREPL != null) mainREPL.historyView.appendLns(s);
@@ -114,7 +92,14 @@ void keyPressed(KeyEvent e) {
   //}
   //println("P", +key, keyCode, shift, ctrl, e.getNative());
   //println("P", e.getNative());
-  if (key == 18 && keyCode == 82) {
+  println(+key,keyCode);
+  if (key== 5 && keyCode==69) {
+    println("clearing..");
+    background(0);
+    return;
+  }
+  if (key==18 && keyCode==82) {
+    println("redrawing..");
     redrawAll();
     return;
   }
@@ -167,3 +152,7 @@ static boolean cshift() {
 //static void textS(PGraphics g, char s, float x, float y) {
 //  g.text(s, x, y + (MOBILE? g.textSize*.333 : 0));
 //}
+
+static void redrawAll() {
+  all.upd(0, 0, a.width, a.height);
+}
