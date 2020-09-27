@@ -115,7 +115,6 @@ public class Tokenizer {
         char next = i+1 < len? raw.charAt(i + 1) : ' ';
         String cS = String.valueOf(c);
         if (c == '(' || c == '{' || c == '[' || c == '⟨') {
-          char match;
           levels.add(new Block(new ArrayList<>(), c, i));
           lines = levels.get(levels.size() - 1).a;
           lines.add(new Line(raw, i));
@@ -175,7 +174,7 @@ public class Tokenizer {
         } else if (validNameStart(c) || c == '•' && validNameStart(next)) {
           i++;
           while (i < len && validNameMid(raw.charAt(i))) i++;
-          var name = raw.substring(li, i);
+          String name = raw.substring(li, i);
           tokens.add(new NameTok(raw, li, i, name, args));
         } else if ("∞π".indexOf(c)!=-1  ||  c=='¯' && "∞π".indexOf(next)!=-1) {
           boolean neg = c=='¯';
@@ -319,8 +318,8 @@ public class Tokenizer {
       // else, attempt to recover
       while (levels.size() > 1) {
         Block closed = levels.remove(levels.size() - 1);
-        
-        var lineTokens = new ArrayList<LineTok>();
+  
+        ArrayList<LineTok> lineTokens = new ArrayList<>();
         for (Line ta : closed.a) lineTokens.add(ta.tok(true));
         Token r;
         switch (closed.b) {
@@ -340,14 +339,14 @@ public class Tokenizer {
           default:
             throw new Error("this should really not happen "+closed.b);
         }
-        var lines = levels.get(levels.size() - 1).a;
+        ArrayList<Line> lines = levels.get(levels.size() - 1).a;
         Line tokens = lines.get(lines.size() - 1);
         tokens.add(r);
       }
     }
-    var lines = levels.get(0).a;
+    ArrayList<Line> lines = levels.get(0).a;
     if (lines.size() > 0 && lines.get(lines.size()-1).size() == 0) lines.remove(lines.size()-1); // no trailing empties!!
-    var expressions = new ArrayList<LineTok>();
+    ArrayList<LineTok> expressions = new ArrayList<>();
     for (Line line : lines) {
       expressions.add(line.tok(pointless));
     }

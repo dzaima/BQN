@@ -27,11 +27,11 @@ public class OldKeyBuiltin extends Md1Builtin {
     }
     if (f instanceof Fun) {
       int i = 0;
-      var vals = new HashMap<Value, ArrayList<Value>>();
-      var order = new ArrayList<Value>();
+      HashMap<Value, ArrayList<Value>> vals = new HashMap<>();
+      ArrayList<Value> order = new ArrayList<>();
       for (Value v : x) {
         if (!vals.containsKey(v)) {
-          var l = new ArrayList<Value>();
+          ArrayList<Value> l = new ArrayList<>();
           l.add(Num.of(i));
           vals.put(v, l);
           order.add(v);
@@ -40,7 +40,7 @@ public class OldKeyBuiltin extends Md1Builtin {
         }
         i++;
       }
-      var res = new Value[order.size()];
+      Value[] res = new Value[order.size()];
       i = 0;
       for (Value c : order) {
         res[i++] = f.call(c, Arr.create(vals.get(c)));

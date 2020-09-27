@@ -19,7 +19,7 @@ for filename in glob.iglob('srcm/**/*.java', recursive=True):
   with open(filename, 'w') as myfile:
     myfile.write(data)
 print('replaced')
-for i in range(2):
+for i in range(0):
 
 
   os.system('./build8 -Xdiags:verbose 2> err');

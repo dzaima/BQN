@@ -65,7 +65,7 @@ public abstract class Arr extends Value {
     }
     if (r() == 1) { // simple vectors
       StringBuilder res = new StringBuilder();
-      var simple = true;
+      boolean simple = true;
       for (Value v : this) {
         if (res.length() > 0) res.append('‿');
         if (v != null) {

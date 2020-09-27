@@ -130,7 +130,7 @@ public class DTackBuiltin extends FnBuiltin {
       if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame, w);
       throw new DomainError(blame+": 𝕨 < 1", blame, w);
     }
-    var res = new ArrayList<Double>();
+    ArrayList<Double> res = new ArrayList<>();
     if (num < 0) {
       num = -num;
       while (num > 0) {
