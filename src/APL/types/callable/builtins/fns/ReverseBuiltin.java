@@ -29,8 +29,8 @@ public class ReverseBuiltin extends FnBuiltin {
   public Value call(Value w, Value x) {
     if (w instanceof Primitive) return on(w.asInt(), x);
     int[] wi = w.asIntVec();
-    if (wi.length > x.rank) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.formatAPL(x.shape))+" ≡ ≢𝕩, "+Main.formatAPL(wi)+" ≡ 𝕨)", this);
-    wi = Arrays.copyOf(wi, x.rank); // pads with 0s; also creates a mutable copy for moduloing
+    if (wi.length > x.r()) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.formatAPL(x.shape))+" ≡ ≢𝕩, "+Main.formatAPL(wi)+" ≡ 𝕨)", this);
+    wi = Arrays.copyOf(wi, x.r()); // pads with 0s; also creates a mutable copy for moduloing
     if (x.scalar()) return x; // so recursion doesn't have to worry about it
   
     for (int i = 0; i < wi.length; i++) {
@@ -51,7 +51,7 @@ public class ReverseBuiltin extends FnBuiltin {
     int mv = w[d];
     is*= ax;
     rs*= ax;
-    if (d == x.rank-1) {
+    if (d == x.r()-1) {
       res.copy(x, is   , rs+ax-mv,    mv);
       res.copy(x, is+mv, rs      , ax-mv);
     } else {
@@ -70,7 +70,7 @@ public class ReverseBuiltin extends FnBuiltin {
     if (x.ia==0) return x;
     a = Math.floorMod(a, x.shape[0]);
     if (a == 0) return x;
-    int csz = Arr.prod(x.shape, 1, x.shape.length);
+    int csz = Arr.prod(x.shape, 1, x.r());
     int pA = csz*a; // first part
     int pB = x.ia - pA; // second part
     

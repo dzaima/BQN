@@ -29,7 +29,7 @@ public class ShapeBuiltin extends FnBuiltin {
   
   
   public Value call(Value w, Value x) {
-    if (w.rank > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
+    if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
     int[] sh;
     int ia;
     int emptyPos = -1;
@@ -144,7 +144,7 @@ public class ShapeBuiltin extends FnBuiltin {
     for (int i = 0; i < w.ia; i++) {
       Value c = w.get(i);
       if (!(c instanceof Num)) { // a‿⟨⟩‿b ⥊ w - must use all items
-        if (x.rank == 0 && v.first() instanceof Primitive) return v.first();
+        if (x.r() == 0 && v.first() instanceof Primitive) return v.first();
         if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
         return v.ofShape(x.shape);
       }

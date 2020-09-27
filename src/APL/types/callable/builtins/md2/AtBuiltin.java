@@ -37,7 +37,7 @@ public class AtBuiltin extends Md2Builtin {
         fa = f.call(Arr.create(matching));
       } else fa = f;
       Value[] ra = new Value[ia];
-      if (fa.rank == 0) {
+      if (fa.r() == 0) {
         Value inner = fa.get(0);
         for (int i = 0; i < ia; i++) {
           if (ba[i]) ra[i] = inner;
@@ -69,7 +69,7 @@ public class AtBuiltin extends Md2Builtin {
     if (o.quickDoubleArr() && n.quickDoubleArr()) {
       double[] res = o.asDoubleArrClone();
       int[] is = poss.vals;
-      if (n.rank == 0) {
+      if (n.r() == 0) {
         double f0 = n.first().asDouble();
         // noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < is.length; i++) res[is[i]] = f0;
@@ -78,11 +78,11 @@ public class AtBuiltin extends Md2Builtin {
         Arr.eqShapes(n.shape, poss.sh, blame);
         for (int i = 0; i < is.length; i++) res[is[i]] = nd[i];
       }
-      return o.rank==0? Num.of(res[0]) : new DoubleArr(res, o.shape);
+      return o.r()==0? Num.of(res[0]) : new DoubleArr(res, o.shape);
     }
     Value[] res = o.valuesClone();
     int[] is = poss.vals;
-    if (n.rank == 0) {
+    if (n.r() == 0) {
       Value f0 = n.first();
       // noinspection ForLoopReplaceableByForEach
       for (int i = 0; i < is.length; i++) res[is[i]] = f0;

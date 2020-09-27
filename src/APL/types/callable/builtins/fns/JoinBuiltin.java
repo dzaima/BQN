@@ -16,8 +16,8 @@ public class JoinBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    simple: if (x.rank == 1) {
-      for (Value c : x) if (c.rank!=1) break simple;
+    simple: if (x.r() == 1) {
+      for (Value c : x) if (c.r()!=1) break simple;
       Value joined = JoinBuiltin.joinVec(x);
       if (joined != null) return joined;
     }
@@ -27,9 +27,9 @@ public class JoinBuiltin extends FnBuiltin {
     int[] sh0 = vs[0].shape;
     int ir = sh0.length;
     for (Value v : vs) {
-      if (ir!=v.shape.length) throw new RankError("∾: expected all items to have equal rank", this, v);
+      if (ir!=v.r()) throw new RankError("∾: expected all items to have equal rank", this, v);
     }
-    int or = x.shape.length;
+    int or = x.r();
     if (ir < or) throw new RankError("∾: rank of items must be at least the total rank", this);
   
     int[] fsh = new int[ir];
@@ -75,7 +75,7 @@ public class JoinBuiltin extends FnBuiltin {
   }
   
   public static Value joinVec(Value x) { // joins all vertically or something; doesn't check anything
-    assert x.rank == 1;
+    assert x.r() == 1;
     if (x.ia == 0) return x;
     Value first = x.first();
     int am = 0;
@@ -155,7 +155,7 @@ public class JoinBuiltin extends FnBuiltin {
   
   
   public static void check(Value w, Value x, Callable blame) {
-    int a = w.rank, b = x.rank;
+    int a = w.r(), b = x.r();
     int c = Math.max(1,Math.max(a,b));
     if (c-a > 1 || c-b > 1) throw new RankError(blame+": argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
     for (int i = 1; i < c; i++) {
@@ -163,7 +163,7 @@ public class JoinBuiltin extends FnBuiltin {
     }
   }
   public static Value on(Value w, Value x, Callable blame) {
-    int a = w.rank, b = x.rank;
+    int a = w.r(), b = x.r();
     int c = Math.max(1,Math.max(a,b));
     if (c-a > 1 || c-b > 1) throw new RankError(blame+": argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
     
@@ -232,8 +232,8 @@ public class JoinBuiltin extends FnBuiltin {
     boolean wScalar = w.scalar(), xScalar = x.scalar();
     if (wScalar && xScalar) return cat(SingleItemArr.sh1(w.first()), x, 0, blame);
     if (!wScalar && !xScalar) {
-      if (w.rank != x.rank) throw new RankError("ranks not matchable", blame, x);
-      for (int i = 0; i < w.rank; i++) {
+      if (w.r() != x.r()) throw new RankError("ranks not matchable", blame, x);
+      for (int i = 0; i < w.r(); i++) {
         if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
       }
     }
@@ -283,7 +283,7 @@ public class JoinBuiltin extends FnBuiltin {
   }
   
   public Value under(Value o, Value x) {
-    if (x.rank != 1) throw new NYIError("⌾∾ for rank>1", this, x); // doesn't work 
+    if (x.r() != 1) throw new NYIError("⌾∾ for rank>1", this, x); // doesn't work 
     Value joined = call(x);
     Value v = o instanceof Fun? o.call(joined) : o;
     Arr.eqShapes(joined.shape, v.shape, this);

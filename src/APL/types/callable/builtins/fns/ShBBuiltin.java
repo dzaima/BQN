@@ -13,7 +13,7 @@ public class ShBBuiltin extends FnBuiltin {
   
   public Value call(Value w, Value x) {
     if (x.scalar()) throw new RankError("»: 𝕩 cannot be scalar", this, x);
-    if (w.rank > x.rank) throw new RankError("»: rank of 𝕨 cannot exceed =𝕩", this);
+    if (w.r() > x.r()) throw new RankError("»: rank of 𝕨 cannot exceed =𝕩", this);
     JoinBuiltin.check(w, x, this);
     MutVal res = new MutVal(x.shape, x);
     int mid = Math.min(w.ia, x.ia);

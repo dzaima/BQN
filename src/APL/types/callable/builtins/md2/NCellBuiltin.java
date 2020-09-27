@@ -18,9 +18,9 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value ra = g.call(x);
-    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
-    int rx = dim(ra.get(ra.ia==2? 1 : 0), x.rank);
+    int rx = dim(ra.get(ra.ia==2? 1 : 0), x.r());
     int[] rsh = Arrays.copyOf(x.shape, rx);
     
     Value[] cs = cells(x, rx);
@@ -32,10 +32,10 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value ra = g.call(w, x);
-    if (ra.rank>1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
-    int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.rank);
-    int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.rank);
+    int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.r());
+    int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.r());
     
     int min = Math.min(rw, rx);
     int max = Math.max(rw, rx);
@@ -71,7 +71,7 @@ public class NCellBuiltin extends Md2Builtin {
   
   public static Value[] cells(Value x, int k) { // k is amount of leading dimensions to squash
     int cam = Arr.prod(x.shape, 0, k);
-    int[] csh = Arrays.copyOfRange(x.shape, k, x.shape.length);
+    int[] csh = Arrays.copyOfRange(x.shape, k, x.r());
     int csz = Arr.prod(csh, 0, csh.length);
     
     Value[] res = new Value[cam];

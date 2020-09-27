@@ -520,15 +520,15 @@ public class Scope {
       }
       StrMap map = new StrMap();
       for (Value v : x) {
-        if (v.rank != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
+        if (v.r() != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
         map.set(v.get(0), v.get(1));
       }
       return map;
     }
     
     public Value call(Value w, Value x) {
-      if (w.rank != 1) throw new RankError("rank of 𝕨 ≠ 1", this, w);
-      if (x.rank != 1) throw new RankError("rank of 𝕩 ≠ 1", this, x);
+      if (w.r() != 1) throw new RankError("rank of 𝕨 ≠ 1", this, w);
+      if (x.r() != 1) throw new RankError("rank of 𝕩 ≠ 1", this, x);
       if (w.ia != x.ia) throw new LengthError("both sides lengths should match", this, x);
       StrMap map = new StrMap();
       for (int i = 0; i < w.ia; i++) {
@@ -567,7 +567,7 @@ public class Scope {
     
     public Value call(Value w, Value x) {
       String path = x.asString();
-      if (w.rank > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
+      if (w.r() > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
       return Scope.this.sys.execFile(path, w.values(), new Scope(Scope.this));
     }
   }

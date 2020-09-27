@@ -13,7 +13,7 @@ public class DownArrowBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.rank==0) throw new RankError("↓: argument cannot be scalar", this, x);
+    if (x.r()==0) throw new RankError("↓: argument cannot be scalar", this, x);
     int cells = x.shape[0];
     int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
@@ -35,12 +35,12 @@ public class DownArrowBuiltin extends FnBuiltin {
   public Value call(Value w, Value x) {
     int[] gsh = w.asIntVec();
     if (gsh.length == 0) return x;
-    int rank = Math.max(x.rank, gsh.length);
+    int rank = Math.max(x.r(), gsh.length);
     int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     int rem = rank - gsh.length;
     if (rem > 0) System.arraycopy(x.shape, gsh.length, sh, gsh.length, rem);
-    int diff = rank - x.rank;
+    int diff = rank - x.r();
     int[] off = new int[sh.length];
     for (int i = 0; i < gsh.length; i++) {
       int am = gsh[i];

@@ -372,7 +372,7 @@ public final class BitArr extends Arr {
   }
   
   public Arr reverseOn(int dim) {
-    if (dim!=0 || rank!=1) return super.reverseOn(dim);
+    if (dim!=0 || r()!=1) return super.reverseOn(dim);
     long[] nl = new long[arr.length];
     int off = (64-ia) & 63;
     copy(arr, 0, nl, off, ia);

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class HArr extends Arr {
   private final Value[] arr;
   public HArr(Value[] v, int[] sh) {
-    super(sh, v.length, sh.length);
+    super(sh, v.length);
     arr = v;
   }
   public HArr(ArrayList<Value> v) { // 1D
@@ -16,7 +16,7 @@ public class HArr extends Arr {
     arr = v.toArray(new Value[0]);
   }
   public HArr(Value[] v) { // 1D
-    super(new int[]{v.length}, v.length, 1);
+    super(new int[]{v.length}, v.length);
     arr = v;
   }
   

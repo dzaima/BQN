@@ -21,16 +21,16 @@ public class OrBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) { // TODO this isn't stable
-    if (x.rank==0) throw new RankError("∨: argument cannot be scalar", this, x);
+    if (x.r()==0) throw new RankError("∨: argument cannot be scalar", this, x);
     if (x.ia==0) return x;
-    if (x.quickIntArr() && x.rank==1) {
+    if (x.quickIntArr() && x.r()==1) {
       int[] is = x.asIntArrClone();
       Arrays.sort(is); for (int i = 0; i < is.length>>1; i++) { int t = is[i]; is[i] = is[is.length-i-1]; is[is.length-i-1] = t; }
       return new IntArr(is, x.shape);
     }
-    Value[] cells = x.rank==1? x.valuesClone() : CellBuiltin.cells(x);
+    Value[] cells = x.r()==1? x.valuesClone() : CellBuiltin.cells(x);
     Arrays.sort(cells);
-    return ReverseBuiltin.on(x.rank==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
+    return ReverseBuiltin.on(x.r()==1? Arr.create(cells, x.shape) : GTBuiltin.merge(cells, new int[]{x.shape[0]}, this));
   }
   
   public Pervasion.NN2N dyNum() { return DF; }

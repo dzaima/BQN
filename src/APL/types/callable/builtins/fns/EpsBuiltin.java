@@ -14,10 +14,10 @@ public class EpsBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.rank == 0) throw new RankError("∊: argument cannot be scalar", this, x);
+    if (x.r() == 0) throw new RankError("∊: argument cannot be scalar", this, x);
     Value[] vs;
     BitArr.BA res;
-    if (x.rank == 1) {
+    if (x.r() == 1) {
       res = new BitArr.BA(x.shape);
       if (x.quickIntArr()) {
         HashSet<Integer> seen = new HashSet<>();

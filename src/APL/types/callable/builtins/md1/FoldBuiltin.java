@@ -18,7 +18,7 @@ public class FoldBuiltin extends Md1Builtin {
   
   
   public Value call(Value f, Value x, Md1Derv derv) {
-    if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
+    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
     if (x.ia==0) {
       Value id = f.identity();
       if (id == null) throw new DomainError("no identity defined for "+f, this, f);
@@ -63,7 +63,7 @@ public class FoldBuiltin extends Md1Builtin {
       }
     }
     join: if (f instanceof JoinBuiltin) {
-      for (Value c : x) if (c.rank!=1) break join;
+      for (Value c : x) if (c.r()!=1) break join;
       return JoinBuiltin.joinVec(x);
     }
     
@@ -87,7 +87,7 @@ public class FoldBuiltin extends Md1Builtin {
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
-    if (x.rank != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
+    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this, f);
   
     if (x.quickDoubleArr() && w instanceof Num) {
       Pervasion.NN2N fd = f.dyNum();

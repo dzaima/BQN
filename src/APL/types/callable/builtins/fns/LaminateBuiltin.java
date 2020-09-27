@@ -14,9 +14,9 @@ public class LaminateBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    int[] nsh = new int[x.rank+1];
+    int[] nsh = new int[x.r()+1];
     nsh[0] = 1;
-    System.arraycopy(x.shape, 0, nsh, 1, x.shape.length);
+    System.arraycopy(x.shape, 0, nsh, 1, x.r());
     return x.ofShape(nsh);
   }
 }

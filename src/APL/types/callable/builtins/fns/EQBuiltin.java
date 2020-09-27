@@ -13,7 +13,7 @@ public class EQBuiltin extends FnBuiltin {
   
   
   public Value call(Value x) {
-    return Num.of(x.rank);
+    return Num.of(x.r());
   }
   
   public static final Pervasion.VV2B DF = new Pervasion.VV2B() {

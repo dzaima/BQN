@@ -15,7 +15,7 @@ public class UpArrowBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.rank==0) throw new RankError("↑: argument cannot be scalar", this, x);
+    if (x.r()==0) throw new RankError("↑: argument cannot be scalar", this, x);
     int cells = x.shape[0];
     int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];
@@ -36,12 +36,12 @@ public class UpArrowBuiltin extends FnBuiltin {
   public Value call(Value w, Value x) {
     int[] gsh = w.asIntVec();
     if (gsh.length == 0) return x;
-    int rank = Math.max(x.rank, gsh.length);
+    int rank = Math.max(x.r(), gsh.length);
     int[] sh = new int[rank];
     System.arraycopy(gsh, 0, sh, 0, gsh.length);
     int rem = rank - gsh.length;
     if (rem > 0) System.arraycopy(x.shape, gsh.length, sh, gsh.length, rem);
-    int diff = rank - x.rank;
+    int diff = rank - x.r();
     boolean overtake = false;
     int[] off = new int[rank];
     for (int i = 0; i < gsh.length; i++) {
@@ -56,7 +56,7 @@ public class UpArrowBuiltin extends FnBuiltin {
     if (overtake) {
       Value proto = x.prototype();
       MutVal res = new MutVal(sh);
-      if (x.rank<=1 && gsh.length==1) {
+      if (x.r()<=1 && gsh.length==1) {
         if (off[0]==0) {
           res.copy(x, 0, 0, x.ia);
           res.fill(proto, x.ia, res.ia);
@@ -90,18 +90,18 @@ public class UpArrowBuiltin extends FnBuiltin {
   
   public static Value on(int[] sh, int[] off, Value x) { // valuecopy
     int rank = sh.length;
-    assert rank==off.length && rank>=x.rank;
-    if (rank > x.rank) {
+    assert rank==off.length && rank>=x.r();
+    if (rank > x.r()) {
       boolean empty = false; // has to be empty or all leading 1s
-      int d = rank - x.rank;
+      int d = rank - x.r();
       for (int i = 0; i < d; i++) {
         if (sh[i] == 0) { empty = true; break; }
       }
       if (empty) {
         return new EmptyArr(sh, x.safePrototype());
       } else {
-        int[] ssh  = new int[x.rank]; System.arraycopy(sh , d, ssh , 0, x.rank);
-        int[] soff = new int[x.rank]; System.arraycopy(off, d, soff, 0, x.rank);
+        int[] ssh  = new int[x.r()]; System.arraycopy(sh , d, ssh , 0, x.r());
+        int[] soff = new int[x.r()]; System.arraycopy(off, d, soff, 0, x.r());
         return on(ssh, soff, x).ofShape(sh);
       }
     }
@@ -167,13 +167,13 @@ public class UpArrowBuiltin extends FnBuiltin {
   }
   
   public static Value undo(int[] e, Value w, Value origW, Callable blame) {
-    if (e.length==1 && w.rank==1) {
+    if (e.length==1 && w.r()==1) {
       int am = e[0];
       if (am > 0) return JoinBuiltin.on(w, on(new int[]{origW.ia-am}, e, origW), blame);
       else return JoinBuiltin.on(on(new int[]{origW.ia+am}, new int[]{0}, origW), w, blame);
     }
     chk: {
-      fail: if (w.rank == e.length) {
+      fail: if (w.r() == e.length) {
         for (int i = 0; i < e.length; i++) {
           if (Math.abs(e[i]) != w.shape[i]) break fail;
         }

@@ -11,17 +11,15 @@ import java.util.Iterator;
 
 public abstract class Value extends Obj implements Iterable<Value>, Comparable<Value> {
   public final int[] shape;
-  public final int rank;
+  public final int r() { return shape.length; }
   public final int ia; // item amount
   Value(int[] shape) {
     this.shape = shape;
-    rank = shape.length;
     ia = Arr.prod(shape);
   }
-  Value(int[] shape, int ia, int rank) {
+  Value(int[] shape, int ia) {
     this.shape = shape;
     this.ia = ia;
-    this.rank = rank;
   }
   
   
@@ -69,7 +67,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return res;
   }
   public /*open*/ int[] asIntVec() { // also works on rank≡0; immutable
-    if (rank > 1) throw new DomainError("Using rank "+rank+" array as an integer vector", this);
+    if (r() > 1) throw new DomainError("Using rank "+r()+" array as an integer vector", this);
     return asIntArr();
   }
   
@@ -79,7 +77,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public /*open*/ boolean quickDoubleArr() { return false; } // if true, asDoubleArr must succeed; also true for Num
   public /*open*/ boolean quickIntArr   () { return false; } // if true, asIntArr must succeed; also true for integer Num
   public /*open*/ boolean quickDepth1   () { return false; } // true if object is guaranteed to be depth 1 (returning false always is allowed)
-  public boolean scalar() { return rank == 0; }
+  public boolean scalar() { return r() == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
   public abstract Value safePrototype(); // what to append to this array
   public Value prototype() {
@@ -105,30 +103,30 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   // outdated bad item getting methods; TODO don't use
   public Value at(int[] pos) {
-    if (pos.length != rank) throw new RankError("array rank was "+rank+", tried to get item at rank "+pos.length, this);
+    if (pos.length != r()) throw new RankError("array rank was "+r()+", tried to get item at rank "+pos.length, this);
     int x = 0;
-    for (int i = 0; i < rank; i++) {
+    for (int i = 0; i < r(); i++) {
       if (pos[i] < 0) throw new DomainError("Tried to access item at position "+pos[i], this);
       if (pos[i] >= shape[i]) throw new DomainError("Tried to access item at position "+pos[i]+" while max was "+(shape[i]-1), this);
       x+= pos[i];
-      if (i != rank-1) x*= shape[i+1];
+      if (i != r()-1) x*= shape[i+1];
     }
     return get(x);
   }
   public Value at(int[] pos, Value def) { // 0-indexed
     int x = 0;
-    for (int i = 0; i < rank; i++) {
+    for (int i = 0; i < r(); i++) {
       if (pos[i] < 0 || pos[i] >= shape[i]) return def;
       x+= pos[i];
-      if (i != rank-1) x*= shape[i+1];
+      if (i != r()-1) x*= shape[i+1];
     }
     return get(x);
   }
   public Value simpleAt(int[] pos) {
     int x = 0;
-    for (int i = 0; i < rank; i++) {
+    for (int i = 0; i < r(); i++) {
       x+= pos[i];
-      if (i != rank-1) x*= shape[i+1];
+      if (i != r()-1) x*= shape[i+1];
     }
     return get(x);
   }
@@ -189,14 +187,14 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     if (w instanceof Primitive && x instanceof Primitive) throw new DomainError("Cannot compare "+w+" and "+x);
     if (Math.min(w.ia, x.ia) == 0) return Integer.compare(w.ia, x.ia);
   
-    int rc = Integer.compare(w.rank+(w instanceof Primitive?0:1), x.rank+(x instanceof Primitive?0:1));
-    int rr = Math.min(w.rank, x.rank);
+    int rc = Integer.compare(w.r()+(w instanceof Primitive?0:1), x.r()+(x instanceof Primitive?0:1));
+    int rr = Math.min(w.r(), x.r());
     int ri = 0; // matching shape tail
-    while (ri<rr  &&  w.shape[w.shape.length-1-ri] == x.shape[x.shape.length-1-ri]) ri++;
-    int rm = Arr.prod(w.shape, w.shape.length-ri, w.shape.length);
+    while (ri<rr  &&  w.shape[w.r()-1-ri] == x.shape[x.r()-1-ri]) ri++;
+    int rm = Arr.prod(w.shape, w.r()-ri, w.r());
     if (ri<rr) {
-      int wm = w.shape[w.shape.length-1-ri];
-      int xm = x.shape[x.shape.length-1-ri];
+      int wm = w.shape[w.r()-1-ri];
+      int xm = x.shape[x.r()-1-ri];
       rc = Integer.compare(wm, xm);
       rm*= Math.min(wm, xm);
     }

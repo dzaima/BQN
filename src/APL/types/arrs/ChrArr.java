@@ -9,11 +9,11 @@ public class ChrArr extends Arr {
   public String s;
   
   public ChrArr(String s) {
-    super(new int[]{s.length()}, s.length(), 1);
+    super(new int[]{s.length()}, s.length());
     this.s = s;
   }
   public ChrArr(String s, int[] sh) {
-    super(sh, s.length(), sh.length);
+    super(sh, s.length());
     this.s = s;
   }
   
@@ -30,7 +30,7 @@ public class ChrArr extends Arr {
   }
   
   public String asString() {
-    if (rank > 1) throw new DomainError("Using rank "+rank+" character array as string", this);
+    if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string", this);
     return s;
   }
   

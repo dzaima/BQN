@@ -97,7 +97,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     return x;
   }
   public static int fromShapeChk(int[] sh, Value pos, Callable blame) {
-    if (pos.rank > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.formatAPL(pos.shape)+")", blame);
+    if (pos.r() > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.formatAPL(pos.shape)+")", blame);
     if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
     int x = 0;
     int[] ds = pos.asIntArr();
@@ -137,7 +137,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
           }
         }
       }
-      if (v.rank > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
+      if (v.r() > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
       if (!(!deep && ish.length==1) && ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
       if (!deep) { // either the rank==1 case or a single position
         int[] res = v.asIntArr();
@@ -186,7 +186,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   // checks for rank & bound errors and returns a ravel index
   public static int vec(Value v, int[] ish, Callable blame) {
     if (ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
-    if (v.rank != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
+    if (v.r() != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
     int ind = 0;
     int[] vi = v.asIntArr();
     for (int i = 0; i < v.ia; i++) {

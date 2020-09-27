@@ -27,7 +27,7 @@ public class SingleItemArr extends Arr {
   
   
   public String asString() {
-    if (rank >= 2) throw new DomainError("Using rank≥2 array as string", this);
+    if (r() >= 2) throw new DomainError("Using rank≥2 array as string", this);
     if (!(item instanceof Char)) throw new DomainError("Using non-char array as string", this);
     char c = ((Char) item).chr;
     return Main.repeat(String.valueOf(c), ia);

@@ -12,10 +12,7 @@ public abstract class Arr extends Value {
     super(shape);
   }
   public Arr(int[] shape, int ia) {
-    super(shape, ia, shape.length);
-  }
-  public Arr(int[] shape, int ia, int rank) {
-    super(shape, ia, rank);
+    super(shape, ia);
   }
   
   public Value call(         Value x) { return this; }
@@ -24,10 +21,10 @@ public abstract class Arr extends Value {
   public String basicFormat(boolean quote) {
     if (ia == 0) {
       String mr = safePrototype() instanceof Char? "\"\"" : "⟨⟩";
-      if (rank == 1) return mr;
+      if (r() == 1) return mr;
       else return Main.formatAPL(shape) + "⥊" + mr;
     }
-    if (rank == 1) { // strings
+    if (r() == 1) { // strings
       StringBuilder all = new StringBuilder();
       for (Value v : this) {
         if (v instanceof Char) {
@@ -56,17 +53,17 @@ public abstract class Arr extends Value {
       if (str) return oneliner();
     }
     
-    if (rank == 0) return "<"+first().toString().replace("\n", "\n ");
+    if (r() == 0) return "<"+first().toString().replace("\n", "\n ");
     if (ia == 1) {
       Value c = get(0);
-      if (c instanceof Primitive || rank > 2) {
+      if (c instanceof Primitive || r() > 2) {
         String enc = c instanceof Primitive? "" : "<";
-        if (rank==1) return "⟨"+c+"⟩";
+        if (r()==1) return "⟨"+c+"⟩";
         String pre = Main.formatAPL(shape);
         return pre + "⥊" + enc + c.toString().replace("\n", "\n" + Main.repeat(" ", pre.length()+2));
       }
     }
-    if (rank == 1) { // simple vectors
+    if (r() == 1) { // simple vectors
       StringBuilder res = new StringBuilder();
       var simple = true;
       for (Value v : this) {
@@ -79,7 +76,7 @@ public abstract class Arr extends Value {
       if (simple) return res.toString();
     }
     
-    if (rank == 2) {
+    if (r() == 2) {
       boolean charmat = true;
       if (!(this instanceof ChrArr)) {
         for (Value v : this) {
@@ -101,9 +98,9 @@ public abstract class Arr extends Value {
       }
     }
     
-    if (rank < 3) { // boxed arrays
-      int w = rank==1? shape[0] : shape[1];
-      int h = rank==1? 1 : shape[0];
+    if (r() < 3) { // boxed arrays
+      int w = r()==1? shape[0] : shape[1];
+      int h = r()==1? 1 : shape[0];
       String[][][] stringified = new String[w][h][];
       int[][] itemWidths = new int[w][h];
       int[] widths = new int[w];
@@ -190,8 +187,8 @@ public abstract class Arr extends Value {
   public String oneliner() {
     String f = basicFormat(true);
     if (f != null) return f;
-    if (rank == 0) return "<" + get(0).oneliner();
-    if (rank == 1) {
+    if (r() == 0) return "<" + get(0).oneliner();
+    if (r() == 1) {
       if (ia == 1) return "⟨"+get(0).oneliner()+"⟩";
       boolean vec = false;
       for (Value c : this) {
@@ -221,18 +218,18 @@ public abstract class Arr extends Value {
     return v instanceof Num || v instanceof Char || v instanceof BigValue;
   }
   public Arr reverseOn(int dim) {
-    if (rank == 0) {
+    if (r() == 0) {
       if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis", this);
       return this;
     }
-    if (dim < 0) dim+= rank;
+    if (dim < 0) dim+= r();
     // 2×3×4:
     // 0 - 3×4s for 2
     // 1 - 4s for 3
     // 2 - 1s for 4
     int chunkS = 1;
     int cPSec = shape[dim]; // chunks per section
-    for (int i = rank-1; i > dim; i--) {
+    for (int i = r()-1; i > dim; i--) {
       chunkS*= shape[i];
     }
     int sec = chunkS * cPSec; // section length

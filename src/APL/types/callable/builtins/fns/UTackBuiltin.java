@@ -30,9 +30,9 @@ public class UTackBuiltin extends FnBuiltin {
   }
   
   public static Value on(Value w, Value x, Callable blame) {
-    if (x.rank == 0) throw new DomainError("A⊥num is pointless", blame);
+    if (x.r() == 0) throw new DomainError("A⊥num is pointless", blame);
     if (w instanceof BigValue || w.first() instanceof BigValue || x.first() instanceof BigValue) {
-      if (w.rank == 0) {
+      if (w.r() == 0) {
         BigInteger al = BigValue.bigint(w);
         BigInteger res = BigInteger.ZERO;
         for (int i = 0; i < x.ia; i++) {
@@ -40,8 +40,8 @@ public class UTackBuiltin extends FnBuiltin {
         }
         return new BigValue(res);
       } else {
-        if (x.rank != 1) throw new NYIError(blame+": 1<≠≢𝕩", blame);
-        if (w.rank != 1) throw new DomainError(blame+": 1<≠≢𝕨", blame);
+        if (x.r() != 1) throw new NYIError(blame+": 1<≠≢𝕩", blame);
+        if (w.r() != 1) throw new DomainError(blame+": 1<≠≢𝕨", blame);
         if (w.ia != x.shape[0]) throw new DomainError(blame+": (≠𝕨) ≠ ≠𝕩", blame);
         BigInteger res = BigInteger.ZERO;
         for (int i = 0; i < w.ia; i++) {
@@ -53,7 +53,7 @@ public class UTackBuiltin extends FnBuiltin {
     }
     if (w instanceof Num) {
       double base = w.asDouble();
-      if (x.rank == 1) {
+      if (x.r() == 1) {
         double res = 0;
         for (int i = 0; i < x.ia; i++) {
           res = res*base + x.get(i).asDouble();
@@ -61,8 +61,8 @@ public class UTackBuiltin extends FnBuiltin {
         return new Num(res);
       } else {
         double[] d = x.asDoubleArr();
-        int[] sh = new int[x.rank-1];
-        System.arraycopy(x.shape, 1, sh, 0, x.rank - 1);
+        int[] sh = new int[x.r()-1];
+        System.arraycopy(x.shape, 1, sh, 0, x.r() - 1);
         int layers = x.shape[0];
         double[] r = new double[x.ia / layers];
         
@@ -79,8 +79,8 @@ public class UTackBuiltin extends FnBuiltin {
       if (w.ia != x.shape[0]) throw new DomainError(blame+": (≠𝕨) ≠ ≠𝕩", blame);
       double[] d = x.asDoubleArr();
       double[] bases = w.asDoubleArr();
-      int[] sh = new int[x.rank-1];
-      System.arraycopy(x.shape, 1, sh, 0, x.rank - 1);
+      int[] sh = new int[x.r()-1];
+      System.arraycopy(x.shape, 1, sh, 0, x.r() - 1);
       int layers = x.shape[0];
       double[] r = new double[x.ia/layers];
       

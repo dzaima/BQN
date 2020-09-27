@@ -83,18 +83,18 @@ public class DoubleArr extends Arr {
   }
   
   public Arr reverseOn(int dim) {
-    if (rank == 0) {
+    if (r() == 0) {
       if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis", this);
       return this;
     }
-    if (dim < 0) dim+= rank;
+    if (dim < 0) dim+= r();
     // 2×3×4:
     // 0 - 3×4s for 2
     // 1 - 4s for 3
     // 2 - 1s for 4
     int chunkS = 1;
     int cPSec = shape[dim]; // chunks per section
-    for (int i = rank-1; i > dim; i--) {
+    for (int i = r()-1; i > dim; i--) {
       chunkS*= shape[i];
     }
     int sec = chunkS * cPSec; // section length

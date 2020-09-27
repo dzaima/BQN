@@ -15,7 +15,7 @@ public class TransposeBuiltin extends FnBuiltin {
   
   public Value call(Value x) {
     if (x.scalar()) return x;
-    int r = x.rank;
+    int r = x.r();
     int[] sh = new int[r];
     int n = 1;
     for (int i = 0; i < r-1; i++) {
@@ -26,7 +26,7 @@ public class TransposeBuiltin extends FnBuiltin {
   }
   public Value callInv(Value x) {
     if (x.scalar()) return x;
-    int r = x.rank;
+    int r = x.r();
     int[] sh = new int[r];
     int n = sh[0] = x.shape[r-1];
     int m = 1;
@@ -72,7 +72,7 @@ public class TransposeBuiltin extends FnBuiltin {
     int[] ts = w.asIntVec();
     int l = ts.length;
     if (l == 0) return x.scalar()? x.ofShape(new int[]{}) : x;
-    int r = x.rank;
+    int r = x.r();
     if (l > r) throw new RankError("⍉: Length of 𝕨 ("+l+") exceeded rank of 𝕩 ("+r+")", this);
     
     // compute shape for the given axes
@@ -117,7 +117,7 @@ public class TransposeBuiltin extends FnBuiltin {
       if (x.scalar()) throw new DomainError("⍉⁼: Result of ⍉ must be an array");
       return x;
     }
-    int r = x.rank;
+    int r = x.r();
     if (l > r) throw new RankError("⍉⁼: Length of 𝕨 ("+l+") exceeded rank of 𝕩 ("+r+")", this);
     
     // fill trailing axes

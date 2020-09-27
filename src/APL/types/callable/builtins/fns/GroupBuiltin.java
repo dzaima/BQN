@@ -28,7 +28,7 @@ public class GroupBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.rank != 1) throw new RankError("⊔: argument must be a vector", this, x);
+    if (x.r() != 1) throw new RankError("⊔: argument must be a vector", this, x);
     int depth = MatchBuiltin.full(x);
     if (depth == 1) {
       int[] xi = x.asIntVec();
@@ -51,7 +51,7 @@ public class GroupBuiltin extends FnBuiltin {
     int[] args = new int[x.ia];
     for (int i = 0; i < args.length; i++) {
       Value c = x.get(i);
-      if (c.rank != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this, x);
+      if (c.r() != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this, x);
       args[i] = c.ia;
     }
     return call(x, UDBuiltin.on(new IntArr(args), null)); // gives strange errors but whatever
@@ -63,21 +63,21 @@ public class GroupBuiltin extends FnBuiltin {
     int depth = MatchBuiltin.full(w);
     int[][] wp;
     int wsz;
-    int xsz = x.rank;
+    int xsz = x.r();
     if (depth == 1) {
       wsz = 1;
-      if (w.rank != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.rank==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this, w);
+      if (w.r() != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.r()==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this, w);
       if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this, w);
       if (w.ia != x.shape[0]) throw new LengthError("⊔: length of 𝕨 must be ⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
       wp = new int[][]{w.asIntArr()};
     } else if (depth == 2) {
       wsz = w.ia;
-      if (w.rank > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
+      if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
       if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
       wp = new int[w.ia][];
       for (int i = 0; i < w.ia; i++) {
         Value c = w.get(i);
-        if (c.rank!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this, w);
+        if (c.r()!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this, w);
         wp[i] = c.asIntArr();
         if (c.ia != x.shape[i]) { int[] shs = new int[w.ia]; for (int j = 0; j < w.ia; j++) shs[j] = w.get(j).ia;
           throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.formatAPL(shs)+" ≡ ≠¨𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w); }
@@ -86,7 +86,7 @@ public class GroupBuiltin extends FnBuiltin {
     
     
     
-    if (x.rank==1) { // fast path
+    if (x.r()==1) { // fast path
       int[] poss = wp[0];
       int sz = -1;
       for (int i : poss) sz = Math.max(sz, i);

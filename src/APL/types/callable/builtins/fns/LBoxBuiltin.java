@@ -18,25 +18,25 @@ public class LBoxBuiltin extends FnBuiltin {
   
   
   public Value call(Value x) {
-    if (x.shape.length==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);
+    if (x.r()==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);
     if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.formatAPL(x.shape)+")", this, x);
-    int[] nsh = new int[x.rank-1];
+    int[] nsh = new int[x.r()-1];
     System.arraycopy(x.shape, 1, nsh, 0, nsh.length);
     return MutVal.cut(x, 0, Arr.prod(nsh), nsh);
   }
   
   public Value call(Value w, Value x) {
-    if (x.rank==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
+    if (x.r()==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
     if (w instanceof Num) return getCell(w.asInt(), x, this);
     
-    int wr = w.shape.length;
-    int xr = x.shape.length;
+    int wr = w.r();
+    int xr = x.r();
     if (w.ia==0 || w.quickDepth1() || w.first() instanceof Num) {
       int[] sh = new int[wr+xr-1];
       System.arraycopy(w.shape, 0, sh, 0, wr);
       System.arraycopy(x.shape, 1, sh, wr, xr-1);
       int[] wi = w.asIntArr();
-      spec: if (w.rank==1 && x.rank==1) {
+      spec: if (w.r()==1 && x.r()==1) {
         if (x.quickDoubleArr()) {
           if (x.quickIntArr()) {
             if (x instanceof BitArr) {
@@ -101,14 +101,14 @@ public class LBoxBuiltin extends FnBuiltin {
       
       int shl = 0;
       Value[] av = w.values();
-      for (Value c : av) shl+= c.rank;
+      for (Value c : av) shl+= c.r();
       int[] sh = new int[shl + xr-w.ia];
       System.arraycopy(x.shape, w.ia, sh, shl, xr-w.ia);
       
       int cp = 0;
       for (Value c : av) {
-        System.arraycopy(c.shape, 0, sh, cp, c.shape.length);
-        cp+= c.rank;
+        System.arraycopy(c.shape, 0, sh, cp, c.r());
+        cp+= c.r();
       }
       int[] c = new int[w.ia];
       int csz = 1;
@@ -162,7 +162,7 @@ public class LBoxBuiltin extends FnBuiltin {
     int csz = CellBuiltin.csz(x);// cell size
     int start = csz*Indexer.scal(a, cam, blame);
     
-    int[] sh = new int[x.rank-1];
+    int[] sh = new int[x.r()-1];
     System.arraycopy(x.shape, 1, sh, 0, sh.length);
     return MutVal.cut(x, start, csz, sh);
   }

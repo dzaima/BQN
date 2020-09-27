@@ -101,7 +101,7 @@ public class LBoxUBBuiltin extends FnBuiltin {
   void underWSub(Value v, Value a, Value[] vs, int[] shape) {
     if (a instanceof Primitive) throw new DomainError(this+": indices must all be vectors when nesting (found "+a+")", this);
     if (a.ia>=1 && !(a.get(0) instanceof Primitive)) {
-      if (a.rank != v.rank) throw new RankError(this+": shapes of nested indices and values must be equal (ranks "+a.rank+" vs "+v.rank + ")", this);
+      if (a.r() != v.r()) throw new RankError(this+": shapes of nested indices and values must be equal (ranks "+a.r()+" vs "+v.r()+")", this);
       if (!Arrays.equals(a.shape, v.shape)) throw new LengthError(this+": shapes of nested indices and values must be equal ("+Main.formatAPL(a.shape)+" vs "+Main.formatAPL(v.shape)+")", this);
       for (int i = 0; i < a.ia; i++) underWSub(v.get(i), a.get(i), vs, shape);
     } else {

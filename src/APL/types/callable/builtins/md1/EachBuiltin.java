@@ -52,10 +52,10 @@ public class EachBuiltin extends Md1Builtin {
       return Arr.create(n, x.shape);
     }
     
-    int mr = Math.min(w.shape.length, x.shape.length);
+    int mr = Math.min(w.r(), x.r());
     if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
     
-    if (w.shape.length == x.shape.length) {
+    if (w.r() == x.r()) {
       MutVal res = new MutVal(x.shape);
       for (int i = 0; i < x.ia; i++) {
         res.set(i, f.call(w.get(i), x.get(i)));
@@ -63,7 +63,7 @@ public class EachBuiltin extends Md1Builtin {
       return res.get();
     }
     
-    boolean we = w.rank < x.rank; // w is expanded
+    boolean we = w.r() < x.r(); // w is expanded
     int max = Math.max(w.ia, x.ia);
     int min = Math.min(w.ia, x.ia);
     int ext = max/min;
@@ -80,7 +80,7 @@ public class EachBuiltin extends Md1Builtin {
     for (int i = 0; i < n.length; i++) {
       n[i] = f.callInv(x.get(i)).squeeze();
     }
-    if (x.rank == 0 && n[0] instanceof Primitive) return n[0];
+    if (x.r() == 0 && n[0] instanceof Primitive) return n[0];
     return Arr.create(n, x.shape);
   }
   
@@ -111,11 +111,11 @@ public class EachBuiltin extends Md1Builtin {
   }
   
   public static Value underW(Value f, Value o, Value w, Value x, Callable blame) {
-    if (w.rank!=0 && x.rank!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
+    if (w.r()!=0 && x.r()!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
     int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
-    if (w.rank==0 && !(w instanceof Primitive)) w = SingleItemArr.r0(w.first()); // abuse that get doesn't check indexes for simple scalar extension
-    if (x.rank==0 && !(x instanceof Primitive)) x = SingleItemArr.r0(w.first());
+    if (w.r()==0 && !(w instanceof Primitive)) w = SingleItemArr.r0(w.first()); // abuse that get doesn't check indexes for simple scalar extension
+    if (x.r()==0 && !(x instanceof Primitive)) x = SingleItemArr.r0(w.first());
     rec(f, o, w, x, 0, new Value[ia], new Value[1], res2);
     return Arr.create(res2, x.shape);
   }

@@ -16,7 +16,7 @@ public class EmptyArr extends Arr {
   
   private final Value proto;
   public EmptyArr(int[] sh, Value proto) {
-    super(sh, 0, sh.length);
+    super(sh, 0);
     this.proto = proto;
   }
   
@@ -26,7 +26,7 @@ public class EmptyArr extends Arr {
   
   
   public String asString() {
-    if (rank >= 2) throw new DomainError("Using rank≥2 array as char vector", this);
+    if (r() >= 2) throw new DomainError("Using rank≥2 array as char vector", this);
     return "";
   }
   

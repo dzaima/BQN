@@ -16,13 +16,13 @@ public class FindBuiltin extends FnBuiltin {
   
   
   public Value call(Value x) {
-    if (x.shape.length==0) throw new DomainError("⍷: argument cannot be a scalar", this, x);
+    if (x.r()==0) throw new DomainError("⍷: argument cannot be a scalar", this, x);
     if (x.ia==0) {
       int[] nsh = x.shape.clone();
       nsh[0] = Math.min(nsh[0], 1);
       return new EmptyArr(nsh, Num.ZERO);
     }
-    if (x.rank>1) {
+    if (x.r() > 1) {
       Value[] rcs = call(new HArr(CellBuiltin.cells(x))).values();
       return GTBuiltin.merge(rcs, new int[]{rcs.length}, this);
     }
@@ -39,9 +39,9 @@ public class FindBuiltin extends FnBuiltin {
   }
   
   public Value call(Value w, Value x) {
-    if (w.rank != x.rank) throw new RankError("⍷: argument ranks should be equal ("+w.rank+" ≠ "+x.rank+")", this, x);
+    if (w.r() != x.r()) throw new RankError("⍷: argument ranks should be equal ("+w.r()+" ≠ "+x.r()+")", this, x);
     BitArr.BC res = new BitArr.BC(x.shape);
-    if (w.rank == 1) {
+    if (w.r() == 1) {
       if (w instanceof BitArr && x instanceof BitArr) {
         long[] al = ((BitArr) w).arr;
         long[] wl = ((BitArr) x).arr;

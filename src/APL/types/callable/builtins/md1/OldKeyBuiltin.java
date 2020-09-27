@@ -16,7 +16,7 @@ public class OldKeyBuiltin extends Md1Builtin {
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (f instanceof APLMap) {
-      if (x.rank > 1) {
+      if (x.r() > 1) {
         Value[] arr = new Value[x.ia];
         for (int i = 0; i < x.ia; i++) {
           arr[i] = ((APLMap) f).getRaw(x.get(i));
@@ -57,7 +57,7 @@ public class OldKeyBuiltin extends Md1Builtin {
     }
     if (f instanceof Fun) {
       if (!Arrays.equals(w.shape, x.shape)) {
-        if (w.rank != x.rank) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.rank+" vs "+x.rank+")", derv, x);
+        if (w.r() != x.r()) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.r()+" vs "+x.r()+")", derv, x);
         throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
       }
       HashMap<Value, ArrayList<Value>> vals = new HashMap<>();

@@ -44,11 +44,11 @@ public class DTackBuiltin extends FnBuiltin {
         Collections.reverse(res);
         return HArr.create(res);
       }
-      int[] sh = new int[x.rank+w.rank];
-      if (w.rank != 1) throw new NYIError(blame+": 𝕨 with rank≥2 not yet implemented", blame);
+      int[] sh = new int[x.r() + w.r()];
+      if (w.r() != 1) throw new NYIError(blame+": 𝕨 with rank≥2 not yet implemented", blame);
       
-      System.arraycopy(w.shape, 0, sh, 0, w.rank); // ≡ for (int i = 0; i < a.rank; i++) sh[i] = a.shape[i];
-      System.arraycopy(x.shape, 0, sh, w.rank, x.rank); // ≡ for (int i = 0; i < w.rank; i++) sh[i+a.rank] = w.shape[i];
+      System.arraycopy(w.shape, 0, sh, 0, w.r()); // ≡ for (int i = 0; i < a.rank; i++) sh[i] = a.shape[i];
+      System.arraycopy(x.shape, 0, sh, w.r(), x.r()); // ≡ for (int i = 0; i < w.rank; i++) sh[i+a.rank] = w.shape[i];
       if (w.ia == 0) return new EmptyArr(sh, Num.ZERO);
       double[] c = x.asDoubleArrClone();
       double[] b = w.asDoubleArr();

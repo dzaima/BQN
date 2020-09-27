@@ -6,7 +6,7 @@ public abstract class Primitive extends Value {
   private static final int[] SHAPE = new int[0];
   
   public Primitive() {
-    super(SHAPE, 1, 0);
+    super(SHAPE, 1);
   }
   
   public Value call(         Value x) { return this; }

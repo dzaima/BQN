@@ -15,7 +15,7 @@ public class ObliqueBuiltin extends Md1Builtin {
   
   
   public Value call(Value f, Value x, Md1Derv derv) {
-    if (x.rank != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, x);
+    if (x.r() != 2) throw new DomainError("⍁: 𝕩 must be a rank 2 array", this, x);
     int[] sz = x.shape;
     int H = sz[0];
     int W = sz[1];
@@ -42,10 +42,10 @@ public class ObliqueBuiltin extends Md1Builtin {
         }
       }
       res[0] = f.call(new DoubleArr(rows[0]));
-      int rrank = res[0].rank; // required rank
+      int rrank = res[0].r(); // required rank
       for (int i = 0; i < ram; i++) {
         Value v = f.call(new DoubleArr(rows[i]));
-        if (v.rank != rrank) throw new RankError("⍁: 𝔽 must return equal rank arrays", this, f);
+        if (v.r() != rrank) throw new RankError("⍁: 𝔽 must return equal rank arrays", this, f);
         res[i] = v;
       }
     } else {
@@ -64,10 +64,10 @@ public class ObliqueBuiltin extends Md1Builtin {
         }
       }
       res[0] = f.call(new HArr(rows[0]));
-      int rrank = res[0].rank; // required rank
+      int rrank = res[0].r(); // required rank
       for (int i = 0; i < ram; i++) {
         Value v = f.call(new HArr(rows[i]));
-        if (v.rank != rrank) throw new DomainError("⍁: 𝔽 must return equal rank arrays", this, f);
+        if (v.r() != rrank) throw new DomainError("⍁: 𝔽 must return equal rank arrays", this, f);
         res[i] = v;
       }
     }

@@ -11,8 +11,8 @@ public class Pervasion { // implementations must be okay with not being called o
     public abstract Value on(Primitive w, Primitive x);
     
     public Value call(Value w, Value x) {
-      int wr = w.rank;
-      int xr = x.rank;
+      int wr = w.r();
+      int xr = x.r();
       if (xr==0 || wr==0) {
         if (wr!=0) return scalarX(w, x.first());
         if (xr!=0) return scalarW(w.first(), x);

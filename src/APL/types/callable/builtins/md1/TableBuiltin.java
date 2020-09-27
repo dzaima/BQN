@@ -16,9 +16,9 @@ public final class TableBuiltin extends Md1Builtin {
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) { // TODO use valuecopy
-    int[] sh = new int[w.rank+x.rank];
-    System.arraycopy(w.shape, 0, sh, 0, w.rank);
-    System.arraycopy(x.shape, 0, sh, w.rank, x.rank);
+    int[] sh = new int[w.r() + x.r()];
+    System.arraycopy(w.shape, 0, sh, 0, w.r());
+    System.arraycopy(x.shape, 0, sh, w.r(), x.r());
     
     if (w.ia==0 || x.ia==0) return new EmptyArr(sh, w.safePrototype());
   

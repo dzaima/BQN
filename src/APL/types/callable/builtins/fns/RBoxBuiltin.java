@@ -15,8 +15,8 @@ public class RBoxBuiltin extends FnBuiltin {
   
   public Value call(Value x) {
     HashMap<Value, Integer> map = new HashMap<>();
-    if (x.rank == 0) throw new DomainError("⊐: argument cannot be a scalar", this);
-    Value[] xv = x.rank==1? x.values() : CellBuiltin.cells(x);
+    if (x.r() == 0) throw new DomainError("⊐: argument cannot be a scalar", this);
+    Value[] xv = x.r()==1? x.values() : CellBuiltin.cells(x);
     int[] res = new int[xv.length];
     int am = 0;
     for (int i = 0; i < xv.length; i++) {
@@ -36,8 +36,8 @@ public class RBoxBuiltin extends FnBuiltin {
   }
   
   public static Value on(Value w, Value x, Callable blame) {
-    if (x.rank > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, x);
-    if (w.rank > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, w);
+    if (x.r() > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, x);
+    if (w.r() > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, w);
     if (x.ia > 20 && w.ia > 20) {
       if (w.quickIntArr() && x.quickIntArr()) {
         HashMap<Integer, Integer> map = new HashMap<>();

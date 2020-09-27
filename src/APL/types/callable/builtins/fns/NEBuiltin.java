@@ -13,7 +13,7 @@ public class NEBuiltin extends FnBuiltin {
   
   
   public Value call(Value x) {
-    if (x.rank==0) return Num.ONE;
+    if (x.r()==0) return Num.ONE;
     return Num.of(x.shape[0]);
   }
   

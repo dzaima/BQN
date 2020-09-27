@@ -15,15 +15,15 @@ public class ScanBuiltin extends Md1Builtin {
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (x.ia == 0) return x;
-    if (x.rank == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
-    int l = Arr.prod(x.shape, 1, x.shape.length);
+    if (x.r() == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
+    int l = Arr.prod(x.shape, 1, x.r());
     if (x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         final double[] dres;
         int i = l;
         ia: if (x.quickIntArr()) {
-          if (x.rank==1 && x instanceof BitArr) {
+          if (x.r()==1 && x instanceof BitArr) {
             if (f instanceof NEBuiltin) {
               long[] xl = ((BitArr) x).arr;
               long[] res = new long[xl.length];
@@ -97,7 +97,7 @@ public class ScanBuiltin extends Md1Builtin {
     int n = w.asInt();
     int len = x.ia;
     if (n < 0) throw new DomainError("`: 𝕨 should be non-negative (was "+n+")", this);
-    if (x.rank > 1) throw new RankError("`: rank of 𝕩 should be less than 2 (was "+x.rank+")", this);
+    if (x.r() > 1) throw new RankError("`: rank of 𝕩 should be less than 2 (was "+x.r()+")", this);
     
     if (x.quickDoubleArr()) {
       Value[] res = new Value[len-n+1];

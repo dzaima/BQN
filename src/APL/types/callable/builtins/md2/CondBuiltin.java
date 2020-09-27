@@ -21,7 +21,7 @@ public class CondBuiltin extends Md2Builtin {
   private Value get(Value F, Value g) {
     if (F instanceof Num) {
       int f = F.asInt();
-      if (g.rank != 1) throw new RankError("◶: Expected 𝕘 to be a vector, had rank "+g.rank, this, g);
+      if (g.r() != 1) throw new RankError("◶: Expected 𝕘 to be a vector, had rank "+g.r(), this, g);
       if (f>=g.ia || f<0) throw new LengthError("◶: 𝔽 out of bounds of 𝕘 (𝔽 = "+f+")", this, F);
       return g.get(f);
     }

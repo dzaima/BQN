@@ -37,7 +37,7 @@ public class GTBuiltin extends FnBuiltin {
     int i = 0;
     for (Value c : x) {
       if (!Arrays.equals(c.shape, sh0)) {
-        if (c.rank != sh0.length) throw new RankError(blame+": expected equal ranks of items (shapes "+Main.formatAPL(x0.shape)+" vs "+Main.formatAPL(c.shape)+")", blame, c);
+        if (c.r() != sh0.length) throw new RankError(blame+": expected equal ranks of items (shapes "+Main.formatAPL(x0.shape)+" vs "+Main.formatAPL(c.shape)+")", blame, c);
         throw new DomainError(blame+": mismatched shapes ("+Main.formatAPL(sh0)+" vs "+Main.formatAPL(c.shape)+")", blame, c); // cannot be more specific due to the wide array of uses for merging
       }
       res.copy(c, 0, i, c.ia);
