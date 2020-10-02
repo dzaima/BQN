@@ -1022,8 +1022,11 @@ public class Comp {
     if (tk instanceof NameTok) {
       String name = ((NameTok) tk).name;
       if (create) {
-        if (m.vars.containsKey(name) && !m.topLvl) throw Local.redefine(name, tk);
-        if (name.charAt(0)!='•') m.nvar(name);
+        if (m.vars.containsKey(name)) {
+          if (!m.topLvl) throw Local.redefine(name, tk);
+        } else if (name.charAt(0)!='•') {
+          m.nvar(name);
+        }
       }
       m.var(tk, name, true);
       return;
