@@ -19,47 +19,43 @@ public class BlockTok extends TokArr {
   public BlockTok(String line, int spos, int epos, ArrayList<Token> tokens) {
     super(line, spos, epos, tokens);
     type = 'f'; boolean canBeImmediate = funType(tokens, this);
-    ArrayList<ArrayList<Token>> parts = new ArrayList<>();
+    if (tokens.size()==0) throw new SyntaxError("Empty block", this);
+    ArrayList<List<Token>> bodyTks = new ArrayList<>();
     int li = 0;
     for (int i = 0; i < tokens.size(); i++) {
-      if (((LineTok) tokens.get(i)).end == ';') {
-        parts.add(new ArrayList<>(tokens.subList(li, i+1)));
+      List<Token> cln = ((LineTok) tokens.get(i)).tokens;
+      if (cln.size()==1 && cln.get(0) instanceof SemiTok) {
+        bodyTks.add(tokens.subList(li, i));
         li = i+1;
       }
     }
-    parts.add(new ArrayList<>(li==0? tokens : tokens.subList(li, tokens.size())));
-    
-    for (int i = 0; i < parts.size(); i++) {
-      List<Token> part = parts.get(i);
-      if (part.size() == 0) throw new SyntaxError("function contained empty body", this);
-      for (int j = 1; j < part.size(); j++) {
-        LineTok c = (LineTok) part.get(j);
-        if (c.end == ':') throw new SyntaxError("function body contained header in the middle", c.tokens.get(c.tokens.size()-1));
-      }
-      if (i < parts.size()-2  &&  ((LineTok)part.get(0)).end != ':') throw new SyntaxError("only the last 2 bodies in a function can be header-less", part.get(0));
-    }
-    
-    int tail; // amount of no-header bodies
-    if (parts.size() > 1) {
-      boolean p = ((LineTok)parts.get(parts.size()-2).get(0)).end != ':';
-      boolean l = ((LineTok)parts.get(parts.size()-1).get(0)).end != ':';
-      if (p && !l) throw new SyntaxError("header-less function bodies must be the last", parts.get(parts.size()-2).get(0));
-      tail = p? 2 : l? 1 : 0;
-    } else tail = ((LineTok)parts.get(0).get(0)).end != ':'? 1 : 0;
-    
+    bodyTks.add(li==0? tokens : tokens.subList(li, tokens.size()));
     ArrayList<Body> bodies = new ArrayList<>();
-    for (int i = 0; i < parts.size(); i++) {
-      ArrayList<Token> part = parts.get(i);
-      Body body;
-      if (((LineTok)part.get(0)).end == ':') {
-        List<Token> src = part.subList(1, part.size());
-        body = new Body(part.get(0), new ArrayList<>(src), funType(src, this));
-      } else {
-        assert tail != 0;
-        int rid = parts.size()-i;
-        body = new Body(part, tail==1? 'a' : rid==1? 'd' : 'm', funType(part, this));
+    for (List<Token> part : bodyTks) {
+      boolean header = false;
+      for (int j = 0; j < part.size(); j++) {
+        List<Token> cln = ((LineTok) part.get(j)).tokens;
+        if (cln.size()==1 && cln.get(0) instanceof ColonTok) {
+          if (j != 1) throw new SyntaxError("Function header mid-body", cln.get(0));
+          header = true;
+        }
       }
+      ArrayList<Token> src = new ArrayList<>(header? part.subList(2, part.size()) : part);
+      if (src.size() == 0) throw new SyntaxError("Block contains empty body", this);
+      Body body;
+      if (header) body = new Body(src, part.get(0), funType(src, this));
+      else        body = new Body(src, '\0'       , funType(src, this));
       bodies.add(body);
+    }
+    for (int i = 0; i < bodies.size()-2; i++) {
+      if (bodies.get(i).arity=='\0') throw new SyntaxError("Header-less bodies must be the last two", bodies.get(i).lns.get(0));
+    }
+    if (bodies.size()>=2) {
+      Body pb = bodies.get(bodies.size()-2); boolean p = pb.arity=='\0';
+      Body lb = bodies.get(bodies.size()-1); boolean l = lb.arity=='\0';
+      if (p && l) { pb.arity='m'; lb.arity='d'; }
+      else if (p) throw new SyntaxError("Header-less bodies must be at the end", bodies.get(bodies.size()-2).lns.get(0));
+      else if (l) { lb.arity='a'; }
     }
     if (immBlock && canBeImmediate && type=='f' && bodies.size()==1) type = 'a';
     

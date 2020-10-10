@@ -14,15 +14,7 @@ public abstract class SimpleMap extends APLMap {
     setv(k.asString(), v);
   }
   
-  public Arr allValues() {
-    throw new SyntaxError("getting list of values of "+this);
-  }
-  
-  public Arr allKeys() {
-    throw new SyntaxError("getting list of keys of "+this);
-  }
-  
-  public Arr kvPair() {
+  public Value[][] kvPair() {
     throw new SyntaxError("getting entries of "+this);
   }
   

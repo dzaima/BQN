@@ -17,7 +17,10 @@ public class MutIntArr {
     is[sz] = i;
     sz++;
   }
-  public IntArr get() {
+  public IntArr getA() {
     return new IntArr(Arrays.copyOf(is, sz));
+  }
+  public int[] get() {
+    return Arrays.copyOf(is, sz);
   }
 }

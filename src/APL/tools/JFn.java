@@ -7,5 +7,5 @@ import APL.types.Value;
 public abstract class JFn {
   public Value[] vals;
   public BlockTok[] blocks;
-  public abstract Value get(Scope sc);
+  public abstract Value get(Scope sc, Body bd);
 }

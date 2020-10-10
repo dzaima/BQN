@@ -44,7 +44,7 @@ public class Tokenizer {
     LineTok tok(boolean pointless) { // also handles strands because why not
       int spos = size()==0? pos : ts.get(0).spos;
       int epos = size()==0? pos : ts.get(size()-1).epos;
-      if (pointless) return new LineTok(line, spos, epos, ts, '\0');
+      if (pointless) return new LineTok(line, spos, epos, ts);
       ArrayList<Token> pts = new ArrayList<>();
       
       ArrayList<Token> cstr = new ArrayList<>();
@@ -66,16 +66,7 @@ public class Tokenizer {
           pts.add(t1);
         }
       }
-      
-      char end = 0;
-      if (!pts.isEmpty()) {
-        Token l = pts.get(pts.size()-1);
-        if (l instanceof SemiTok || l instanceof ColonTok) {
-          end = l instanceof SemiTok? ';' : ':';
-          pts.remove(pts.size()-1);
-        }
-      }
-      return new LineTok(line, spos, epos, pts, end);
+      return new LineTok(line, spos, epos, pts);
     }
   }
   static class Block { // temp storage of multiple lines
@@ -145,7 +136,7 @@ public class Tokenizer {
           for (Line ta : closed.a) lineTokens.add(ta.tok(pointless));
           Token r;
           switch (c) {
-            case ')': if (pointless) { ArrayList<Token> ts = new ArrayList<>(lineTokens); r = new ParenTok(raw, closed.pos, i+1, new LineTok(raw, closed.pos, len, ts, '\0')); } else {
+            case ')': if (pointless) { ArrayList<Token> ts = new ArrayList<>(lineTokens); r = new ParenTok(raw, closed.pos, i+1, new LineTok(raw, closed.pos, len, ts)); } else {
               if (lineTokens.size()!=1) throw new SyntaxError("parenthesis should be a single expression", new ErrTok(raw, li));
               r = new ParenTok(raw, closed.pos, i+1, lineTokens.get(0));
             }
@@ -226,9 +217,12 @@ public class Tokenizer {
               tokens.add(new BigTok(raw, li, i, new BigValue(big)));
             } else tokens.add(new NumTok(raw, li, i, f));
           } else tokens.add(new NumTok(raw, li, i, f));
-        } else if (ops.contains(cS)) {
-          tokens.add(new OpTok(raw, i, i+1, cS));
+        } else if (c == '.') {
           i++;
+          tokens.add(new DotTok(raw, li, i));
+        } else if (ops.contains(cS)) {
+          i++;
+          tokens.add(new OpTok(raw, li, i, cS));
         } else if (c == 55349) { // low surrogate pair of double-struck chars
           if (i+1==len) throw new SyntaxError("expression ended with low surrogate \\uD835", new ErrTok(raw, li));
           if (surrogateOps.indexOf(next) == -1) {
@@ -240,11 +234,14 @@ public class Tokenizer {
         } else if (c == '←') {
           tokens.add(new SetTok(raw, i, i+1));
           i++;
-        } else if (c == '@') {
-          tokens.add(new NullChrTok(raw, i, i+1));
+        } else if (c == '⇐') {
+          tokens.add(new ExportTok(raw, i, i+1));
           i++;
         } else if (c == '↩') {
           tokens.add(new ModTok(raw, i, i+1));
+          i++;
+        } else if (c == '@') {
+          tokens.add(new NullChrTok(raw, i, i+1));
           i++;
         } else if (c == '‿') {
           tokens.add(new StranderTok(raw, i, i+1));
@@ -274,15 +271,19 @@ public class Tokenizer {
           }
           i++;
           tokens.add(new StrTok(raw, li, i, str.toString()));
-        } else if (c=='\n' || c=='\r' || c=='⋄' || c==';' || c==':' || c==',') {
+        } else if (c=='\n' || c=='\r' || c=='⋄' || c==',') {
           if ((c=='⋄' || c==',') && pointless) tokens.add(new DiamondTok(raw, i));
-          if (c==';') tokens.add(new SemiTok(raw, i, i+1));
-          if (c==':') tokens.add(new ColonTok(raw, i, i+1));
           
-          if (tokens.size() > 0) {
-            lines.add(new Line(raw, li));
-          }
+          if (tokens.size() > 0) lines.add(new Line(raw, li));
           i++;
+        } else if (c==';' || c==':') {
+          i++;
+          if (tokens.size()==0) throw new SyntaxError("Expected something before "+c, new ErrTok(raw, li));
+          Line nln = new Line(raw, li);
+          if (c==';') nln.add(new SemiTok (raw, li, i));
+          if (c==':') nln.add(new ColonTok(raw, li, i));
+          lines.add(nln);
+          lines.add(new Line(raw, li));
         } else if (c == '#') {
           i++;
           while (i < len && raw.charAt(i) != '\n') i++;
@@ -322,7 +323,7 @@ public class Tokenizer {
         switch (closed.b) {
           case '(':
             ArrayList<Token> ts = new ArrayList<>(lineTokens);
-            r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts, '\0'));
+            r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts));
             break;
           case '{':
             r = new BlockTok(raw, closed.pos, len, lineTokens, true);

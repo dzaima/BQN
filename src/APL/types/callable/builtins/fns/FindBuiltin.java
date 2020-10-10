@@ -30,7 +30,7 @@ public class FindBuiltin extends FnBuiltin {
       HashSet<Integer> vals = new HashSet<>();
       MutIntArr res = new MutIntArr(10);
       for (int c : x.asIntArr()) if (vals.add(c)) res.add(c);
-      return res.get();
+      return res.getA();
     }
     HashSet<Value> vals = new HashSet<>();
     ArrayList<Value> res = new ArrayList<>();

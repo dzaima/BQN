@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.Main;
-import APL.types.arrs.HArr;
+import APL.types.arrs.ChrArr;
 
 import java.util.*;
 
@@ -46,28 +46,15 @@ public class StrMap extends APLMap {
     else vals.put(k, v);
   }
   
-  public Arr allValues() {
-    return Arr.create(new ArrayList<>(vals.values()));
-  }
-  
-  public Arr allKeys() {
-    ArrayList<Value> items = new ArrayList<>();
-    for (String o : vals.keySet()) {
-      items.add(Main.toAPL(o));
-    }
-    return Arr.create(items);
-  }
-  
-  public Arr kvPair() {
-    ArrayList<Value> ks = new ArrayList<>();
-    ArrayList<Value> vs = new ArrayList<>();
+  public Value[][] kvPair() {
+    Value[] ks = new Value[vals.size()];
+    Value[] vs = new Value[vals.size()];
+    final int[] i = {0};
     vals.forEach((k, v) -> {
-      ks.add(Main.toAPL(k));
-      vs.add(v);
+      ks[i[0]++] = new ChrArr(k);
+      vs[i[0]++] = v;
     });
-    return new HArr(new Value[]{
-      HArr.create(ks),
-       Arr.create(vs)});
+    return new Value[][]{ks, vs};
   }
   
   public int size() {

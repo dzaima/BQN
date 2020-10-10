@@ -22,7 +22,7 @@ public class Variable extends Settable {
     if (update) {
       sc.update(name, x);
     } else {
-      if (sc.varMap().containsKey(name)) throw new SyntaxError("←: cannot redefine \""+name+"\"", blame, this);
+      if (sc.varMap().containsKey(name)) throw new SyntaxError("Cannot redefine \""+name+"\"", blame, this);
       sc.set(name, x);
     }
   }

@@ -5,11 +5,9 @@ import APL.tokenizer.Token;
 import java.util.List;
 
 public class LineTok extends TokArr { // +TODO make things using this verify end
-  public char end;
   
-  public LineTok(String raw, int spos, int epos, List<Token> tokens, char end) {
+  public LineTok(String raw, int spos, int epos, List<Token> tokens) {
     super(raw, spos, epos, tokens);
-    this.end = end;
   }
   
   public String toString() {

@@ -597,9 +597,9 @@ public final class Scope {
           Value eo = m.getRaw("e");
           if (eo != Null.NULL) {
             APLMap e = (APLMap) eo;
-            for (Value k : e.allKeys()) {
-              Value v = e.getRaw(k);
-              conn.setRequestProperty(k.asString(), v.asString());
+            Value[][] kv = e.kvPair();
+            for (int i = 0; i < kv[0].length; i++) {
+              conn.setRequestProperty(kv[0][i].asString(), kv[1][i].asString());
             }
           }
           

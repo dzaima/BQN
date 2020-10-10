@@ -36,7 +36,7 @@ public class Local extends Settable {
   }
   
   public static ValueError redefine(String name, Tokenable blame) {
-    return new ValueError("←: cannot redefine \""+name+"\"", blame);
+    return new ValueError("Cannot redefine \""+name+"\"", blame);
   }
   
   private String name(Scope sc) {

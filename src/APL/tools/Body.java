@@ -20,35 +20,42 @@ public class Body {
   // important
   public int start;
   public String[] vars;
-  public int[] exp;
+  public HashMap<String, Integer> exp;
   
   // unimportant
   public final boolean immediate;
   public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
-  public final char arity; // one of [mda] - monadic, dyadic, ambivalent
+  public char arity; // one of [mda] - monadic, dyadic, ambivalent
   
   
-  public Body(char type, boolean imm, int off, String[] vars, char arity, int[] exp) {
-    this.exp = exp; // •COMPiled body
+  public Body(char type, boolean imm, int off, String[] vars, char arity, int[] exp) { // •COMPiled body
     this.lns = null;
+    
     self = null;
     wM=fM=gM=xM=null;
+  
+    start = off;
+    this.vars = vars;
+    setExp(exp);
+    
     immediate = imm;
     this.type = type;
     this.arity = arity;
-    start = off;
-    this.vars = vars;
   }
+  
   public Body(int off, String[] vars, int[] exp) {
+    lns = null;
+    
+    self = null;
+    wM=fM=gM=xM = null;
+    
     this.start = off;
     this.vars = vars;
-    this.exp = exp;
+    setExp(exp);
+    
     immediate = false;
-    arity = 'a';
     type = '⍰';
-    wM=fM=gM=xM = null;
-    self = null;
-    lns = null;
+    arity = 'a';
   }
   
   public Body(ArrayList<Token> lns, char arity, boolean immediate) { // no header
@@ -62,7 +69,7 @@ public class Body {
   
   
   
-  public Body(Token hdr, ArrayList<Token> lns, boolean imm) { // given header
+  public Body(ArrayList<Token> lns, Token hdr, boolean imm) { // given header
     this.lns = lns;
     char type = Comp.typeof(hdr);
     List<Token> ts = ((LineTok)hdr).tokens;
@@ -171,6 +178,12 @@ public class Body {
     }
   }
   
+  
+  public void setExp(int[] expi) {
+    if (expi==null) return;
+    exp = new HashMap<>();
+    for (int id : expi) exp.put(vars[id], id);
+  }
   
   
   public static boolean op(Token tk, String str) {

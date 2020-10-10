@@ -40,9 +40,9 @@ public class Main {
                   println("Usage: BQN [options]");
                   println("Options:");
                   println("-f file: execute the contents of the file with all further arguments as •args");
-                  println("-e code: execute the argument as APL");
-                  println("-p code: execute the argument as APL and print its result");
-                  println("-i     : execute STDIN as APL");
+                  println("-e code: execute the argument as BQN");
+                  println("-p code: execute the argument as BQN and print its result");
+                  println("-i     : execute STDIN as BQN");
                   println("-r     : start the REPL after everything else");
                   println("-s     : start the REPL without indenting input after everything else");
                   println("-d     : enable debug mode");

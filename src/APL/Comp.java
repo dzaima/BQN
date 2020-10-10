@@ -57,7 +57,9 @@ public class Comp {
   public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
   public static final byte SETH = 24; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
   public static final byte RETN = 25; // returns top of stack
-  // public static final byte ____ = 6;
+  public static final byte FLDO = 26; // N; get field objs[N] of ToS
+  public static final byte FLDM = 27; // N; set field objs[N] from ToS
+  public static final byte RETD = 28; // return a namespace of exported items
   
   public static final byte SPEC = 30; // special
   public static final byte   EVAL = 0; // ⍎
@@ -85,10 +87,10 @@ public class Comp {
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
-      if (body.gen!=null) return body.gen.get(sc);
+      if (body.gen!=null) return body.gen.get(sc, body);
       if (body.iter++>=compileStart && compileStart>=0) {
         body.gen = new JComp(this, body.start).r;
-        if (body.gen!=null) return body.gen.get(sc);
+        if (body.gen!=null) return body.gen.get(sc, body);
         else body.iter = Integer.MIN_VALUE;
       }
       Stk s = new Stk();
@@ -268,6 +270,26 @@ public class Comp {
           case RETN: {
             break exec;
           }
+          case RETD: {
+            s.push(new Namespace(sc, body.exp));
+            break exec;
+          }
+          case FLDO: {
+            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Obj m = s.pop();
+            String k = objs[n].asString();
+            if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
+            s.push(((APLMap) m).getRaw(k));
+            break;
+          }
+          case FLDM: {
+            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Obj m = s.pop();
+            String k = objs[n].asString();
+            if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
+            s.push(((APLMap) m).get(k));
+            break;
+          }
           case SPEC: {
             switch(bc[c++]) {
               case EVAL:
@@ -342,6 +364,9 @@ public class Comp {
           case LOCO: cs = "LOCO " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
           case LOCM: cs = "LOCM " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
           case RETN: cs = "RETN"; break;
+          case RETD: cs = "RETD"; break;
+          case FLDO: cs = "FLDO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case FLDM: cs = "FLDM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
           default  : cs = "unknown";
         }
@@ -405,12 +430,13 @@ public class Comp {
       case PUSH: case DFND:
       case VARO: case VARM:
       case ARRO: case ARRM:
+      case FLDO: case FLDM:
         return l7end(bc, i+1);
       case FN1C: case FN2C: case FN1O: case FN2O:
       case OP1D: case OP2D: case OP2H:
       case TR2D: case TR3D: case TR3O:
       case SETN: case SETU: case SETM: case SETH:
-      case POPS: case CHKV: case RETN: case VFYM:
+      case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case SPEC: return i+2;
       case LOCO: case LOCM:
@@ -468,16 +494,35 @@ public class Comp {
     
     HashMap<String, Integer> vars; // map of varName→index
     ArrayList<String> varnames;
+    HashSet<String> exported;
     public void newBody(String[] preset) {
       varnames = new ArrayList<>();
+      exported = null;
       Collections.addAll(varnames, preset);
       vars = new HashMap<>();
       for (int i = 0; i < preset.length; i++) vars.put(preset[i], i);
     }
+    
+    public void export(String name) {
+      if (exported == null) exported = new HashSet<>();
+      exported.add(name);
+    }
+    
     public String[] getVars() {
       return varnames.toArray(new String[0]);
     }
-  
+    public int[] getExp() {
+      if (exported == null) return null;
+      int[] exp = new int[exported.size()];
+      int i = 0;
+      for (String name : exported) {
+        Integer pos = vars.get(name);
+        if (pos == null) throw new SyntaxError("Exporting non-defined variable "+name);
+        exp[i++] = pos;
+      }
+      return exp;
+    }
+    
     public void addNum(int n) {
       leb128(bc, n, ref);
     }
@@ -566,31 +611,41 @@ public class Comp {
   }
   
   public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) { // block
-    for (int i = 0; i < parts.size(); i++) {
-      Body b = parts.get(i);
+    for (Body b : parts) {
       b.start = mut.bc.len;
       mut.newBody(tk.defNames());
       b.addHeader(mut);
       int sz = b.lns.size();
+      boolean pushed = false;
       for (int j = 0; j < sz; j++) {
-        LineTok ln = (LineTok) b.lns.get(j); typeof(ln); flags(ln);
-        typeof(ln);
-        compO(mut, ln);
-        if (j!=sz-1) mut.add(POPS);
+        if (pushed) mut.add(POPS);
+        LineTok ln = (LineTok) b.lns.get(j);
+        if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
+          compE(mut, ln.tokens.get(0));
+        } else {
+          typeof(ln); flags(ln);
+          compO(mut, ln);
+          pushed = true;
+        }
       }
       b.vars = mut.getVars();
-      if (i!=parts.size()-1) mut.add(RETN); // +TODO insert CHKV if return could be a nothing
+      b.setExp(mut.getExp());
+      if (b.exp==null) {
+        mut.add(RETN);
+      } else {
+        if (pushed) mut.add(POPS);
+        mut.add(RETD); // +TODO insert CHKV if return could be a nothing
+      }
     }
     return mut.finish(tk);
   }
   
-  private static boolean isE(LinkedList<Res> tps, String pt, boolean last) { // O=[aAf] in non-!, A ≡ a
-    if (tps.size() > 4) return false;
+  private static boolean isE(DQ tps, String pt, int lim, boolean last) { // O=[aAf] in non-!, A ≡ a
+    if (tps.size() > lim) return false;
     int pi = pt.length()-1;
     int ti = tps.size()-1;
     boolean qex = false;
     while (pi>=0) {
-      // System.out.println(pt+" "+pi+" "+ti);
       char c = pt.charAt(pi--);
       if (c=='|') {
         if (last) qex = true;
@@ -621,7 +676,7 @@ public class Comp {
     }
     return true;
   }
-  private static boolean isS(LinkedList<Res> tps, String pt, int off) { // O=[aAf] in non-!
+  private static boolean isS(DQ tps, String pt, int off) { // O=[aAf] in non-!
     int pi = 0;
     int ti = off;
     int tsz = tps.size();
@@ -652,7 +707,7 @@ public class Comp {
     }
     
     abstract void add(Mut m);
-    Res mut(boolean create) { throw new Error(getClass()+" cannot be mutated"); }
+    Res mut(boolean create, boolean export) { throw new SyntaxError("This cannot be mutated", lastTok()); }
     
     public abstract Token lastTok();
   }
@@ -661,6 +716,7 @@ public class Comp {
     Token tk;
     private boolean mut;
     private boolean create;
+    private boolean export;
     
     public ResTk(Token tk) {
       super(tk.type);
@@ -670,14 +726,16 @@ public class Comp {
     }
     
     void add(Mut m) {
+      if (export) compE(m, tk);
       if (mut) compM(m, tk, create, false);
       else compO(m, tk);
     }
     
-    Res mut(boolean create) {
+    Res mut(boolean create, boolean export) {
       assert !mut;
       mut = true;
       this.create = create;
+      this.export = export;
       return this;
     }
     
@@ -714,6 +772,33 @@ public class Comp {
     
     public String toString() {
       return Arrays.toString(bc);
+    }
+  }
+  static class ResGet extends Res {
+    private final Res o;
+    private final String k;
+    private final Token tk;
+    private boolean mut;
+    public ResGet(Res o, String k, char t, Token tk) {
+      super(t);
+      this.o = o;
+      this.k = k;
+      this.tk = tk;
+    }
+    void add(Mut m) {
+      o.add(m);
+      m.add(tk, mut? FLDM : FLDO);
+      m.addNum(m.addObj(new ChrArr(k)));
+    }
+  
+    Res mut(boolean create, boolean export) { // TODO use create?
+      mut = true;
+      if (export) throw new SyntaxError("Cannot export field access", tk);
+      return this;
+    }
+  
+    public Token lastTok() {
+      return tk;
     }
   }
   static class ResMix extends Res {
@@ -781,12 +866,28 @@ public class Comp {
   private static void printlvl(String s) {
     System.out.println(Main.repeat(" ", Main.printlvl*2) + s);
   }
-  public static void collect(LinkedList<Res> tps, boolean train, boolean last) {
+  public static void collect(DQ tps, boolean train, boolean last, Mut mut) {
     while (true) {
       if (Main.debug) printlvl(tps.toString());
       if (tps.size() <= 1) break;
+      if (tps.peekFirst().type=='.' || tps.get(1).type=='.'  &&  !last) break;
+      if (last && tps.size()>=3 && tps.get(1).type=='.'
+       ||         tps.size()>=3 && tps.get(2).type=='.') {
+        int s = tps.get(1).type=='.'? 0 : 1;
+        do {
+          Res m = tps.remove(s);
+          Res d = tps.remove(s); assert d.type=='.';
+          Res k = tps.remove(s);
+          if (m.type!='a' && m.type!='A') throw new SyntaxError("expected token before '.' to be a subject", m.lastTok());
+          if (!(k instanceof ResTk)) throw new SyntaxError("expected name after '.'", k.lastTok());
+          Token tk = ((ResTk) k).tk;
+          if (!(tk instanceof NameTok)) throw new SyntaxError("expected name after '.'", tk);
+          String ks = ((NameTok) tk).name;
+          tps.add(s, new ResGet(m, ks, k.type, d.lastTok()));
+        } while (tps.size()>=s+3 && tps.get(s+1).type=='.');
+      }
       if (train) { // trains only
-        if (isE(tps, "d!|Off", last)) {
+        if (isE(tps, "d!|Off", 4, last)) {
           if (Main.debug) printlvl("match F F F");
           Res h = tps.removeLast();
           Res g = tps.removeLast();
@@ -799,7 +900,7 @@ public class Comp {
           }
           continue;
         }
-        if (isE(tps, "[←↩]|ff", last)) {
+        if (isE(tps, "[←↩]|ff", 4, last)) {
           if (Main.debug) printlvl("match F F");
           Res h = tps.removeLast();
           Res g = tps.removeLast();
@@ -808,7 +909,7 @@ public class Comp {
           continue;
         }
       } else { // value expressions
-        if (isE(tps, "d!|afa", last)) {
+        if (isE(tps, "d!|afa", 4, last)) {
           if (Main.debug) printlvl("match a F a");
           Res x = tps.removeLast();
           Res f = tps.removeLast();
@@ -819,7 +920,7 @@ public class Comp {
           ));
           continue;
         }
-        if (isE(tps, "[da]!|fa", last)) {
+        if (isE(tps, "[da]!|fa", 4, last)) {
           if (Main.debug) printlvl("match F a");
           Res x = tps.removeLast();
           Res f = tps.removeLast();
@@ -878,20 +979,20 @@ public class Comp {
         }
       }
       
-      if (isE(tps, "af↩a", false)) {
+      if (isE(tps, ".!|af↩a", 5, last)) {
         if (Main.debug) printlvl("af↩a");
         tps.addLast(new ResMix('a',
           tps.removeLast(),
           tps.removeLast(),
           tps.removeLast(), // empty
-          tps.removeLast().mut(false),
+          tps.removeLast().mut(false, false),
           new ResBC(SETM)
         ));
         continue;
       }
       set: if (tps.size() >= (last? 3 : 4)) {
         char a = tps.get(tps.size()-2).type;
-        if (a=='←' || a=='↩') {
+        if (a=='←' || a=='↩' || a=='⇐') {
           char k = tps.get(tps.size()-3).type;
           char v = tps.get(tps.size()-1).type;
           char p = tps.size()>=4? tps.get(tps.size()-4).type : 0;
@@ -905,11 +1006,11 @@ public class Comp {
               tps.removeLast(),
               new ResBC(ov=='A'? CHKVBC : NOBYTES),
               tps.removeLast(), // empty
-              tps.removeLast().mut(a=='←'),
-              new ResBC(a=='←'? SETN : SETU)
+              tps.removeLast().mut(a!='↩', a=='⇐'),
+              new ResBC(a=='↩'? SETU : SETN)
             ));
             continue;
-          } else if (v!='a' && k!='f') throw new SyntaxError(a+": Cannot assign with different types", ((ResTk) tps.get(tps.size() - 2)).tk);
+          } else if (last) throw new SyntaxError(a+": Cannot assign with different types", ((ResTk) tps.get(tps.size() - 2)).tk);
         }
       }
       break;
@@ -974,7 +1075,9 @@ public class Comp {
           }
           return t.type = 'm';
         }
+        if (last == '⇐') return t.type = '\0'; // idk man
       }
+      return '\0';
     } else if (t instanceof BasicLines) {
       List<Token> ts = ((BasicLines) t).tokens;
       for (Token c : ts) typeof(c);
@@ -986,7 +1089,7 @@ public class Comp {
   public static byte flags(Token t) {
     if (t.flags != -1) return t.flags;
     if (t instanceof ConstTok || t instanceof NothingTok) return t.flags = 7;
-    if (t instanceof ModTok || t instanceof SetTok || t instanceof NameTok) return t.flags = 6;
+    if (t instanceof ModTok || t instanceof SetTok || t instanceof NameTok || t instanceof ExportTok) return t.flags = 6;
     
     if (t instanceof ParenTok) return t.flags = flags(((ParenTok) t).ln);
     if (t instanceof TokArr) {
@@ -1009,6 +1112,33 @@ public class Comp {
     throw new ImplementationError("didn't check for "+t.getClass().getSimpleName());
   }
   
+  public static void compE(Mut m, Token tk) {
+    if (tk instanceof NameTok) {
+      String name = ((NameTok) tk).name;
+      if (name.charAt(0)=='•' || name.equals("𝕣")) throw new SyntaxError("Cannot export "+name, tk);
+      m.export(name);
+      return;
+    }
+    if (tk instanceof StrandTok) {
+      for (Token c : ((StrandTok) tk).tokens) compE(m, c);
+      return;
+    }
+    if (tk instanceof ArrayTok) {
+      for (Token c : ((ArrayTok) tk).tokens) compE(m, c);
+      return;
+    }
+    if (tk instanceof ParenTok) {
+      compE(m, ((ParenTok) tk).ln);
+      return;
+    }
+    if (tk instanceof LineTok) {
+      if (((LineTok) tk).tokens.size() == 1) {
+        compE(m, ((LineTok) tk).tokens.get(0));
+        return;
+      }
+    }
+    throw new SyntaxError("Cannot export "+tk, tk);
+  }
   public static void compM(Mut m, Token tk, boolean create, boolean header) {
     assert tk.type != 0;
     if (tk instanceof NameTok) {
@@ -1078,7 +1208,7 @@ public class Comp {
       if (ts.size() == 1) { compO(m, ts.get(0)); return; }
       int i = ts.size()-1;
       
-      LinkedList<Res> tps = new LinkedList<>();
+      DQ tps = new DQ();
       Res t0 = new ResTk(ts.get(i));
       tps.addFirst(t0);
       i--;
@@ -1093,10 +1223,10 @@ public class Comp {
       while (i>=0) {
         Res c = new ResTk(ts.get(i));
         tps.addFirst(c);
-        collect(tps, train, false);
+        collect(tps, train, false, m);
         i--;
       }
-      collect(tps, train, true);
+      collect(tps, train, true, m);
       if (Main.debug) Main.printlvl--;
       
       if (tps.size()!=1) {
@@ -1159,7 +1289,7 @@ public class Comp {
       m.add(tk, ARRO); m.addNum(tks.size());
       return;
     }
-    if (tk instanceof SetTok || tk instanceof ModTok) {
+    if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok) { // TODO should this be here?
       return;
     }
     if (tk instanceof BlockTok) {
@@ -1319,4 +1449,129 @@ public class Comp {
       default: throw new ImplementationError("no built-in " + t.op + " defined in Comp", t);
     }
   }
+  
+  /*
+  static final class DQ extends LinkedList<Res> {
+    
+  }
+  /*/
+  static final class DQ { // double-ended queue
+    // static final Object[] none = new Object[1];
+    // Object[] es = none;
+    private Res[] es = new Res[16];
+    private int s, e; // s - 1st elem; e - after last elem (but still a valid index in es)
+    private int sz;
+    int size() {
+      return sz;
+    }
+    Res get(int i) {
+      i+= s;
+      if (i>=es.length) return es[i-es.length];
+      return es[i];
+    }
+    Res peekFirst() {
+      return es[s];
+    }
+    
+    
+    
+    Res remove(int is) {
+      int ai = is+s; if (ai>=es.length) ai-= es.length;
+      Res ret = es[ai];
+      if (is < sz/2) {
+        if (ai >= s) {
+          System.arraycopy(es, s, es, s+1, is);
+        } else {
+          System.arraycopy(es, 0, es, 1, ai);
+          es[0] = es[es.length-1];
+          System.arraycopy(es, s, es, s+1, is-ai-1);
+        }
+        s++;
+        if (s >= es.length) s = 0;
+      } else {
+        int ie = sz-is-1;
+        int ne = e-1; if (ne<0) ne = es.length-1;
+        if (ai <= ne) {
+          System.arraycopy(es, ai+1, es, ai, ie);
+        } else {
+          System.arraycopy(es, ai+1, es, ai, es.length-ai-1);
+          es[es.length-1] = es[0];
+          System.arraycopy(es, 1, es, 0, e-1);
+        }
+        e = ne;
+      }
+      sz--;
+      return ret;
+    }
+    
+    
+    Res removeLast() {
+      if (e > 0) e--;
+      else e = es.length-1;
+      sz--;
+      return es[e];
+    }
+    void addFirst(Res t) {
+      if (++sz == es.length) dc();
+      if (s > 0) s--;
+      else s = es.length-1;
+      es[s] = t;
+    }
+    void addLast(Res t) {
+      if (++sz == es.length) dc();
+      es[e] = t;
+      if(e+1 >= es.length) e = 0;
+      else e++;
+    }
+    void add(int i, Res t) {
+      if (++sz == es.length) dc();
+      
+      int ai;
+      if (i>sz/2) {
+        ai = i+s;
+        if(ai>=es.length) ai-= es.length; // pos of new item
+        if (ai<=e) {
+          System.arraycopy(es, ai, es, ai+1, e-ai);
+        } else {
+          System.arraycopy(es, 0, es, 1, e);
+          es[0] = es[es.length-1];
+          System.arraycopy(es, ai, es, ai+1, es.length-ai-1);
+        }
+        e++; if (e==es.length) e=0;
+      } else {
+        ai = i+s-1;
+        if(ai<0)ai=es.length-1; if(ai>=es.length) ai-=es.length; // pos of new item
+        if (i==0) {
+        } else if (s==0) {
+          es[es.length-1] = es[0];
+          System.arraycopy(es, 1, es, 0, ai);
+        } else if (ai==i+s-1) {
+          System.arraycopy(es, s, es, s-1, ai-s+1);
+        } else {
+          System.arraycopy(es, s, es, s-1, es.length-s);
+          es[es.length-1] = es[0];
+          System.arraycopy(es, 1, es, 0, ai);
+        }
+        s--; if(s<0) s=es.length-1;
+      }
+      es[ai] = t;
+    }
+    void dc() {
+      int ol = es.length;
+      Res[] nes = Arrays.copyOf(es, ol*2);
+      System.arraycopy(es, 0, nes, ol, e);
+      if (e<s) e+= ol;
+      es = nes;
+    }
+    public String toString() {
+      StringBuilder b = new StringBuilder("[");
+      for (int i = s; i != e; i=++i==es.length?0:i) {
+        if (i!=s) b.append(", ");
+        b.append(es[i]);
+      }
+      b.append("]");
+      // b.append(" ").append(s).append("-").append(e).append(" sz=").append(sz).append(" -- ").append(Arrays.toString(es));
+      return b.toString();
+    }
+  } //*/
 }

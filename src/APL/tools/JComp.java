@@ -8,6 +8,7 @@ import APL.types.callable.builtins.fns.EvalBuiltin;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
 
+import javax.naming.Name;
 import java.util.*;
 
 import static APL.Comp.*;
@@ -35,12 +36,13 @@ public class JComp {
     {
       
       
-      Met fn = new Met(0x0001, "get", met(Value.class, Scope.class), 3);
-      // aload 0 - this (JFn); 1 - scope; 2,3,4 - temp values
+      Met fn = new Met(0x0001, "get", met(Value.class, Scope.class, Body.class), 3);
+      // aload 0 - this (JFn); 1 - scope; 2 - body; 3,4,5 - temp values
       int SC   = 1;
-      int TMP  = 2;
-      int TMP2 = 3;
-      int TMP3 = 4;
+      int BODY = 2;
+      int TMP  = 3;
+      int TMP2 = 4;
+      int TMP3 = 5;
       // fields.add(new Fld(0x0009, "vals", name(Value[].class))); // ACC_PUBLIC ACC_STATIC ACC_FINAL
   
   
@@ -53,7 +55,7 @@ public class JComp {
       loop: while (i != bc.length) {
         int pi = i;
         i++;
-        switch (bc[pi]) { default: throw new DomainError("Unsupported bytecode "+bc[pi]);
+        switch (bc[pi]) { default: throw new DomainError("Unimplemented bytecode "+bc[pi]);
           case PUSH: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(0);
@@ -327,6 +329,34 @@ public class JComp {
             cstack++;
             break;
           }
+          case FLDO: { Met.Lbl l = fn.lbl();
+            int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+              fn.new_(DomainError.class); fn.dup();
+              fn.ldc("Expected value to the left of '.' to be a namespace");
+              fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
+              fn.athrow();
+            l.here(); // }
+            fn.cast(APLMap.class);
+            fn.ldc(comp.objs[n].asString());
+            fn.invvirt(APLMap.class, "getRaw", met(Value.class, String.class));
+            mstack = Math.max(mstack, cstack+3);
+            break;
+          }
+          case FLDM: { Met.Lbl l = fn.lbl();
+            int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+              fn.new_(DomainError.class); fn.dup();
+              fn.ldc("Expected value to the left of '.' to be a namespace");
+              fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
+              fn.athrow();
+            l.here(); // }
+            fn.cast(APLMap.class);
+            fn.ldc(comp.objs[n].asString());
+            fn.invvirt(APLMap.class, "get", met(APLMap.MapPointer.class, String.class));
+            mstack = Math.max(mstack, cstack+3);
+            break;
+          }
           case CHKV: { Met.Lbl l = fn.lbl();
             fn.dup();
             fn.is(Nothing.class);
@@ -341,6 +371,16 @@ public class JComp {
             break;
           }
           case RETN: {
+            break loop;
+          }
+          case RETD: {
+            fn.new_(Namespace.class); fn.dup();
+            fn.aload(SC);
+            fn.aload(BODY);
+            fn.getfield(Body.class, "exp", HashMap.class);
+            fn.invspec(Namespace.class, "<init>", met(void.class, Scope.class, HashMap.class));
+            mstack = Math.max(mstack, cstack+4);
+            cstack++;
             break loop;
           }
           case SPEC: {
