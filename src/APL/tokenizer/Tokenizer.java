@@ -141,7 +141,7 @@ public class Tokenizer {
           }
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
   
-          ArrayList<LineTok> lineTokens = new ArrayList<>();
+          ArrayList<Token> lineTokens = new ArrayList<>();
           for (Line ta : closed.a) lineTokens.add(ta.tok(pointless));
           Token r;
           switch (c) {
@@ -153,9 +153,6 @@ public class Tokenizer {
             case '}':
               if (pointless) r = new BlockTok(raw, closed.pos, i+1, lineTokens, true);
               else r = new BlockTok(raw, closed.pos, i+1, lineTokens);
-              break;
-            case ']':
-              r = new BracketTok(raw, closed.pos, i+1, lineTokens);
               break;
             case '⟩':
               r = new ArrayTok(raw, closed.pos, i+1, lineTokens);
@@ -319,7 +316,7 @@ public class Tokenizer {
       while (levels.size() > 1) {
         Block closed = levels.remove(levels.size() - 1);
   
-        ArrayList<LineTok> lineTokens = new ArrayList<>();
+        ArrayList<Token> lineTokens = new ArrayList<>();
         for (Line ta : closed.a) lineTokens.add(ta.tok(true));
         Token r;
         switch (closed.b) {
@@ -329,9 +326,6 @@ public class Tokenizer {
             break;
           case '{':
             r = new BlockTok(raw, closed.pos, len, lineTokens, true);
-            break;
-          case '[':
-            r = new BracketTok(raw, closed.pos, len, lineTokens);
             break;
           case '⟨':
             r = new ArrayTok(raw, closed.pos, len, lineTokens);
@@ -346,7 +340,7 @@ public class Tokenizer {
     }
     ArrayList<Line> lines = levels.get(0).a;
     if (lines.size() > 0 && lines.get(lines.size()-1).size() == 0) lines.remove(lines.size()-1); // no trailing empties!!
-    ArrayList<LineTok> expressions = new ArrayList<>();
+    ArrayList<Token> expressions = new ArrayList<>();
     for (Line line : lines) {
       expressions.add(line.tok(pointless));
     }

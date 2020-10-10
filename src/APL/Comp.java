@@ -549,12 +549,12 @@ public class Comp {
     public Value exec(Scope sc) { return c.exec(sc, b); }
     public String fmt() { return c.fmt(); }
   }
-  public static SingleComp comp(TokArr<LineTok> lns, Scope sc) { // non-block
+  public static SingleComp comp(TokArr lns, Scope sc) { // non-block
     Mut mut = new Mut(sc.parent==null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
     for (int i = 0; i < sz; i++) {
-      LineTok ln = lns.tokens.get(i); typeof(ln); flags(ln);
+      Token ln = lns.tokens.get(i); typeof(ln); flags(ln);
       compO(mut, ln);
       if (i!=sz-1) mut.add(POPS);
     }
@@ -573,7 +573,7 @@ public class Comp {
       b.addHeader(mut);
       int sz = b.lns.size();
       for (int j = 0; j < sz; j++) {
-        LineTok ln = b.lns.get(j); typeof(ln); flags(ln);
+        LineTok ln = (LineTok) b.lns.get(j); typeof(ln); flags(ln);
         typeof(ln);
         compO(mut, ln);
         if (j!=sz-1) mut.add(POPS);
@@ -976,7 +976,7 @@ public class Comp {
         }
       }
     } else if (t instanceof BasicLines) {
-      List<LineTok> ts = ((BasicLines) t).tokens;
+      List<Token> ts = ((BasicLines) t).tokens;
       for (Token c : ts) typeof(c);
       return t.type = ts.get(ts.size()-1).type;
     }
@@ -989,8 +989,8 @@ public class Comp {
     if (t instanceof ModTok || t instanceof SetTok || t instanceof NameTok) return t.flags = 6;
     
     if (t instanceof ParenTok) return t.flags = flags(((ParenTok) t).ln);
-    if (t instanceof TokArr<?>) {
-      List<? extends Token> ts = ((TokArr<?>) t).tokens;
+    if (t instanceof TokArr) {
+      List<? extends Token> ts = ((TokArr) t).tokens;
       if (t instanceof ArrayTok || t instanceof StrandTok 
       ||  t instanceof LineTok && ts.size()==1) {
         t.flags = 7;
@@ -1030,8 +1030,8 @@ public class Comp {
       return;
     }
     if (tk instanceof ArrayTok) {
-      List<LineTok> tks = ((ArrayTok) tk).tokens;
-      for (LineTok c : tks) compM(m, c, create, header);
+      List<Token> tks = ((ArrayTok) tk).tokens;
+      for (Token c : tks) compM(m, c, create, header);
       m.add(tk, ARRM); m.addNum(tks.size());
       return;
     }
@@ -1152,8 +1152,8 @@ public class Comp {
     }
     if (tk instanceof ArrayTok) {
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
-      List<LineTok> tks = ((ArrayTok) tk).tokens;
-      for (LineTok c : tks) compO(m, c);
+      List<Token> tks = ((ArrayTok) tk).tokens;
+      for (Token c : tks) compO(m, c);
       if (Main.debug) Main.printlvl--;
       
       m.add(tk, ARRO); m.addNum(tks.size());
@@ -1189,7 +1189,7 @@ public class Comp {
       return Arr.create(ps);
     }
     if (t instanceof ArrayTok) {
-      List<LineTok> ts = ((ArrayTok) t).tokens;
+      List<Token> ts = ((ArrayTok) t).tokens;
       Value[] ps = new Value[ts.size()];
       for (int i = 0; i < ps.length; i++) ps[i] = constFold(ts.get(i));
       return Arr.create(ps);

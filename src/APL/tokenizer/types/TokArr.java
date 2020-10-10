@@ -4,10 +4,10 @@ import APL.tokenizer.Token;
 
 import java.util.List;
 
-abstract public class TokArr<T extends Token> extends Token {
-  public final List<T> tokens;
+abstract public class TokArr extends Token {
+  public final List<Token> tokens;
   
-  TokArr(String line, int spos, int epos, List<T> tokens) {
+  TokArr(String line, int spos, int epos, List<Token> tokens) {
     super(line, spos, epos);
     this.tokens = tokens;
   }

@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Body {
   // code
-  public final ArrayList<LineTok> lns;
+  public final ArrayList<Token> lns;
   public JFn gen;
   public int iter;
   
@@ -51,7 +51,7 @@ public class Body {
     lns = null;
   }
   
-  public Body(ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
+  public Body(ArrayList<Token> lns, char arity, boolean immediate) { // no header
     this.lns = lns;
     this.type = 0;
     this.arity = arity;
@@ -62,10 +62,10 @@ public class Body {
   
   
   
-  public Body(LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
+  public Body(Token hdr, ArrayList<Token> lns, boolean imm) { // given header
     this.lns = lns;
     char type = Comp.typeof(hdr);
-    List<Token> ts = hdr.tokens;
+    List<Token> ts = ((LineTok)hdr).tokens;
     int sz = ts.size();
     if (sz == 1) {
       Token a = ts.get(0);

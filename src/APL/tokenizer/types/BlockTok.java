@@ -9,20 +9,20 @@ import APL.types.callable.blocks.*;
 
 import java.util.*;
 
-public class BlockTok extends TokArr<LineTok> {
+public class BlockTok extends TokArr {
   public Comp comp;
   public final boolean immediate;
   public final static boolean immBlock = true;
   public final Body[] bodiesM;
   public final Body[] bodiesD;
   
-  public BlockTok(String line, int spos, int epos, ArrayList<LineTok> tokens) {
+  public BlockTok(String line, int spos, int epos, ArrayList<Token> tokens) {
     super(line, spos, epos, tokens);
     type = 'f'; boolean canBeImmediate = funType(tokens, this);
-    ArrayList<ArrayList<LineTok>> parts = new ArrayList<>();
+    ArrayList<ArrayList<Token>> parts = new ArrayList<>();
     int li = 0;
     for (int i = 0; i < tokens.size(); i++) {
-      if (tokens.get(i).end == ';') {
+      if (((LineTok) tokens.get(i)).end == ';') {
         parts.add(new ArrayList<>(tokens.subList(li, i+1)));
         li = i+1;
       }
@@ -30,29 +30,29 @@ public class BlockTok extends TokArr<LineTok> {
     parts.add(new ArrayList<>(li==0? tokens : tokens.subList(li, tokens.size())));
     
     for (int i = 0; i < parts.size(); i++) {
-      List<LineTok> part = parts.get(i);
+      List<Token> part = parts.get(i);
       if (part.size() == 0) throw new SyntaxError("function contained empty body", this);
       for (int j = 1; j < part.size(); j++) {
-        LineTok c = part.get(j);
+        LineTok c = (LineTok) part.get(j);
         if (c.end == ':') throw new SyntaxError("function body contained header in the middle", c.tokens.get(c.tokens.size()-1));
       }
-      if (i < parts.size()-2  &&  part.get(0).end != ':') throw new SyntaxError("only the last 2 bodies in a function can be header-less", part.get(0));
+      if (i < parts.size()-2  &&  ((LineTok)part.get(0)).end != ':') throw new SyntaxError("only the last 2 bodies in a function can be header-less", part.get(0));
     }
     
     int tail; // amount of no-header bodies
     if (parts.size() > 1) {
-      boolean p = parts.get(parts.size()-2).get(0).end != ':';
-      boolean l = parts.get(parts.size()-1).get(0).end != ':';
+      boolean p = ((LineTok)parts.get(parts.size()-2).get(0)).end != ':';
+      boolean l = ((LineTok)parts.get(parts.size()-1).get(0)).end != ':';
       if (p && !l) throw new SyntaxError("header-less function bodies must be the last", parts.get(parts.size()-2).get(0));
       tail = p? 2 : l? 1 : 0;
-    } else tail = parts.get(0).get(0).end != ':'? 1 : 0;
+    } else tail = ((LineTok)parts.get(0).get(0)).end != ':'? 1 : 0;
     
     ArrayList<Body> bodies = new ArrayList<>();
     for (int i = 0; i < parts.size(); i++) {
-      ArrayList<LineTok> part = parts.get(i);
+      ArrayList<Token> part = parts.get(i);
       Body body;
-      if (part.get(0).end == ':') {
-        List<LineTok> src = part.subList(1, part.size());
+      if (((LineTok)part.get(0)).end == ':') {
+        List<Token> src = part.subList(1, part.size());
         body = new Body(part.get(0), new ArrayList<>(src), funType(src, this));
       } else {
         assert tail != 0;
@@ -101,7 +101,7 @@ public class BlockTok extends TokArr<LineTok> {
     bodiesD = db.toArray(new Body[0]);
   }
   
-  public BlockTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) { // for pointless
+  public BlockTok(String line, int spos, int epos, List<Token> tokens, boolean pointless) { // for pointless
     super(line, spos, epos, tokens);
     assert pointless;
     comp = null;
@@ -119,10 +119,10 @@ public class BlockTok extends TokArr<LineTok> {
   }
   
   public static boolean funType(Token t, BlockTok dt) { // returns if can be immediate, mutates dt's type
-    if (t instanceof TokArr<?>) {
+    if (t instanceof TokArr) {
       if (!(t instanceof BlockTok)) {
         boolean imm = true;
-        for (Token c : ((TokArr<?>) t).tokens) imm&= funType(c, dt);
+        for (Token c : ((TokArr) t).tokens) imm&= funType(c, dt);
         return imm;
       }
       return true;
@@ -145,16 +145,16 @@ public class BlockTok extends TokArr<LineTok> {
     } else return true;
   }
   
-  private boolean funType(List<LineTok> lns, BlockTok block) { // TODO split up into separate thing getting immediate and type
+  private boolean funType(List<Token> lns, BlockTok block) { // TODO split up into separate thing getting immediate and type
     boolean imm = true;
-    for (LineTok ln : lns) imm&= funType(ln, block);
+    for (Token ln : lns) imm&= funType(ln, block);
     return imm;
   }
   
   public String toRepr() {
     StringBuilder s = new StringBuilder("{");
     boolean tail = false;
-    for (LineTok v : tokens) {
+    for (Token v : tokens) {
       if (tail) s.append(" ⋄ ");
       s.append(v.toRepr());
       tail = true;

@@ -3,9 +3,9 @@ package APL.tokenizer.types;
 import APL.tokenizer.Token;
 
 public class ParenTok extends Token {
-  public final LineTok ln;
+  public final Token ln;
   
-  public ParenTok(String line, int spos, int epos, LineTok ln) {
+  public ParenTok(String line, int spos, int epos, Token ln) {
     super(line, spos, epos);
     this.ln = ln;
   }

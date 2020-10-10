@@ -4,7 +4,7 @@ import APL.tokenizer.Token;
 
 import java.util.List;
 
-public class StrandTok extends TokArr<Token> {
+public class StrandTok extends TokArr {
   
   public StrandTok(String line, int spos, int epos, List<Token> tokens) {
     super(line, spos, epos, tokens);
