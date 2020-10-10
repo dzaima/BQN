@@ -5,9 +5,10 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.callable.builtins.md2.*;
+import APL.types.arrs.ChrArr;
 import APL.types.callable.builtins.fns.*;
 import APL.types.callable.builtins.md1.*;
+import APL.types.callable.builtins.md2.*;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
 
@@ -16,17 +17,15 @@ import java.util.*;
 public class Comp {
   public final byte[] bc;
   public final Value[] objs;
-  public final String[] strs;
   public final BlockTok[] blocks;
   private final Token[] ref;
   private final Token tk;
   
   public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
   
-  public Comp(byte[] bc, Value[] objs, String[] strs, BlockTok[] blocks, Token[] ref, Token tk) {
+  public Comp(byte[] bc, Value[] objs, BlockTok[] blocks, Token[] ref, Token tk) {
     this.bc = bc;
     this.objs = objs;
-    this.strs = strs;
     this.blocks = blocks;
     this.ref = ref;
     this.tk = tk;
@@ -105,13 +104,13 @@ public class Comp {
           }
           case VARO: {
             int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            Value got = sc.getC(strs[n]);
+            Value got = sc.getC(objs[n].asString());
             s.push(got);
             break;
           }
           case VARM: {
             int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            s.push(new Variable(strs[n]));
+            s.push(new Variable(objs[n].asString()));
             break;
           }
           case LOCO: {
@@ -318,8 +317,8 @@ public class Comp {
         String cs;
         switch (bc[pi]) {
           case PUSH: cs = "PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARO: cs = "VARO " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARM: cs = "VARM " + safeStr(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARO: cs = "VARO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case VARM: cs = "VARM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
           case DFND: cs = "DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case ARRO: cs = "ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case ARRM: cs = "ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
@@ -368,10 +367,6 @@ public class Comp {
       b.append("objs:\n");
       for (int j = 0; j < objs.length; j++) b.append(' ').append(j).append(": ").append(objs[j].oneliner()).append('\n');
     }
-    if (strs.length > 0) {
-      b.append("strs:\n");
-      for (int j = 0; j < strs.length; j++) b.append(' ').append(j).append(": ").append(strs[j]).append('\n');
-    }
     if (blocks.length > 0) {
       b.append("blocks:\n");
       for (int j = 0; j < blocks.length; j++) {
@@ -379,18 +374,17 @@ public class Comp {
         char tp = blk.type;
         b.append(' ').append(j).append(": ").append(tp=='f'? "function" : tp=='d'? "2-modifier" : tp=='m'? "1-modifier" : tp=='a'? "immediate block" : String.valueOf(tp)).append(" \n");
         b.append("  flags: ").append(blk.flags).append('\n');
-        Body b0 = blk.bodies.get(0);
-        if (blk.bodies.size()>1 || b0.start!=0 || !b0.noHeader || b0.vars.length!=0) {
-          ArrayList<Body> bodies = blk.bodies;
-          for (int k = 0; k < bodies.size(); k++) { // TODO move this around so it can also show for the top-level function
-            Body bd = bodies.get(k);
-            b.append("  body ").append(k).append(": ").append(bd.immediate? "immediate" : bd.arity=='m'? "monadic" : bd.arity=='d'? "dyadic" : "ambivalent").append('\n');
+        HashSet<Body> mb = new HashSet<>(Arrays.asList(blk.bodiesM));
+        HashSet<Body> db = new HashSet<>(Arrays.asList(blk.bodiesD));
+        for (int k = 0; k < 2; k++) {
+          Body[] cbs = k==0? blk.bodiesM : blk.bodiesD;
+          if (cbs==null) continue;
+          for (Body bd : cbs) { // TODO move this around so it can also show for the top-level function
+            boolean mq = mb.contains(bd);
+            boolean dq = db.contains(bd);
+            if (mq && k==1) continue;
+            b.append("  body ").append(k).append(": ").append(mq&&dq? "ambivalent" : mq? "monadic" : "dyadic").append('\n');
             b.append("    start: ").append(bd.start).append('\n');
-            // if (bd.self!=null) b.append("    self: ").append(bd.self).append('\n');
-            // if (bd.wM!=null) b.append("    𝕨: ").append(bd.wM.toRepr()).append('\n');
-            // if (bd.xM!=null) b.append("    𝕩: ").append(bd.xM.toRepr()).append('\n');
-            // if (bd.fM!=null) b.append("    𝕗: ").append(bd.fM.toRepr()).append('\n');
-            // if (bd.gM!=null) b.append("    𝕘: ").append(bd.gM.toRepr()).append('\n');
             if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
           }
         }
@@ -442,12 +436,8 @@ public class Comp {
   }
   
   private String safeObj(int l) {
-    if (l>=objs.length) return "INVALID";
-    return "!"+objs[l].oneliner();
-  }
-  private String safeStr(int l) {
-    if (l>=strs.length) return "INVALID";
-    return "\""+strs[l]+"\"";
+    if (l>=objs.length) return l+" INVALID";
+    return l+": "+objs[l].oneliner();
   }
   
   
@@ -473,7 +463,6 @@ public class Comp {
   
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<BlockTok> blocks = new ArrayList<>();
-    ArrayList<String> strs = new ArrayList<>();
     MutByteArr bc = new MutByteArr(10);
     ArrayList<Token> ref = new ArrayList<>();
     
@@ -495,8 +484,12 @@ public class Comp {
     
     public void push(Value o) {
       add(o.token, PUSH);
-      addNum(objs.size());
+      addNum(addObj(o));
+    }
+    public int addObj(Value o) {
+      int r = objs.size();
       objs.add(o);
+      return r;
     }
     
     public void push(BlockTok o) {
@@ -513,8 +506,7 @@ public class Comp {
       Integer pos = vars.get(s);
       if (pos == null) {
         add(t, mut? VARM : VARO);
-        addNum(strs.size());
-        strs.add(s);
+        addNum(addObj(new ChrArr(s)));
       } else {
         add(t, mut? LOCM : LOCO);
         add((byte) 0);
@@ -546,7 +538,7 @@ public class Comp {
     
     public Comp finish(Token tk) {
       assert bc.len == ref.size() : bc.len +" "+ ref.size();
-      return new Comp(bc.get(), objs.toArray(new Value[0]), strs.toArray(new String[0]), blocks.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
+      return new Comp(bc.get(), objs.toArray(new Value[0]), blocks.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
   

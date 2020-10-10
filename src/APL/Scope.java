@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
-public class Scope {
+public final class Scope {
   public final Scope parent;
   public final Sys sys;
   public Random rnd;
@@ -154,7 +154,7 @@ public class Scope {
         case "•l":
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser();
-        case "•gc": System.gc(); return Num.ONE;
+        case "•gc": System.gc(); return new Num(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
         case "•gclog": return new GCLog(this);
         case "•null": return Null.NULL;
         case "•map": case "•NS": return new MapGen();
@@ -219,61 +219,52 @@ public class Scope {
             boolean allowImm = Main.bool(w);
             Value bc = x.get(0);
             Value obj = x.get(1);
-            Value str = x.get(2);
-            Value blk = x.get(3);
+            Value blk = x.get(2);
+            Value bdy = x.get(3);
             
             byte[] bcp = new byte[bc.ia];
             int[] bcis = bc.asIntVec();
             for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bcis[i];
-            Token[] ref = new Token[bcp.length]; // keep as nulls for now
+            Token[] ref = new Token[bcp.length]; // keep as nulls
             
             Value[] objp = new Value[obj.ia];
             for (int i = 0; i < objp.length; i++) objp[i] = obj.get(i);
             
-            String[] strp = new String[str.ia];
-            for (int i = 0; i < strp.length; i++) strp[i] = str.get(i).asString();
-            
-            BlockTok[] blkp = new BlockTok[blk.ia];
-            for (int i = 0; i < blkp.length; i++) {
-              Value c = blk.get(i);
-              if (c.ia!=4 && c.ia!=5) throw new DomainError("•COMP: ¬∧´(≠3⊑𝕩)∊4‿5", this);
-              
-              int type = c.get(0).asInt();
-              boolean imm = Main.bool(c.get(1));
-              
-              if (type<0 || type>2) throw new DomainError("•COMP: ⊑𝕨 must be one 0, 1 or 2", this);
-              char typec = type==0? (imm?'a':'f') : type==1? 'm' : 'd';
-              
-              if (c.ia==4) {
-                int off = c.get(2).asInt();
-                int lvarAm = c.get(3).ia;
-                String[] lvars = new String[lvarAm];
-                for (int j = 0; j < lvarAm; j++) lvars[j] = c.get(3).get(j).asString();
-                
-                blkp[i] = new BlockTok(typec, imm, off, lvars);
-              } else {
-                BlockTok r = new BlockTok(typec, imm);
-                ArrayList<Body> bs = r.bodies;
-                int[] offs = c.get(2).asIntVec();
-                for (int j = 0; j < offs.length; j++) {
-                  Value v = c.get(3).get(j);
-                  String[] lvars = new String[v.ia];
-                  for (int k = 0; k < lvars.length; k++) lvars[k] = v.get(k).asString();
-                  char a = ((Char) c.get(4).get(j)).chr;
-                  bs.add(new Body(typec, imm, offs[j], lvars, a));
-                }
-                blkp[i] = r;
-              }
+            // BlockTok[] blkp = new BlockTok[blk.ia];
+            Body[] bodies = new Body[bdy.ia];
+            for (int i = 0; i < bodies.length; i++) {
+              Value bd = bdy.get(i);
+              int off = bd.get(0).asInt();
+              Value[] vno = bd.get(1).values();
+              String[] vns = new String[vno.length];
+              for (int j = 0; j < vno.length; j++) vns[j] = vno[j].asString();
+              int[] exp = bd.ia >= 3? SlashBuiltin.on(bd.get(2), null).asIntArr() : null;
+              bodies[i] = new Body(off, vns, exp);
             }
             
-            Comp c = new Comp(bcp, objp, strp, blkp, ref, Token.COMP);
-            for (BlockTok block : blkp) block.comp = c;
+            BlockTok[] blocks = new BlockTok[blk.ia];
+            for (int i = 0; i < blocks.length; i++) {
+              Value bl = blk.get(i);
+              
+              int type = bl.get(0).asInt();
+              boolean imm = Main.bool(bl.get(1));
+              if (type<0 || type>2) throw new DomainError("•COMP: type must be one of 0, 1 or 2", this);
+              char typec = type==0? (imm?'a':'f') : type==1? 'm' : 'd';
+              int[] mi = bl.get(2).asIntVec();
+              int[] di = bl.get(3).asIntVec();
+              Body[] mb = new Body[mi.length]; for (int j = 0; j < mi.length; j++) mb[j] = bodies[mi[j]];
+              Body[] db = new Body[di.length]; for (int j = 0; j < di.length; j++) db[j] = bodies[di[j]];
+              blocks[i] = new BlockTok(typec, imm, mb, db);
+            }
+            Comp c = new Comp(bcp, objp, blocks, ref, Token.COMP);
+            for (BlockTok block : blocks) block.comp = c;
             if (!allowImm) {
-              BlockTok f = new BlockTok(blkp[0].type=='a'?'f':blkp[0].type, false, 0, new String[0]);
+              BlockTok b0 = blocks[0];
+              BlockTok f = new BlockTok(b0.type=='a'?'f': b0.type, false, b0.bodiesM, b0.bodiesD);
               f.comp = c;
               return f.eval(Scope.this);
             }
-            return blkp[0].eval(Scope.this);
+            return blocks[0].eval(Scope.this);
           }
         };
         case "•bc": return new Fun() {

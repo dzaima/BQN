@@ -1,42 +1,57 @@
 package APL.tools;
 
-import APL.*;
+import APL.Comp;
 import APL.errors.SyntaxError;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
-import APL.types.Value;
 
 import java.util.*;
 
 public class Body {
+  // code
   public final ArrayList<LineTok> lns;
-  public final char arity; // one of [mda] - monadic, dyadic, ambivalent
-  public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
-  public final boolean noHeader;
-  public final boolean immediate;
-  public final Token wM, fM, gM, xM;
-  public final String self;
-  
-  public int start;
-  public String[] vars;
-  
   public JFn gen;
   public int iter;
   
-  public Body(char type, boolean imm, int off, String[] vars, char arity) { // •COMPiled body
+  // headers
+  public final Token wM, fM, gM, xM;
+  public final String self;
+  
+  // important
+  public int start;
+  public String[] vars;
+  public int[] exp;
+  
+  // unimportant
+  public final boolean immediate;
+  public final char type; // one of [afmd\0] - value, function, modifier, composition, unknown
+  public final char arity; // one of [mda] - monadic, dyadic, ambivalent
+  
+  
+  public Body(char type, boolean imm, int off, String[] vars, char arity, int[] exp) {
+    this.exp = exp; // •COMPiled body
     this.lns = null;
     self = null;
     wM=fM=gM=xM=null;
     immediate = imm;
-    noHeader = true;
     this.type = type;
     this.arity = arity;
     start = off;
     this.vars = vars;
   }
+  public Body(int off, String[] vars, int[] exp) {
+    this.start = off;
+    this.vars = vars;
+    this.exp = exp;
+    immediate = false;
+    arity = 'a';
+    type = '⍰';
+    wM=fM=gM=xM = null;
+    self = null;
+    lns = null;
+  }
   
   public Body(ArrayList<LineTok> lns, char arity, boolean immediate) { // no header
-    noHeader = true;
     this.lns = lns;
     this.type = 0;
     this.arity = arity;
@@ -49,7 +64,6 @@ public class Body {
   
   public Body(LineTok hdr, ArrayList<LineTok> lns, boolean imm) { // given header
     this.lns = lns;
-    noHeader = false;
     char type = Comp.typeof(hdr);
     List<Token> ts = hdr.tokens;
     int sz = ts.size();
@@ -159,12 +173,6 @@ public class Body {
   
   
   
-  
-  public boolean matchArity(Value w) {
-    return arity=='a' || (arity=='m') == (w==null);
-  }
-  
-  
   public static boolean op(Token tk, String str) {
     return tk instanceof OpTok && ((OpTok) tk).op.equals(str);
   }
@@ -175,7 +183,7 @@ public class Body {
   public void addHeader(Comp.Mut m) {
     addVar(m, xM, "𝕩");
     addVar(m, gM, "𝕘");
-    if (self != null && type!='a') {
+    if (self!=null && type!='a') {
       m.var(null, type=='f'? "𝕤" : "𝕣", false);
       m.nvar(self);
       m.var(null, self, true);

@@ -20,6 +20,9 @@ public class SlashBuiltin extends FnBuiltin {
   
   
   public Value call(Value x) {
+    return on(x, this);
+  }
+  public static Value on(Value x, Callable blame) {
     int sum = (int) x.sum();
     if (x.r() == 1) {
       int[] sub = new int[sum];
@@ -31,11 +34,11 @@ public class SlashBuiltin extends FnBuiltin {
           if (xr.read()) sub[p++] = i;
         }
       } else {
-        if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError("/: 𝕩 contained "+v, this, x);
+        if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError(blame+": argument contained "+v, blame, x);
         int[] xi = x.asIntArr();
         for (int i = 0; i < x.ia; i++) {
           int v = xi[i];
-          if (v < 0) throw new DomainError("/: 𝕩 contained "+v, this, x);
+          if (v < 0) throw new DomainError(blame+": argument contained "+v, blame, x);
           for (int j = 0; j < v; j++) {
             sub[p++] = i;
           }
@@ -57,7 +60,7 @@ public class SlashBuiltin extends FnBuiltin {
               for (int j = 0; j < n; j++) res[k][ri+j] = p[k];
             }
             ri+= n;
-          } else if (n != 0) throw new DomainError("/: 𝕩 contained "+n, this, x);
+          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame, x);
         }
         Value[] resv = new Value[rank];
         for (int i = 0; i < rank; i++) resv[i] = new IntArr(res[i]);
@@ -72,7 +75,7 @@ public class SlashBuiltin extends FnBuiltin {
           if (n > 0) {
             Arr pos = new IntArr(p.clone());
             for (int j = 0; j < n; j++) res[ri++] = pos;
-          } else if (n != 0) throw new DomainError("/: 𝕩 contained "+n, this, x);
+          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame, x);
         }
         return new HArr(res);
       }

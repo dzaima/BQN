@@ -13,7 +13,8 @@ public class BlockTok extends TokArr<LineTok> {
   public Comp comp;
   public final boolean immediate;
   public final static boolean immBlock = true;
-  public final ArrayList<Body> bodies;
+  public final Body[] bodiesM;
+  public final Body[] bodiesD;
   
   public BlockTok(String line, int spos, int epos, ArrayList<LineTok> tokens) {
     super(line, spos, epos, tokens);
@@ -89,30 +90,32 @@ public class BlockTok extends TokArr<LineTok> {
     }
     Comp.Mut mut = new Comp.Mut(false); // TODO why is this still a thing
     comp = Comp.comp(mut, bodies, this);
-    this.bodies = bodies;
+    
+    ArrayList<Body> mb = new ArrayList<>();
+    ArrayList<Body> db = new ArrayList<>();
+    for (Body c : bodies) {
+      if (c.arity!='m') db.add(c);
+      if (c.arity!='d') mb.add(c);
+    }
+    bodiesM = mb.toArray(new Body[0]);
+    bodiesD = db.toArray(new Body[0]);
   }
   
-  public BlockTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) {
+  public BlockTok(String line, int spos, int epos, List<LineTok> tokens, boolean pointless) { // for pointless
     super(line, spos, epos, tokens);
     assert pointless;
     comp = null;
     immediate = false;
-    bodies = new ArrayList<>();
+    bodiesM=bodiesD=null;
   }
   
   
-  public BlockTok(char type, boolean imm, int off, String[] varNames) { // for •COMP
+  public BlockTok(char type, boolean imm, Body[] mb, Body[] db) {
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
-    bodies = new ArrayList<>();
     immediate = imm;
-    bodies.add(new Body(type, imm, off, varNames, 'a'));
-  }
-  public BlockTok(char type, boolean imm) {
-    super(Token.COMP.raw, 0, 18, new ArrayList<>());
-    this.type = type;
-    bodies = new ArrayList<>();
-    immediate = imm;
+    this.bodiesM = mb;
+    this.bodiesD = db;
   }
   
   public static boolean funType(Token t, BlockTok dt) { // returns if can be immediate, mutates dt's type
@@ -187,7 +190,7 @@ public class BlockTok extends TokArr<LineTok> {
       case '?': if (Main.vind) return new FunBlock(this, sc);
         /* fallthrough */
       case 'a': {
-        Body b = bodies.get(0);
+        Body b = bodiesD[0];
         return comp.exec(new Scope(sc, b.vars), b);
       }
       default: throw new IllegalStateException(this.type+"");
@@ -196,8 +199,7 @@ public class BlockTok extends TokArr<LineTok> {
   
   public Value exec(Scope psc, Value w, Value[] vb) {
     Scope sc = new Scope(psc);
-    for (Body b : bodies) {
-      if (!b.matchArity(w)) continue;
+    for (Body b : w!=null? bodiesD : bodiesM) {
       sc.varNames = b.vars; // no cloning is suuuuurely fiiine
       sc.vars = new Value[b.vars.length]; // TODO decide some nicer way than just creating a new array per header
       System.arraycopy(vb, 0, sc.vars, 0, vb.length);

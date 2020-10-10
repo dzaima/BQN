@@ -20,7 +20,6 @@ public class JComp {
     
     
     
-    
     ArrayList<Met> methods = new ArrayList<>();
     ArrayList<Fld> fields = new ArrayList<>();
   
@@ -69,7 +68,7 @@ public class JComp {
           case VARO: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(SC);
-            fn.ldc(comp.strs[n]);
+            fn.ldc(comp.objs[n].asString());
             fn.invvirt(Scope.class, "getC", met(Value.class, String.class));
             mstack = Math.max(mstack, cstack+4);
             cstack++;
@@ -78,7 +77,7 @@ public class JComp {
           case VARM: {
             int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.new_(Variable.class); fn.dup();
-            fn.ldc(comp.strs[n]);
+            fn.ldc(comp.objs[n].asString());
             fn.invspec(Variable.class, "<init>", met(void.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             cstack++;
