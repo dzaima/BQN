@@ -3,7 +3,7 @@ package APL.types;
 import APL.errors.SyntaxError;
 
 public abstract class SimpleMap extends APLMap {
-  public Value getRaw(Value k) {
+  public Value get(Value k) {
     return getv(k.asString());
   }
   

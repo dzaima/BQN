@@ -19,11 +19,11 @@ public class OldKeyBuiltin extends Md1Builtin {
       if (x.r() > 1) {
         Value[] arr = new Value[x.ia];
         for (int i = 0; i < x.ia; i++) {
-          arr[i] = ((APLMap) f).getRaw(x.get(i));
+          arr[i] = ((APLMap) f).get(x.get(i));
         }
         return Arr.create(arr, x.shape);
       }
-      return ((APLMap) f).getRaw(x);
+      return ((APLMap) f).get(x);
     }
     if (f instanceof Fun) {
       int i = 0;

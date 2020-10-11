@@ -576,8 +576,8 @@ public final class Scope {
     }
     
     String get(APLMap m, String key, String def) {
-      Value got = m.getRaw(key);
-      if (got != Null.NULL) return got.asString();
+      Value got = m.get(key);
+      if (got != null) return got.asString();
       return def;
     }
     
@@ -594,8 +594,8 @@ public final class Scope {
           conn.setRequestProperty("Content-Language", get(m, "language", "en-US"));
           conn.setRequestProperty("Content-Length", Integer.toString(content.length()));
           
-          Value eo = m.getRaw("e");
-          if (eo != Null.NULL) {
+          Value eo = m.get("e");
+          if (eo != null) {
             APLMap e = (APLMap) eo;
             Value[][] kv = e.kvPair();
             for (int i = 0; i < kv[0].length; i++) {
@@ -603,8 +603,8 @@ public final class Scope {
             }
           }
           
-          Value cache = m.getRaw("cache");
-          conn.setUseCaches(cache!=Null.NULL && Main.bool(cache));
+          Value cache = m.get("cache");
+          conn.setUseCaches(cache!=null && Main.bool(cache));
           conn.setDoOutput(true);
           
           if (content.length() != 0) {
@@ -653,12 +653,12 @@ public final class Scope {
       APLMap m = (APLMap) w;
       
       File dir = null;
-      Value diro = m.getRaw("dir");
-      if (diro != Null.NULL) dir = new File(diro.asString());
+      Value diro = m.get("dir");
+      if (diro != null) dir = new File(diro.asString());
       
       byte[] inp = null;
-      Value inpo = m.getRaw("inp");
-      if (inpo != Null.NULL) {
+      Value inpo = m.get("inp");
+      if (inpo != null) {
         if (inpo.ia > 0) {
           if (inpo.first() instanceof Char) inp = inpo.asString().getBytes(StandardCharsets.UTF_8);
           else {
@@ -670,8 +670,8 @@ public final class Scope {
       }
       
       boolean raw = false;
-      Value rawo = m.getRaw("raw");
-      if (rawo != Null.NULL) raw = Main.bool(rawo);
+      Value rawo = m.get("raw");
+      if (rawo != null) raw = Main.bool(rawo);
       
       return exec(x, dir, inp, raw);
     }

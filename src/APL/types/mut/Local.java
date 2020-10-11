@@ -39,8 +39,11 @@ public class Local extends Settable {
     return new ValueError("Cannot redefine \""+name+"\"", blame);
   }
   
-  private String name(Scope sc) {
+  @Override public String name(Scope sc) {
     return sc.owner(depth).varNames[index];
+  }
+  @Override protected boolean hasName() {
+    return true;
   }
   
   public String toString() {

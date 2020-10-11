@@ -13,10 +13,14 @@ public class Namespace extends APLMap {
     this.sc = sc;
     this.exports = exports;
   }
-  public Value getRaw(Value ko) {
-    String k = ko.asString();
+  
+  public Value get(Value k) {
+    return get(k.asString());
+  }
+  
+  public Value get(String k) {
     Integer kn = exports.get(k);
-    if (kn==null) throw new ValueError("Getting non-defined namespace field "+ko, ko);
+    if (kn==null) return null;
     return sc.vars[kn];
   }
   

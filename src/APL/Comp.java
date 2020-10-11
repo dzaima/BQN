@@ -5,7 +5,7 @@ import APL.tokenizer.*;
 import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.arrs.ChrArr;
+import APL.types.arrs.*;
 import APL.types.callable.builtins.fns.*;
 import APL.types.callable.builtins.md1.*;
 import APL.types.callable.builtins.md2.*;
@@ -52,14 +52,15 @@ public class Comp {
   public static final byte CHKV = 18; // throw error if top of stack is ·
   public static final byte TR3O = 19; // TR3D but creates an atop if F is ·
   public static final byte OP2H = 20; // derive 2-modifier to 1-modifier ⟨…,g,_m_⟩ → (_m_ g)
-  public static final byte LOCO = 21; // B,N; push variable at depth B and position N
-  public static final byte LOCM = 22; // B,N; push mutable variable at depth B and position N
+  public static final byte LOCO = 21; // N0,N1; push variable at depth N0 and position N1
+  public static final byte LOCM = 22; // N0,N1; push mutable variable at depth N0 and position N1
   public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
   public static final byte SETH = 24; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
   public static final byte RETN = 25; // returns top of stack
   public static final byte FLDO = 26; // N; get field objs[N] of ToS
   public static final byte FLDM = 27; // N; set field objs[N] from ToS
-  public static final byte RETD = 28; // return a namespace of exported items
+  public static final byte NSPM = 28; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
+  public static final byte RETD = 29; // return a namespace of exported items
   
   public static final byte SPEC = 30; // special
   public static final byte   EVAL = 0; // ⍎
@@ -116,16 +117,16 @@ public class Comp {
             break;
           }
           case LOCO: {
-            int depth = bc[c++];
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            Value got = sc.getL(depth, n);
+            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Value got = sc.getL(n0, n1);
             s.push(got);
             break;
           }
           case LOCM: {
-            int depth = bc[c++];
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            s.push(new Local(depth, n));
+            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            s.push(new Local(n0, n1));
             break;
           }
           case ARRO: {
@@ -279,7 +280,7 @@ public class Comp {
             Obj m = s.pop();
             String k = objs[n].asString();
             if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
-            s.push(((APLMap) m).getRaw(k));
+            s.push(((APLMap) m).getChk(k));
             break;
           }
           case FLDM: {
@@ -287,7 +288,17 @@ public class Comp {
             Obj m = s.pop();
             String k = objs[n].asString();
             if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
-            s.push(((APLMap) m).get(k));
+            s.push(((APLMap) m).getMut(k));
+            break;
+          }
+          case NSPM: {
+            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            Settable[] vs = new Settable[n0];
+            for (int j = 0; j < n0; j++) {
+              vs[n0-j-1] = (Settable) s.pop();
+            }
+            s.push(new SettableNS(vs, objs[n1]));
             break;
           }
           case SPEC: {
@@ -361,8 +372,9 @@ public class Comp {
           case TR3O: cs = "TR3O"; break;
           case OP2H: cs = "OP2H"; break;
           case VFYM: cs = "VFYM"; break;
-          case LOCO: cs = "LOCO " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
-          case LOCM: cs = "LOCM " + (bc[i++]&0xff) + " " + l7dec(bc, i); i = l7end(bc, i); break;
+          case LOCO: cs = "LOCO " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case LOCM: cs = "LOCM " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case NSPM: cs = "NSPM " + l7dec(bc, i) + " " + safeObj(l7dec(bc, i=l7end(bc, i))); i = l7end(bc, i); break;
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
           case FLDO: cs = "FLDO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
@@ -439,8 +451,8 @@ public class Comp {
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case SPEC: return i+2;
-      case LOCO: case LOCM:
-        return l7end(bc, i+2);
+      case LOCO: case LOCM: case NSPM:
+        return l7end(bc, l7end(bc, i+1));
       default  : return -1;
     }
   }
@@ -1139,7 +1151,7 @@ public class Comp {
     }
     throw new SyntaxError("Cannot export "+tk, tk);
   }
-  public static void compM(Mut m, Token tk, boolean create, boolean header) {
+  public static void  compM(Mut m, Token tk, boolean create, boolean header) {
     assert tk.type != 0;
     if (tk instanceof NameTok) {
       String name = ((NameTok) tk).name;
@@ -1159,10 +1171,33 @@ public class Comp {
       m.add(tk, ARRM); m.addNum(tks.size());
       return;
     }
-    if (tk instanceof ArrayTok) {
+    arraytok: if (tk instanceof ArrayTok) {
       List<Token> tks = ((ArrayTok) tk).tokens;
-      for (Token c : tks) compM(m, c, create, header);
-      m.add(tk, ARRM); m.addNum(tks.size());
+      boolean dict = false;
+      for (Token token : tks) {
+        if (!(token instanceof LineTok)) throw new SyntaxError("Didn't expect "+token+" in array literal");
+        if (((LineTok) token).tokens.size() == 3) { dict = true; break; }
+      }
+      if (dict) {
+        Value[] nsKeys = new Value[tks.size()];
+        for (int i = 0; i < tks.size(); i++) {
+          LineTok c = ((LineTok) tks.get(i));
+          List<Token> parts = c.tokens;
+          if (c.tokens.size() == 3) {
+            if (!(parts.get(1) instanceof ExportTok)) break arraytok; // i.e. give generic "cannot be mutated"
+          } else if (c.tokens.size()!=1) break arraytok;
+          Token name = parts.get(parts.size()-1);
+          if (!(name instanceof NameTok)) throw new SyntaxError("Expected name after ⇐ in assigment", name);
+          nsKeys[i] = new ChrArr(((NameTok) name).name);
+          compM(m, parts.get(0), create, header);
+        }
+        m.add(tk, NSPM);
+        m.addNum(tks.size());
+        m.addNum(m.addObj(new HArr(nsKeys)));
+      } else {
+        for (Token c : tks) compM(m, c, create, header);
+        m.add(tk, ARRM); m.addNum(tks.size());
+      }
       return;
     }
     if (tk instanceof ParenTok) {
@@ -1501,6 +1536,8 @@ public class Comp {
         e = ne;
       }
       sz--;
+      // System.out.println("rm @"+ri+": -- "+ret);
+      // System.out.println(this);
       return ret;
     }
     
@@ -1524,6 +1561,8 @@ public class Comp {
       else e++;
     }
     void add(int i, Res t) {
+      // System.out.println(this);
+      // System.out.println("add "+t+"@"+i+":     "+hashCode());
       if (++sz == es.length) dc();
       
       int ai;
@@ -1555,6 +1594,7 @@ public class Comp {
         s--; if(s<0) s=es.length-1;
       }
       es[ai] = t;
+      // System.out.println(this);
     }
     void dc() {
       int ol = es.length;
@@ -1562,6 +1602,8 @@ public class Comp {
       System.arraycopy(es, 0, nes, ol, e);
       if (e<s) e+= ol;
       es = nes;
+      // System.out.println("DC");
+      // System.out.println(this);
     }
     public String toString() {
       StringBuilder b = new StringBuilder("[");

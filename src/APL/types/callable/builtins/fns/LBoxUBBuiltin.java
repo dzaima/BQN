@@ -43,7 +43,7 @@ public class LBoxUBBuiltin extends FnBuiltin {
       APLMap map = (APLMap) x;
       Value[] vs = w.values();
       for (int i = 0; i < w.ia; i++) {
-        res[i] = map.getRaw(vs[i].asString());
+        res[i] = map.getChk(vs[i].asString());
       }
       return Arr.create(res, w.shape);
     }

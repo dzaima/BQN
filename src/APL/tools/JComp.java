@@ -88,21 +88,21 @@ public class JComp {
   
   
           case LOCO: {
-            int depth = bc[i++];
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n0=0,h=0,b; do { b = bc[i]; n0|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n1=0;h=0;   do { b = bc[i]; n1|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.aload(SC);
-            for (int j = 0; j < depth; j++) fn.getfield(Scope.class, "parent", Scope.class);
+            for (int j = 0; j < n0; j++) fn.getfield(Scope.class, "parent", Scope.class);
             fn.getfield(Scope.class, "vars", Value[].class);
-            fn.iconst(n); fn.aaload();
+            fn.iconst(n1); fn.aaload();
             mstack = Math.max(mstack, cstack+2);
             cstack++;
             break;
           }
           case LOCM: {
-            int depth = bc[i++];
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n0=0,h=0,b; do { b = bc[i]; n0|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n1=0;h=0;   do { b = bc[i]; n1|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
             fn.new_(Local.class); fn.dup();
-            fn.iconst(depth); fn.iconst(n);
+            fn.iconst(n0); fn.iconst(n1);
             fn.invspec(Local.class, "<init>", met(void.class, int.class, int.class));
             mstack = Math.max(mstack, cstack+4);
             cstack++;
@@ -339,7 +339,7 @@ public class JComp {
             l.here(); // }
             fn.cast(APLMap.class);
             fn.ldc(comp.objs[n].asString());
-            fn.invvirt(APLMap.class, "getRaw", met(Value.class, String.class));
+            fn.invvirt(APLMap.class, "getChk", met(Value.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             break;
           }
@@ -353,7 +353,7 @@ public class JComp {
             l.here(); // }
             fn.cast(APLMap.class);
             fn.ldc(comp.objs[n].asString());
-            fn.invvirt(APLMap.class, "get", met(APLMap.MapPointer.class, String.class));
+            fn.invvirt(APLMap.class, "getMut", met(APLMap.MapPointer.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             break;
           }

@@ -14,4 +14,4 @@ err←"err"
   }¨ lns
   (0=≠)◶{𝕩:•←path∾": "∾(⍕lns-○≠msgs)∾" / "∾⍕≠lns}‿{𝕩:•←path∾": Passed all "∾(⍕≠lns)∾" tests"} msgs
   {•←"   "∾𝕩}¨msgs
-}¨ •path⊸∾¨ ⟨"assignment","headers","shape","eq","export"⟩
+}¨ •path⊸∾¨ ⟨"assignment","headers","shape","eq","export","namespaces"⟩

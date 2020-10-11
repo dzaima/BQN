@@ -1,6 +1,5 @@
 package APL.types;
 
-import APL.Main;
 import APL.types.arrs.ChrArr;
 
 import java.util.*;
@@ -24,25 +23,20 @@ public class StrMap extends APLMap {
   // }
   
   
-  @Override
-  public Value getRaw(Value k) {
-    return getRaw(k.asString());
+  public Value get(Value k) {
+    return get(k.asString());
   }
-  @Override
-  public Value getRaw(String k) {
-    Value v = vals.get(k);
-    if (v == null) return Null.NULL;
-    return v;
+  public Value get(String k) {
+    return vals.get(k);
   }
   
-  @Override
   public void set(Value k, Value v) {
-    if (v == Null.NULL) vals.remove(k.asString());
+    if (v == null) vals.remove(k.asString());
     else vals.put(k.asString(), v);
   }
   
   public void setStr(String k, Value v) {
-    if (v == Null.NULL) vals.remove(k);
+    if (v == null) vals.remove(k);
     else vals.put(k, v);
   }
   

@@ -32,6 +32,13 @@ public class Variable extends Settable {
     return true;
   }
   
+  public String name(Scope sc) {
+    return name;
+  }
+  protected boolean hasName() {
+    return true;
+  }
+  
   public String toString() {
     return "var("+name+")";
   }

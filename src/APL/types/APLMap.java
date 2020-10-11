@@ -1,22 +1,27 @@
 package APL.types;
 
 import APL.*;
-import APL.errors.SyntaxError;
+import APL.errors.*;
+import APL.types.arrs.ChrArr;
 import APL.types.mut.Settable;
 
 public abstract class APLMap extends Primitive {
   
-  public MapPointer get(Value k) {
+  public MapPointer getMut(Value k) {
     return new MapPointer(this, k);
   }
-  
-  public abstract Value getRaw(Value k);
-  
-  public Value getRaw(String k) {
-    return getRaw(Main.toAPL(k));
+  public MapPointer getMut(String k) {
+    return getMut(new ChrArr(k));
   }
-  public MapPointer get(String k) {
-    return get(Main.toAPL(k));
+  
+  public abstract Value get(Value k); // returns null if doesn't have
+  public Value get(String k) {
+    return get(new ChrArr(k));
+  }
+  public Value getChk(String k) {
+    Value v = get(k);
+    if (v == null) throw new ValueError("Reading non-defined key "+k, null);
+    return v;
   }
   
   abstract public void set(Value k, Value v);
@@ -33,11 +38,11 @@ public abstract class APLMap extends Primitive {
     }
   
     public Value get(Scope sc) {
-      return map.getRaw(k);
+      return map.get(k);
     }
   
     public void set(Value x, boolean update, Scope sc, Callable blame) {
-      boolean prev = map.getRaw(k) != Null.NULL;
+      boolean prev = map.get(k) != null;
       if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame, k);
       if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame, k);
       map.set(k, x);
