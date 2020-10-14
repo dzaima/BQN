@@ -121,16 +121,17 @@ public abstract class Sys {
     }
   }
   
-  public Value execFile(String path, Value[] args, Scope sc) {
+  public Value execFile(String path, Value args, Scope sc) {
     int sl = path.lastIndexOf("/")+1;
-    Value[] rargs = Arrays.copyOf(args, args.length+2);
-    rargs[args.length  ] = Main.toAPL(path.substring(sl));
-    rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
+    Value[] rargs = new Value[3];
+    rargs[0] = args;
+    rargs[1] = Main.toAPL(path.substring(sl)); // name
+    rargs[2] = Main.toAPL(path.substring(0, sl)); // path
     String code = Main.readFile(path);
     return Comp.compN(Tokenizer.tokenize(code, rargs), sc).exec(sc);
   }
   public Value execFile(String path, Scope sc) {
-    return execFile(path, EmptyArr.NOVALUES, sc);
+    return execFile(path, EmptyArr.SHAPE0S, sc);
   }
   public HashMap<String, Value> imported = new HashMap<>();
   

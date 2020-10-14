@@ -20,9 +20,9 @@ public class NameTok extends Token {
     String name1 = type=='a' || type=='f'? name0 : type=='d'? name0.substring(1,name0.length()-1) : name0.substring(1);
     name = rawName.charAt(0)=='•'? '•'+name1 : name1;
     switch (name) {
-      case "•path": if (args==null) throw new SyntaxError("using •path outside of file", this); val=args[args.length-1]; break;
-      case "•name": if (args==null) throw new SyntaxError("using •name outside of file", this); val=args[args.length-2]; break;
-      case "•args": if (args==null) throw new SyntaxError("using •args outside of file", this); val=Arr.create(Arrays.copyOf(args, args.length-2)); break;
+      case "•args": if (args==null) throw new SyntaxError("using •args outside of file", this); val=args[0]; break;
+      case "•name": if (args==null) throw new SyntaxError("using •name outside of file", this); val=args[1]; break;
+      case "•path": if (args==null) throw new SyntaxError("using •path outside of file", this); val=args[2]; break;
     }
   }
   public static char varType(String name) {

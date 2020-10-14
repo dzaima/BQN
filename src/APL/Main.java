@@ -3,7 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.*;
 import APL.types.*;
-import APL.types.arrs.ChrArr;
+import APL.types.arrs.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -64,8 +64,8 @@ public class Main {
                   case 'f':
                     String name = args[++i]; i++;
                     Value[] gargs = new Value[args.length-i];
-                    for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i + j]);
-                    sys.execFile(name, gargs, sys.gsc);
+                    for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i+j]);
+                    sys.execFile(name, new HArr(gargs), sys.gsc);
                     i = args.length;
                     break;
                   case 'e':

@@ -1,16 +1,16 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.*;
+import APL.tokenizer.Token;
 import APL.tokenizer.types.BlockTok;
-import APL.tools.Body;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.*;
-import APL.types.callable.builtins.*;
-import APL.types.callable.builtins.md2.DepthBuiltin;
-import APL.types.callable.builtins.fns.*;
 import APL.types.callable.blocks.*;
+import APL.types.callable.builtins.*;
+import APL.types.callable.builtins.fns.*;
+import APL.types.callable.builtins.md2.DepthBuiltin;
 
 import java.io.*;
 import java.net.*;
@@ -143,11 +143,10 @@ public final class Scope {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
         case "•time": return new Timer(this);
         case "•ctime": return new CompTimer(this);
-        case "•ex": return new Ex();
+        case "•ex": return new Ex(this);
         case "•import": return new Import(this);
         case "•lns": return new Lns();
         case "•sh": return new Shell();
-        case "•nc": return new NC();
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
@@ -550,8 +549,11 @@ public final class Scope {
     }
   }
   
-  private class Ex extends FnBuiltin {
+  private static class Ex extends FnBuiltin {
     public String repr() { return "•EX"; }
+  
+    private final Scope sc;
+    public Ex(Scope sc) { this.sc = sc; }
     
     public Value call(Value x) {
       return call(EmptyArr.SHAPE0S, x);
@@ -559,11 +561,10 @@ public final class Scope {
     
     public Value call(Value w, Value x) {
       String path = x.asString();
-      if (w.r() > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
-      return Scope.this.sys.execFile(path, w.values(), new Scope(Scope.this));
+      return sc.sys.execFile(path, w, new Scope(sc));
     }
   }
-  private class Import extends FnBuiltin {
+  private static class Import extends FnBuiltin {
     public String repr() { return "•Import"; }
     
     private final Scope sc;
@@ -573,7 +574,7 @@ public final class Scope {
       String s = x.asString();
       Value val = sc.sys.imported.get(s);
       if (val == null) {
-        val = sc.sys.execFile(s, sc);
+        val = sc.sys.execFile(s, new Scope(sc));
         sc.sys.imported.put(s, val);
       }
       return val;
@@ -584,8 +585,7 @@ public final class Scope {
     }
     
     private Value get(Value w, String x) {
-      if (w.r() > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
-      return Scope.this.sys.execFile(x, w.values(), new Scope(Scope.this));
+      return sc.sys.execFile(x, w, new Scope(sc));
     }
   }
   private static class Lns extends FnBuiltin {
