@@ -1,7 +1,7 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.Token;
+import APL.tokenizer.*;
 import APL.tokenizer.types.BlockTok;
 import APL.tools.Body;
 import APL.types.*;
@@ -144,6 +144,7 @@ public final class Scope {
         case "•time": return new Timer(this);
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex();
+        case "•import": return new Import(this);
         case "•lns": return new Lns();
         case "•sh": return new Shell();
         case "•nc": return new NC();
@@ -560,6 +561,31 @@ public final class Scope {
       String path = x.asString();
       if (w.r() > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
       return Scope.this.sys.execFile(path, w.values(), new Scope(Scope.this));
+    }
+  }
+  private class Import extends FnBuiltin {
+    public String repr() { return "•Import"; }
+    
+    private final Scope sc;
+    public Import(Scope sc) { this.sc = sc; }
+    
+    public Value call(Value x) {
+      String s = x.asString();
+      Value val = sc.sys.imported.get(s);
+      if (val == null) {
+        val = sc.sys.execFile(s, sc);
+        sc.sys.imported.put(s, val);
+      }
+      return val;
+    }
+    
+    public Value call(Value w, Value x) {
+      return get(w, x.asString());
+    }
+    
+    private Value get(Value w, String x) {
+      if (w.r() > 1) throw new DomainError("•EX: 𝕨 must be a vector or scalar (had shape "+Main.formatAPL(w.shape)+")");
+      return Scope.this.sys.execFile(x, w.values(), new Scope(Scope.this));
     }
   }
   private static class Lns extends FnBuiltin {

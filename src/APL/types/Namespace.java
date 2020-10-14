@@ -55,11 +55,11 @@ public class Namespace extends APLMap {
   }
   
   public String toString() {
-    StringBuilder res = new StringBuilder("⟨");
+    StringBuilder res = new StringBuilder("{");
     exports.forEach((key, value) -> {
       if (res.length() != 1) res.append(" ⋄ ");
-      res.append(key).append(":").append(sc.vars[value]);
+      res.append(key).append("⇐").append(sc.vars[value]);
     });
-    return res + "⟩";
+    return res + "}";
   }
 }

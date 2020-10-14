@@ -225,7 +225,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Value constant(Callable blame) {
     if (this instanceof Callable) {
       if (this instanceof Md1Derv && ((Md1Derv) this).op instanceof ConstBultin) return ((Md1Derv) this).f;
-      throw new DomainError(blame+": cannot interpret "+humanType(true)+" as a constant", blame, this);
+      throw new DomainError(blame+": Cannot interpret "+humanType(true)+" as a constant", blame, this);
     }
     return this;
   }

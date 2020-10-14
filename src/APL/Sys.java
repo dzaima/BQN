@@ -126,11 +126,13 @@ public abstract class Sys {
     Value[] rargs = Arrays.copyOf(args, args.length+2);
     rargs[args.length  ] = Main.toAPL(path.substring(sl));
     rargs[args.length+1] = Main.toAPL(path.substring(0, sl));
-    return Main.exec(Main.readFile(path), sc, rargs);
+    String code = Main.readFile(path);
+    return Comp.compN(Tokenizer.tokenize(code, rargs), sc).exec(sc);
   }
   public Value execFile(String path, Scope sc) {
     return execFile(path, EmptyArr.NOVALUES, sc);
   }
+  public HashMap<String, Value> imported = new HashMap<>();
   
   public void line(String s) {
     if (s.startsWith(")")) {

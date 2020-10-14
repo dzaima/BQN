@@ -178,23 +178,26 @@ public class Comp {
           }
           case OP1D: {
             Value f = (Value) s.pop();
-            Md1   r = (Md1  ) s.pop(); // +TODO (+↓ & ↓↓) don't cast to modifier for stuff like F←+ ⋄ 1_f
-            Value d = r.derive(f); d.token = r.token;
+            Value r = (Value) s.pop();
+            if (!(r instanceof Md1)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 1-modifier");
+            Value d = ((Md1) r).derive(f); d.token = r.token;
             s.push(d);
             break;
           }
           case OP2D: {
             Value f = (Value) s.pop();
-            Md2   r = (Md2  ) s.pop();
+            Value r = (Value) s.pop();
             Value g = (Value) s.pop();
-            Value d = r.derive(f, g); d.token = r.token;
+            if (!(r instanceof Md2)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 2-modifier");
+            Value d = ((Md2) r).derive(f, g); d.token = r.token;
             s.push(d);
             break;
           }
           case OP2H: {
-            Md2   r = (Md2  ) s.pop();
+            Value r = (Value) s.pop();
             Value g = (Value) s.pop();
-            Md1 d = r.derive(g); d.token = r.token;
+            if (!(r instanceof Md2)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 2-modifier");
+            Md1 d = ((Md2) r).derive(g); d.token = r.token;
             s.push(d);
             break;
           }
@@ -621,6 +624,40 @@ public class Comp {
     sc.removeMap();
     return new SingleComp(mut.finish(lns), new Body(new ArrayList<>(lns.tokens), 'a', false));
   }
+  public static SingleComp compN(TokArr lns, Scope sc) { // non-block
+    Mut mut = new Mut(sc.parent==null);
+    Body b = new Body(new ArrayList<>(lns.tokens), 'a', false);
+    mut.newBody(sc.varNames);
+    int sz = lns.tokens.size();
+    boolean pushed = false;
+    for (int i = 0; i < sz; i++) {
+      if (pushed) mut.add(POPS);
+      LineTok ln = (LineTok) lns.tokens.get(i);
+      if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
+        compE(mut, ln.tokens.get(0));
+      } else {
+        typeof(ln); flags(ln);
+        compO(mut, ln);
+        if (ln.type=='A') mut.add(CHKV);
+        pushed = true;
+      }
+    }
+    b.vars = mut.getVars();
+    b.setExp(mut.getExp());
+    if (b.exp==null) {
+      mut.add(RETN);
+    } else {
+      if (pushed) mut.add(POPS);
+      mut.add(RETD);
+    }
+    
+    sc.varNames = mut.getVars();
+    sc.varAm = sc.varNames.length;
+    if (sc.vars.length < sc.varAm) sc.vars = Arrays.copyOf(sc.vars, sc.varAm);
+    sc.removeMap();
+    
+    return new SingleComp(mut.finish(lns), b);
+  }
   
   public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) { // block
     for (Body b : parts) {
@@ -637,6 +674,7 @@ public class Comp {
         } else {
           typeof(ln); flags(ln);
           compO(mut, ln);
+          if (ln.type=='A') mut.add(CHKV);
           pushed = true;
         }
       }
@@ -646,7 +684,7 @@ public class Comp {
         mut.add(RETN);
       } else {
         if (pushed) mut.add(POPS);
-        mut.add(RETD); // +TODO insert CHKV if return could be a nothing
+        mut.add(RETD);
       }
     }
     return mut.finish(tk);
@@ -912,7 +950,7 @@ public class Comp {
           }
           continue;
         }
-        if (isE(tps, "[←↩]|ff", 4, last)) {
+        if (isE(tps, "[⇐←↩]|ff", 4, last)) {
           if (Main.debug) printlvl("match F F");
           Res h = tps.removeLast();
           Res g = tps.removeLast();
@@ -1076,7 +1114,7 @@ public class Comp {
       } else {
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
         if (last=='a' || last=='A') {
-          for (char tp : tps) if (tp=='←' || tp=='↩') return t.type = 'a'; // {x←𝕨} discards the optionality property
+          for (char tp : tps) if (tp=='←' || tp=='↩' || tp=='⇐') return t.type = 'a'; // {x←𝕨} discards the optionality property
           return t.type = last; // not as arg of modifier
         }
         if (last == 'f') return t.type = 'f';
@@ -1270,7 +1308,7 @@ public class Comp {
           Res tp = tps.get(j);
           if (tp.lastTok() != null) t = tp.lastTok();
           if (j>=1 && norm(tps.get(j).type)=='a' && norm(tps.get(j-1).type)=='a') throw new SyntaxError("failed to parse expression (found two adjacent values, missing `‿`?)", tps.get(j-1).lastTok());
-          if (j>=2 && "↩←".indexOf(tps.get(j-1).type)!=-1 && norm(tps.get(j).type)!=norm(tps.get(j-2).type)) throw new SyntaxError(tps.get(j-1)+": cannot assign with different types", tps.get(j-1).lastTok());
+          if (j>=2 && "↩←⇐".indexOf(tps.get(j-1).type)!=-1 && norm(tps.get(j).type)!=norm(tps.get(j-2).type)) throw new SyntaxError(tps.get(j-1)+": cannot assign with different types", tps.get(j-1).lastTok());
         }
         throw new SyntaxError("failed to parse expression", t);
       }
