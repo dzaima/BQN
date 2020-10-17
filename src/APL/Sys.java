@@ -128,7 +128,7 @@ public abstract class Sys {
   public static Path path(String path, String s) {
     if (path == null) {
       Path p = Paths.get(s);
-      if (!p.isAbsolute()) throw new DomainError("Expected code outside files to only use relative paths");
+      if (!p.isAbsolute()) throw new DomainError("Expected code outside files to only use absolute paths");
       return p.normalize();
     }
     return Paths.get(path).resolve(s).toAbsolutePath().normalize();
