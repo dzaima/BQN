@@ -65,7 +65,7 @@ public class Main {
                     String name = args[++i]; i++;
                     Value[] gargs = new Value[args.length-i];
                     for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i+j]);
-                    sys.execFile(name, new HArr(gargs), sys.gsc);
+                    sys.execFile(Sys.path(sys.cd, name), new HArr(gargs), sys.gsc);
                     i = args.length;
                     break;
                   case 'e':
@@ -209,8 +209,11 @@ public class Main {
     return r.toString();
   }
   public static String readFile(String path) {
+    return readFile(Paths.get(path));
+  }
+  public static String readFile(Path path) {
     try {
-      byte[] encoded = Files.readAllBytes(Paths.get(path));
+      byte[] encoded = Files.readAllBytes(path);
       return new String(encoded, StandardCharsets.UTF_8);
     } catch (IOException e) {
       String msg = "File " + path + " not found";

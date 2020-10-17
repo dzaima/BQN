@@ -3,13 +3,13 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.Tokenizer;
 import APL.tokenizer.types.BasicLines;
-import APL.tools.JComp;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.callable.builtins.fns.EvalBuiltin;
 import APL.types.callable.blocks.*;
+import APL.types.callable.builtins.fns.EvalBuiltin;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 public abstract class Sys {
@@ -17,10 +17,14 @@ public abstract class Sys {
   public Scope csc; // current scope in which things happen
   public boolean oneline;
   public APLError lastError = null;
-  public Value[] defArgs = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S};
+  public Value[] defArgs;
+  public String cd;
   
   public Sys() {
     gsc = csc = new Scope(this);
+    Path p = Paths.get(".").toAbsolutePath().normalize();
+    cd = p.toString();
+    defArgs = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S, new ChrArr(p.toString())};
   }
   
   public void ucmd(String cr) {
@@ -34,7 +38,7 @@ public abstract class Sys {
         break;
       case "EX":
         String full = cr.substring(cr.indexOf(" ")+1);
-        execFile(full, gsc);
+        execFile(path(cd, full), gsc);
         break;
       case "DEBUG":
         Main.debug = !Main.debug; // keeping these as static booleans to improve performance (plus getting Sys where needed might be extremely annoying)
@@ -121,19 +125,33 @@ public abstract class Sys {
     }
   }
   
-  public Value execFile(String path, Value args, Scope sc) {
-    int sl = path.lastIndexOf("/")+1;
-    Value[] rargs = new Value[3];
-    rargs[0] = args;
-    rargs[1] = Main.toAPL(path.substring(sl)); // name
-    rargs[2] = Main.toAPL(path.substring(0, sl)); // path
+  public static Path path(String path, String s) {
+    if (path == null) {
+      Path p = Paths.get(s);
+      if (!p.isAbsolute()) throw new DomainError("Expected code outside files to only use relative paths");
+      return p.normalize();
+    }
+    return Paths.get(path).resolve(s).toAbsolutePath().normalize();
+  }
+  
+  public String[] split(Path p) {
+    p = p.toAbsolutePath().normalize();
+    return new String[]{p.getParent().toString()+"/", p.getFileName().toString()};
+  }
+  public Value execFile(Path path, Value args, Scope sc) {
+    String[] spl = split(path);
+    Value[] rargs = new Value[]{
+      args,               // args
+      Main.toAPL(spl[1]), // name
+      Main.toAPL(spl[0]), // path
+    };
     String code = Main.readFile(path);
     return Comp.compN(Tokenizer.tokenize(code, rargs), sc).exec(sc);
   }
-  public Value execFile(String path, Scope sc) {
+  public Value execFile(Path path, Scope sc) {
     return execFile(path, EmptyArr.SHAPE0S, sc);
   }
-  public HashMap<String, Value> imported = new HashMap<>();
+  public HashMap<Path, Value> imported = new HashMap<>();
   
   public void line(String s) {
     if (s.startsWith(")")) {

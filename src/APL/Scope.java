@@ -15,6 +15,7 @@ import APL.types.callable.builtins.md2.DepthBuiltin;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 
 
@@ -145,6 +146,8 @@ public final class Scope {
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex(this);
         case "•import": return new Import(this);
+        case "•ty": return new TY();
+        case "•dr": return new DR();
         case "•lns": return new Lns();
         case "•sh": return new Shell();
         case "•a": return Main.uAlphabet;
@@ -159,7 +162,6 @@ public final class Scope {
         case "•null": return Null.NULL;
         case "•map": case "•NS": return new MapGen();
         case "•dl": return new Delay();
-        case "•dr": return new DR();
         case "•as": return new AS();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
@@ -549,51 +551,71 @@ public final class Scope {
     }
   }
   
-  private static class Ex extends FnBuiltin {
+  private static class Ex extends RelFn {
     public String repr() { return "•EX"; }
   
     private final Scope sc;
     public Ex(Scope sc) { this.sc = sc; }
     
-    public Value call(Value x) {
-      return call(EmptyArr.SHAPE0S, x);
+    public Value call(String path, Value x) {
+      return call(path, EmptyArr.SHAPE0S, x);
     }
     
-    public Value call(Value w, Value x) {
-      String path = x.asString();
-      return sc.sys.execFile(path, w, new Scope(sc));
+    public Value call(String path, Value w, Value x) {
+      return sc.sys.execFile(Sys.path(path, x.asString()), w, new Scope(sc));
     }
   }
-  private static class Import extends FnBuiltin {
+  private static class Import extends RelFn {
     public String repr() { return "•Import"; }
     
     private final Scope sc;
     public Import(Scope sc) { this.sc = sc; }
     
-    public Value call(Value x) {
-      String s = x.asString();
-      Value val = sc.sys.imported.get(s);
+    public Value call(String path, Value x) {
+      Path p = Sys.path(path, x.asString());
+      Value val = sc.sys.imported.get(p);
       if (val == null) {
-        val = sc.sys.execFile(s, new Scope(sc));
-        sc.sys.imported.put(s, val);
+        val = sc.sys.execFile(p, new Scope(sc));
+        sc.sys.imported.put(p, val);
       }
       return val;
     }
     
-    public Value call(Value w, Value x) {
-      return get(w, x.asString());
+    public Value call(String path, Value w, Value x) {
+      return sc.sys.execFile(Sys.path(path, x.asString()), w, new Scope(sc));
     }
     
-    private Value get(Value w, String x) {
-      return sc.sys.execFile(x, w, new Scope(sc));
-    }
   }
-  private static class Lns extends FnBuiltin {
+  
+  abstract static class RelFn extends Md1 {
+    public Value derive(Value f) {
+      String path = f==Nothing.inst? null : f.asString();
+      return new FnBuiltin() {
+        public String repr() {
+          return RelFn.this.repr();
+        }
+        public Value call(Value w, Value x) {
+          return RelFn.this.call(path, w, x);
+        }
+        public Value call(Value x) {
+          return RelFn.this.call(path, x);
+        }
+      };
+    }
+    
+    public Value call(String path, Value w, Value x) { return call(w, x); }
+    public Value call(String path, Value x) { return call(x); }
+  }
+  public static boolean isRel(String name) {
+    return name.equals("•import") || name.equals("•lns") || name.equals("•ex");
+  }
+  
+  private static class Lns extends RelFn {
     public String repr() { return "•LNS"; }
     
-    public Value call(Value x) {
-      String path = x.asString();
-      String[] a = Main.readFile(path).split("\n");
+    public Value call(String path, Value x) {
+      Path p = Sys.path(path, x.asString());
+      String[] a = Main.readFile(p).split("\n"); // TODO this should read relative to here
       Value[] o = new Value[a.length];
       for (int i = 0; i < a.length; i++) {
         o[i] = Main.toAPL(a[i]);
@@ -607,7 +629,7 @@ public final class Scope {
       return def;
     }
     
-    public Value call(Value w, Value x) {
+    public Value call(String path, Value w, Value x) {
       if (w instanceof APLMap) {
         try {
           URL url = new URL(x.asString());
@@ -655,9 +677,9 @@ public final class Scope {
           throw new DomainError("IOException: "+e.getMessage(), this);
         }
       } else {
-        String p = w.asString();
+        Path p = Sys.path(path, w.asString());
         String s = x.asString();
-        try (PrintWriter pw = new PrintWriter(p)) {
+        try (PrintWriter pw = new PrintWriter(p.toFile())) {
           pw.write(s);
         } catch (FileNotFoundException e) {
           throw new DomainError("File "+p+" not found: "+e.getMessage(), this);
@@ -746,19 +768,6 @@ public final class Scope {
     }
   }
   
-  
-  private class NC extends FnBuiltin {
-    public String repr() { return "•NC"; }
-    
-    public Value call(Value x) {
-      Value o = Scope.this.get(x.asString());
-      if (o == null) return Num.ZERO;
-      if (o instanceof Fun) return Num.NUMS[3];
-      if (o instanceof Md2) return Num.NUMS[4];
-      if (o instanceof Md1) return Num.NUMS[5];
-      return Num.NUMS[2];
-    }
-  }
   
   
   private static class Hasher extends FnBuiltin {
@@ -976,65 +985,100 @@ public final class Scope {
     }
   }
   
+  
+  private static class TY extends FnBuiltin {
+    public String repr() { return "•TY"; }
+    /*
+     0 - array
+     1 - number
+     2 - char
+     3 - function
+     4 - 1-modifier
+     5 - 2-modifier
+     6 - bigint
+     7 - namespace
+     99 - unknown
+     */
+    public Value call(Value x) {
+      if (x instanceof      Arr) return Num.ZERO;
+      if (x instanceof      Num) return Num.NUMS[1];
+      if (x instanceof     Char) return Num.NUMS[2];
+      if (x instanceof      Fun) return Num.NUMS[3];
+      if (x instanceof      Md1) return Num.NUMS[4];
+      if (x instanceof      Md2) return Num.NUMS[5];
+      if (x instanceof BigValue) return Num.NUMS[6];
+      if (x instanceof   APLMap) return Num.NUMS[7];
+      return Num.NUMS[99];
+    }
+  }
   static class DR extends FnBuiltin {
     public String repr() { return "•DR"; }
     
     /*
-       0=100| - unknown
-       1=100| - bit
-       2=100| - char
-       3=100| - 64-bit float
-       4=100| - map
-       5=100| - bigint
-       9=100| - null
+        0=100| - unknown
+       10=100| - bit number
+       11=100| - 64-bit float
+       12=100| - 32-bit int
+       20=100| - char
+       30=100| - function
+       40=100| - 1-modifier
+       50=100| - 2-modifier
+       60=100| - bigint
+       70=100| - namespace object
+       71=100| - native namespace
       
-      0=÷∘100 - primitive
-      1=÷∘100 - array
+      0=⌊𝕩÷100 - primitive
+      1=⌊𝕩÷100 - array
     */
     public Value call(Value x) {
-      if (x instanceof    BitArr) return Num.of(101);
-      if (x instanceof      Char) return Num.of(  2);
-      if (x instanceof    ChrArr) return Num.of(102);
-      if (x instanceof       Num) return Num.of(  3);
-      if (x instanceof DoubleArr) return Num.of(103);
-      if (x instanceof    APLMap) return Num.of(  4);
-      if (x instanceof  BigValue) return Num.of(  5);
-      if (x instanceof      Null) return Num.of(  9);
-      if (x instanceof       Arr) return Num.of(100);
-      if (x instanceof Primitive) return Num.of(  0);
-      return Num.of(200); // idk ¯\_(ツ)_/¯
+      if (x instanceof Arr) {
+        if (x instanceof      HArr) return Num.NUMS[100];
+        if (x instanceof    BitArr) return Num.NUMS[110];
+        if (x instanceof DoubleArr) return Num.NUMS[111];
+        if (x instanceof    IntArr) return Num.NUMS[112];
+        if (x instanceof    ChrArr) return Num.NUMS[120];
+        return Num.NUMS[100];
+      } else {
+        if (x instanceof       Num) return Num.NUMS[11];
+        if (x instanceof      Char) return Num.NUMS[20];
+        if (x instanceof       Fun) return Num.NUMS[30];
+        if (x instanceof       Md1) return Num.NUMS[40];
+        if (x instanceof       Md2) return Num.NUMS[50];
+        if (x instanceof  BigValue) return Num.NUMS[60];
+        if (x instanceof Namespace) return Num.NUMS[70];
+        if (x instanceof    APLMap) return Num.NUMS[71];
+        return Num.NUMS[0];
+      }
     }
     public Value call(Value w, Value x) {
       int[] is = w.asIntVec();
       if (is.length != 2) throw new DomainError("•DR: 𝕨 must have 2 items", this);
       int f = is[0];
       int t = is[1];
-      if ((f==1 || f==3 || f==5)
-       && (t==1 || t==3 || t==5)
-       && (f==3 ^ t==3)) { // convert float to/from bits/long
-        // if (w instanceof Num) return new BigValue(Double.doubleToLongBits(w.asDouble()), false);
-        // return new Num(Double.longBitsToDouble(((BigValue) w).i.longValue()));
-        if (t==3) {
-          if (f==1) return DepthBuiltin.on(new Fun() {
+      if ((f==10 || f==11 || f==60)
+       && (t==10 || t==11 || t==60)
+       && (f==11 ^ t==11)) { // convert float to/from bits/long
+        if (t==11) {
+          if (f==10) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
             }
           }, 1, x, this);
-          if (f==5) return DepthBuiltin.on(new Fun() {
+          if (f==60) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
             }
           }, 0, x, this);
         } else {
-          if (t==1) return DepthBuiltin.on(new Fun() {
+          if (t==10) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
             }
           }, 0, x, this);
-          if (t==5) return DepthBuiltin.on(new Fun() {
+          if (t==60) return DepthBuiltin.on(new Fun() {
             public String repr() { return ""; }
             public Value call(Value x) {
               return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
@@ -1048,5 +1092,4 @@ public final class Scope {
       return call(ReverseBuiltin.on(w), x);
     }
   }
-  
 }
