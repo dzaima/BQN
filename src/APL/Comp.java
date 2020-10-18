@@ -409,23 +409,25 @@ public class Comp {
     }
     if (blocks.length > 0) {
       b.append("blocks:\n");
-      for (int j = 0; j < blocks.length; j++) {
+      for (int j = 0; j < blocks.length; j++) { // TODO move this around so it can also show for the top-level block
         BlockTok blk = blocks[j];
         char tp = blk.type;
-        b.append(' ').append(j).append(": ").append(tp=='f'? "function" : tp=='d'? "2-modifier" : tp=='m'? "1-modifier" : tp=='a'? "immediate block" : String.valueOf(tp)).append(" \n");
+        b.append(' ').append(j).append(": ").append(tp=='a'? "immediate block" : (blk.immediate?"immediate ":"") + (tp=='f'? "function" : tp=='d'? "2-modifier" : tp=='m'? "1-modifier" : tp+"")).append(" \n");
         b.append("  flags: ").append(blk.flags).append('\n');
-        HashSet<Body> mb = new HashSet<>(Arrays.asList(blk.bodiesM));
-        HashSet<Body> db = new HashSet<>(Arrays.asList(blk.bodiesD));
-        for (int k = 0; k < 2; k++) {
-          Body[] cbs = k==0? blk.bodiesM : blk.bodiesD;
-          if (cbs==null) continue;
-          for (Body bd : cbs) { // TODO move this around so it can also show for the top-level function
-            boolean mq = mb.contains(bd);
-            boolean dq = db.contains(bd);
-            if (mq && k==1) continue;
-            b.append("  body ").append(k).append(": ").append(mq&&dq? "ambivalent" : mq? "monadic" : "dyadic").append('\n');
-            b.append("    start: ").append(bd.start).append('\n');
-            if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
+        HashSet<Body> mb = new HashSet<>(); mb.addAll(Arrays.asList(blk.bdM)); mb.addAll(Arrays.asList(blk.bdMxi));
+        HashSet<Body> db = new HashSet<>(); db.addAll(Arrays.asList(blk.bdD)); db.addAll(Arrays.asList(blk.bdDxi)); db.addAll(Arrays.asList(blk.bdDwi));
+        HashSet<Body> done = new HashSet<>();
+        for (int k = 0; k < 3; k++) {
+          for (Body[] bs : new Body[][][]{{blk.bdM, blk.bdD}, {blk.bdMxi, blk.bdDxi}, {blk.bdDwi}}[k]) {
+            for (Body bd : bs) {
+              if (done.contains(bd)) continue;
+              boolean mq = mb.contains(bd);
+              boolean dq = db.contains(bd);
+              b.append("  ").append(mq&&dq? "ambivalent" : mq? "monadic" : "dyadic").append(k==0?"" : k==1? " inverse" : " 𝕨-inverse").append(" body: ").append('\n');
+              b.append("    start: ").append(bd.start).append('\n');
+              if (bd.vars.length!=0) b.append("    vars: ").append(Arrays.toString(bd.vars)).append('\n');
+              done.add(bd);
+            }
           }
         }
         if (blk.comp != this) {

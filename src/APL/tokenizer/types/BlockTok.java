@@ -13,8 +13,11 @@ public class BlockTok extends TokArr {
   public Comp comp;
   public final boolean immediate;
   public final static boolean immBlock = true;
-  public final Body[] bodiesM;
-  public final Body[] bodiesD;
+  public final Body[] bdM;
+  public final Body[] bdD;
+  public final Body[] bdMxi;
+  public final Body[] bdDxi;
+  public final Body[] bdDwi;
   
   public BlockTok(String line, int spos, int epos, ArrayList<Token> tokens) {
     super(line, spos, epos, tokens);
@@ -87,14 +90,16 @@ public class BlockTok extends TokArr {
     Comp.Mut mut = new Comp.Mut(false); // TODO why is this still a thing
     comp = Comp.comp(mut, bodies, this);
     
-    ArrayList<Body> mb = new ArrayList<>();
-    ArrayList<Body> db = new ArrayList<>();
+    ArrayList<Body> db   = new ArrayList<>(); ArrayList<Body> mb   = new ArrayList<>();
+    ArrayList<Body> dbxi = new ArrayList<>(); ArrayList<Body> mbxi = new ArrayList<>();
+    ArrayList<Body> dbwi = new ArrayList<>();
     for (Body c : bodies) {
-      if (c.arity!='m') db.add(c);
-      if (c.arity!='d') mb.add(c);
+      if (c.arity!='m') (c.inverse==0? db : c.inverse==1? dbxi : dbwi).add(c);
+      if (c.arity!='d') (c.inverse==0? mb :               mbxi       ).add(c);
     }
-    bodiesM = mb.toArray(new Body[0]);
-    bodiesD = db.toArray(new Body[0]);
+    bdD   = db  .toArray(new Body[0]); bdM   = mb  .toArray(new Body[0]);
+    bdDxi = dbxi.toArray(new Body[0]); bdMxi = mbxi.toArray(new Body[0]);
+    bdDwi = dbwi.toArray(new Body[0]);
   }
   
   public BlockTok(String line, int spos, int epos, List<Token> tokens, boolean pointless) { // for pointless
@@ -102,7 +107,7 @@ public class BlockTok extends TokArr {
     assert pointless;
     comp = null;
     immediate = false;
-    bodiesM=bodiesD=null;
+    bdM=bdD = bdMxi=bdDxi = bdDwi = null;
   }
   
   
@@ -110,8 +115,9 @@ public class BlockTok extends TokArr {
     super(Token.COMP.raw, 0, 18, new ArrayList<>());
     this.type = type;
     immediate = imm;
-    this.bodiesM = mb;
-    this.bodiesD = db;
+    bdM = mb;
+    bdD = db;
+    bdMxi=bdDxi = bdDwi = new Body[0];
   }
   
   public static boolean funType(Token t, BlockTok dt) { // returns if can be immediate, mutates dt's type
@@ -186,16 +192,17 @@ public class BlockTok extends TokArr {
       case '?': if (Main.vind) return new FunBlock(this, sc);
         /* fallthrough */
       case 'a': {
-        Body b = bodiesD[0];
+        Body b = bdD[0];
         return comp.exec(new Scope(sc, b.vars), b);
       }
       default: throw new IllegalStateException(this.type+"");
     }
   }
   
-  public Value exec(Scope psc, Value w, Value[] vb) {
+  public Value exec(Scope psc, Value w, Value[] vb, int inv) {
     Scope sc = new Scope(psc);
-    for (Body b : w!=null? bodiesD : bodiesM) {
+    boolean dy = w != null;
+    for (Body b : inv==0? (dy? bdD : bdM) : inv==1? (dy? bdDxi : bdMxi) : bdDwi) {
       sc.varNames = b.vars; // no cloning is suuuuurely fiiine
       sc.vars = new Value[b.vars.length]; // TODO decide some nicer way than just creating a new array per header
       System.arraycopy(vb, 0, sc.vars, 0, vb.length);

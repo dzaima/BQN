@@ -262,7 +262,7 @@ public final class Scope {
             for (BlockTok block : blocks) block.comp = c;
             if (!allowImm) {
               BlockTok b0 = blocks[0];
-              BlockTok f = new BlockTok(b0.type=='a'?'f': b0.type, false, b0.bodiesM, b0.bodiesD);
+              BlockTok f = new BlockTok(b0.type=='a'?'f': b0.type, false, b0.bdM, b0.bdD);
               f.comp = c;
               return f.eval(Scope.this);
             }

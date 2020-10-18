@@ -19,8 +19,7 @@ public class Md2Block extends Md2 {
   public Value derive(Value f, Value g) { // ···𝕣𝕗𝕘
     if (!code.immediate) return super.derive(f, g);
     Main.printdbg("Md2Block immediate call", f, g);
-  
-    return code.exec(sc, null, new Value[]{this, f, g});
+    return code.exec(sc, null, new Value[]{this, f, g}, 0);
   }
   
   public Md1 derive(Value g) {
@@ -28,6 +27,22 @@ public class Md2Block extends Md2 {
     Main.printdbg("Md2Block immediate half-derive", g);
     return new Md2BlockHalfDerv(g, this);
   }
+  
+  public Value call(Value f, Value g, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
+    Main.printdbg("Md2Block call", x);
+    return code.exec(sc, null, new Value[]{derv, x, Nothing.inst, this, f, g}, 0);
+  }
+  
+  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
+    Main.printdbg("Md2Block call", w, x);
+    return code.exec(sc, w, new Value[]{derv, x, w, this, f, g}, 0);
+  }
+  
+  public String repr() {
+    return code.toRepr();
+  }
+  
+  
   
   public static class Md2BlockHalfDerv extends Md1 {
     public final Value g;
@@ -56,21 +71,5 @@ public class Md2Block extends Md2 {
     public int hashCode() {
       return 31*g.hashCode() + op.hashCode();
     }
-  }
-  
-  public Value call(Value f, Value g, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
-    Main.printdbg("Md2Block call", x);
-    
-    return code.exec(sc, null, new Value[]{derv, x, Nothing.inst, this, f, g});
-  }
-  
-  public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) { // 𝕊𝕩𝕨𝕣𝕗𝕘
-    Main.printdbg("Md2Block call", w, x);
-    
-    return code.exec(sc, w, new Value[]{derv, x, w, this, f, g});
-  }
-  
-  public String repr() {
-    return code.toRepr();
   }
 }

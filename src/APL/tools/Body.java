@@ -1,7 +1,7 @@
 package APL.tools;
 
 import APL.Comp;
-import APL.errors.SyntaxError;
+import APL.errors.*;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
 
@@ -16,6 +16,7 @@ public class Body {
   // headers
   public final Token wM, fM, gM, xM;
   public final String self;
+  public final int inverse; // 0 - normal; 1 - ⍵; 2 - ⍺
   
   // important
   public int start;
@@ -28,22 +29,8 @@ public class Body {
   public char arity; // one of [mda] - monadic, dyadic, ambivalent
   
   
-  public Body(char type, boolean imm, int off, String[] vars, char arity, int[] exp) { // •COMPiled body
-    this.lns = null;
-    
-    self = null;
-    wM=fM=gM=xM=null;
   
-    start = off;
-    this.vars = vars;
-    setExp(exp);
-    
-    immediate = imm;
-    this.type = type;
-    this.arity = arity;
-  }
-  
-  public Body(int off, String[] vars, int[] exp) {
+  public Body(int off, String[] vars, int[] exp) { // •COMPiled body
     lns = null;
     
     self = null;
@@ -56,6 +43,7 @@ public class Body {
     immediate = false;
     type = '⍰';
     arity = 'a';
+    inverse = 0; // TODO
   }
   
   public Body(ArrayList<Token> lns, char arity, boolean immediate) { // no header
@@ -65,116 +53,92 @@ public class Body {
     this.immediate = immediate;
     self=null;
     wM=fM=gM=xM=null;
+    inverse = 0;
   }
   
   
   
-  public Body(ArrayList<Token> lns, Token hdr, boolean imm) { // given header
+  public Body(ArrayList<Token> lns, Token hdr, boolean canBeImm) { // given header
     this.lns = lns;
-    char type = Comp.typeof(hdr);
+    char hdrty = Comp.typeof(hdr);
     List<Token> ts = ((LineTok)hdr).tokens;
     int sz = ts.size();
-    if (sz == 1) {
-      Token a = ts.get(0);
-      if (type == 'a') { // 1: or v:
-        fM=gM=wM=null;
-        if (a instanceof NameTok) { // v:
-          this.type = 'a'; arity = 'a';
-          immediate = true;
+    if (sz==1 && hdrty=='a') {
+      wM=fM=gM = null;
+      inverse = 0;
+      Token t0 = ts.get(0);
+      if (t0 instanceof NameTok) { // v:
+        this.type = 'a'; arity = 'a';
+        immediate = true;
         
-          xM=null;
-          self = ((NameTok) a).name;
-        } else { // 1:
-          this.type = 'f'; arity = 'm';
-          immediate = false;
+        xM=null;
+        self = ((NameTok) t0).name;
+      } else { // 1:
+        this.type = 'f'; arity = 'm';
+        immediate = false;
         
-          xM = a;
-          self = null;
-        }
-      } else { // F: or _m: or _d_:
-        this.type = type; arity = 'a';
-        // if (!imm) throw new SyntaxError("Using 𝕨/𝕩 in immediate definition", a);
-        immediate = imm;
-      
-        fM=gM=wM=xM=null;
-        if (!(a instanceof NameTok) || name(a, "𝕣")) throw new SyntaxError(a.source()+" not allowed as self in function header", a);
-        self = ((NameTok) a).name;
+        xM = t0;
+        self = null;
       }
     } else {
-      boolean ae = ts.size()>4; Token a = ae? ts.get(ts.size()-5) : null; char at = ae? a.type : 0;
-      boolean be = ts.size()>3; Token b = be? ts.get(ts.size()-4) : null; char bt = be? b.type : 0;
-      boolean ce = ts.size()>2; Token c = ce? ts.get(ts.size()-3) : null; char ct = ce? c.type : 0;
-      Token d =                               ts.get(ts.size()-2)       ; char dt =     d.type;
-      Token e =                               ts.get(ts.size()-1)       ; char et =     e.type;
-      if (type == 'a') { // non-immediate definitions
-        if (dt == 'f' && ts.size()<=3) { // F 𝕩: or 𝕨 F 𝕩:
-          if (ce && ct!='a' && ct!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
-          boolean wo = ce && op(c, "𝕨");
-          this.type = 'f'; arity = wo? 'a' : ce? 'd' : 'm';
-          immediate = false;
+      char ty = 'f';
+      int bi = -123;
+      for (int i = 0; i < sz; i++) {
+        Token c = ts.get(i);
+        if (c.type=='a' || c instanceof OpTok && (((OpTok) c).op.equals("⁼") || ((OpTok) c).op.equals("˜"))) continue;
         
-          wM = op(c, "𝕨")? null : c; // no 𝕨 handled automatically
-          fM=gM=null;
-          xM = op(e, "𝕩")? null : e;
+        if (c.type=='m' || c.type=='d') {
+          ty = c.type;
+          bi = i;
+          break;
+        }
+        if (c.type=='f') bi = i;
+      }
+      if (bi==-123) throw new SyntaxError("Invalid header", hdr);
+      this.type = ty;
+      int is = bi+(ty=='d'? 2 : 1); // inverse start
+      if (is < sz && ts.get(is) instanceof OpTok) {
+        String i1 = ((OpTok) ts.get(is)).op;
+        if (i1.equals("⁼")) inverse = 1;
+        else if (i1.equals("˜")) {
+          if (is+1 >= sz) throw new SyntaxError("Header cannot end with ˜", ts.get(is));
+          Token i2 = ts.get(is+1);
+          if (!(i2 instanceof OpTok) || !((OpTok) i2).op.equals("⁼")) throw new SyntaxError("Expected ⁼ after ˜ in header", ts.get(bi+2));
+          inverse = 2;
+        } else inverse = 0;
+      } else inverse = 0;
+      this.immediate = hdrty!='a' && canBeImm;
+      boolean fx = ty!='f';
+      boolean gx = ty=='d';
+      
+      int wi = bi-1 - (fx?1:0);
+      int fi = bi-1;
+      int gi = bi+1;
+      int xi = bi+1 + (gx?1:0) + inverse;
+  
+      Token st = ts.get(bi);
+  
+      if (gx  &&  (fi>=0) != (gi<sz)) throw new SyntaxError("Header must either specify both operands or none", st);
+      if (!fx || fi>=0) {
+        if (wi>0   ) throw new SyntaxError("Invalid header", ts.get(0   ));
+        if (xi<sz-1) throw new SyntaxError("Invalid header", ts.get(sz-1));
+        if (wi>=0 && xi>=sz) throw new SyntaxError("Header cannot only specify left argument", ts.get(wi));
         
-          if (d instanceof NameTok) self = ((NameTok) d).name;
-          else if (op(d, "𝕊")) self = null;
-          else throw new SyntaxError(d+" not allowed as self in function header", d);
+        if (fx) { Token ft = ts.get(fi); fM = op(ft, "𝔽")||op(ft, "𝕗")? null : ft; } else fM = null;
+        if (gx) { Token gt = ts.get(gi); gM = op(gt, "𝔾")||op(gt, "𝕘")? null : gt; } else gM = null;
+        if (wi>=0) { Token wt = ts.get(wi); wM = op(wt, "𝕨")? null : wt; } else wM = null;
+        if (xi<sz) { Token xt = ts.get(xi); xM = op(xt, "𝕩")? null : xt; } else xM = null;
         
-        } else if (dt == 'm') { // F _m 𝕩 or 𝕨 F _m 𝕩
-          if (be && bt!='a' && bt!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
-          boolean wo = be && op(b, "𝕨");
-          this.type = 'm'; arity = wo? 'a' : be? 'd' : 'm';
-          immediate = false;
-        
-          wM = op(b, "𝕨")? null : b;
-          fM = op(c, "𝔽")||op(c, "𝕗")? null : c;
-          gM = null;
-          xM = op(e, "𝕩")? null : e;
-        
-          if (d instanceof NameTok) self = ((NameTok) d).name;
-          else if (op(d, "𝕣")) self = null;
-          else throw new SyntaxError(d.source()+" not allowed as self in function header", d);
-        
-        } else if (ct == 'd') { // F _d_ G 𝕩: or 𝕨 F _d_ G 𝕩:
-          if (ae && at!='a' && at!='A'  ||  et!='a') throw new SyntaxError("Invalid header", hdr);
-          boolean wo = ae && op(a, "𝕨");
-          this.type = 'd'; arity = wo? 'a' : ae? 'd' : 'm';
-          immediate = false;
-        
-          wM = op(a, "𝕨")? null : a;
-          fM = op(b, "𝔽")||op(b, "𝕗")? null : b;
-          gM = op(d, "𝔾")||op(d, "𝕘")? null : d;
-          xM = op(e, "𝕩")? null : e;
-        
-          if (c instanceof NameTok) self = ((NameTok) c).name;
-          else if (name(c, "𝕣")) self = null;
-          else throw new SyntaxError(c.source()+" not allowed as self in function header", c);
-        
-        } else throw new SyntaxError("Invalid header", hdr);
-      } else if (type == 'f') { // immediate operators
-        immediate = imm;
-        wM=xM=null;
-        if (et == 'm') { // F _m:
-          this.type = 'm'; arity = 'a';
-          fM = op(d, "𝔽")||op(d, "𝕗")? null : d;
-          gM = null;
-        
-          if (e instanceof NameTok) self = ((NameTok) e).name;
-          else if (name(e, "𝕣")) self = null;
-          else throw new SyntaxError(e.source()+" not allowed as self in function header", e);
-        
-        } else if (dt == 'd') { // F _d_ G:
-          this.type = 'd'; arity = 'a';
-          fM = op(c, "𝔽")||op(c, "𝕗")? null : c;
-          gM = op(e, "𝔾")||op(e, "𝕘")? null : e;
-        
-          if (d instanceof NameTok) self = ((NameTok) d).name;
-          else if (name(d, "𝕣")) self = null;
-          else throw new SyntaxError(d.source()+" not allowed as self in function header", d);
-        
-        } else throw new SyntaxError("Invalid header", hdr);
-      } else throw new SyntaxError("Invalid header", hdr);
+      } else { wM = null; fM = null; xM = null; gM = null; }
+      
+      if (st instanceof NameTok) self = ((NameTok) st).name;
+      else if (op(st, ty=='f'? "𝕊" : "𝕣")) self = null;
+      else throw new SyntaxError(st.source()+" not allowed as self in header", st);
+      
+      arity = wM!=null? 'd' : wi<0 && xi<sz? 'm' : inverse==2? 'd' : 'a';
+      if (inverse==2 && arity!='d') throw new SyntaxError("𝕊˜⁼-header must be dyadic", hdr);
+      if (inverse!=0 && immediate) throw new SyntaxError("Inverse headers cannot be immediate", hdr);
+      if (inverse!=0 && fx) throw new NYIError("modifier inverses not yet implemented", hdr);
     }
   }
   
