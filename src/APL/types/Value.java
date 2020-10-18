@@ -1,5 +1,6 @@
 package APL.types;
 
+import APL.Scope;
 import APL.errors.*;
 import APL.tools.Pervasion;
 import APL.types.arrs.*;
@@ -87,7 +88,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   }
   
   public /*open*/ String oneliner() {
-    return toString();
+    return repr();
   }
   
   
@@ -131,45 +132,6 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return get(x);
   }
   
-  
-  public Value squeeze() {
-    if (ia == 0) return this;
-    Value f = get(0);
-    if (f instanceof Num) {
-      double[] ds = new double[ia];
-      for (int i = 0; i < ia; i++) {
-        if (get(i) instanceof Num) ds[i] = get(i).asDouble();
-        else {
-          ds = null;
-          break;
-        }
-      }
-      if (ds != null) return new DoubleArr(ds, shape);
-    }
-    if (f instanceof Char) {
-      StringBuilder s = new StringBuilder();
-      for (int i = 0; i < ia; i++) {
-        if (get(i) instanceof Char) s.append(((Char) get(i)).chr);
-        else {
-          s = null;
-          break;
-        }
-      }
-      if (s != null) return new ChrArr(s.toString(), shape);
-    }
-    boolean anyBetter = false;
-    Value[] optimized = new Value[ia];
-    Value[] values = values();
-    for (int i = 0, valuesLength = values.length; i < valuesLength; i++) {
-      Value v = values[i];
-      Value vo = v.squeeze();
-      if (vo != v) anyBetter = true;
-      optimized[i] = vo;
-    }
-    if (anyBetter) return new HArr(optimized, shape);
-    return this;
-  }
-  
   public boolean equals(Object obj) {
     return obj instanceof Value && eq((Value) obj);
   }
@@ -209,7 +171,6 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   
   
-  public String repr() { return toString(); } // todo this is a stupid function
   public abstract Value call(         Value x);
   public abstract Value call(Value w, Value x);
   public Value identity() { return null; }
@@ -229,6 +190,9 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return this;
   }
+  
+  public abstract String repr();
+  public final String toString() { return repr(); }
   
   public String humanType(boolean article) {
     if (this instanceof Arr     )return article? "an array"     : "array";

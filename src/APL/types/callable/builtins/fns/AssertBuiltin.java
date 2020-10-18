@@ -15,6 +15,6 @@ public class AssertBuiltin extends FnBuiltin {
   
   public Value call(Value w, Value x) {
     if (x.eq(Num.ONE)) return x;
-    throw new APL.errors.AssertionError(w.toString(), this);
+    throw new APL.errors.AssertionError(w.repr(), this);
   }
 }

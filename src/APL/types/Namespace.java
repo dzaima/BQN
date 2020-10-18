@@ -54,7 +54,7 @@ public class Namespace extends APLMap {
     return sc.hashCode();
   }
   
-  public String toString() {
+  public String repr() {
     StringBuilder res = new StringBuilder("{");
     exports.forEach((key, value) -> {
       if (res.length() != 1) res.append(" ⋄ ");

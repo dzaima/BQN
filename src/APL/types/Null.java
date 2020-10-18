@@ -5,7 +5,7 @@ public class Null extends Primitive {
   private Null() { }
   
   
-  public String toString() {
+  public String repr() {
     return "•NULL";
   }
   

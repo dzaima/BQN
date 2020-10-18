@@ -43,13 +43,6 @@ public abstract class Md1 extends Callable {
     return callInvW(f, v, x);
   }
   
-  public String toString() {
-    return repr();
-  }
-  public abstract String repr();
-  
-  
-  
   // functions are equal per-object basis
   public int hashCode() {
     return actualHashCode();

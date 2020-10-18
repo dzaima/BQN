@@ -74,7 +74,7 @@ public class Main {
                     break;
                   case 'p':
                     code = args[++i];
-                    println(exec(code, sys.gsc, null).toString());
+                    println(exec(code, sys.gsc, null).repr());
                     break;
                   case 'i':
                     StringBuilder s = new StringBuilder();
@@ -108,7 +108,7 @@ public class Main {
                     for (int j = 0; j < origS.length(); j++) {
                       char chr = origS.charAt(j);
                       int index = CODEPAGE.indexOf(chr);
-                      if (index == -1) throw new DomainError("error encoding character " + chr + " (" + (+chr) + ")");
+                      if (index == -1) throw new DomainError("error encoding character "+chr+" (dec "+(+chr)+")");
                       res[j] = (byte) index;
                     }
                     String conv = args[++i];
@@ -134,7 +134,7 @@ public class Main {
                     }
                     break;
                   default:
-                    throw new DomainError("Unknown command-line argument -" + c);
+                    throw new DomainError("Unknown command-line argument -"+c);
                 }
               }
             }
@@ -145,7 +145,7 @@ public class Main {
             String qv = p.substring(si+1);
             sys.gsc.set(qk, exec(qv, sys.gsc, null));
           } else {
-            throw new DomainError("Unknown command-line argument " + p);
+            throw new DomainError("Unknown command-line argument "+p);
           }
         }
       } catch (APLError e) {
@@ -268,7 +268,7 @@ public class Main {
   }
   
   
-  public static ChrArr toAPL(String s) {
+  public static ChrArr toAPL(String s) { // TODO remove
     return new ChrArr(s);
   }
   

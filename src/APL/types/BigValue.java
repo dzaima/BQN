@@ -76,7 +76,7 @@ public class BigValue extends Primitive {
   }
   
   
-  public String toString() {
+  public String repr() {
     if (i.signum()==-1) return "¯" + i.negate() + "L";
     return i.toString()+"L";
   }

@@ -13,7 +13,7 @@ public class EachLeft extends Md1Builtin {
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
     Value[] n = new Value[w.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = f.call(w.get(i), x).squeeze();
+      n[i] = f.call(w.get(i), x);
     }
     return Arr.create(n, w.shape);
   }

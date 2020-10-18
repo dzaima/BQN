@@ -17,7 +17,7 @@ public class Nothing extends Primitive {
   public Value ofShape(int[] sh) { throw used(); }
   
   
-  public String toString() { return "·"; }
+  public String repr() { return "·"; }
   
   
   public int hashCode() { return 0; }

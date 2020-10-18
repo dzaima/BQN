@@ -75,7 +75,7 @@ public abstract class Sys {
             Value val = csc.vars[i];
             if (val == null) println("  "+s+": unset");
             else {
-              String vs = val.toString();
+              String vs = val.repr();
               println("  "+s+": "+(vs.length()<100 && !vs.contains("\n")? vs : val.humanType(false)));
             }
           } else println("  ("+i+") unused");
@@ -194,7 +194,7 @@ public abstract class Sys {
   
   
   public void println(Value v) {
-    println(oneline? v.oneliner() : v.toString());
+    println(oneline? v.oneliner() : v.repr());
   }
   
   public abstract String input();

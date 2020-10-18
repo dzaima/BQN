@@ -68,7 +68,4 @@ public class EmptyArr extends Arr {
   public Iterator<Value> iterator() {
     return EIT;
   }
-  public Value squeeze() {
-    return this;
-  }
 }

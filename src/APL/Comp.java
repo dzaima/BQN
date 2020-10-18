@@ -896,7 +896,7 @@ public class Comp {
     }
   
     public String toString() {
-      return "C"+c.toString();
+      return "C"+c.repr();
     }
   }
   

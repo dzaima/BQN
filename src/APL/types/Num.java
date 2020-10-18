@@ -92,7 +92,7 @@ public class Num extends Primitive {
   
   
   
-  public String toString() {
+  public String repr() {
     return format(num);
   }
   public boolean eq(Value n) {
@@ -113,68 +113,6 @@ public class Num extends Primitive {
   
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  public static double gcd(double... nums) {
-    if (nums.length == 0) return 0;
-    double res = nums[0];
-    for (int i = 1; i < nums.length; i++) {
-      double b = nums[i];
-      while (b != 0) {
-        double t = b;
-        b = res % b;
-        res = t;
-      }
-    }
-    return res;
-  }
-  public static double gcd2(double num0, double num1) {
-    double res = num0;
-    double b = num1;
-    while (b != 0) {
-      double t = b;
-      b = res % b;
-      res = t;
-    }
-    return res;
-  }
-  
-  public static double lcm2(double num0, double num1) {
-    double a = num1;
-    double b = num0;
-    if (a==0) return 0;
-    while (b != 0) {
-      double t = b;
-      b = a%b;
-      a = t;
-    }
-    return num0*num1 / a;
-  }
-  public static double lcm(double... nums) {
-    if (nums.length == 0) return 1;
-    double res = nums[0];
-    for (int i = 1; i < nums.length; i++) {
-      double n = nums[i];
-      double a = n;
-      if (a==0) return 0;
-      double b = res;
-      while (b != 0) {
-        double t = b;
-        b = a%b;
-        a = t;
-      }
-      res = n*res / a;
-    }
-    return res;
-  }
   // ============================== NUMBER FORMATTING ============================== \\
   
   public static int pp;

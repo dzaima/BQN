@@ -13,7 +13,7 @@ public class EachRight extends Md1Builtin {
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
     Value[] n = new Value[x.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = f.call(w, x.get(i)).squeeze();
+      n[i] = f.call(w, x.get(i));
     }
     return Arr.create(n, x.shape);
   }

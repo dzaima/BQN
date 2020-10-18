@@ -47,10 +47,6 @@ public class ChrArr extends Arr {
     return new ChrArr(s, sh);
   }
   
-  public Value squeeze() {
-    return this;
-  }
-  
   public int hashCode() {
     if (hash == 0) {
       for (char c : s.toCharArray()) hash = hash*31 + c;

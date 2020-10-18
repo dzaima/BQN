@@ -16,7 +16,7 @@ public class Md2HalfDerv extends Md1 {
   }
   
   public String repr() {
-    String gs = g.toString();
+    String gs = g.repr();
     if (!(g instanceof Arr) && gs.length() != 1) gs = "("+gs+")";
     return op.repr()+gs;
   }

@@ -38,7 +38,7 @@ public abstract class Arr extends Value {
     }
     return null;
   }
-  public String toString() {
+  public String repr() {
     String f = basicFormat(Main.quotestrings);
     if (f != null) return f;
     
@@ -53,14 +53,14 @@ public abstract class Arr extends Value {
       if (str) return oneliner();
     }
     
-    if (r() == 0) return "<"+first().toString().replace("\n", "\n ");
+    if (r() == 0) return "<"+first().repr().replace("\n", "\n ");
     if (ia == 1) {
       Value c = get(0);
       if (c instanceof Primitive || r() > 2) {
         String enc = c instanceof Primitive? "" : "<";
         if (r()==1) return "⟨"+c+"⟩";
         String pre = Main.formatAPL(shape);
-        return pre + "⥊" + enc + c.toString().replace("\n", "\n" + Main.repeat(" ", pre.length()+2));
+        return pre + "⥊" + enc + c.repr().replace("\n", "\n" + Main.repeat(" ", pre.length()+2));
       }
     }
     if (r() == 1) { // simple vectors
@@ -110,7 +110,7 @@ public abstract class Arr extends Value {
       for (Value v : this) {
         if (v == null) v = Main.toAPL("NULLPTR");
         simple&= simple(v);
-        String[] c = v.toString().split("\n");
+        String[] c = v.repr().split("\n");
         int cw = 0;
         for (String ln : c) cw = Math.max(ln.length(), cw);
         itemWidths[x][y] = cw;

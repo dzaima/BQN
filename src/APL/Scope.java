@@ -344,9 +344,11 @@ public final class Scope {
     
     
     public Value call(Value x) {
-      return new Logger(sc, x.toString());
+      return new Logger(sc, x.repr());
     }
     static class Logger extends Primitive {
+      public String repr() { return "•GCLOG["+msg+"]"; }
+      
       private final Scope sc;
       final String msg;
       Logger(Scope sc, String s) {
@@ -357,9 +359,6 @@ public final class Scope {
       @SuppressWarnings("deprecation") // this is this things purpose
       protected void finalize() {
         sc.sys.println(msg+" was GCed");
-      }
-      public String toString() {
-        return "•GCLOG["+msg+"]";
       }
   
       public boolean eq(Value o) { return this == o; }
@@ -531,16 +530,12 @@ public final class Scope {
     }
   }
   
-  private class Optimizer extends FnBuiltin {
+  private static class Optimizer extends FnBuiltin {
     public String repr() { return "•OPT"; }
     
     public Value call(Value x) {
-      String name = x.asString();
-      Value v = Scope.this.get(name);
-      Value optimized = v.squeeze();
-      if (v == optimized) return Num.ZERO;
-      update(name, optimized);
-      return Num.ONE;
+      if (x instanceof Primitive || x instanceof ChrArr || x instanceof BitArr || x instanceof SingleItemArr) return x;
+      return Arr.create(x.values(), shape);
     }
   }
   private static class ClassGetter extends FnBuiltin {
@@ -770,13 +765,6 @@ public final class Scope {
   
   
   
-  private static class Hasher extends FnBuiltin {
-    public String repr() { return "•HASH"; }
-    
-    public Value call(Value x) {
-      return Num.of(x.hashCode());
-    }
-  }
   private static class Stdin extends FnBuiltin {
     public String repr() { return "•STDIN"; }
     public Value call(Value x) {
@@ -795,6 +783,13 @@ public final class Scope {
     }
   }
   
+  private static class Hasher extends FnBuiltin {
+    public String repr() { return "•HASH"; }
+    
+    public Value call(Value x) {
+      return Num.of(x.hashCode());
+    }
+  }
   public static class Profiler extends Fun {
     public String repr() { return "•PFX"; }
     
@@ -986,7 +981,7 @@ public final class Scope {
   }
   
   
-  private static class TY extends FnBuiltin {
+  public static class TY extends FnBuiltin {
     public String repr() { return "•TY"; }
     /*
      0 - array
@@ -1000,6 +995,9 @@ public final class Scope {
      99 - unknown
      */
     public Value call(Value x) {
+      return on(x);
+    }
+    public static Value on(Value x) {
       if (x instanceof      Arr) return Num.ZERO;
       if (x instanceof      Num) return Num.NUMS[1];
       if (x instanceof     Char) return Num.NUMS[2];
@@ -1011,7 +1009,7 @@ public final class Scope {
       return Num.NUMS[99];
     }
   }
-  static class DR extends FnBuiltin {
+  public static class DR extends FnBuiltin {
     public String repr() { return "•DR"; }
     
     /*
@@ -1031,6 +1029,9 @@ public final class Scope {
       1=⌊𝕩÷100 - array
     */
     public Value call(Value x) {
+      return on(x);
+    }
+    public static Value on(Value x) {
       if (x instanceof Arr) {
         if (x instanceof      HArr) return Num.NUMS[100];
         if (x instanceof    BitArr) return Num.NUMS[110];
@@ -1060,26 +1061,26 @@ public final class Scope {
        && (f==11 ^ t==11)) { // convert float to/from bits/long
         if (t==11) {
           if (f==10) return DepthBuiltin.on(new Fun() {
-            public String repr() { return ""; }
+            public String repr() { return "•DR"; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
             }
           }, 1, x, this);
           if (f==60) return DepthBuiltin.on(new Fun() {
-            public String repr() { return ""; }
+            public String repr() { return "•DR"; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
             }
           }, 0, x, this);
         } else {
           if (t==10) return DepthBuiltin.on(new Fun() {
-            public String repr() { return ""; }
+            public String repr() { return "•DR"; }
             public Value call(Value x) {
               return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
             }
           }, 0, x, this);
           if (t==60) return DepthBuiltin.on(new Fun() {
-            public String repr() { return ""; }
+            public String repr() { return "•DR"; }
             public Value call(Value x) {
               return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
             }

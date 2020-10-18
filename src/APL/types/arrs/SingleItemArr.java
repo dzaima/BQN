@@ -73,12 +73,6 @@ public class SingleItemArr extends Arr {
     return res;
   }
   
-  public Value squeeze() {
-    Value ov = item.squeeze();
-    if (ov == item) return this;
-    return new SingleItemArr(item, shape);
-  }
-  
   public String oneliner() {
     String r = Main.formatAPL(shape) + "⥊";
     if (!(item instanceof Primitive)) r+= "<";

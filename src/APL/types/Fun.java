@@ -8,10 +8,10 @@ public abstract class Fun extends Callable {
   protected Fun() { }
   
   public Value call(Value x) {
-    throw new IncorrectArgsError("function "+toString()+" called monadically", this, x);
+    throw new IncorrectArgsError("function "+repr()+" called monadically", this, x);
   }
   public Value call(Value w, Value x) {
-    throw new IncorrectArgsError("function "+toString()+" called dyadically", this, w);
+    throw new IncorrectArgsError("function "+repr()+" called dyadically", this, w);
   }
   
   public Value callInv (         Value x) { throw new DomainError(this+" doesn't support monadic inverting", this, x); }
@@ -135,13 +135,7 @@ public abstract class Fun extends Callable {
   }
   
   
-  public abstract String repr();
-  public String toString() {
-    return repr();
-  }
-  
-  
-  // functions are equal on a per-object basis
+  // functions in general are equal on a per-object basis
   public int hashCode() {
     return actualHashCode();
   }

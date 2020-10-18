@@ -345,8 +345,6 @@ public final class BitArr extends Arr {
     }
   }
   
-  public Value squeeze() { return this; } // we don't need no squeezing!
-  
   public BR read() {
     return new BR();
   }

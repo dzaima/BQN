@@ -65,7 +65,7 @@ public class StrMap extends APLMap {
   }
   
   
-  public String toString() {
+  public String repr() {
     StringBuilder res = new StringBuilder("⟨");
     vals.forEach((key, value) -> {
       if (res.length() != 1) res.append(" ⋄ ");

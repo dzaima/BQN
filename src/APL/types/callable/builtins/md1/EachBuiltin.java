@@ -78,7 +78,7 @@ public class EachBuiltin extends Md1Builtin {
     if (!(f instanceof Fun)) throw new DomainError("can't invert A¨", this);
     Value[] n = new Value[x.ia];
     for (int i = 0; i < n.length; i++) {
-      n[i] = f.callInv(x.get(i)).squeeze();
+      n[i] = f.callInv(x.get(i));
     }
     if (x.r() == 0 && n[0] instanceof Primitive) return n[0];
     return Arr.create(n, x.shape);

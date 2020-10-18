@@ -21,8 +21,4 @@ public abstract class Primitive extends Value {
   public Value safePrototype() {
     return null;
   }
-  
-  public Value squeeze() { // primitives are already pretty squeezed
-    return this;
-  }
 }
