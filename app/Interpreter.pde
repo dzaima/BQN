@@ -4,69 +4,12 @@ abstract static class Interpreter {
   abstract String[] repl(String ln);
   abstract Value exec(String s);
 }
-static class Dyalog extends Interpreter {
-  Value exec(String s) { return null; }
-  String[] repl(String code) {
-    try {
-      Scanner s = send("eval", code);
-      String ln = s.nextLine();
-      return a.parseJSONArray(ln).getStringArray();
-    } catch (Exception e) {
-      e.printStackTrace();
-      return new String[]{"failed to request:", e.toString()};
-    }
-  }
-  Scanner send(String function, String data) throws Exception {
-    URL url = new URL(l + function);
-    URLConnection con = url.openConnection();
-    HttpURLConnection http = (HttpURLConnection)con;
-    http.setRequestMethod("POST");
-    http.setDoOutput(true);
-    StringBuilder b = new StringBuilder("\"");
 
-    for (char c : data.toCharArray()) {
-      if (c >= 128) b.append("\\u").append(String.format("%04X", (int) c));
-      else if (c == '"') b.append("\\\"");
-      else if (c == '\\') b.append("\\\\");
-      else b.append(c);
-    }
-    b.append("\"");
-    byte[] bytes = b.toString().getBytes(StandardCharsets.UTF_8);
-    http.setFixedLengthStreamingMode(bytes.length);
-    http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-    http.connect();
-    //try (
-    OutputStream os = http.getOutputStream();
-    //) {
-    os.write(bytes);
-    //}
-    return new Scanner(http.getInputStream());
-  }
-  String l = "http://localhost:8080/";
-  void setLink(String s) {
-    l = s;
-  }
-  String[] special(String s) {
-    setLink("http://"+s+"/");
-    return new String[0];
-  }
-}
-static Sys glSys = new Sys() {
-  void off(int i) {
-    System.exit(i);
-  }
-  String input() {
-    return null;
-  }
-  void println(String s) {
-    System.out.println(s);
-  }
-};
-static Scope dzaimaSC = glSys.gsc;
-static Fun layoutUpdate, actionCalled;
-static {
-  Main.colorful = false;
-}
+
+
+
+
+
 
 
 static class AppMap extends SimpleMap {
@@ -86,7 +29,7 @@ static class AppMap extends SimpleMap {
         kb.redraw();
       return;
       case "action": actionCalled = (Fun) v; return;
-      default: throw new DomainError("setting non-existing key "+s+" for app");
+      default: throw new DomainError("Setting non-existing key "+s+" for app");
     }
   }
   Value getv(String k) {
@@ -137,26 +80,48 @@ static class AppMap extends SimpleMap {
         return new HArr(vs);
       }
       case "t": return all.ctab;
-      default: return Null.NULL;
+      default: return null;
     }
   }
 }
 
+DzaimaBQN dbqn = new DzaimaBQN();
+
+static Sys glSys = new Sys() {
+  void off(int i) {
+    System.exit(i);
+  }
+  String input() {
+    return "";
+  }
+  void println(String s) {
+    System.out.println(s);
+    mainREPL.hist.appendLns(s);
+    mainREPL.hist.end();
+  }
+};
+static Scope dzaimaSC = glSys.gsc;
+static Fun layoutUpdate, actionCalled;
+static {
+  Main.colorful = false;
+  Comp.compileStart = -1;
+}
 
 static class DzaimaBQN extends Interpreter {
-  final Sys sys = new Sys() {
-    void off(int code) {
-      System.exit(code);
-    }
-    String input() {
-      return "";
-    }
-    void println(String s) {
-      System.out.println(s);
-      mainREPL.hist.appendLns(s);
-      mainREPL.hist.end();
-    }
-  };
+  //final Sys sys = new Sys() {
+  //  void off(int code) {
+  //    System.exit(code);
+  //  }
+  //  String input() {
+  //    return "";
+  //  }
+  //  void println(String s) {
+  //    System.out.println(s);
+  //    mainREPL.hist.appendLns(s);
+  //    mainREPL.hist.end();
+  //  }
+  //};
+  final Sys sys = glSys;
   
   DzaimaBQN() {
     sys.gsc.set("app", new AppMap(this));

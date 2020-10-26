@@ -13,6 +13,7 @@ abstract static class Drawable {
   }
   
   void mouseWheel(int dir) { }
+  void mouseEvent(MouseEvent e, boolean pressed) { }
   boolean mouseInMe() {
     return a.mouseX > x && a.mouseY > y && a.mouseX < x+w && a.mouseY < y+h;
   }

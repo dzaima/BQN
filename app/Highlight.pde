@@ -157,7 +157,7 @@ static class SyntaxHighlight {
     }
     if (t instanceof TokArr) {
       int ndlvl = t instanceof BlockTok? dlvl+1 : dlvl;
-      for (Token c : ((TokArr<?>)t).tokens) {
+      for (Token c : ((TokArr)t).tokens) {
         walk(c, ndlvl);
       }
     }

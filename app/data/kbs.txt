@@ -24,13 +24,14 @@ MOD X spec=close
 MOD M spec=match
 MOD K spec=vkb
 MOD F spec=changecase
+MOD S spec=save
 
 MOD N spec=none goto=NUM
 
 LAYOUT P 6×5 CODE portrait
 PART CODE P
 C      U      D      col    L      R
-E   ⌫A|X   č |KxyzV |300033|    C |⍎   ⌦ |
+E   ⌫A|X   čS|KxyzV |300033|    C |⍎   ⌦ |
 «»↕⋄←⏎|  ↑≍ ▲|⌽⍉↓∾↩▼|332223| ↶⊣˜⥊ |M↷⊢⌜# |
 ⓐ789-+|:˘¨⁼¯ |;⎉⚇⍟¬∨|222222|{⊐⊒⊔ ⌈|}⊏⊑◶⍒ |
 ⓑ456÷×| ´○`|⋆|‿⊸∘⟜√∧|222222|(𝕨𝔽𝕣/⌊|)𝕩𝔾𝕊⍋ |
@@ -48,7 +49,7 @@ E   ⌫A|X   č |KxyzV |300033|    C |⍎   ⌦ |
 
 PART ABC3 P
 C      U      D      col    L      R
-E   ⌫R|      |K     |300033|    C |⍎     |
+E   ⌫R|    čS|K   V |300033|    C |⍎   ⌦ |
 «»F⋄←⏎|12345▲|67890▼|332223| ↶    |M↷    |
 ⓐaei"•|: 𝕗𝕘  |; 𝔽𝔾  |222222|{bdg  |}cfh  |
 ⓑlnr'_|, ∞𝕣¯ |   π  |222222|(jmp  |)koq  |

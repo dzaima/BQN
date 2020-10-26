@@ -11,7 +11,7 @@ static class Nfield extends Drawable implements TextReciever {
   boolean multiline = true; // should multiple lines be allowed
   boolean lineNumbering = false; // should line numbers be written on the left
   
-  int tt; // caret flicker timer
+  int tt = 30; // caret flicker timer
   Nfield() {
     sx = sy = ex = ey = 0;
     lns = new ArrayList();
@@ -37,10 +37,13 @@ static class Nfield extends Drawable implements TextReciever {
   int lnTapTime = -100; // last millis() when a line was tapped
   int prevDigam = 0;
   void redraw() {
-    // TODO be efficient
     if (hl!=null) hl.g = d;
+    moved = true;
+    tt = 30;
     draw();
   }
+  
+  int pxoff, pyoff;
   void draw() {
     //println(allText(), sx,sy,ex,ey,lns.size(),len(0));
     if (a.mousePressed && !pmousePressed && smouseIn() && a.mouseButton!=CENTER) textInput = this;
@@ -64,7 +67,9 @@ static class Nfield extends Drawable implements TextReciever {
     }
     
     if (textChanged) moved = true;
-    if (moved || this!=textInput) tt = 70;
+    if (moved || this!=textInput) tt = 30;
+    boolean shouldDraw = moved;
+    
     // keep caret on-screen
     if (moved) {
       int py = (int)(chrH*ey + yoff+y  + chrH*.1); // cannot use posy because that uses dyoff 
@@ -123,88 +128,95 @@ static class Nfield extends Drawable implements TextReciever {
       lnTapMode = 0;
     }
     
+    
     if (textChanged) {
       modified();
       hl = new SyntaxHighlight(allText(), th, d);
       textChanged = false;
     }
     
-    // line number drawing
-    if (lineNumbering) {
-      beginClip(d, x, y, lnOff, h);
-      d.background(#101010);
+    tt++; if (tt >= 60) tt = 0;
+    boolean dttc = tt>=28 && tt<=30  ||  tt>=58  ||  tt==0;
+    int ixo = (int)xoff;
+    int iyo = (int)dyoff;
+    if (pxoff!=ixo || pyoff!=iyo || shouldDraw || dttc) {
+      pxoff = ixo;
+      pyoff = iyo;
       
-      d.textAlign(RIGHT, TOP);
-      d.textSize(chrH);
-      d.fill(th.lnn);
-      
-      int cx = (int)(lnOff+x-chrW);
-      int cy = (int)(y+dyoff);
-      for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
-        textS(d, Integer.toString(ln+1), cx, cy + ln*chrH);
+      if (lineNumbering) { // line number drawing
+        beginClip(d, x, y, lnOff, h);
+        d.background(#101010);
+        
+        d.textAlign(RIGHT, TOP);
+        d.textSize(chrH);
+        d.fill(th.lnn);
+        
+        int cx = (int)(lnOff+x-chrW);
+        int cy = (int)(y+dyoff);
+        for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
+          textS(d, Integer.toString(ln+1), cx, cy + ln*chrH);
+        }
+        endClip(d);
       }
-      endClip(d);
-    }
-    
-    // main content drawing
-    beginClip(d, x+lnOff, y, w, h);
-    // selection
-    //d.fill(#101010);
-    //d.noStroke();
-    //d.rectMode(CORNER);
-    //d.rect(x, y, w, h);
-    d.background(#101010);
-    d.textAlign(LEFT, TOP);
-    d.rectMode(CORNERS);
-    if (sel()) { // draw selection
-      d.fill(0x20ffffff);
-      d.noStroke();
-      boolean swp = swapped();
-      if (swp) swap();
-      PVector ps = pos(sy, sx);
-      PVector pe = pos(ey, ex);
-      if (sy == ey) {
-        d.rect(ps.x, ps.y, pe.x, pe.y+chrH);
+      
+      // main content drawing
+      beginClip(d, x+lnOff, y, w, h);
+      // selection
+      d.background(#101010);
+      d.textAlign(LEFT, TOP);
+      d.rectMode(CORNERS);
+      if (sel()) { // draw selection
+        d.fill(0x20ffffff);
+        d.noStroke();
+        boolean swp = swapped();
+        if (swp) swap();
+        PVector ps = pos(sy, sx);
+        PVector pe = pos(ey, ex);
+        if (sy == ey) {
+          d.rect(ps.x, ps.y, pe.x, pe.y+chrH);
+        } else {
+          float p0 = posx(0);
+          d.rect(ps.x, ps.y, posx(len(sy)+1), ps.y+chrH);
+          d.rect(p0  , pe.y, pe.x         , pe.y+chrH);
+          for (int i = sy+1; i <= ey-1; i++) d.rect(p0, posy(i), posx(len(i)+1), posy(i)+chrH);
+          d.textAlign(LEFT, TOP);
+          d.textSize(chrH);
+          d.fill(#101010);
+          int cx = (int)(x+ xoff);
+          int cy = (int)(y+dyoff);
+          for (int i = sy; i < ey; i++) textS(d, "⏎", cx + len(i)*chrW, cy + i*chrH);
+        }
+        if (swp) swap();
+      }
+      // text
+      if (hl!=null && highlight()) {
+        hl.draw(x+xoff, y+dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex));
       } else {
-        float p0 = posx(0);
-        d.rect(ps.x, ps.y, posx(len(sy)+1), ps.y+chrH);
-        d.rect(p0  , pe.y, pe.x         , pe.y+chrH);
-        for (int i = sy+1; i <= ey-1; i++) d.rect(p0, posy(i), posx(len(i)+1), posy(i)+chrH);
         d.textAlign(LEFT, TOP);
         d.textSize(chrH);
-        d.fill(#101010);
+        d.fill(th.def);
         int cx = (int)(x+ xoff);
         int cy = (int)(y+dyoff);
-        for (int i = sy; i < ey; i++) textS(d, "⏎", cx + len(i)*chrW, cy + i*chrH);
+        for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
+          String s = lns.get(ln).toString();
+          textS(d, s, cx, cy + ln*chrH);
+        }
       }
-      if (swp) swap();
-    }
-    // text
-    if (hl!=null && highlight()) {
-      hl.draw(x+xoff, y+dyoff, y, y+h, chrH, hl.lnstarts[ey]+lns.get(ey).UTF16before(ex));
-    } else {
-      d.textAlign(LEFT, TOP);
-      d.textSize(chrH);
-      d.fill(th.def);
-      int cx = (int)(x+ xoff);
-      int cy = (int)(y+dyoff);
-      for (int ln = max(0, floor((y-cy)/chrH)); ln < min(lns.size(), floor((y+h-cy)/chrH+1)); ln++) {
-        String s = lns.get(ln).toString();
-        textS(d, s, cx, cy + ln*chrH);
+      // caret
+      //if ((tt>28 || tt<2) && editable) { // draw caret
+      //  int dtt = tt>30? 3 : Math.abs(15-tt)-14;
+      if (editable) { // TODO selecting doesn't call move
+        //println(tt,dtt);
+        d.strokeWeight(1);
+        int dtt = Math.max(0, Math.min(3, (33-Math.abs(87-2*tt))/2)); // {3⌊16.5-|43.5-𝕩} {0⌈3⌊2÷˜33-|87-2×𝕩}
+        d.stroke(th.caret & (0xffffff | (dtt*85)<<24));
+        PVector p = pos(ey, ex);
+        d.line(p.x, p.y, p.x, p.y+chrH);
       }
-    }
-    // caret
-    tt--; if (tt < 0) tt = 60;
-    if ((tt>28 || tt<2) && editable) { // draw caret
-      int dtt = tt>30? 3 : Math.abs(15-tt)-14;
-      d.strokeWeight(1);
-      d.stroke(th.caret & (0x3fffffff | dtt<<30));
-      PVector p = pos(ey, ex);
-      d.line(p.x, p.y, p.x, p.y+chrH);
-    }
     
     endClip(d);
     
+    }
     
   }
   boolean highlight() {
@@ -283,7 +295,7 @@ static class Nfield extends Drawable implements TextReciever {
     //if (c==32) return true;
     //for (char k : stop) if (k==c) return true;
     //return false;
-    return c>='a'&&c<='z' || c>='A'&&c<='Z';
+    return c>='a'&&c<='z' || c>='A'&&c<='Z' || c>='0'&&c<='9';
   }
   void ldelete() { if (!editable) return; textChanged = true;
     if (!sel()) movel(true);
@@ -387,6 +399,8 @@ static class Nfield extends Drawable implements TextReciever {
       allE();
     } else if (s.equals("eval")) {
       eval();
+    } else if (s.equals("save")) {
+      saved();
     } else if (s.equals("left")) {
       movel(cshift());
     } else if (s.equals("right")) {
@@ -443,7 +457,7 @@ static class Nfield extends Drawable implements TextReciever {
     } else if (s.equals("copy")) {
       if (!sel()) { sx = 0; ex = len(sy); }
       a.copy(getsel());
-    } else if (s.equals("sall")) {
+    } else if (s.equals("sall")) { moved = true;
       sx=sy=0;
       ey=lns.size()-1; ex = len(ey);
     } else if ((s.equals("pgdn") || s.equals("pgup")) && multiline) { moved = true;
@@ -493,10 +507,14 @@ static class Nfield extends Drawable implements TextReciever {
     println("unknown special "+s);
   }
   void eval() { }
+  void saved() { }
+  
   void lnTapped(int y) { }
-  void dragged() { }
   void lnDTapped(int y) { }
+  
+  void dragged() { }
   void modified() { }
+  
   void pasted(String s) {
     append(s);
   }
@@ -568,4 +586,26 @@ static String tostr(int[] ints) {
   StringBuilder b = new StringBuilder();
   for (int c : ints) b.appendCodePoint(c);
   return b.toString();
+}
+
+
+public static class SaveNfield extends Nfield {
+  String file;
+  SaveNfield(String p) {
+    file = p==null? null : a.dataPath(p);
+    if (file!=null) append(readFile(file));
+  }
+  void saved() {
+    if (file==null) {
+      a.selectOutput("Save to file", "savecb", new File(a.dataPath(".")), this);
+    } else {
+      println("saving to "+file);
+      a.saveBytes(file, allText().getBytes(StandardCharsets.UTF_8));
+    }
+  }
+  public void savecb(File f) {
+    if (f==null) return;
+    file = f.toString();
+    saved();
+  }
 }

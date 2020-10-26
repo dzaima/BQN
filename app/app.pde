@@ -1,3 +1,4 @@
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.text.DecimalFormat;
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -8,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
-
 
 static PGraphics d;
 static app a;
@@ -45,6 +45,10 @@ void setup() {
   }
   redrawAll();
 }
+
+void mousePressed (MouseEvent e) { all.mouseEvent(e, true ); }
+void mouseReleased(MouseEvent e) { all.mouseEvent(e, false); }
+
 static boolean redraw;
 void newKb() {
   if (MOBILE) {
@@ -62,7 +66,7 @@ void draw() {
     mouseStart = millis();
   }
   psDraw();
-  
+  if (!focused) shift=ctrl=false;
   all.draw();
   
   //String s = os.get();
@@ -93,12 +97,12 @@ void keyPressed(KeyEvent e) {
   //println("P", +key, keyCode, shift, ctrl, e.getNative());
   //println("P", e.getNative());
   println(+key,keyCode);
-  if (key== 5 && keyCode==69) {
+  if (key==5 && keyCode==69) {
     println("clearing..");
     background(0);
     return;
   }
-  if (key==18 && keyCode==82) {
+  if (key==4 && keyCode==68) {
     println("redrawing..");
     redrawAll();
     return;
@@ -120,7 +124,8 @@ void keyPressed(KeyEvent e) {
       else if (key ==  22 && keyCode ==  86) textInput.special("paste");
       else if (key ==  24 && keyCode ==  88) textInput.special("cut");
       else if (key == 127 && keyCode == 127) textInput.rdelete();
-      else if (key ==  19 && keyCode ==  83) textInput.special("eval");
+      else if (key ==  19 && keyCode ==  83) textInput.special("save");
+      else if (key ==  18 && keyCode ==  82) textInput.special("eval");
       else if (key ==   1 && keyCode ==  65) textInput.special("sall");
       else if (key ==  23 && keyCode ==  87) textInput.special("close");
       else if (key == 10) textInput.special("newline");
@@ -155,4 +160,18 @@ static boolean cshift() {
 
 static void redrawAll() {
   all.upd(0, 0, a.width, a.height);
+}
+
+
+
+static String toPrintable(Value v) { // TODO make part of BQN
+  if (v.r()<=1) return v.asString();
+  if (v.r()==2) {
+    for (Value c : v) if (!(c instanceof Char)) throw new DomainError("Expected all-char array");
+    return v.toString();
+  }
+  throw new DomainError("stringifying "+v);
+}
+static String readFile(String name) {
+  return new String(a.loadBytes(name), StandardCharsets.UTF_8);
 }

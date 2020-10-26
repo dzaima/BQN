@@ -24,6 +24,9 @@ static class TabSelect extends Drawable {
   void mouseWheel(int am) {
     ctab.vw.mouseWheel(am);
   }
+  void mouseEvent(MouseEvent e, boolean pressed) {
+    ctab.vw.mouseEvent(e, pressed);
+  }
 }
 static class TopBar extends Drawable {
   ArrayList<Tab> tabs = new ArrayList();
@@ -86,21 +89,24 @@ static class TopBar extends Drawable {
   void toNew(Tab t) {
     tabs.add(t);
     to(t);
+    t.opened();
   }
   void add(Tab t) {
     tabs.add(t);
     redraw();
   }
   
-  void close() {
+  void closeCurr() {
     close(ts.ctab);
   }
   void close(Tab t) {
     if (tabs.size() == 1) return;
     int i = tabs.indexOf(t);
+    if (i==-1) { println(t.name()+" was already closed"); return; }
     tabs.remove(i);
     if (t==ts.ctab) to(tabs.get(Math.max(0, i-1)));
     else ts.redraw();
+    t.close();
   }
 }
 

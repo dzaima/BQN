@@ -6,7 +6,9 @@ class FakeTouch { // for interoperability with android mode
   FakeTouch(int x, int y) { this.x = x; this.y = y; }
 }
 FakeTouch[] touches = new FakeTouch[0];
-
+static int[] touchIs(PApplet a) {
+  return a.mousePressed? new int[]{a.mouseX, a.mouseY} : EmptyArr.NOINTS;
+}
 void settings() {
   //size(540, 830);
   //size(1200, 800, JAVA2D);
@@ -68,6 +70,58 @@ static void endClip(PGraphics g) {
   g.noClip();
 }
 
+
+static class PWindow extends PApplet {
+  int tw, th;
+  P5Impl tu;
+  WP5Disp td;
+  void create(int[] sz, P5Impl u, WP5Disp d) {
+    if (sz.length==2) {
+      tw = sz[0];
+      th = sz[1];
+    } else tw=-1;
+    tu = u;
+    td = d;
+    PApplet.runSketch(new String[]{getClass().getName()}, this);
+  }
+  void settings() {
+    if (tw==-1) fullScreen();
+    else size(tw, th);
+  }
+  void setup() {
+    tu.setup(g);
+    surface.setResizable(true); // TODO configurable
+  }
+  boolean actuallyExited;
+  int pw=-1,ph=-2;
+  void draw() {
+    if(pw!=width || ph!=height) {
+      tu.resized(g, width, height);
+      pw = width;
+      ph = height;
+    }
+    if (finished) return;
+    tu.draw(g);
+  }
+  
+  void exit() { // weird roundabout setup of exiting so that there's no case of exiting twice breaking things
+    finished = true;
+    td.stop();
+  }
+  void close() {
+    finished = true;
+    exitCalled = true;
+  }
+  void exitActual() {
+    tu.closed();
+    if(surface instanceof processing.awt.PSurfaceAWT) {
+      ((javax.swing.JFrame)((processing.awt.PSurfaceAWT.SmoothCanvas)((processing.awt.PSurfaceAWT)surface).getNative()).getFrame()).dispose(); // when this finally breaks, feel free to delete :)
+    }
+  }
+  void mousePressed (MouseEvent e) { tu.mouseEvent(e, true ); }
+  void mouseReleased(MouseEvent e) { tu.mouseEvent(e, false); }
+}
+
 /*/ // ANDROID
 
 import android.content.ClipboardManager;
@@ -91,6 +145,14 @@ void psDraw() {
     clipRec.pasted(gottenClip);
     gottenClip = null;
   }
+}
+static int[] touchIs(PApplet a) {
+  int[] is = new int[a.touches.length*2];
+  for (int i = 0; i < a.touches.length; i++) {
+    is[i*2  ] = (int)a.touches[i].x;
+    is[i*2+1] = (int)a.touches[i].y;
+  }
+  return is;
 }
 
 void prepareClip() {
@@ -133,6 +195,7 @@ void handleCoded(int keyCode) {
     if (keyCode == android.view.KeyEvent.KEYCODE_Y) textInput.special("redo");
     if (keyCode == android.view.KeyEvent.KEYCODE_X) textInput.special("cut");
     if (keyCode == android.view.KeyEvent.KEYCODE_A) textInput.special("sall");
+    if (keyCode == android.view.KeyEvent.KEYCODE_S) textInput.special("save");
     if (keyCode == android.view.KeyEvent.KEYCODE_ENTER) textInput.special("eval");
     
   }
@@ -162,6 +225,11 @@ static void beginClip(PGraphics g, float x, float y, float x2, float y2) {
 static void endClip(PGraphics g) {
   if (g instanceof PGraphicsAndroid2D) ((PGraphicsAndroid2D)g).canvas.restore();
   else g.noClip();
+}
+
+static class PWindow extends PApplet {
+  void create(int[] sz, P5Impl u, WP5Disp d) { throw new Error("stub"); }
+  void close() { throw new Error("stub"); }
 }
 
 //*/

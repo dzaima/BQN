@@ -4,6 +4,9 @@ abstract static class Tab extends SimpleMap {
   
   String toString() { return "tab["+name()+"]"; }
   
+  void opened() { }
+  void close() { }
+  
   Drawable vw;
   
   Value getv(String k) {
@@ -16,16 +19,15 @@ abstract static class Tab extends SimpleMap {
           return Num.ONE;
         }
       };
-      default: return Null.NULL;
+      default: return null;
     }
   }
   void setv(String k, Value v) {
     String s = k.toLowerCase();
     switch (k) {
-      default: throw new DomainError("setting non-existing key "+s+" for tab");
+      default: throw new DomainError("Setting non-existing key "+s+" for tab");
     }
   }
-  
 }
 
 
@@ -144,12 +146,13 @@ static class REPL extends Tab {
             isz = ceil(Float.parseFloat(arg)/.8);
             redrawAll();
           } else if (nm.equals("i")) {
-            if (argl.equals("dyalog")) it = new Dyalog();
             if (argl.equals("dzaima")) it = new DzaimaBQN();
           } else if (nm.equals("clear")) {
             hist.clear();
           } else if (nm.equals("g")) {
             topbar.toNew(new Grapher(it, arg));
+          } else if (nm.equals("d")) {
+            topbar.toNew(new P5Tab(arg.length()==0? null : arg));
           } else if (nm.equals("tsz")) {
             all.tsz = int(arg);
             redrawAll();
@@ -241,20 +244,30 @@ static class REPL extends Tab {
 
 abstract static class Editor extends Tab {
   String name;
+  void eval() { }
   Nfield ta = new Nfield() {
-    void eval() {
+    void saved() {
       save(ta.allText());
+    }
+    void eval() {
+      Editor.this.eval();
     }
     void extraSpecial(String s) {
       if (s.equals("close")) {
-        eval();
-        topbar.close();
+        save(ta.allText());
+        topbar.closeCurr();
       } else println("unknown special " + s);
     }
     void redraw() { super.redraw();
       textInput = ta; // TODO think about whether there's a better place to place this
     }
+    void draw() { super.draw();
+      Editor.this.draw();
+    }
   };
+  
+  void draw() { }
+  
   
   Editor(String name, String val) {
     this.name = name;
@@ -299,7 +312,7 @@ static class Grapher extends Tab {
     void extraSpecial(String s) {
       if (s.equals("close")) {
         eval();
-        topbar.close();
+        topbar.closeCurr();
       } else if (s.equals("newline")) {
         eval();
       } else println("unknown special " + s);
