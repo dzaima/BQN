@@ -1,15 +1,13 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.RankError;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.Value;
 import APL.types.callable.builtins.FnBuiltin;
 import APL.types.callable.builtins.md1.CellBuiltin;
 
 public class ShBBuiltin extends FnBuiltin {
-  public String repr() {
-    return "»";
-  }
+  public String ln(FmtInfo f) { return "»"; }
   
   public Value call(Value w, Value x) {
     if (x.scalar()) throw new RankError("»: 𝕩 cannot be scalar", this, x);

@@ -1,14 +1,13 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class NotBuiltin extends FnBuiltin {
-  public String repr() {
-    return "¬";
-  }
+  public String ln(FmtInfo f) { return "¬"; }
   
   public Value call(Value x) {
     return on(x, this);

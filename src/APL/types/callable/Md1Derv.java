@@ -1,5 +1,6 @@
 package APL.types.callable;
 
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 public class Md1Derv extends Fun {
@@ -38,8 +39,8 @@ public class Md1Derv extends Fun {
   }
   
   
-  public String repr() {
-    return f.oneliner()+op.repr();
+  public String ln(FmtInfo fi) {
+    return f.ln(fi)+op.ln(fi);
   }
   public boolean eq(Value o) {
     if (!(o instanceof Md1Derv)) return false;

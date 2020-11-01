@@ -1,16 +1,12 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.DomainError;
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class DivBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "÷";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "÷"; }
   
   private static final NumMV NF = new NumMV() {
     public Value call(Num x) {

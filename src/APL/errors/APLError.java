@@ -76,8 +76,12 @@ public abstract class APLError extends RuntimeException {
       sys.println((trace.size()-i) + ":");
       Frame f = trace.get(i);
       APLError.println(f.msgs, sys);
-      //noinspection StringEquality
-      if (f.msgs.size()>0 && f.msgs.get(0).t.raw==Token.COMP.raw) sys.println(f.comp.fmt(f.idx, 20));
+      boolean bc = true;
+      for (Mg c : f.msgs) {
+        //noinspection StringEquality
+        if (c.t.raw!=Token.COMP.raw) { bc = false; break; }
+      }
+      if (f.msgs.size()>0 && bc) sys.println(f.comp.fmt(f.idx, 20));
     }
   }
   

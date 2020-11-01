@@ -1,16 +1,13 @@
 package APL.types.callable.builtins.fns;
 
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.callable.builtins.FnBuiltin;
 
 
 public class EQBuiltin extends FnBuiltin {
-  public String repr() {
-    return "=";
-  }
-  
+  public String ln(FmtInfo f) { return "="; }
   
   public Value call(Value x) {
     return Num.of(x.r());

@@ -2,6 +2,7 @@ package APL.types;
 
 import APL.*;
 import APL.errors.*;
+import APL.tools.FmtInfo;
 import APL.types.arrs.ChrArr;
 import APL.types.mut.Settable;
 
@@ -55,7 +56,7 @@ public abstract class APLMap extends Primitive {
     public String toString() {
       Value v = get(null);
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;
-      return v == null? "map@"+k : v.repr();
+      return v == null? "map@"+k : v.ln(FmtInfo.dbg);
     }
   }
 }

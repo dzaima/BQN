@@ -2,6 +2,7 @@ package APL.types.callable.builtins.md1;
 
 import APL.Main;
 import APL.errors.*;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.HArr;
 import APL.types.callable.Md1Derv;
@@ -10,9 +11,7 @@ import APL.types.callable.builtins.Md1Builtin;
 import java.util.*;
 
 public class OldKeyBuiltin extends Md1Builtin {
-  @Override public String repr() {
-    return "⌸";
-  }
+  public String ln(FmtInfo f) { return "⌸"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (f instanceof APLMap) {

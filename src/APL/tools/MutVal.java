@@ -6,7 +6,7 @@ import APL.types.arrs.*;
 import java.util.Arrays;
 
 public class MutVal { // inserts can be in any order (might change to a sequential requirement later), but must not override previous ones
-  private final int[] sh;
+  public final int[] sh;
   public final int ia;
   
   long  [] ls; // 1 
@@ -136,7 +136,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
           for (int i = 0; i < len; i++) {
             Value c = x.get(xS+i);
             if (c instanceof Char) cs[rS+i] = ((Char) c).chr;
-            else { move(5); copy(x, xS+i, rS, len-i); return; }
+            else { move(5); copy(x, xS+i, rS+i, len-i); return; }
           }
         }
         break;
@@ -397,7 +397,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
     int i = 0;
     int csz = x.shape[x.r()-1];
     // System.out.println("  "+Arrays.toString(pos)+" "+Arrays.toString(sh)+" "+Arrays.toString(x.shape)+":");
-    int  toff = pos[pos.length-1];
+    int toff = pos[pos.length-1];
     for (int[] p : new Indexer(csh, pos)) {
       int cp = 0;
       for (int j = 0; j < p.length; j++) {

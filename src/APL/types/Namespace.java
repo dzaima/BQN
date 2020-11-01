@@ -1,7 +1,8 @@
 package APL.types;
 
 import APL.Scope;
-import APL.errors.*;
+import APL.errors.ValueError;
+import APL.tools.*;
 import APL.types.arrs.ChrArr;
 
 import java.util.HashMap;
@@ -54,12 +55,19 @@ public class Namespace extends APLMap {
     return sc.hashCode();
   }
   
-  public String repr() {
+  public String ln(FmtInfo f) {
+    if (f.v.contains(this)) return "{...}";
+    f.v.add(this);
     StringBuilder res = new StringBuilder("{");
     exports.forEach((key, value) -> {
       if (res.length() != 1) res.append(" ⋄ ");
-      res.append(key).append("⇐").append(sc.vars[value]);
+      Value v = sc.vars[value].pretty(f);
+      res.append(key).append("⇐").append(v);
     });
+    f.v.remove(this);
     return res + "}";
+  }
+  public Value pretty(FmtInfo f) {
+    return Format.str(ln(f));
   }
 }

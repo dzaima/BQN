@@ -2,6 +2,7 @@ package APL.types.arrs;
 
 import APL.Main;
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 import java.util.Iterator;
@@ -73,14 +74,14 @@ public class SingleItemArr extends Arr {
     return res;
   }
   
-  public String oneliner() {
+  public String ln(FmtInfo f) {
+    if (ia == 0) return super.ln(f);
     String r = Main.formatAPL(shape) + "⥊";
     if (!(item instanceof Primitive)) r+= "<";
-    return r + item.oneliner();
+    return r + item.ln(f);
   }
   
   public Iterator<Value> iterator() {
-    //noinspection Convert2Diamond java 8
     return new Iterator<Value>() { int c = 0;
       public boolean hasNext() {
         return c < ia;

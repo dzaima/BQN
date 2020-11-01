@@ -2,15 +2,13 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.Indexer;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class UDBuiltin extends FnBuiltin {
-  public String repr() {
-    return "↕";
-  }
+  public String ln(FmtInfo f) { return "↕"; }
   
   public Value call(Value x) {
     return on(x, this);

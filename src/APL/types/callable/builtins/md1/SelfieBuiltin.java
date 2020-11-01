@@ -1,17 +1,14 @@
 package APL.types.callable.builtins.md1;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.Value;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 import APL.types.callable.builtins.fns.*;
 
 public class SelfieBuiltin extends Md1Builtin {
-  public String repr() {
-    return "˜";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "˜"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     return f.call(x, x);

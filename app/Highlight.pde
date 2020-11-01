@@ -106,11 +106,12 @@ static class SyntaxHighlight {
     int dfncol = dlvl<0 || dlvl>=th.dfn.length? th.dfn[0] : th.dfn[dlvl];
     if (t instanceof NumTok) set(t, th.num);
     if (t instanceof BigTok) set(t, th.num);
-    if (t instanceof SetTok) set(t, th.dmd);
-    if (t instanceof ModTok) set(t, th.dmd);
     if (t instanceof ErrTok) set(t, th.err);
     if (t instanceof StrTok) set(t, th.str);
     if (t instanceof ChrTok) set(t, th.str);
+    if (t instanceof SetTok) set(t, th.dmd);
+    if (t instanceof ModTok) set(t, th.dmd);
+    if (t instanceof ExportTok) set(t, th.dmd);
     if (t instanceof StranderTok) set(t, th.arr);
     
     if (t instanceof CommentTok) set(t, th.com);

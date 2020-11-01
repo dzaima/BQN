@@ -1,13 +1,11 @@
 package APL.types.callable.builtins.fns;
 
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class MatchBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "≡";
-  }
-  
+  public String ln(FmtInfo f) { return "≡"; }
   
   public static int lazy(Value x) {
     int depth = 0;

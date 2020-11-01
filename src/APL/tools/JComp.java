@@ -8,7 +8,6 @@ import APL.types.callable.builtins.fns.EvalBuiltin;
 import APL.types.callable.trains.*;
 import APL.types.mut.*;
 
-import javax.naming.Name;
 import java.util.*;
 
 import static APL.Comp.*;

@@ -2,18 +2,17 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.Value;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
-import APL.types.callable.builtins.md2.NCellBuiltin;
 import APL.types.callable.builtins.md1.CellBuiltin;
+import APL.types.callable.builtins.md2.NCellBuiltin;
 
 import java.util.Arrays;
 
 public class GradeDownBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⍒";
-  }
+  public String ln(FmtInfo f) { return "⍒"; }
   
   public Value call(Value x) {
     return new IntArr(gradeDown(x));

@@ -1,14 +1,13 @@
 package APL.types.callable.builtins.md2;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 
 public class RepeatBuiltin extends Md2Builtin {
-  @Override public String repr() {
-    return "⍟";
-  }
+  public String ln(FmtInfo f) { return "⍟"; }
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value gf = g.call(x);
@@ -94,7 +93,7 @@ public class RepeatBuiltin extends Md2Builtin {
       return o instanceof Fun? o.call(x) : o;
     }
     
-    return repeat(f, n-1, new Fun() { public String repr() { return f.repr(); }
+    return repeat(f, n-1, new Fun() { public String ln(FmtInfo fi) { return f.ln(fi); }
       public Value call(Value x) {
         return f.under(o, x);
       }

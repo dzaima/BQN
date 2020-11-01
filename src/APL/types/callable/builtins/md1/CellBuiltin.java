@@ -2,7 +2,7 @@ package APL.types.callable.builtins.md1;
 
 import APL.Main;
 import APL.errors.LengthError;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
 import APL.types.callable.Md1Derv;
@@ -13,9 +13,7 @@ import java.util.Arrays;
 
 public class CellBuiltin extends Md1Builtin {
   
-  public String repr() {
-    return "˘";
-  }
+  public String ln(FmtInfo f) { return "˘"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (x.r() == 0) return f.call(x);

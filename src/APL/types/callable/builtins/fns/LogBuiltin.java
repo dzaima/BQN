@@ -1,15 +1,12 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.DomainError;
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class LogBuiltin extends FnBuiltin { // here only to serve as DNF/NF for *⁼ & √˜⁼˜
-  @Override public String repr() {
-    return "*⁼";
-  }
-  
+  public String ln(FmtInfo f) { return "*⁼"; }
   
   static final double LN2 = Math.log(2);
   

@@ -2,7 +2,7 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
@@ -11,11 +11,7 @@ import APL.types.callable.builtins.md2.AtopBuiltin;
 import java.util.Arrays;
 
 public class ShapeBuiltin extends FnBuiltin {
-  public String repr() {
-    return "⥊";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⥊"; }
   
   public Value call(Value x) {
     if (x instanceof Primitive) {
@@ -65,7 +61,7 @@ public class ShapeBuiltin extends FnBuiltin {
       mod = x.ia%ia;
       int r = div;
       if (emptyMode==0) {
-        if (mod != 0) throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+w.oneliner()+"; "+(x.ia)+" = ≢𝕩)", this);
+        if (mod != 0) throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+w.ln(FmtInfo.dbg)+"; "+(x.ia)+" = ≢𝕩)", this);
       } else if (emptyMode!=1) {
         if (mod != 0) r++;
       }
@@ -76,7 +72,7 @@ public class ShapeBuiltin extends FnBuiltin {
     if (x.ia == 0) {
       Value proto = x.safePrototype();
       if (ia==0) return new EmptyArr(sh, proto);
-      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.oneliner(), this);
+      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.ln(FmtInfo.dbg), this);
       return new SingleItemArr(proto, sh);
     }
     if (ia == x.ia) return x.ofShape(sh);

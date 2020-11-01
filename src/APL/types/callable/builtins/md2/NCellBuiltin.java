@@ -2,7 +2,7 @@ package APL.types.callable.builtins.md2;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.EmptyArr;
 import APL.types.callable.Md2Derv;
@@ -12,9 +12,7 @@ import APL.types.callable.builtins.fns.*;
 import java.util.Arrays;
 
 public class NCellBuiltin extends Md2Builtin {
-  public String repr() {
-    return "⎉";
-  }
+  public String ln(FmtInfo f) { return "⎉"; }
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value ra = g.call(x);
@@ -78,5 +76,4 @@ public class NCellBuiltin extends Md2Builtin {
     for (int i = 0; i < cam; i++) res[i] = MutVal.cut(x, i*csz, csz, csh);
     return res;
   }
-  
 }

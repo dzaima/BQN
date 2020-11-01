@@ -1,16 +1,14 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.RankError;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 import APL.types.callable.builtins.md1.CellBuiltin;
 
 public class DownArrowBuiltin extends FnBuiltin {
-  public String repr() {
-    return "↓";
-  }
+  public String ln(FmtInfo f) { return "↓"; }
   
   public Value call(Value x) {
     if (x.r()==0) throw new RankError("↓: argument cannot be scalar", this, x);

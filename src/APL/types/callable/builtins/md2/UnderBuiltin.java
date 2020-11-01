@@ -1,17 +1,14 @@
 package APL.types.callable.builtins.md2;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
 import APL.types.callable.builtins.md1.InvBuiltin;
 
 public class UnderBuiltin extends Md2Builtin {
-  @Override public String repr() {
-    return "⌾";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⌾"; }
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     return g.under(f, x);
@@ -54,9 +51,6 @@ public class UnderBuiltin extends Md2Builtin {
       return f.callInvX(w, x);
     }
     
-    public String repr() {
-      return f.repr();
-    }
     public boolean eq(Value o) {
       if (!(o instanceof BindA)) return false;
       BindA that = (BindA) o;
@@ -65,5 +59,6 @@ public class UnderBuiltin extends Md2Builtin {
     public int hashCode() {
       return 31*w.hashCode() + f.hashCode();
     }
+    public String ln(FmtInfo fi) { return f.ln(fi); }
   }
 }

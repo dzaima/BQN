@@ -11,9 +11,7 @@ import java.util.Arrays;
 
 public class JoinBuiltin extends FnBuiltin {
   
-  public String repr() {
-    return "∾";
-  }
+  public String ln(FmtInfo f) { return "∾"; }
   
   public Value call(Value x) {
     simple: if (x.r() == 1) {

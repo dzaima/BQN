@@ -1,6 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.*;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.IntArr;
 import APL.types.callable.builtins.FnBuiltin;
@@ -9,9 +10,7 @@ import APL.types.callable.builtins.md1.CellBuiltin;
 import java.util.HashMap;
 
 public class RBoxBuiltin extends FnBuiltin {
-  public String repr() {
-    return "⊐";
-  }
+  public String ln(FmtInfo f) { return "⊐"; }
   
   public Value call(Value x) {
     HashMap<Value, Integer> map = new HashMap<>();

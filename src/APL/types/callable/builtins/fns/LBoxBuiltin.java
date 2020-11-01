@@ -11,11 +11,7 @@ import APL.types.callable.builtins.md1.CellBuiltin;
 import java.util.Arrays;
 
 public class LBoxBuiltin extends FnBuiltin {
-  public String repr() {
-    return "⊏";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⊏"; }
   
   public Value call(Value x) {
     if (x.r()==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);

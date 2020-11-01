@@ -2,7 +2,7 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
@@ -10,10 +10,7 @@ import APL.types.callable.builtins.FnBuiltin;
 import java.util.Arrays;
 
 public class GroupBuiltin extends FnBuiltin {
-  public String repr() {
-    return "⊔";
-  }
-  
+  public String ln(FmtInfo f) { return "⊔"; }
   
   private static class MutIA {
     int[] ds = new int[4];

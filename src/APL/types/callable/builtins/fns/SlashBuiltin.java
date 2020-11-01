@@ -13,11 +13,7 @@ import java.util.Arrays;
 public class SlashBuiltin extends FnBuiltin {
   private static final Value fn = new FoldBuiltin().derive(new CeilingBuiltin());
   
-  public String repr() {
-    return "/";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "/"; }
   
   public Value call(Value x) {
     return on(x, this);

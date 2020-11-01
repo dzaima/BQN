@@ -2,6 +2,7 @@ package APL.types.callable.blocks;
 
 import APL.*;
 import APL.tokenizer.types.BlockTok;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md1Derv;
 
@@ -31,7 +32,5 @@ public class Md1Block extends Md1 {
     return code.exec(sc, w, new Value[]{derv, x, w, this, f}, 0);
   }
   
-  public String repr() {
-    return code.toRepr();
-  }
+  public String ln(FmtInfo f) { return code.toRepr(); }
 }

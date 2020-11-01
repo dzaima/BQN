@@ -1,12 +1,11 @@
 package APL.types.callable.builtins.fns;
 
+import APL.tools.FmtInfo;
 import APL.types.Value;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class LaminateBuiltin extends FnBuiltin {
-  public String repr() {
-    return "≍";
-  }
+  public String ln(FmtInfo f) { return "≍"; }
   
   private static final int[] MSH = new int[]{2};
   public Value call(Value w, Value x) {

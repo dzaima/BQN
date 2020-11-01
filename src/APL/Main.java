@@ -2,6 +2,7 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.*;
+import APL.tools.Format;
 import APL.types.*;
 import APL.types.arrs.*;
 
@@ -74,7 +75,7 @@ public class Main {
                     break;
                   case 'p':
                     code = args[++i];
-                    println(exec(code, sys.gsc, null).repr());
+                    println(Format.outputFmt(exec(code, sys.gsc, null)));
                     break;
                   case 'i':
                     StringBuilder s = new StringBuilder();
@@ -97,7 +98,7 @@ public class Main {
                     quotestrings = true;
                     break;
                   case 'b':
-                    sys.oneline = true;
+                    sys.ln = true;
                     break;
                   case 'c':
                     colorful = false;

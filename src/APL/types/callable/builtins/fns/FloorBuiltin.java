@@ -1,17 +1,13 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.DomainError;
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 public class FloorBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⌊";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⌊"; }
   
   public Value identity() {
     return Num.POSINF;

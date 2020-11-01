@@ -1,6 +1,8 @@
 package APL.types;
 
 import APL.errors.SyntaxError;
+import APL.tools.FmtInfo;
+import APL.types.arrs.ChrArr;
 
 public class Nothing extends Primitive {
   public static final Nothing inst = new Nothing();
@@ -17,7 +19,8 @@ public class Nothing extends Primitive {
   public Value ofShape(int[] sh) { throw used(); }
   
   
-  public String repr() { return "·"; }
+  public Value pretty(FmtInfo f) { return new ChrArr("·"); }
+  public String    ln(FmtInfo f) { return "·";  }
   
   
   public int hashCode() { return 0; }

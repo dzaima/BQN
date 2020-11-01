@@ -1,7 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.DomainError;
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
@@ -9,11 +9,7 @@ import APL.types.callable.builtins.FnBuiltin;
 import java.math.BigInteger;
 
 public class MulBuiltin extends FnBuiltin {
-  public String repr() {
-    return "×";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "×"; }
   
   public Value identity() {
     return Num.ONE;

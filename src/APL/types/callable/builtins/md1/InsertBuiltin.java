@@ -1,14 +1,13 @@
 package APL.types.callable.builtins.md1;
 
 import APL.errors.RankError;
+import APL.tools.FmtInfo;
 import APL.types.Value;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public class InsertBuiltin extends Md1Builtin {
-  public String repr() {
-    return "˝";
-  }
+  public String ln(FmtInfo f) { return "˝"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (x.r()==0) throw new RankError("˝: argument cannot be a scalar", this, x);

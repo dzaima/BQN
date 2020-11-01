@@ -1,15 +1,13 @@
 package APL.types.callable.builtins.md1;
 
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public final class TableBuiltin extends Md1Builtin {
-  @Override public String repr() {
-    return "⌜";
-  }
+  public String ln(FmtInfo f) { return "⌜"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     return EachBuiltin.on(f, x);

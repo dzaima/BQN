@@ -1,5 +1,6 @@
 package APL.types.callable.trains;
 
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 public class Atop extends Fun {
@@ -29,15 +30,15 @@ public class Atop extends Fun {
   }
   
   public Value under(Value o, Value x) {
-    return h.under(new Fun() { public String repr() { return g.repr(); }
+    return h.under(new Fun() { public String ln(FmtInfo f) { return g.ln(f); }
       public Value call(Value x) {
         return g.under(o, x);
       }
     }, x);
   }
   
-  public String repr() {
-    return "("+g+" "+h+")";
+  public String ln(FmtInfo f) {
+    return "("+g.ln(f)+" "+h.ln(f)+")";
   }
   
   

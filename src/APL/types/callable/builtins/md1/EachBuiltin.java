@@ -2,7 +2,7 @@ package APL.types.callable.builtins.md1;
 
 import APL.Main;
 import APL.errors.*;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.Md1Derv;
@@ -11,11 +11,7 @@ import APL.types.callable.builtins.Md1Builtin;
 import java.util.Arrays;
 
 public class EachBuiltin extends Md1Builtin {
-  @Override public String repr() {
-    return "¨";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "¨"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     return on(f, x);
@@ -95,7 +91,7 @@ public class EachBuiltin extends Md1Builtin {
       Value v = o instanceof Fun? o.call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
-      res[i] = f.under(new Fun() { public String repr() { return f.repr()+"¨"; }
+      res[i] = f.under(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
         public Value call(Value x1) {
           args[i] = x1;
           rec(f, o, x, i+1, args, resPre, res);
@@ -125,7 +121,7 @@ public class EachBuiltin extends Md1Builtin {
       Value v = o instanceof Fun? o.call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
-      res[i] = f.underW(new Fun() { public String repr() { return f.repr()+"¨"; }
+      res[i] = f.underW(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
         public Value call(Value x1) {
           args[i] = x1;
           rec(f, o, w, x, i+1, args, resPre, res);

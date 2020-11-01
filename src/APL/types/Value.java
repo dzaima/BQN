@@ -1,9 +1,7 @@
 package APL.types;
 
-import APL.Scope;
 import APL.errors.*;
-import APL.tools.Pervasion;
-import APL.types.arrs.*;
+import APL.tools.*;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.md1.ConstBultin;
 
@@ -87,9 +85,6 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return v;
   }
   
-  public /*open*/ String oneliner() {
-    return repr();
-  }
   
   
   
@@ -191,9 +186,6 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return this;
   }
   
-  public abstract String repr();
-  public final String toString() { return repr(); }
-  
   public String humanType(boolean article) {
     if (this instanceof Arr     )return article? "an array"     : "array";
     if (this instanceof Char    )return article? "a character"  : "character";
@@ -207,4 +199,9 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     if (this instanceof Nothing )return article? "nothing"      : "nothing";
     return getClass().getSimpleName();
   }
+  
+  // public String ln(FmtInfo f) { return FmtInfo.tmp(this); }
+  public abstract String ln(FmtInfo f);
+  public abstract Value pretty(FmtInfo f); // returns rank 1 or 2 array; elements must be characters or a string of a single glyph
+  public final String toString() { return ln(FmtInfo.dbg); }
 }

@@ -10,6 +10,7 @@ import APL.types.callable.*;
 import APL.types.callable.blocks.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.fns.*;
+import APL.types.callable.builtins.md1.CellBuiltin;
 import APL.types.callable.builtins.md2.DepthBuiltin;
 
 import java.io.*;
@@ -146,6 +147,9 @@ public final class Scope {
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex(this);
         case "•import": return new Import(this);
+        case "•fmt": return new Fmt();
+        case "•pretty": return new Pretty(this);
+        case "•out": return new Out(this);
         case "•ty": return new TY();
         case "•dr": return new DR();
         case "•lns": return new Lns();
@@ -175,7 +179,7 @@ public final class Scope {
         case "•stdin": return new Stdin();
         case "•big": return new Big();
         case "•ia": return new FnBuiltin() {
-          public String repr() { return "•IA"; }
+          public String ln(FmtInfo f) { return "•IA"; }
 
           public Value call(Value x) {
             int[] is = new int[x.ia];
@@ -184,23 +188,21 @@ public final class Scope {
           }
         };
         case "•rand": return new FnBuiltin() {
+          public String ln(FmtInfo f) { return "•RAND"; }
+          
           public Value call(Value x) {
             return RandBuiltin.on(x, Scope.this);
           }
-          
-          public String repr() {
-            return "•RAND";
-          }
         };
         case "•r": return new Md2Builtin() {
-          public String repr() { return "•_R_"; }
+          public String ln(FmtInfo f) { return "•_R_"; }
   
           public Value call(Value f, Value g, Value x, Md2Derv derv) {
             return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
         case "•u": return new FnBuiltin() {
-          public String repr() { return "•U"; }
+          public String ln(FmtInfo f) { return "•U"; }
   
           public Value call(Value x) {
             sys.ucmd(x.asString());
@@ -208,10 +210,7 @@ public final class Scope {
           }
         };
         case "•comp": return new FnBuiltin() {
-          
-          public String repr() {
-            return "•COMP";
-          }
+          public String ln(FmtInfo f) { return "•COMP"; }
           
           public Value call(Value x) {
             return call(Num.ONE, x);
@@ -270,9 +269,7 @@ public final class Scope {
           }
         };
         case "•bc": return new Fun() {
-          public String repr() {
-            return "•BC";
-          }
+          public String ln(FmtInfo f) { return "•BC"; }
           
           public Value call(Value x) {
             return call(Num.MINUS_ONE, x);
@@ -333,9 +330,7 @@ public final class Scope {
   }
   
   static class GCLog extends Fun {
-    public String repr() {
-      return "•GCLOG";
-    }
+    public String ln(FmtInfo f) { return "•GCLOG"; }
     
     private final Scope sc;
     protected GCLog(Scope sc) {
@@ -344,10 +339,11 @@ public final class Scope {
     
     
     public Value call(Value x) {
-      return new Logger(sc, x.repr());
+      return new Logger(sc, x.ln(sc.sys.fi));
     }
     static class Logger extends Primitive {
-      public String repr() { return "•GCLOG["+msg+"]"; }
+      public String ln(FmtInfo f) { return "•GCLOG["+msg+"]"; }
+      public Value pretty(FmtInfo f) { return new ChrArr("•GCLOG["+msg+"]"); }
       
       private final Scope sc;
       final String msg;
@@ -360,13 +356,13 @@ public final class Scope {
       protected void finalize() {
         sc.sys.println(msg+" was GCed");
       }
-  
+      
       public boolean eq(Value o) { return this == o; }
       public int hashCode() { return actualHashCode(); }
     }
   }
   static class Timer extends Fun {
-    public String repr() { return "•TIME"; }
+    public String ln(FmtInfo f) { return "•TIME"; }
     
     private final Scope sc;
     Timer(Scope sc) { this.sc = sc; }
@@ -402,7 +398,7 @@ public final class Scope {
   
   
   static class CompTimer extends Fun {
-    public String repr() { return "•CTIME"; }
+    public String ln(FmtInfo f) { return "•CTIME"; }
     
     private final Scope sc;
     public CompTimer(Scope sc) { this.sc = sc; }
@@ -441,7 +437,7 @@ public final class Scope {
   
   
   class Eraser extends FnBuiltin { // leaves a hole in the local variable map and probably breaks many things; TODO should maybe be a ucmd?
-    public String repr() { return "•ERASE"; }
+    public String ln(FmtInfo f) { return "•ERASE"; }
     
     public Value call(Value x) {
       String k = x.asString();
@@ -453,9 +449,7 @@ public final class Scope {
     }
   }
   static class Delay extends FnBuiltin {
-    public String repr() {
-      return "•DL";
-    }
+    public String ln(FmtInfo f) { return "•DL"; }
     
     public Value call(Value x) {
       long nsS = System.nanoTime();
@@ -468,9 +462,7 @@ public final class Scope {
     }
   }
   static class UCS extends FnBuiltin {
-    public String repr() {
-      return "•UCS";
-    }
+    public String ln(FmtInfo f) { return "•UCS"; }
     
     public Value call(Value x) {
       return numChrM(new NumMV() {
@@ -492,7 +484,7 @@ public final class Scope {
   }
   
   private static class MapGen extends FnBuiltin {
-    public String repr() { return "•MAP"; }
+    public String ln(FmtInfo f) { return "•MAP"; }
     
     public Value call(Value x) {
       if (x instanceof StrMap) {
@@ -531,7 +523,7 @@ public final class Scope {
   }
   
   private static class Optimizer extends FnBuiltin {
-    public String repr() { return "•OPT"; }
+    public String ln(FmtInfo f) { return "•OPT"; }
     
     public Value call(Value x) {
       if (x instanceof Primitive || x instanceof ChrArr || x instanceof BitArr || x instanceof SingleItemArr) return x;
@@ -539,7 +531,7 @@ public final class Scope {
     }
   }
   private static class ClassGetter extends FnBuiltin {
-    public String repr() { return "•CLASS"; }
+    public String ln(FmtInfo f) { return "•CLASS"; }
     
     public Value call(Value x) {
       return new ChrArr(x.getClass().getCanonicalName());
@@ -547,7 +539,7 @@ public final class Scope {
   }
   
   private static class Ex extends RelFn {
-    public String repr() { return "•EX"; }
+    public String ln(FmtInfo f) { return "•EX"; }
   
     private final Scope sc;
     public Ex(Scope sc) { this.sc = sc; }
@@ -561,7 +553,7 @@ public final class Scope {
     }
   }
   private static class Import extends RelFn {
-    public String repr() { return "•Import"; }
+    public String ln(FmtInfo f) { return "•Import"; }
     
     private final Scope sc;
     public Import(Scope sc) { this.sc = sc; }
@@ -586,9 +578,7 @@ public final class Scope {
     public Value derive(Value f) {
       String path = f==Nothing.inst? null : f.asString();
       return new FnBuiltin() {
-        public String repr() {
-          return RelFn.this.repr();
-        }
+        public String ln(FmtInfo f) { return RelFn.this.ln(f); }
         public Value call(Value w, Value x) {
           return RelFn.this.call(path, w, x);
         }
@@ -606,7 +596,7 @@ public final class Scope {
   }
   
   private static class Lns extends RelFn {
-    public String repr() { return "•LNS"; }
+    public String ln(FmtInfo f) { return "•LNS"; }
     
     public Value call(String path, Value x) {
       Path p = Sys.path(path, x.asString());
@@ -686,7 +676,7 @@ public final class Scope {
   
   
   private static class Shell extends FnBuiltin {
-    public String repr() { return "•SH"; }
+    public String ln(FmtInfo f) { return "•SH"; }
     
     public Value call(Value x) {
       return exec(x, null, null, false);
@@ -766,7 +756,8 @@ public final class Scope {
   
   
   private static class Stdin extends FnBuiltin {
-    public String repr() { return "•STDIN"; }
+    public String ln(FmtInfo f) { return "•STDIN"; }
+    
     public Value call(Value x) {
       if (x instanceof Num) {
         int n = x.asInt();
@@ -782,16 +773,51 @@ public final class Scope {
       throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
     }
   }
+  private static class Fmt extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Fmt"; }
+    
+    public Value call(Value x) {
+      return new ChrArr(Format.outputFmt(x));
+    }
+  }
+  private static class Pretty extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Pretty"; }
+    
+    private final Scope sc;
+    Pretty(Scope sc) { this.sc = sc; }
+    
+    public Value call(Value x) {
+      return call(Num.ONE, x);
+    }
+  
+    public Value call(Value w, Value x) {
+      int wi = w.asInt();
+      if (Math.abs(wi)==2) return Format.str(x.ln(sc.sys.fi));
+      Value v = x.pretty(sc.sys.fi);
+      return wi<0? v : new ChrArr(FmtInfo.fmt(v));
+    }
+  }
+  private static class Out extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Out"; }
+    
+    private final Scope sc;
+    public Out(Scope sc) { this.sc = sc; }
+    
+    public Value call(Value x) {
+      sc.sys.println(Format.outputFmt(x));
+      return x;
+    }
+  }
   
   private static class Hasher extends FnBuiltin {
-    public String repr() { return "•HASH"; }
+    public String ln(FmtInfo f) { return "•HASH"; }
     
     public Value call(Value x) {
       return Num.of(x.hashCode());
     }
   }
   public static class Profiler extends Fun {
-    public String repr() { return "•PFX"; }
+    public String ln(FmtInfo f) { return "•PFX"; }
     
     private final Scope sc;
     Profiler(Scope sc) { this.sc = sc; }
@@ -838,6 +864,8 @@ public final class Scope {
     }
     
     static class ProfilerOp extends Md1 {
+      public String ln(FmtInfo f) { return "•_PFO"; }
+      
       Scope sc;
       public ProfilerOp(Scope sc) {
         this.sc = sc;
@@ -870,13 +898,9 @@ public final class Scope {
         p.end(ens-sns);
         return r;
       }
-      
-      public String repr() {
-        return "•_PFO";
-      }
     }
     public static class ProfilerMd2 extends Md2 {
-      public String repr() { return "•_PFC_"; }
+      public String ln(FmtInfo f) { return "•_PFC_"; }
       
       private final Scope sc;
       ProfilerMd2(Scope sc) { this.sc = sc; }
@@ -925,7 +949,7 @@ public final class Scope {
   }
   
   private static class Big extends FnBuiltin {
-    public String repr() { return "•BIG"; }
+    public String ln(FmtInfo f) { return "•BIG"; }
     
     public Value call(Value x) {
       return rec(x);
@@ -956,6 +980,8 @@ public final class Scope {
   }
   
   static class AS extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•AS"; }
+    
     /*
       0 - bit booleans
       1 - 32-bit ints
@@ -974,15 +1000,11 @@ public final class Scope {
           return new DoubleArr(x.asDoubleArr(), x.shape);
       }
     }
-    
-    public String repr() {
-      return "•AS";
-    }
   }
   
   
   public static class TY extends FnBuiltin {
-    public String repr() { return "•TY"; }
+    public String ln(FmtInfo f) { return "•TY"; }
     /*
      0 - array
      1 - number
@@ -1010,7 +1032,7 @@ public final class Scope {
     }
   }
   public static class DR extends FnBuiltin {
-    public String repr() { return "•DR"; }
+    public String ln(FmtInfo f) { return "•DR"; }
     
     /*
         0=100| - unknown
@@ -1061,26 +1083,26 @@ public final class Scope {
        && (f==11 ^ t==11)) { // convert float to/from bits/long
         if (t==11) {
           if (f==10) return DepthBuiltin.on(new Fun() {
-            public String repr() { return "•DR"; }
+            public String ln(FmtInfo f) { return "•DR"; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
             }
           }, 1, x, this);
           if (f==60) return DepthBuiltin.on(new Fun() {
-            public String repr() { return "•DR"; }
+            public String ln(FmtInfo f) { return "•DR"; }
             public Value call(Value x) {
               return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
             }
           }, 0, x, this);
         } else {
           if (t==10) return DepthBuiltin.on(new Fun() {
-            public String repr() { return "•DR"; }
+            public String ln(FmtInfo f) { return "•DR"; }
             public Value call(Value x) {
               return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
             }
           }, 0, x, this);
           if (t==60) return DepthBuiltin.on(new Fun() {
-            public String repr() { return "•DR"; }
+            public String ln(FmtInfo f) { return "•DR"; }
             public Value call(Value x) {
               return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
             }

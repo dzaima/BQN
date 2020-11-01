@@ -2,8 +2,11 @@ package APL.types;
 
 import APL.Main;
 import APL.errors.*;
+import APL.tools.*;
 import APL.types.arrs.*;
-import APL.types.callable.builtins.fns.LBoxBuiltin;
+import APL.types.callable.builtins.fns.*;
+import APL.types.callable.builtins.md1.CellBuiltin;
+import APL.types.callable.builtins.md2.NCellBuiltin;
 
 import java.util.*;
 
@@ -20,7 +23,8 @@ public abstract class Arr extends Value {
   
   public String basicFormat(boolean quote) {
     if (ia == 0) {
-      String mr = safePrototype() instanceof Char? "\"\"" : "⟨⟩";
+      Value pr = safePrototype();
+      String mr = pr instanceof Char? "@" : pr instanceof Num? "0" : "⟨⟩";
       if (r() == 1) return mr;
       else return Main.formatAPL(shape) + "⥊" + mr;
     }
@@ -38,169 +42,24 @@ public abstract class Arr extends Value {
     }
     return null;
   }
-  public String repr() {
-    String f = basicFormat(Main.quotestrings);
-    if (f != null) return f;
-    
-    if (Main.quotestrings) {
-      boolean str = true;
-      for (Value v : this) {
-        if (!(v instanceof Char)) {
-          str = false;
-          break;
-        }
-      }
-      if (str) return oneliner();
-    }
-    
-    if (r() == 0) return "<"+first().repr().replace("\n", "\n ");
-    if (ia == 1) {
-      Value c = get(0);
-      if (c instanceof Primitive || r() > 2) {
-        String enc = c instanceof Primitive? "" : "<";
-        if (r()==1) return "⟨"+c+"⟩";
-        String pre = Main.formatAPL(shape);
-        return pre + "⥊" + enc + c.repr().replace("\n", "\n" + Main.repeat(" ", pre.length()+2));
-      }
-    }
-    if (r() == 1) { // simple vectors
-      StringBuilder res = new StringBuilder();
-      boolean simple = true;
-      for (Value v : this) {
-        if (res.length() > 0) res.append('‿');
-        if (v != null) {
-          if (!simple(v)) { simple = false; break; }
-          res.append(v.oneliner());
-        } else res.append("NULLPTR");
-      }
-      if (simple) return res.toString();
-    }
-    
-    if (r() == 2) {
-      boolean charmat = true;
-      if (!(this instanceof ChrArr)) {
-        for (Value v : this) {
-          if (!(v instanceof Char)) {
-            charmat = false;
-            break;
-          }
-        }
-      }
-      
-      if (charmat) {
-        StringBuilder b = new StringBuilder();
-        int i = 0;
-        for (Value v : this) {
-          if (i++ % shape[1] == 0 && i!=1) b.append('\n');
-          b.append(((Char) v).chr);
-        }
-        return b.toString();
-      }
-    }
-    
-    if (r() < 3) { // boxed arrays
-      int w = r()==1? shape[0] : shape[1];
-      int h = r()==1? 1 : shape[0];
-      String[][][] stringified = new String[w][h][];
-      int[][] itemWidths = new int[w][h];
-      int[] widths = new int[w];
-      int[] heights = new int[h];
-      boolean simple = true;
-      int x=0, y=0;
-      for (Value v : this) {
-        if (v == null) v = Main.toAPL("NULLPTR");
-        simple&= simple(v);
-        String[] c = v.repr().split("\n");
-        int cw = 0;
-        for (String ln : c) cw = Math.max(ln.length(), cw);
-        itemWidths[x][y] = cw;
-        
-        widths[x] = Math.max(widths[x], cw);
-        heights[y] = Math.max(heights[y], c.length);
-        
-        stringified[x][y] = c;
-        x++;
-        if (x==w) {
-          x = 0;
-          y++;
-        }
-      }
-      int borderSize = simple? 0 : 1;
-      int rw = simple? -1 : 1,
-      rh = borderSize ; // result w&h;
-      for (x = 0; x < w; x++) rw+= widths[x]+1;
-      for (y = 0; y < h; y++) rh+= heights[y]+borderSize;
-      char[][] chars = new char[rh][rw];
-      int rx = borderSize , ry; // x&y in chars
-      for (x = 0; x < w; x++) {
-        ry = borderSize;
-        for (y = 0; y < h; y++) {
-          String[] cobj = stringified[x][y];
-          for (int cy = 0; cy < cobj.length; cy++) {
-            String s = cobj[cy];
-            char[] line = s.toCharArray();
-            int sx = get(y*w + x) instanceof Num? rx+widths[x]-itemWidths[x][y] : rx;
-            System.arraycopy(line, 0, chars[ry + cy], sx, line.length);
-          }
-          ry+= heights[y]+borderSize;
-        }
-        rx+= widths[x]+1;
-      }
-      if (!simple) { // draw borders
-        rx = 0;
-        for (x = 0; x < w; x++) {
-          ry = 0;
-          for (y = 0; y < h; y++) {
-            chars[ry][rx] = '┼';
-            for (int cx = 1; cx <=  widths[x]; cx++) chars[ry][rx+cx] = '─';
-            for (int cy = 1; cy <= heights[y]; cy++) chars[ry+cy][rx] = '│';
-            if (x == 0) {
-              for (int cy = 1; cy <= heights[y]; cy++) chars[ry+cy][rw-1] = '│';
-              chars[ry][rw-1] = y==0? '┐' : '┤';
-              chars[ry][0] = '├';
-            }
-            ry+= heights[y]+borderSize;
-          }
-          chars[0][rx] = '┬';
-          chars[rh-1][rx] = x==0?'└' : '┴';
-          for (int cx = 1; cx <=  widths[x]; cx++) chars[rh-1][rx+cx] = '─';
-          rx+= widths[x]+1;
-        }
-        chars[0][0] = '┌';
-        chars[rh-1][rw-1] = '┘';
-      }
-      for (char[] ca : chars) {
-        for (int i = 0; i < ca.length; i++) {
-          if (ca[i] == 0) ca[i] = ' ';
-        }
-      }
-      StringBuilder res = new StringBuilder();
-      boolean next = false;
-      for (char[] ln : chars) {
-        if (next) res.append('\n');
-        res.append(ln);
-        next = true;
-      }
-      return res.toString();
-    } else return oneliner();
-  }
-  public String oneliner() {
+  public String ln(FmtInfo fi) {
     String f = basicFormat(true);
     if (f != null) return f;
-    if (r() == 0) return "<" + get(0).oneliner();
+    if (r() == 0) return "<" + get(0).ln(fi);
     if (r() == 1) {
-      if (ia == 1) return "⟨"+get(0).oneliner()+"⟩";
+      if (ia == 1) return "⟨"+get(0).ln(fi)+"⟩";
       boolean vec = false;
       for (Value c : this) {
         if (!simple(c)) { vec = true; break; }
       }
       StringBuilder b = new StringBuilder();
+      char c = vec? (MatchBuiltin.full(this)<=2? ',' : '⋄') : '‿';
       if (vec) b.append('⟨');
       boolean first = true;
       for (Value v : this) {
         if (first) first = false;
-        else b.append(vec? ',' : '‿');
-        b.append(v.oneliner());
+        else b.append(c);
+        b.append(v.ln(fi));
       }
       if (vec) b.append('⟩');
       return b.toString();
@@ -209,13 +68,10 @@ public abstract class Arr extends Value {
     StringBuilder b = new StringBuilder(">⟨");
     for (int i = 0; i < shape[0]; i++) {
       if (i != 0) b.append(",");
-      b.append(LBoxBuiltin.getCell(i, this, null).oneliner());
+      b.append(LBoxBuiltin.getCell(i, this, null).ln(fi));
     }
     b.append("⟩");
     return b.toString();
-  }
-  private static boolean simple(Value v) {
-    return v instanceof Num || v instanceof Char || v instanceof BigValue;
   }
   public Arr reverseOn(int dim) {
     if (r() == 0) {
@@ -403,5 +259,190 @@ public abstract class Arr extends Value {
     for (int i = 0; i < w.length; i++) {
       if (w[i] != x[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(w) + " vs " + Main.formatAPL(x) + ")", blame);
     }
+  }
+  
+  
+  public Value pretty(FmtInfo f) { // assumes a single Char is guaranteed to be a single character
+    if (ia==0) return Format.str(ln(f));
+    int r = r();
+    Value g0 = first();
+    
+    spec: if (g0 instanceof Char && r<=2) { // strings
+      String s;
+      if (this instanceof ChrArr) s = ((ChrArr) this).s;
+      else {
+        StringBuilder b = new StringBuilder(ia);
+        for (Value c : this) {
+          if (!(c instanceof Char)) break spec;
+          b.append(((Char) c).chr);
+        }
+        s = b.toString();
+      }
+      int sl = s.length();
+  
+      if (r==1) {
+        MutVal m = new MutVal(new int[]{2+ia}, Char.SPACE);
+        int i = 0;
+        int o = 0;
+        
+        m.set(o++, Char.ASCII['"']);
+        while (i != sl) {
+          int c = s.codePointAt(i);
+          int csz = Character.charCount(c);
+          if (c < 32) c+= '␀';
+          if (c == 127) c = '␡';
+          m.set(o++, csz==1? Char.of((char) c) : new ChrArr(new String(Character.toChars(c)))); // Character.toString(c) ._.
+          i+= csz;
+        }
+        m.set(o++, Char.ASCII['"']);
+        Value mv = m.get();
+        if (i==o-2) return mv;
+        return MutVal.cut(mv, 0, o, new int[]{o});
+      } else if (r==2) {
+        int w = shape[1];
+        int h = shape[0];
+        MutVal m = new MutVal(new int[]{h+2, w+4}); simpleBox(m);
+        m.set(w+5     , Char.ASCII['"']);
+        m.set(m.ia-w-6, Char.ASCII['"']);
+        int o = w+6;
+        for (int y = 0; y < h; y++) {
+          for (int x = y*w; x < (y+1)*w; x++) {
+            char g = s.charAt(x);
+            if (g < 32) g+= '␀';
+            if (g == 127) g = '␡';
+            boolean isH = Character.isHighSurrogate(g);
+            boolean isD = isH && x+1<sl && Character.isLowSurrogate(s.charAt(x+1));
+            m.set(o++, isD? new ChrArr(s.substring(x,x+2)) : Character.isLowSurrogate(g)? Char.of('␠') : Char.of(g));
+          }
+          o+= 4;
+        }
+        return m.get();
+      }
+    }
+    spec: if (r==2 && g0 instanceof Num) { // number matrix
+      if (!this.quickDoubleArr()) for (Value c : this) if (!(c instanceof Num)) break spec;
+      int w = shape[1]; int h = shape[0];
+      Value[] v = new Value[ia];
+      for (int i = 0; i < ia; i++) v[i] = get(i).pretty(f);
+      int[] ws = new int[w];
+      int[] hs = new int[h];
+      for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+          Value c = v[x+y*w];
+          ws[x] = Math.max(ws[x], c.shape[c.shape.length-1]);
+          hs[y] = Math.max(hs[y], c.r()==1? 1 : c.shape[0]);
+        }
+      }
+      int fw = w+1; for (int c : ws) fw+= c;
+      int fh = 2  ; for (int c : hs) fh+= c;
+      
+      MutVal m = new MutVal(new int[]{fh, fw}); simpleBox(m);
+      int cy = 1;
+      for (int y = 0; y < h; y++) {
+        int cx = 1;
+        for (int x = 0; x < w; x++) {
+          Value c = v[x + y*w];
+          int dx = ws[x] - c.shape[c.shape.length-1];
+          if (c.r()==2) m.copy(c, new int[]{cy, cx+dx});
+          else m.copy(c, 0, cx + dx + cy*fw, c.ia);
+          cx+= ws[x]+1;
+        }
+        cy+= hs[y];
+      }
+      return m.get();
+    }
+    
+    spec: if (r==1 && simple(g0)) { // simple vectors; assumes simple always make simple strings, which might break
+      if (!this.quickDoubleArr()) for (Value c : this) if (!simple(c)) break spec;
+      if (ia == 1) return new ChrArr("⟨"+g0.pretty(f).asString()+"⟩");
+      StringBuilder b = new StringBuilder(ia*2);
+      boolean first = true;
+      for (Value c : this) {
+        if (first) first = false;
+        else b.append("‿");
+        b.append(c.pretty(f).asString());
+      }
+      return new ChrArr(b.toString());
+    }
+    
+    if (r     == 0) return box(f, values(), 1, 1, reg, 0);
+    if (r     == 1) return box(f, values(), ia, 1, reg, 1);
+    if (r     == 2) return box(f, values(), shape[1], shape[0], reg, 2);
+    if ((r&1) == 0) return box(f, NCellBuiltin.cells(this, 2), shape[1], shape[0], nst, 2); // even dimensions
+    /*  (r&1) == 1*/return box(f, CellBuiltin.cells(this), shape[0], 1, nst, 1); // odd dimensions
+  }
+  static Char[] reg = chrs("┌┬┐├┼┤└┴┘─│");
+  static Char[] nst = chrs("┏┳┓┣╋┫┗┻┛━┃");
+  // static Char[] reg = chrs("╔╦╗╠╬╣╚╩╝═║");
+  static Char[] chrs(String s) {
+    Char[] r = new Char[s.length()];
+    for (int i = 0; i < r.length; i++) r[i] = Char.of(s.charAt(i));
+    return r;
+  }
+  
+  static Value box(FmtInfo fi, Value[] vs, int w, int h, Char[] b, int rnk) { // b = {┌,┬,┐, ├,┼,┤, └,┴,┘, ─,│}
+    Value[] f = new Value[vs.length];
+    for (int i = 0; i < vs.length; i++) f[i] = vs[i].pretty(fi);
+    int[] ws = new int[w];
+    int[] hs = new int[h];
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < w; x++) {
+        Value c = f[x+y*w];
+        ws[x] = Math.max(ws[x], c.shape[c.shape.length-1]);
+        hs[y] = Math.max(hs[y], c.r()==1? 1 : c.shape[0]);
+      }
+    }
+    int fw = w+1; for (int c : ws) fw+= c;
+    int fh = h+1; for (int c : hs) fh+= c;
+    MutVal m = new MutVal(new int[]{fh, fw}, f[0]);
+    m.fill(Char.SPACE, 0, m.ia);
+    
+    int cy = 1;
+    for (int y = 0; y < h; y++) {
+      int cx = 1;
+      for (int x = 0; x < w; x++) {
+        Value c = f[x + y*w];
+        if (c.r()==2) m.copy(c, new int[]{cy, cx});
+        else m.copy(c, 0, cx + cy*fw, c.ia);
+        cx+= ws[x]+1;
+        for (int dy = 0; dy < hs[y]; dy++) m.set((cy+dy)*fw+cx-1, b[10]); // vline
+      } for (int dy = 0; dy < hs[y]; dy++) m.set((cy+dy)*fw     , b[10]); // vline final 
+      cy+= hs[y]+1;
+      m.set(cy*fw-fw, b[3]); // ├
+      m.set(cy*fw-1 , b[5]); // ┤
+      m.fill(b[9], (cy-1)*fw+1, cy*fw-1); // hline
+    } m.fill(b[9],           1,  fw  -1); // hline final
+    
+    cy = 0;
+    for (int y = 0; y <= h; y++) {
+      if (y>0) cy+= hs[y-1]+1;
+      Char mc = y==0? b[1] : y==h? b[7] : b[4];
+      int cx = 0;
+      for (int x = 1; x < w; x++) {
+        cx+= ws[x-1]+1;
+        m.set(cy*fw + cx, mc);
+      }
+    }
+    m.set(0   , b[0]); m.set(m.ia-1 , b[8]); // corners
+    m.set(fw-1, b[2]); m.set(m.ia-fw, b[6]);
+    if (rnk>0) m.set(1 , Char.of('→'));
+    if (rnk>1) m.set(fw, Char.of('↓'));
+    
+    return m.get();
+  }
+  
+  private static void simpleBox(MutVal m) {
+    int w = m.sh[1];
+    int h = m.sh[0];
+    m.fill(Char.SPACE, 0, m.ia);
+    m.set(w-1   , nst[2]); m.set(0     , nst[0]);
+    m.set(m.ia-w, nst[6]); m.set(m.ia-1, nst[8]);
+    m.fill(nst[9], 1, w-1); m.fill(nst[9], 1+m.ia-w, m.ia-1);
+    for (int y = 1; y < h-1; y++) { m.set(y*w, nst[10]); m.set(y*w+w-1, nst[10]); }
+  }
+  
+  private static boolean simple(Value v) {
+    if (v instanceof Char) return !((Char) v).spec();
+    return v instanceof Num || v instanceof BigValue;
   }
 }

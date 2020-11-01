@@ -1,5 +1,6 @@
 package APL.types.callable.builtins;
 
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 public abstract class Md1Builtin extends Md1 {
@@ -8,6 +9,6 @@ public abstract class Md1Builtin extends Md1 {
   }
   
   public int hashCode() {
-    return repr().hashCode();
+    return ln(FmtInfo.dbg).hashCode();
   }
 }

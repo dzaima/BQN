@@ -10,9 +10,7 @@ import APL.types.callable.builtins.md1.CellBuiltin;
 
 public class UpArrowBuiltin extends FnBuiltin {
   
-  public String repr() {
-    return "↑";
-  }
+  public String ln(FmtInfo f) { return "↑"; }
   
   public Value call(Value x) {
     if (x.r()==0) throw new RankError("↑: argument cannot be scalar", this, x);

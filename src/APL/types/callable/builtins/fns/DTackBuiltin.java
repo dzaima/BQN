@@ -1,6 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.*;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
@@ -9,11 +10,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class DTackBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⊤";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⊤"; }
   
   public Value call(Value x) {
     return call(Num.NUMS[2], x);

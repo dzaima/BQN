@@ -1,6 +1,6 @@
 package APL.types;
 
-import APL.Main;
+import APL.tools.FmtInfo;
 import APL.types.arrs.ChrArr;
 
 
@@ -46,13 +46,6 @@ public class Char extends Primitive {
   
   
   
-  public String oneliner() {
-    return "'"+chr+"'";
-  }
-  public String repr() {
-    if (Main.quotestrings) return "'"+chr+"'";
-    else return String.valueOf(chr);
-  }
   public boolean eq(Value c) {
     return c instanceof Char && chr == ((Char) c).chr;
   }
@@ -61,5 +54,16 @@ public class Char extends Primitive {
   }
   public int hashCode() {
     return chr;
+  }
+  
+  public String ln(FmtInfo f) {
+    if (spec()) return "@+" + (+chr);
+    return "'"+chr+"'";
+  }
+  public Value pretty(FmtInfo f) {
+    return new ChrArr(ln(f));
+  }
+  public boolean spec() {
+    return chr<32 || chr==127;
   }
 }

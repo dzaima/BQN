@@ -1,8 +1,9 @@
 package APL.types;
 
+import APL.tools.FmtInfo;
 import APL.types.arrs.ChrArr;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class StrMap extends APLMap {
   public final HashMap<String, Value> vals;
@@ -64,13 +65,6 @@ public class StrMap extends APLMap {
     return res[0];
   }
   
-  
-  public String repr() {
-    StringBuilder res = new StringBuilder("⟨");
-    vals.forEach((key, value) -> {
-      if (res.length() != 1) res.append(" ⋄ ");
-      res.append(key).append(":").append(value);
-    });
-    return res + "⟩";
-  }
+  public Value pretty(FmtInfo f) { return new ChrArr("[StrMap]"); }
+  public String ln(FmtInfo f) { return "[StrMap]"; }
 }

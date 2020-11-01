@@ -2,6 +2,7 @@ package APL.types.callable.builtins.fns;
 
 import APL.Scope;
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
@@ -12,9 +13,7 @@ import java.util.*;
 public class RandBuiltin extends FnBuiltin {
   private final Scope sc;
   
-  public String repr() {
-    return "?";
-  }
+  public String ln(FmtInfo f) { return "?"; }
   
   protected RandBuiltin(Scope sc) {
     this.sc = sc;

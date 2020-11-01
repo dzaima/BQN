@@ -3,6 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.Tokenizer;
 import APL.tokenizer.types.BasicLines;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.blocks.*;
@@ -15,10 +16,11 @@ import java.util.*;
 public abstract class Sys {
   public Scope gsc; // global/top-level scope
   public Scope csc; // current scope in which things happen
-  public boolean oneline;
+  public boolean ln;
   public APLError lastError = null;
   public Value[] defArgs;
   public String cd;
+  public FmtInfo fi = new FmtInfo(14, -10, 10);
   
   public Sys() {
     gsc = csc = new Scope(this);
@@ -46,8 +48,9 @@ public abstract class Sys {
       case "QUOTE":
         Main.quotestrings = !Main.quotestrings;
         break;
-      case "ONELINE":
-        oneline = !oneline;
+      case "LN":
+        if (rest.length()==0) ln = !ln;
+        else println(Main.exec(rest, csc, defArgs).ln(fi));
         break;
       case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest,defArgs); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
       case "TOKENIZEREPR": println(Tokenizer.tokenize(rest,defArgs).toRepr()); break;
@@ -75,7 +78,7 @@ public abstract class Sys {
             Value val = csc.vars[i];
             if (val == null) println("  "+s+": unset");
             else {
-              String vs = val.repr();
+              String vs = val.ln(FmtInfo.dbg);
               println("  "+s+": "+(vs.length()<100 && !vs.contains("\n")? vs : val.humanType(false)));
             }
           } else println("  ("+i+") unused");
@@ -176,13 +179,11 @@ public abstract class Sys {
   public void lineCatch(String s) {
     try {
       line(s);
-    } catch (Throwable t) {
-      setLastError(t).print(this);
-    }
+    } catch (Throwable t) { report(t); }
   }
-  
-  public APLError setLastError(Throwable t) {
-    return lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
+  public void report(Throwable t) {
+    APLError err = lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
+    err.print(this);
   }
   
   
@@ -194,7 +195,7 @@ public abstract class Sys {
   
   
   public void println(Value v) {
-    println(oneline? v.oneliner() : v.repr());
+    println(ln? v.ln(fi) : FmtInfo.fmt(v.pretty(fi)));
   }
   
   public abstract String input();

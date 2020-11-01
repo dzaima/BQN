@@ -405,7 +405,7 @@ public class Comp {
     }
     if (objs.length > 0) {
       b.append("objs:\n");
-      for (int j = 0; j < objs.length; j++) b.append(' ').append(j).append(": ").append(objs[j].oneliner()).append('\n');
+      for (int j = 0; j < objs.length; j++) b.append(' ').append(j).append(": ").append(objs[j].ln(FmtInfo.dbg)).append('\n');
     }
     if (blocks.length > 0) {
       b.append("blocks:\n");
@@ -480,7 +480,7 @@ public class Comp {
   
   private String safeObj(int l) {
     if (l>=objs.length) return l+" INVALID";
-    return l+": "+objs[l].oneliner();
+    return l+": "+objs[l].ln(FmtInfo.dbg);
   }
   
   
@@ -896,7 +896,7 @@ public class Comp {
     }
   
     public String toString() {
-      return "C"+c.repr();
+      return "C:"+c.ln(FmtInfo.dbg);
     }
   }
   

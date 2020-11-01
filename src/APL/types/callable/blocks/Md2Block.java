@@ -2,9 +2,9 @@ package APL.types.callable.blocks;
 
 import APL.*;
 import APL.tokenizer.types.BlockTok;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md2Derv;
-
 
 
 public class Md2Block extends Md2 {
@@ -38,9 +38,7 @@ public class Md2Block extends Md2 {
     return code.exec(sc, w, new Value[]{derv, x, w, this, f, g}, 0);
   }
   
-  public String repr() {
-    return code.toRepr();
-  }
+  public String ln(FmtInfo f) { return code.toRepr(); }
   
   
   
@@ -57,12 +55,6 @@ public class Md2Block extends Md2 {
       return op.derive(f, g);
     }
     
-    public String repr() {
-      String gs = g.oneliner();
-      if (!(g instanceof Arr) && gs.length() != 1) gs = "("+gs+")";
-      return op.repr()+gs;
-    }
-    
     public boolean eq(Value o) { // reminder: there's a separate Md2HalfDerv
       if (!(o instanceof Md2BlockHalfDerv)) return false;
       Md2BlockHalfDerv that = (Md2BlockHalfDerv) o;
@@ -70,6 +62,10 @@ public class Md2Block extends Md2 {
     }
     public int hashCode() {
       return 31*g.hashCode() + op.hashCode();
+    }
+    
+    public String ln(FmtInfo f) {
+      return op.ln(f)+"("+g.ln(f)+")";
     }
   }
 }

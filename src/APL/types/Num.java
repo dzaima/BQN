@@ -1,6 +1,7 @@
 package APL.types;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.arrs.*;
 
 import java.util.Locale;
@@ -92,9 +93,6 @@ public class Num extends Primitive {
   
   
   
-  public String repr() {
-    return format(num);
-  }
   public boolean eq(Value n) {
     return n instanceof Num && ((Num) n).num == num;
   }
@@ -111,6 +109,9 @@ public class Num extends Primitive {
   
   
   
+  
+  public Value pretty(FmtInfo f) { return new ChrArr(format(num, f.pp, f.scs, f.sce)); }
+  public String    ln(FmtInfo f) { return            format(num, f.pp, f.scs, f.sce);  }
   
   
   // ============================== NUMBER FORMATTING ============================== \\

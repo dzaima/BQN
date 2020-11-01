@@ -2,17 +2,14 @@ package APL.types.callable.builtins.fns;
 
 import APL.Main;
 import APL.errors.DomainError;
-import APL.tools.MutVal;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 import java.util.Arrays;
 
 public class ReverseBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⌽";
-  }
-  
+  public String ln(FmtInfo f) { return "⌽"; }
   
   public Value call(Value x) {
     return on(x);

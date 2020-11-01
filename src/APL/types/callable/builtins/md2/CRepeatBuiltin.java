@@ -1,6 +1,7 @@
 package APL.types.callable.builtins.md2;
 
 import APL.Main;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md2Derv;
 import APL.types.callable.builtins.Md2Builtin;
@@ -8,9 +9,7 @@ import APL.types.callable.builtins.Md2Builtin;
 import java.util.ArrayList;
 
 public class CRepeatBuiltin extends Md2Builtin {
-  @Override public String repr() {
-    return "⍡";
-  }
+  public String ln(FmtInfo f) { return "⍡"; }
   
   @Override public Value call(Value f, Value g, Value x, Md2Derv derv) {
     if (g instanceof Fun) {

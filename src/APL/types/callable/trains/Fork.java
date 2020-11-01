@@ -1,6 +1,7 @@
 package APL.types.callable.trains;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 public class Fork extends Fun {
@@ -34,7 +35,7 @@ public class Fork extends Fun {
   
   public Value under(Value o, Value x) {
     Value cf = f.constant(this);
-    return h.under(new Fun() { public String repr() { return g.repr(); }
+    return h.under(new Fun() { public String ln(FmtInfo f) { return g.ln(f); }
       public Value call(Value x) {
         return g.underW(o, cf, x);
       }
@@ -42,9 +43,6 @@ public class Fork extends Fun {
   }
   
   
-  public String repr() {
-    return "("+f+" "+g+" "+h+")";
-  }
   public boolean eq(Value o) {
     if (!(o instanceof Fork)) return false;
     Fork that = (Fork) o;
@@ -55,5 +53,8 @@ public class Fork extends Fun {
     res = 31*res + g.hashCode();
     res = 31*res + h.hashCode();
     return res;
+  }
+  public String ln(FmtInfo fi) {
+    return "("+f.ln(fi)+" "+g.ln(fi)+" "+h.ln(fi)+")";
   }
 }

@@ -1,16 +1,13 @@
 package APL.types.callable.builtins.fns;
 
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.callable.builtins.FnBuiltin;
 
 
 public class NEBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "≠";
-  }
-  
+  public String ln(FmtInfo f) { return "≠"; }
   
   public Value call(Value x) {
     if (x.r()==0) return Num.ONE;

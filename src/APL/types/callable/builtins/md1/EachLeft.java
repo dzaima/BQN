@@ -1,14 +1,13 @@
 package APL.types.callable.builtins.md1;
 
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.SingleItemArr;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public class EachLeft extends Md1Builtin {
-  @Override public String repr() {
-    return "ᐵ";
-  }
+  public String ln(FmtInfo f) { return "ᐵ"; }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
     Value[] n = new Value[w.ia];

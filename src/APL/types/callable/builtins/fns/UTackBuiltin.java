@@ -1,6 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.*;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.callable.builtins.FnBuiltin;
@@ -8,11 +9,7 @@ import APL.types.callable.builtins.FnBuiltin;
 import java.math.BigInteger;
 
 public class UTackBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⊥";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "⊥"; }
   
   public Value call(Value x) {
     return call(Num.NUMS[2], x);

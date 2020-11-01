@@ -1,17 +1,13 @@
 package APL.types.callable.builtins.fns;
 
-import APL.tools.Pervasion;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.BitArr;
 import APL.types.callable.builtins.FnBuiltin;
 
 
 public class LEBuiltin extends FnBuiltin {
-  public String repr() {
-    return "≤";
-  }
-  
-  
+  public String ln(FmtInfo f) { return "≤"; }
   
   public static final Pervasion.VV2B DF = new Pervasion.VV2B() {
     public Value on(Primitive w, Primitive x) { return w.compareTo(x) <= 0? Num.ONE : Num.ZERO; }

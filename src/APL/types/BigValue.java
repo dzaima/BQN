@@ -1,6 +1,8 @@
 package APL.types;
 
 import APL.errors.DomainError;
+import APL.tools.FmtInfo;
+import APL.types.arrs.ChrArr;
 
 import java.math.BigInteger;
 
@@ -76,14 +78,16 @@ public class BigValue extends Primitive {
   }
   
   
-  public String repr() {
-    if (i.signum()==-1) return "¯" + i.negate() + "L";
-    return i.toString()+"L";
-  }
   public boolean eq(Value o) {
     return o instanceof BigValue && i.equals(((BigValue) o).i);
   }
   public int hashCode() {
     return i.hashCode();
+  }
+  
+  public Value pretty(FmtInfo f) { return new ChrArr(ln(f)); }
+  public String ln(FmtInfo f) {
+    if (i.signum()==-1) return "¯" + i.negate() + "L";
+    return i.toString()+"L";
   }
 }

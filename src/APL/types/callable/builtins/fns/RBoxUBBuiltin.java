@@ -1,7 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.*;
-import APL.tools.MutIntArr;
+import APL.tools.*;
 import APL.types.Value;
 import APL.types.arrs.IntArr;
 import APL.types.callable.builtins.FnBuiltin;
@@ -9,9 +9,7 @@ import APL.types.callable.builtins.FnBuiltin;
 import java.util.HashMap;
 
 public class RBoxUBBuiltin extends FnBuiltin {
-  public String repr() {
-    return "⊒";
-  }
+  public String ln(FmtInfo f) { return "⊒"; }
   
   public Value call(Value x) {
     if (x.r()==0) throw new DomainError("⊒: rank=0", this, x);

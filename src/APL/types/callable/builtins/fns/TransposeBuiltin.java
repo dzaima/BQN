@@ -1,7 +1,7 @@
 package APL.types.callable.builtins.fns;
 
 import APL.errors.*;
-import APL.tools.Indexer;
+import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.DoubleArr;
 import APL.types.callable.builtins.FnBuiltin;
@@ -9,9 +9,7 @@ import APL.types.callable.builtins.FnBuiltin;
 import java.util.Arrays;
 
 public class TransposeBuiltin extends FnBuiltin {
-  @Override public String repr() {
-    return "⍉";
-  }
+  public String ln(FmtInfo f) { return "⍉"; }
   
   public Value call(Value x) {
     if (x.scalar()) return x;

@@ -2,6 +2,7 @@ package APL.types.callable.blocks;
 
 import APL.*;
 import APL.tokenizer.types.BlockTok;
+import APL.tools.FmtInfo;
 import APL.types.*;
 
 
@@ -39,7 +40,5 @@ public class FunBlock extends Fun {
     return code.exec(sc, w, new Value[]{this, w, x}, 2);
   }
   
-  public String repr() {
-    return code.toRepr();
-  }
+  public String ln(FmtInfo f) { return code.toRepr(); }
 }

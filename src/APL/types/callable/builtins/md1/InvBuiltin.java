@@ -1,14 +1,13 @@
 package APL.types.callable.builtins.md1;
 
 import APL.errors.NYIError;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.Md1Builtin;
 
 public class InvBuiltin extends Md1Builtin {
-  public String repr() {
-    return "⁼";
-  }
+  public String ln(FmtInfo f) { return "⁼"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
     return f.callInv(x);
@@ -32,7 +31,7 @@ public class InvBuiltin extends Md1Builtin {
   
   public static Fun invertM(Value f) {
     return new Fun() {
-      public String repr() { return f.repr()+"⁼"; }
+      public String ln(FmtInfo f) { return "⁼"; }
       public Value call(Value x) {
         return f.callInv(x);
       }
@@ -41,7 +40,7 @@ public class InvBuiltin extends Md1Builtin {
   
   public static Fun invertW(Value f) {
     return new Fun() {
-      public String repr() { return f.repr()+"⁼"; }
+      public String ln(FmtInfo f) { return "⁼"; }
       public Value call(Value w, Value x) {
         return f.callInvX(w, x);
       }
@@ -54,7 +53,7 @@ public class InvBuiltin extends Md1Builtin {
   
   public static Fun invertA(Value f) {
     return new Fun() {
-      public String repr() { return f.repr()+"˜⁼˜"; }
+      public String ln(FmtInfo f) { return "˜⁼˜"; }
       public Value call(Value w, Value x) {
         return f.callInvW(w, x);
       }
