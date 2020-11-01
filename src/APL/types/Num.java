@@ -124,6 +124,7 @@ public class Num extends Primitive {
   }
   private static final char[] buf = new char[400];
   public static String format(double d, int pp, int pns, int pne) {
+    pp--; // too lazy to change all uses of this
     double a = Math.abs(d);
     if (d == 0) {
       if (Double.doubleToRawLongBits(d) == 0) return "0";
@@ -140,7 +141,7 @@ public class Num extends Primitive {
     if (pp+6<fa.length) exp = exp*10  +  fa[pp+6]-'0';
     boolean negExp = fa[pp+3] == '-';
     
-    /* •pp←4:
+    /* pp=4:
        4.0000e+03 (optionally another digit)
        0123456789
      ∆ 43210123456

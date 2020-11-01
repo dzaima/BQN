@@ -41,7 +41,7 @@ public class FmtInfo {
   
   
   public FmtInfo with(int pp, int pns, int pne) {
-    if (pp < 1) throw new DomainError("Significant digit count must be ≥1");
+    if (pp < 2) throw new DomainError("Significant digit count must be ≥2");
     return new FmtInfo(pp, pns, pne);
   }
   public FmtInfo with(int[] args) {
