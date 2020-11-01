@@ -210,8 +210,9 @@ public final class Scope {
             Value obj = x.get(1);
             Value blk = x.get(2);
             Value bdy = x.get(3);
-            Value inds = x.ia==4?null:x.get(4);
-            Value src  = x.ia==4?null:x.get(5);
+            Value inds = x.ia<5?null:x.get(4);
+            Value inde = x.ia<5?null:x.get(x.ia<=6?4:5); // incl
+            Value src  = x.ia<5?null:x.get(x.ia<=6?5:6);
             
             byte[] bcp = new byte[bc.ia];
             int[] bcis = bc.asIntVec();
@@ -219,8 +220,9 @@ public final class Scope {
             Token[] ref = new Token[bcp.length];
             if(inds!=null) {
               int[] is = inds.asIntArr();
+              int[] ie = inde.asIntArr();
               String srcS = src.asString();
-              for (int i = 0; i < is.length; i++) ref[i] = new CompToken(srcS, is[i], is[i]+1);
+              for (int i = 0; i < is.length; i++) ref[i] = new CompToken(srcS, is[i], ie[i]+1);
             }
             
             
