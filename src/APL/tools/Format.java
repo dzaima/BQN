@@ -8,9 +8,15 @@ public class Format {
   public static String outputFmt(Value v) {
     if (v instanceof Primitive) {
       if (v instanceof Num) {
-        String s = String.valueOf(((Num) v).num);
-        if (s.startsWith("-")) s = "¯"+s.substring(1);
-        return s.endsWith(".0")? s.substring(0, s.length()-2) : s;
+        double n = ((Num) v).num;
+        long b = Double.doubleToRawLongBits(n);
+        if (Double.isInfinite(n)) return n==Double.POSITIVE_INFINITY? "∞" : "¯∞";
+        if (Double.isNaN(n)) return "NaN";
+        StringBuilder s = new StringBuilder(b<0? "¯" : "");
+        s.append(Math.abs(n));
+        int l = s.length();
+        if (s.charAt(l-2)=='.' && s.charAt(l-1)=='0') s.delete(l-2, l);
+        return s.toString();
       }
       if (v instanceof Char) return String.valueOf(((Char) v).chr);
       if (v instanceof BigValue) return ((BigValue) v).i.toString();
