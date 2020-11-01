@@ -147,7 +147,6 @@ public final class Scope {
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex(this);
         case "•import": return new Import(this);
-        case "•fmt": return new Fmt();
         case "•pretty": return new Pretty(this);
         case "•out": return new Out(this);
         case "•ty": return new TY();
@@ -777,13 +776,6 @@ public final class Scope {
         return new HArr(res);
       }
       throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
-    }
-  }
-  private static class Fmt extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•Fmt"; }
-    
-    public Value call(Value x) {
-      return new ChrArr(Format.outputFmt(x));
     }
   }
   private static class Pretty extends FnBuiltin {

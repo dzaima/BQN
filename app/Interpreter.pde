@@ -13,7 +13,7 @@ abstract static class Interpreter {
 
 
 static class AppMap extends SimpleMap {
-  String toString() { return "app"; }
+  String ln(FmtInfo f) { return "app"; }
   Interpreter it;
   
   AppMap(Interpreter it) {
@@ -41,7 +41,7 @@ static class AppMap extends SimpleMap {
     switch (s) {
       case "layout": return Main.toAPL(kb.data.getString("fullName"));
       case "set": return new Fun() {
-        public String repr() { return "app.set"; }
+        public String ln(FmtInfo f) { return "app.set"; }
         public Value call(Value w, Value x) {
           int[] is = w.asIntVec();
           int xp  = is[0];
@@ -52,7 +52,7 @@ static class AppMap extends SimpleMap {
         }
       };
       case "graph": return new Fun() {
-        public String repr() { return "app.graph"; }
+        public String ln(FmtInfo f) { return "app.graph"; }
         public Value call(Value w) {
           Grapher g = new Grapher(it, w.asString());
           topbar.toNew(g);
@@ -60,10 +60,10 @@ static class AppMap extends SimpleMap {
         }
       };
       case "cpy": return new Fun() {
-        public String repr() { return "app.cpy"; }
+        public String ln(FmtInfo f) { return "app.cpy"; }
         public Value call(Value w) {
           if (w.r() == 1) {
-            w = w.squeeze();
+            w = Arr.create(w.values(), w.shape);
             if (w instanceof ChrArr) {
               a.copy(w.asString());
               return Num.ONE;

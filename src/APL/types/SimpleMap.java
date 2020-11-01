@@ -1,6 +1,8 @@
 package APL.types;
 
 import APL.errors.SyntaxError;
+import APL.tools.FmtInfo;
+import APL.types.arrs.ChrArr;
 
 public abstract class SimpleMap extends APLMap {
   public Value get(Value k) {
@@ -28,5 +30,9 @@ public abstract class SimpleMap extends APLMap {
   
   public int hashCode() {
     return 0;
+  }
+  
+  public Value pretty(FmtInfo f) {
+    return new ChrArr(ln(f));
   }
 }

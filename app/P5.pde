@@ -51,7 +51,7 @@ static class P5Tab extends Tab {
       Main.exec(s, sc, new Value[0]);
     } catch(Throwable t) {
       t.printStackTrace();
-      glSys.setLastError(t).print(glSys); // TODO replace with Sys.report or similar
+      glSys.report(t);
       e.stop(); e=null;
       return;
     }
@@ -98,12 +98,14 @@ static void inv(P5Disp e, Value f, Value x) {
     if (f!=null) f.call(x);
   } catch (Throwable t) {
     t.printStackTrace();
-    glSys.setLastError(t).print(glSys); // TODO replace with Sys.report or similar
+    glSys.report(t);
     e.stop();
   }
 }
 
 static class P5Obj extends SimpleMap {
+  public String ln(FmtInfo f) { return "P5"; }
+  
   P5Disp e;
   static final int a=0; // to make sure i don't accidentally use methods on PApplet
   P5Obj(P5Disp e) {
@@ -147,17 +149,19 @@ static class P5Obj extends SimpleMap {
       // case "fps": return new Num(a.frameRate);
       case "touches": int[] ts = e.touches(); return new IntArr(ts, new int[]{ts.length/2, 2});
       case "img": return new FnBuiltin() {
+        public String ln(FmtInfo f) { return "p5.Img"; }
         public Value call(Value x) {
           if (x.r()!=2) throw new DomainError("p5.Img: Expected argument to be a rank 2 array");
           return new ImgObj(x);
         }
-        public String repr() { return "g.Img"; }
       };
       default: return null;
     }
   }
 }
 static class MB extends SimpleMap {
+  public String ln(FmtInfo f) { return "p5."+(d==LEFT? "lm" : d==CENTER? "mm" : "rm"); }
+  
   int d;
   MB(int d) { this.d = d; }
   
@@ -180,12 +184,10 @@ static class MB extends SimpleMap {
       default: return null;
     }
   }
-  String toString() {
-    return "p5."+(d==LEFT? "lm" : d==CENTER? "mm" : "rm");
-  }
 }
 
 static class GObj extends SimpleMap {
+  public String ln(FmtInfo f) { return "g"; }
   PGraphics g;
   GObj(PGraphics g) {
     this.g = g;
@@ -195,24 +197,25 @@ static class GObj extends SimpleMap {
     if (g==null) throw new DomainError("Cannot use g before setup");
     switch (k) {
       case "background": case "bg": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Bg"; }
         public Value call(Value x) {
           g.background(col(x));
           return x;
         }
-        public String repr() {return "P5.G.bg"; }
       };
       case "text": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Text"; }
         public Value call(Value w, Value x) {
           g.textSize(fg(w, 2));
           g.fill(col(w.get(3)));
           if (w.ia>4) g.textAlign(pick(w.get(4), "left",LEFT, "center",CENTER, "right",RIGHT),
                                   pick(w.get(5), "top",TOP, "center",CENTER, "bottom",BOTTOM, "baseline",BASELINE));
-          g.text(toPrintable(x), fg(w, 0), fg(w, 1));
+          g.text(Format.outputFmt(x), fg(w, 0), fg(w, 1));
           return x;
         }
-        public String repr() {return "P5.G.text"; }
       };
-      case "ln": return new FnBuiltin() {
+      case "ln": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Ln"; }
         public Value call(Value x) { return call(EmptyArr.SHAPE0N, x); }
         public Value call(Value w, Value x) { Value[] cs = cs(x); // args: x0 y0 x1 y1 col w=0
           int ta=w.ia+cs.length; if (ta!=5 && ta!=6) throw new DomainError("g.Ln: Expected 5 or 6 total items (x0,y0,x1,y1,color,[width])");
@@ -225,9 +228,9 @@ static class GObj extends SimpleMap {
           }
           return Num.ONE;
         }
-        public String repr() { return "g.Ln"; }
       };
-      case "rect": return new FnBuiltin() {
+      case "rect": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Rect"; }
         public Value call(Value x) { return call(EmptyArr.SHAPE0N, x); }
         public Value call(Value w, Value x) { Value[] cs = cs(x); // args: x0 y0 x1 y1 fcol scol=0 w=0
           int ta=w.ia+cs.length; if (ta!=5 && ta!=7) throw new DomainError("g.Rect: Expected 5 or 7 total items (x0,y0,x1,y1,fill,[stroke,weight])");
@@ -241,9 +244,9 @@ static class GObj extends SimpleMap {
           }
           return Num.ONE;
         }
-        public String repr() { return "g.Rect"; }
       };
-      case "poly": return new FnBuiltin() {
+      case "poly": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Poly"; }
         public Value call(Value w, Value x) { // fill‿[stroke‿w] g.Poly x0‿y0‿x1‿y1‿x2‿y2‿…
           float[] fs = fs(x); if (fs.length%2!=0) throw new DomainError("g.Poly: Expected even number of items in 𝕩");
           if (w.ia!=1 && w.ia!=3) throw new DomainError("g.Poly: Expected 1 or 3 items in 𝕨 (fill,[stroke,weight])");
@@ -255,9 +258,9 @@ static class GObj extends SimpleMap {
           g.endShape(CLOSE);
           return Num.ONE;
         }
-        public String repr() { return "g.Rect"; }
       };
-      case "ellipse": return new FnBuiltin() {
+      case "ellipse": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Ellipse"; }
         public Value call(Value x) { return call(EmptyArr.SHAPE0N, x); }
         public Value call(Value w, Value x) { Value[] cs = cs(x); // args: x0 y0 x1 y1 fcol scol=0 w=0
           int ta=w.ia+cs.length; if (ta!=5 && ta!=7) throw new DomainError("g.Ellipse: Expected 5 or 7 total items (x,y,w,h,fill,[stroke,weight])");
@@ -271,9 +274,9 @@ static class GObj extends SimpleMap {
           }
           return Num.ONE;
         }
-        public String repr() { return "g.Rect"; }
       };
-      case "circle": return new FnBuiltin() {
+      case "circle": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Circle"; }
         public Value call(Value x) { return call(EmptyArr.SHAPE0N, x); }
         public Value call(Value w, Value x) { Value[] cs = cs(x); // args: x0 y0 x1 y1 fcol scol=0 w=0
           int ta=w.ia+cs.length; if (ta!=4 && ta!=6) throw new DomainError("g.Circle: Expected 4 or 6 total items (x,y,d,fill,[stroke,weight])");
@@ -288,9 +291,9 @@ static class GObj extends SimpleMap {
           }
           return Num.ONE;
         }
-        public String repr() { return "g.Rect"; }
       };
-      case "img": return new FnBuiltin() {
+      case "img": return new Fun() {
+        public String ln(FmtInfo f) { return "g.Img"; }
         public Value call(Value x) { return call(new IntArr(new int[]{0, 0}), x); }
         public Value call(Value w, Value x) {
           int[] pos = w.asIntVec(); if (pos.length!=2 && pos.length!=4) throw new DomainError("g.Img: Expected 2 or 4 arguments in 𝕨");
@@ -302,7 +305,6 @@ static class GObj extends SimpleMap {
           else g.image(img.i, pos[0], pos[1]);
           return Num.ONE;
         }
-        public String repr() { return "g.Img"; }
       };
       default: return null;
     }
@@ -317,6 +319,7 @@ static class GObj extends SimpleMap {
 }
 
 static class ImgObj extends SimpleMap {
+  public String ln(FmtInfo f) { return "img"; }
   PImage i;
   ImgObj(PImage i) { this.i = i; }
   ImgObj(Value px) {

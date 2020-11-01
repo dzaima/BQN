@@ -1,8 +1,8 @@
 abstract static class Tab extends SimpleMap {
+  public String ln(FmtInfo f) { return "tab["+name()+"]"; }
   
   abstract String name();
   
-  String toString() { return "tab["+name()+"]"; }
   
   void opened() { }
   void close() { }
@@ -13,7 +13,7 @@ abstract static class Tab extends SimpleMap {
     switch (k) {
       case "name": return Main.toAPL(name());
       case "close": return new Fun() {
-        public String repr() { return Tab.this+".close"; }
+        public String ln(FmtInfo f) { return Tab.this+".close"; }
         public Value call(Value w) {
           topbar.close(Tab.this);
           return Num.ONE;

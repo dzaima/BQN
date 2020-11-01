@@ -164,14 +164,6 @@ static void redrawAll() {
 
 
 
-static String toPrintable(Value v) { // TODO make part of BQN
-  if (v.r()<=1) return v.asString();
-  if (v.r()==2) {
-    for (Value c : v) if (!(c instanceof Char)) throw new DomainError("Expected all-char array");
-    return v.toString();
-  }
-  throw new DomainError("stringifying "+v);
-}
 static String readFile(String name) {
   return new String(a.loadBytes(name), StandardCharsets.UTF_8);
 }
