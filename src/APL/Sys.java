@@ -20,7 +20,7 @@ public abstract class Sys {
   public APLError lastError = null;
   public Value[] defArgs;
   public String cd;
-  public FmtInfo fi = new FmtInfo(14, -10, 10);
+  public FmtInfo fi = new FmtInfo(14, 10, 10);
   
   public Sys() {
     gsc = csc = new Scope(this);
@@ -113,6 +113,10 @@ public abstract class Sys {
             else throw new DomainError("argument to )cs wasn't scoped");
           }
         }
+        break;
+      case "NF":
+        Value val = Main.exec(rest, csc, defArgs);
+        fi = fi.with(val.asIntVec());
         break;
       case "BC":
         println(Main.comp(rest, csc, defArgs).fmt());

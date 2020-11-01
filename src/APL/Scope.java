@@ -120,15 +120,6 @@ public final class Scope {
         case "•rl":
           rnd = new Random(val.asInt());
           break;
-        case "•pp":
-          if (val instanceof Primitive) {
-            Num.setPrecision(val.asInt());
-          } else {
-            int[] args = val.asIntVec();
-            if (args.length == 3) Num.setPrecision(args[0], args[1], args[2]);
-            else throw new DomainError("•pp expected either a scalar number or array of 3 integers as 𝕩", val);
-          }
-          break;
         default:
           throw new DomainError("setting unknown quad "+key);
       }
@@ -170,7 +161,6 @@ public final class Scope {
         case "•hash": return new Hasher();
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
         case "•class": return new ClassGetter();
-        case "•pp": return new DoubleArr(new double[] {Num.pp, Num.sEr, Num.eEr});
         case "•pfx": return new Profiler(this);
         case "•pfo": return new Profiler.ProfilerOp(this);
         case "•pfc": return new Profiler.ProfilerMd2(this);

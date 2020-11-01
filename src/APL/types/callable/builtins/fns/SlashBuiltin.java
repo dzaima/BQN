@@ -380,7 +380,7 @@ public class SlashBuiltin extends FnBuiltin {
       int[] res = new int[x.ia];
       for (int i = 0; i < wi.length; i++) {
         int d = wi[i];
-        if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.format(d));
+        if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d));
         if (d == 1) res[i] = vi[ipos++];
         else res[i] = xi[i];
       }
@@ -389,7 +389,7 @@ public class SlashBuiltin extends FnBuiltin {
     Value[] res = new Value[x.ia];
     for (int i = 0; i < wi.length; i++) {
       int d = wi[i];
-      if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.format(d));
+      if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d));
       if (d == 1) res[i] = v.get(ipos++);
       else res[i] = x.get(i);
     }

@@ -110,22 +110,20 @@ public class Num extends Primitive {
   
   
   
-  public Value pretty(FmtInfo f) { return new ChrArr(format(num, f.pp, f.scs, f.sce)); }
-  public String    ln(FmtInfo f) { return            format(num, f.pp, f.scs, f.sce);  }
+  public Value pretty(FmtInfo f) { return new ChrArr(format(num, f.pp, f.pns, f.pne)); }
+  public String    ln(FmtInfo f) { return            format(num, f.pp, f.pns, f.pne);  }
   
   
   // ============================== NUMBER FORMATTING ============================== \\
   
-  public static int pp;
-  public static int sEr, eEr;
-  static {
-    setPrecision(14, -10, 10);
+  public static String fmt(double d) { // for simple cases when 
+    return format(d, 20, -10, 10);
+  }
+  public static String formatInt(int i) {
+    return i<0? "¯"+(-i) : Integer.toString(i);
   }
   private static final char[] buf = new char[400];
-  public static String format(double d) {
-    return format(d, pp, sEr, eEr);
-  }
-  public static String format(double d, int pp, int sEr, int eEr) {
+  public static String format(double d, int pp, int pns, int pne) {
     double a = Math.abs(d);
     if (d == 0) {
       if (Double.doubleToRawLongBits(d) == 0) return "0";
@@ -138,18 +136,19 @@ public class Num extends Primitive {
       if (fa[0] == 'N') return "NaN";
       return d<0? "¯∞" : "∞";
     }
-    int exp = (fa[pp+4]-'0')*10  +   fa[pp+5]-'0'; // exponent
+    int exp = (fa[pp+4]-'0')*10  +  fa[pp+5]-'0'; // exponent
+    if (pp+6<fa.length) exp = exp*10  +  fa[pp+6]-'0';
+    boolean negExp = fa[pp+3] == '-';
+    
     /* •pp←4:
-       4.0000e+03
+       4.0000e+03 (optionally another digit)
        0123456789
      ∆ 43210123456
        ¯¯¯¯
     */
-    if (exp < sEr || exp > eEr) { // scientific notation
+    if (negExp? exp>pns : exp>pne) { // scientific notation
       int len = 0;
-      if (d < 0) {
-        buf[len++] = '¯';
-      }
+      if (d < 0) buf[len++] = '¯';
       
       int ls = pp+1; // last significant digit position
       while (fa[ls] == '0') ls--;
@@ -160,7 +159,7 @@ public class Num extends Primitive {
       len+= ls;
       buf[len++] = 'e';
       
-      if (fa[pp+3] == '-') buf[len++] = '¯';
+      if (negExp) buf[len++] = '¯';
       
       int es = pp+4;
       int ee = fa.length;
@@ -173,7 +172,7 @@ public class Num extends Primitive {
     }
     
     
-    // generic standard notation
+    // generic positional notation
     /* •pp←4:
        _31416e+00
        01234567890
@@ -181,9 +180,7 @@ public class Num extends Primitive {
        ¯¯¯¯
     */
     int len = 0;
-    if (d < 0) {
-      buf[len++] = '¯';
-    }
+    if (d < 0) buf[len++] = '¯';
     fa[1] = fa[0]; // put all the significant digits in order
     fa[0] = '0'; // 0 so ls calculation doesn't have to special-case
     
@@ -191,7 +188,7 @@ public class Num extends Primitive {
     int ls = pp+1; // length of significant digits
     while (fa[ls] == '0') ls--;
     
-    if (fa[pp+3] == '-') {
+    if (negExp) {
       buf[len] = '0';
       buf[len+1] = '.';
       len+= 2;
@@ -215,17 +212,5 @@ public class Num extends Primitive {
     }
     // System.out.println(f+": sig="+ls+"; exp="+exp+"; len="+len);
     return new String(buf, 0, len);
-  }
-  public static String formatInt(int i) {
-    return i<0? "¯"+(-i) : Integer.toString(i);
-  }
-  public static void setPrecision(int p) {
-    pp = Math.min(p, 20); // without min it'll actually create a ±length-p string of zeroes
-  }
-  public static void setPrecision(int p, int s, int e) {
-    pp = Math.min(p, 20);
-    if (s<-90 | e>90) throw new DomainError("•PP standard notation range too big");
-    sEr = s;
-    eEr = e;
   }
 }

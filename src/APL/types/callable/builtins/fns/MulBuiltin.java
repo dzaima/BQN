@@ -73,7 +73,7 @@ public class MulBuiltin extends FnBuiltin {
   private static final Pervasion.NN2N SET_SGN = new Pervasion.NN2N() {
     public double on(double w, double x) {
       if (x==0) return 0;
-      if (w==0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(x));
+      if (w==0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.fmt(x));
       if (x== 1) return  Math.abs(w);
       if (x==-1) return -Math.abs(w);
       throw new DomainError("⌾×: cannot set sign to "+x);
@@ -81,7 +81,7 @@ public class MulBuiltin extends FnBuiltin {
     public void on(double w, double[] x, double[] res) {
       for (int i = 0; i < res.length; i++) {
         double nc = x[i];
-        if (w==0 && nc!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(nc));
+        if (w==0 && nc!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.fmt(nc));
         if (nc==0 || nc==1 || nc==-1) res[i] = Math.abs(w)*nc;
         else throw new DomainError("⌾×: cannot set sign to "+nc);
       }
@@ -89,7 +89,7 @@ public class MulBuiltin extends FnBuiltin {
     public void on(double[] w, double x, double[] res) {
       for (int i = 0; i < res.length; i++) {
         double oc = w[i];
-        if (oc==0 && x!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(x));
+        if (oc==0 && x!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.fmt(x));
         if (x==0 || x==1 || x==-1) res[i] = Math.abs(oc)*x;
         else throw new DomainError("⌾×: cannot set sign to "+x);
       }
@@ -98,7 +98,7 @@ public class MulBuiltin extends FnBuiltin {
       for (int i = 0; i < res.length; i++) {
         double oc = w[i];
         double nc = x[i];
-        if (oc==0 && nc!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.format(nc));
+        if (oc==0 && nc!=0) throw new DomainError("⌾×: cannot set sign of 0 to "+Num.fmt(nc));
         if (nc==0 || nc==1 || nc==-1) res[i] = Math.abs(oc)*nc;
         else throw new DomainError("⌾×: cannot set sign to "+nc);
       }
