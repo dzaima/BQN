@@ -2,7 +2,7 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.Token;
-import APL.tokenizer.types.BlockTok;
+import APL.tokenizer.types.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -216,22 +216,28 @@ public final class Scope {
             return call(Num.ONE, x);
           }
           public Value call(Value w, Value x) {
-            if (x.ia!=4) throw new LengthError("•COMP: 4 ≠ ≠𝕩", this, x);
             boolean allowImm = Main.bool(w);
             Value bc = x.get(0);
             Value obj = x.get(1);
             Value blk = x.get(2);
             Value bdy = x.get(3);
+            Value inds = x.ia==4?null:x.get(4);
+            Value src  = x.ia==4?null:x.get(5);
             
             byte[] bcp = new byte[bc.ia];
             int[] bcis = bc.asIntVec();
             for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bcis[i];
-            Token[] ref = new Token[bcp.length]; // keep as nulls
+            Token[] ref = new Token[bcp.length];
+            if(inds!=null) {
+              int[] is = inds.asIntArr();
+              String srcS = src.asString();
+              for (int i = 0; i < is.length; i++) ref[i] = new CompToken(srcS, is[i], is[i]+1);
+            }
+            
             
             Value[] objp = new Value[obj.ia];
             for (int i = 0; i < objp.length; i++) objp[i] = obj.get(i);
             
-            // BlockTok[] blkp = new BlockTok[blk.ia];
             Body[] bodies = new Body[bdy.ia];
             for (int i = 0; i < bodies.length; i++) {
               Value bd = bdy.get(i);
