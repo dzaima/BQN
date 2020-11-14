@@ -1,6 +1,7 @@
 package APL.types.arrs;
 
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 
 public class IntArr extends Arr {
@@ -64,6 +65,7 @@ public class IntArr extends Arr {
   public Value ofShape(int[] sh) { return new IntArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }
+  public int arrInfo() { return Pervasion.ARR_I32; }
   
   public int hashCode() {
     if (hash == 0) {

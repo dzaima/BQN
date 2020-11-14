@@ -1,5 +1,6 @@
 package APL.types;
 
+import APL.tools.Pervasion;
 import APL.types.arrs.SingleItemArr;
 
 public abstract class Primitive extends Value {
@@ -20,5 +21,9 @@ public abstract class Primitive extends Value {
   
   public Value safePrototype() {
     return null;
+  }
+  
+  public int arrInfo() {
+    return Pervasion.ARR_ATM;
   }
 }

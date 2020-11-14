@@ -28,8 +28,8 @@ public class LTBuiltin extends FnBuiltin {
     public void on(char[] w, char   x, BitArr.BA res) { for (char cw : w) { res.add(cw <  x); } }
     public void on(char[] w, char[] x, BitArr.BA res) { for (int i = 0; i < w.length; i++) { res.add(w[i] < x[i]); } }
     
-    public Value on(boolean w, BitArr  x) { if(w) return s0(x); return x; }
-    public Value on(BitArr  w, boolean x) { if(x) return not(w); return s0(w); }
+    public Value on(boolean w, BitArr  x) { if(w) return BitArr.s0(x); return x; }
+    public Value on(BitArr  w, boolean x) { if(x) return BitArr.not(w); return BitArr.s0(w); }
     public void  on(long[]  w, long[]  x, long[] res) { for (int i = 0; i < res.length; i++) res[i] = (~w[i]) & x[i]; }
   };
   

@@ -1,6 +1,7 @@
 package APL.types.arrs;
 
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 
 import java.util.Arrays;
@@ -34,13 +35,9 @@ public class ChrArr extends Arr {
     return s;
   }
   
-  public Value prototype() {
-    return Char.SPACE;
-  }
-  public Value safePrototype() {
-    return Char.SPACE;
-  }
-  
+  public Value prototype() { return Char.SPACE; }
+  public Value safePrototype() { return Char.SPACE; }
+  public int arrInfo() { return Pervasion.ARR_C16; }
   
   public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) {

@@ -1,7 +1,7 @@
 package APL.types;
 
 import APL.errors.DomainError;
-import APL.tools.FmtInfo;
+import APL.tools.*;
 import APL.types.arrs.*;
 
 import java.util.Locale;
@@ -82,7 +82,10 @@ public class Num extends Primitive {
   public boolean quickIntArr() { return isInt(num); }
   public boolean quickDoubleArr() { return true; }
   public Value safePrototype() { return ZERO; }
-  
+  public int atomInfo() {
+    int iv = (int)num;
+    return iv==num? ((iv&1)==iv? Pervasion.ATM_BIT : Pervasion.ATM_I32) : Pervasion.ATM_F64;
+  }
   
   
   
@@ -117,7 +120,7 @@ public class Num extends Primitive {
   // ============================== NUMBER FORMATTING ============================== \\
   
   public static String fmt(double d) { // for simple cases when 
-    return format(d, 20, -10, 10);
+    return format(d, 20, 10, 10);
   }
   public static String formatInt(int i) {
     return i<0? "¯"+(-i) : Integer.toString(i);

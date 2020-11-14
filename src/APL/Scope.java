@@ -167,15 +167,6 @@ public final class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
-        case "•ia": return new FnBuiltin() {
-          public String ln(FmtInfo f) { return "•IA"; }
-
-          public Value call(Value x) {
-            int[] is = new int[x.ia];
-            for (int i = 0; i < is.length; i++) is[i] = x.get(i).asInt();
-            return new IntArr(is, x.shape);
-          }
-        };
         case "•rand": return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•RAND"; }
           
@@ -426,10 +417,10 @@ public final class Scope {
     }
   }
   public static Value formatTime(double ns) {
-    if (ns < 1000) return Main.toAPL(Num.format(ns, 3, -99, 99)+"ns");
+    if (ns < 1000) return Main.toAPL(Num.format(ns, 3, 99, 99)+"ns");
     double ms = ns/1e6;
-    if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, -99, 99)+" seconds");
-    return Main.toAPL(Num.format(ms, 3, -99, 99)+"ms");
+    if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, 99, 99)+" seconds");
+    return Main.toAPL(Num.format(ms, 3, 99, 99)+"ms");
   }
   
   

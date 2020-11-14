@@ -2,16 +2,20 @@ package APL.types.arrs;
 
 import APL.Main;
 import APL.errors.DomainError;
-import APL.tools.FmtInfo;
+import APL.tools.*;
 import APL.types.*;
 
-import java.util.Iterator;
+import java.util.*;
 
 public class SingleItemArr extends Arr {
   private final Value item;
   
   public SingleItemArr(Value item, int[] shape) {
     super(shape);
+    this.item = item;
+  }
+  public SingleItemArr(Value item, int[] shape, int ia) {
+    super(shape, ia);
     this.item = item;
   }
   
@@ -56,6 +60,16 @@ public class SingleItemArr extends Arr {
     return vs;
   }
   
+  public int arrInfo() {
+    switch (item.atomInfo()) {
+      case Pervasion.ATM_BIT: return Pervasion.ARR_BIT;
+      case Pervasion.ATM_I32: return Pervasion.ARR_I32;
+      case Pervasion.ATM_F64: return Pervasion.ARR_F64;
+      case Pervasion.ATM_CHR: return Pervasion.ARR_C16;
+      default               : return Pervasion.ARR_ANY;
+    }
+  }
+  
   public double sum() {
     return item.asDouble() * ia;
   }
@@ -72,6 +86,13 @@ public class SingleItemArr extends Arr {
     double n = item.asDouble();
     for (int i = 0; i < ia; i++) res[i] = n;
     return res;
+  }
+  public long[] asBitLongs() {
+    double i = item.asDouble();
+    if (i!=0 && i!=1) throw new DomainError("Using array containing "+i+" as boolean array");
+    long[] r = new long[BitArr.sizeof(ia)];
+    if (i!=0) Arrays.fill(r, -1L);
+    return r;
   }
   
   public String ln(FmtInfo f) {

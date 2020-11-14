@@ -2,6 +2,7 @@ package APL.types;
 
 import APL.errors.*;
 import APL.tools.*;
+import APL.types.arrs.*;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.md1.ConstBultin;
 
@@ -70,12 +71,47 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return asIntArr();
   }
   
+  public /*open*/ long[] asBitLongs() {
+    int i=0, o=0;
+    long[] a = new long[BitArr.sizeof(ia)];
+    for (int c : asIntArr()) {
+      if ((c&1) != c) throw new DomainError("Using array containing "+c+" as boolean array");
+      a[i]|= (long) c << o;
+      o++;
+      if (o == 64) { o = 0; i++; }
+    }
+    return a;
+  }
+  
   
   
   
   public /*open*/ boolean quickDoubleArr() { return false; } // if true, asDoubleArr must succeed; also true for Num
   public /*open*/ boolean quickIntArr   () { return false; } // if true, asIntArr must succeed; also true for integer Num
   public /*open*/ boolean quickDepth1   () { return false; } // true if object is guaranteed to be depth 1 (returning false always is allowed)
+  
+  /*
+    0 - heterogeneous array
+    1 - double array
+    2 - int array
+    3 - bit array
+    4 - char array
+    5 - atom  
+  */
+  
+  public /*open*/ int arrInfo() {
+    return Pervasion.ARR_ANY;
+  }
+  /*
+    0 - bit
+    1 - integer
+    2 - double
+    3 - char
+    4 - something else
+   */
+  public /*open*/ int atomInfo() {
+    return Pervasion.ATM_UNK;
+  }
   public boolean scalar() { return r() == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
   public abstract Value safePrototype(); // what to append to this array

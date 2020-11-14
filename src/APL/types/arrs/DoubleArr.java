@@ -1,6 +1,7 @@
 package APL.types.arrs;
 
 import APL.errors.DomainError;
+import APL.tools.Pervasion;
 import APL.types.*;
 
 import java.util.ArrayList;
@@ -67,8 +68,7 @@ public class DoubleArr extends Arr {
   public Value ofShape(int[] sh) { return new DoubleArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }
-  
-  
+  public int arrInfo() { return Pervasion.ARR_F64; }
   
   public int hashCode() {
     if (hash == 0) {

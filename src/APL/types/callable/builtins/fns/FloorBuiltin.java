@@ -57,8 +57,8 @@ public class FloorBuiltin extends FnBuiltin {
     public int[] on(int[] w, int[] x) {int[]res=new int[x.length]; for(int i=0;i<x.length;i++) {res[i]=Math.min(w[i],x[i]);}return res;}
     
     // MulBuiltin.DF
-    public Value on(boolean w, BitArr x) { return w? x : BitArr.fill(x, false); }
-    public Value on(BitArr w, boolean x) { return x? w : BitArr.fill(w, false); }
+    public Value on(boolean w, BitArr x) { return w? x : BitArr.s0(x); }
+    public Value on(BitArr w, boolean x) { return x? w : BitArr.s0(w); }
     public Value on(BitArr w, BitArr x) {
       BitArr.BC res = new BitArr.BC(w.shape);
       for (int i = 0; i < w.arr.length; i++) res.arr[i] = w.arr[i] & x.arr[i];

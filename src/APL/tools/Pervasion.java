@@ -236,16 +236,6 @@ public class Pervasion { // implementations must be okay with not being called o
       }
       return super.each(w, x);
     }
-    
-    protected Value not(BitArr x) {
-      return NotBuiltin.on(x);
-    }
-    protected Value s0(BitArr x) {
-      return new SingleItemArr(Num.ZERO, x.shape);
-    }
-    protected Value s1(BitArr x) {
-      return new SingleItemArr(Num.ONE, x.shape);
-    }
   }
   
   public static boolean mixed(BitArr b) {
@@ -274,4 +264,17 @@ public class Pervasion { // implementations must be okay with not being called o
   }
   
   private Pervasion() { }
+  
+  public static final int ARR_ANY = 0; // Value::arrInfo
+  public static final int ARR_F64 = 1; // ordered so the max would get the most important
+  public static final int ARR_I32 = 2;
+  public static final int ARR_BIT = 3;
+  public static final int ARR_C16 = 4;
+  public static final int ARR_ATM = 5;
+  
+  public static final int ATM_BIT = 0; // Value::atomInfo
+  public static final int ATM_I32 = 1;
+  public static final int ATM_F64 = 2;
+  public static final int ATM_CHR = 3;
+  public static final int ATM_UNK = 4;
 }

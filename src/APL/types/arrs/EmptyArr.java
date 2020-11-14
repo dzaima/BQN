@@ -1,6 +1,7 @@
 package APL.types.arrs;
 
 import APL.errors.*;
+import APL.tools.Pervasion;
 import APL.types.*;
 
 import java.util.Iterator;
@@ -37,6 +38,9 @@ public class EmptyArr extends Arr {
   public double[] asDoubleArrClone() { return DoubleArr.EMPTY; }
   public double sum() { return 0; }
   
+  public static final long[] NOLONGS = new long[0];
+  public long[] asBitLongs() { return NOLONGS; }
+  
   public Value[] valuesClone() { return NOVALUES; }
   public Value[] values     () { return NOVALUES; }
   
@@ -48,7 +52,9 @@ public class EmptyArr extends Arr {
     assert ia == Arr.prod(sh);
     return new EmptyArr(sh, proto);
   }
-  
+  public int arrInfo() {
+    return proto==Char.SPACE? Pervasion.ARR_C16 : Pervasion.ARR_BIT;
+  }
   
   public Value prototype() {
     if (proto == null) throw new DomainError("couldn't get prototype", this);

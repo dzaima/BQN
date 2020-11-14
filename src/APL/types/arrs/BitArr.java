@@ -1,7 +1,9 @@
 package APL.types.arrs;
 
 import APL.Main;
+import APL.tools.Pervasion;
 import APL.types.*;
+import APL.types.callable.builtins.fns.NotBuiltin;
 
 import java.util.Arrays;
 
@@ -34,18 +36,26 @@ public final class BitArr extends Arr {
     for (int i : sh) m*= i;
     return sizeof(m);
   }
-  public static Value fill(Value v, boolean b) {
-    long[] arr = new long[sizeof(v)];
-    if (b) Arrays.fill(arr, -1L);
-    return new BitArr(arr, v.shape, v.ia);
-  }
+  
+  public static Value not(BitArr x) { return NotBuiltin.on(x); }
+  public static Value s0(Value v) { return new BitArr(new long[sizeof(v.ia)], v.shape, v.ia); }
+  public static Value s1(Value v) { long[]ls=new long[sizeof(v.ia)];Arrays.fill(ls,-1L); return new BitArr(ls, v.shape, v.ia); }
   
   
   public void setEnd(boolean on) {
     if ((ia&63) != 0) {
       int extra = ia&63;
       long tail = -(1L<<extra); // bits outside of the array
-      long last = arr[arr.length - 1]; // last item of the array
+      long last = arr[arr.length-1]; // last item of the array
+      long at = tail & (on? ~last : last); // masking tail bits of the last item
+      arr[arr.length-1] = last ^ at;
+    }
+  }
+  public static void setEnd(long[] arr, int ia, boolean on) {
+    if ((ia&63) != 0) {
+      int extra = ia&63;
+      long tail = -(1L<<extra); // bits outside of the array
+      long last = arr[arr.length-1]; // last item of the array
       long at = tail & (on? ~last : last); // masking tail bits of the last item
       arr[arr.length-1] = last ^ at;
     }
@@ -92,6 +102,9 @@ public final class BitArr extends Arr {
     }
     return res;
   }
+  public long[] asBitLongs() {
+    return arr;
+  }
   
   
   public boolean quickDoubleArr() { return true; }
@@ -100,9 +113,7 @@ public final class BitArr extends Arr {
   public Value ofShape(int[] sh) { return new BitArr(arr, sh); }
   public Value prototype() { return Num.ZERO; }
   public Value safePrototype() { return Num.ZERO; }
-  
-  
-  
+  public int arrInfo() { return Pervasion.ARR_BIT; }
   
   public double sum() {
     return isum();
@@ -136,10 +147,7 @@ public final class BitArr extends Arr {
     }
     public void add(boolean b) {
       a[i]|= (b? 1L : 0L)<<o;
-      o++;
-      // i+= o==64? 1 : 0; // todo, idk ._.
-      // o&= 63;
-      if (o == 64) {
+      if (++o == 64) {
         o = 0;
         i++;
       }
@@ -147,8 +155,7 @@ public final class BitArr extends Arr {
     
     public void add(long l) { // expects a 0 or 1
       a[i]|= l<<o;
-      o++;
-      if (o == 64) {
+      if (++o == 64) {
         o = 0;
         i++;
       }

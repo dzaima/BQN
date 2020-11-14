@@ -1,6 +1,6 @@
 package APL.types;
 
-import APL.tools.FmtInfo;
+import APL.tools.*;
 import APL.types.arrs.ChrArr;
 
 
@@ -43,8 +43,7 @@ public class Char extends Primitive {
   }
   public Value safePrototype() { return SPACE; }
   public String asString() { return String.valueOf(chr); }
-  
-  
+  public int atomInfo() { return Pervasion.ATM_CHR; }
   
   public boolean eq(Value c) {
     return c instanceof Char && chr == ((Char) c).chr;

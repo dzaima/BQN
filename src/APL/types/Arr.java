@@ -24,9 +24,8 @@ public abstract class Arr extends Value {
   public String basicFormat(boolean quote) {
     if (ia == 0) {
       Value pr = safePrototype();
-      String mr = pr instanceof Char? "@" : pr instanceof Num? "0" : "⟨⟩";
-      if (r() == 1) return mr;
-      else return Main.formatAPL(shape) + "⥊" + mr;
+      if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : "⟨⟩";
+      else return Main.formatAPL(shape) + "⥊" + (pr instanceof Char? "@" : pr instanceof Num? "0" : "⟨⟩");
     }
     if (r() == 1) { // strings
       StringBuilder all = new StringBuilder();

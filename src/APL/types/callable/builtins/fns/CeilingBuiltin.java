@@ -57,8 +57,8 @@ public class CeilingBuiltin extends FnBuiltin {
     public int[] on(int[] w, int[] x) {int[]res=new int[x.length]; for(int i=0;i<x.length;i++) {res[i]=Math.max(w[i],x[i]);}return res;}
     
     // OrBuiltin.DF
-    public Value on(boolean w, BitArr x) { return w? BitArr.fill(x, true) : x; }
-    public Value on(BitArr w, boolean x) { return x? BitArr.fill(w, true) : w; }
+    public Value on(boolean w, BitArr x) { return w? BitArr.s1(x) : x; }
+    public Value on(BitArr w, boolean x) { return x? BitArr.s1(w) : w; }
     public Value on(BitArr w, BitArr x) {
       BitArr.BC res = new BitArr.BC(w.shape);
       for (int i = 0; i < w.arr.length; i++) res.arr[i] = w.arr[i] | x.arr[i];
