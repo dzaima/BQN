@@ -177,7 +177,7 @@ public class Num extends Primitive {
     
     
     // generic positional notation
-    /* •pp←4:
+    /* )nf 5 (pp==4):
        _31416e+00
        01234567890
      ∆ 432101234567

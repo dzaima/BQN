@@ -10,8 +10,9 @@ public class MatchBuiltin extends FnBuiltin {
   public static int lazy(Value x) {
     int depth = 0;
     while (!(x instanceof Primitive)) {
-      x = x.first();
       depth++;
+      if (x.ia==0) break;
+      x = x.first();
     }
     return depth;
   }

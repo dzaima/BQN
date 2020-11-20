@@ -10,7 +10,6 @@ import APL.types.callable.*;
 import APL.types.callable.blocks.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.fns.*;
-import APL.types.callable.builtins.md1.CellBuiltin;
 import APL.types.callable.builtins.md2.DepthBuiltin;
 
 import java.io.*;

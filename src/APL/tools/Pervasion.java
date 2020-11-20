@@ -4,7 +4,6 @@ import APL.Main;
 import APL.errors.*;
 import APL.types.*;
 import APL.types.arrs.*;
-import APL.types.callable.builtins.fns.NotBuiltin;
 
 public class Pervasion { // implementations must be okay with not being called on duplicate items!
   public static abstract class VV {

@@ -37,9 +37,7 @@ public class EpsBuiltin extends FnBuiltin {
     if (w.scalar()) { // TODO this _might_ be wrong
       Value w0 = w.first();
       for (Value v : x) {
-        if (v.eq(w0)) {
-          return Num.ONE;
-        }
+        if (v.eq(w0)) return Num.ONE;
       }
       return Num.ZERO;
     }

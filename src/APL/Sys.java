@@ -3,7 +3,7 @@ package APL;
 import APL.errors.*;
 import APL.tokenizer.Tokenizer;
 import APL.tokenizer.types.BasicLines;
-import APL.tools.*;
+import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.blocks.*;
@@ -198,7 +198,7 @@ public abstract class Sys {
   public abstract void off(int code);
   
   
-  public void println(Value v) {
+  public /*open*/ void println(Value v) {
     println(ln? v.ln(fi) : FmtInfo.fmt(v.pretty(fi)));
   }
   

@@ -37,14 +37,16 @@ public class EachBuiltin extends Md1Builtin {
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
     if (x.scalar()) {
-      if (w.scalar()) return SingleItemArr.r0(f.call(w.first(), x.first()));
+      Value x0 = x.first();
+      if (w.scalar()) return SingleItemArr.r0(f.call(w.first(), x0));
       Value[] n = new Value[w.ia];
-      for (int i = 0; i < n.length; i++) n[i] = f.call(w.get(i), x.first());
+      for (int i = 0; i < n.length; i++) n[i] = f.call(w.get(i), x0);
       return Arr.create(n, w.shape);
     }
     if (w.scalar()) {
       Value[] n = new Value[x.ia];
-      for (int i = 0; i < n.length; i++) n[i] = f.call(w.first(), x.get(i));
+      Value w0 = w.first();
+      for (int i = 0; i < n.length; i++) n[i] = f.call(w0, x.get(i));
       return Arr.create(n, x.shape);
     }
     
@@ -53,9 +55,7 @@ public class EachBuiltin extends Md1Builtin {
     
     if (w.r() == x.r()) {
       MutVal res = new MutVal(x.shape);
-      for (int i = 0; i < x.ia; i++) {
-        res.set(i, f.call(w.get(i), x.get(i)));
-      }
+      for (int i = 0; i < x.ia; i++) res.set(i, f.call(w.get(i), x.get(i)));
       return res.get();
     }
     

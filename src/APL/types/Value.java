@@ -2,7 +2,7 @@ package APL.types;
 
 import APL.errors.*;
 import APL.tools.*;
-import APL.types.arrs.*;
+import APL.types.arrs.BitArr;
 import APL.types.callable.Md1Derv;
 import APL.types.callable.builtins.md1.ConstBultin;
 

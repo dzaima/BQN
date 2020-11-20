@@ -1,7 +1,7 @@
 package APL.tools;
 
 import APL.errors.DomainError;
-import APL.types.*;
+import APL.types.Value;
 import APL.types.arrs.ChrArr;
 
 import java.util.HashSet;

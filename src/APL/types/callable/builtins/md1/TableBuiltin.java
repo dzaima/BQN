@@ -14,16 +14,16 @@ public final class TableBuiltin extends Md1Builtin {
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) { // TODO use valuecopy
+    int ia = w.ia*x.ia;
     int[] sh = new int[w.r() + x.r()];
     System.arraycopy(w.shape, 0, sh, 0, w.r());
     System.arraycopy(x.shape, 0, sh, w.r(), x.r());
+    if (ia==0) return new EmptyArr(sh, w.safePrototype());
     
-    if (w.ia==0 || x.ia==0) return new EmptyArr(sh, w.safePrototype());
-  
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
-        double[] arr = new double[w.ia*x.ia];
+        double[] arr = new double[ia];
         int i = 0;
         double[] xd = x.asDoubleArr();
         for (double na : w.asDoubleArr()) {
@@ -39,7 +39,7 @@ public final class TableBuiltin extends Md1Builtin {
     Value first = f.call(w.first(), x.first());
     
     if (first instanceof Num) {
-      double[] dres = new double[w.ia*x.ia];
+      double[] dres = new double[ia];
       boolean allNums = true;
       boolean firstSkipped = false;
       Value failure = null;
@@ -63,7 +63,7 @@ public final class TableBuiltin extends Md1Builtin {
       }
       if (allNums) return IntArr.maybe(dres, sh);
       // i points to the place the failure should be
-      Value[] res = new Value[w.ia*x.ia];
+      Value[] res = new Value[ia];
       
       for (int n = 0; n < i; n++) res[n] = Num.of(dres[n]); // slowly copy the data back..
       
@@ -81,7 +81,7 @@ public final class TableBuiltin extends Md1Builtin {
       return Arr.create(res, sh);
     }
     boolean firstSkipped = false;
-    Value[] arr = new Value[w.ia*x.ia];
+    Value[] arr = new Value[ia];
     for (Value na : w) {
       for (Value nw : x) {
         if (firstSkipped) {
