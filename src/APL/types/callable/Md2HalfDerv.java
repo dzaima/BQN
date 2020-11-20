@@ -13,7 +13,7 @@ public class Md2HalfDerv extends Md1 {
   }
   
   public Value derive(Value f) {
-    return new Md2Derv(f, g, op);
+    return op.derive(f, g);
   }
   
   public String ln(FmtInfo f) {
