@@ -155,14 +155,27 @@ public class BlockTok extends TokArr {
   
   public String toRepr() {
     StringBuilder s = new StringBuilder("{");
-    boolean tail = false;
-    for (Token v : tokens) {
-      if (tail) s.append(" ⋄ ");
-      s.append(v.toRepr());
-      tail = true;
+    if (tokens.size()>0) {
+      s.append(tokens.get(0).toRepr());
+      int pi = edge(tokens.get(0));
+      for (int i = 1; i < tokens.size(); i++) {
+        Token c = tokens.get(i);
+        int ci = edge(c);
+        if (pi==0 && ci==0) s.append(" ⋄ ");
+        else if (ci!=2) s.append(" ");
+        s.append(c.toRepr());
+        pi = ci;
+      }
+      s.append("}");
     }
-    s.append("}");
     return s.toString();
+  }
+  
+  private static int edge(Token t) { // 0 - normal; 1 - ";"; 2 - ":"
+    List<Token> ts = ((LineTok) t).tokens;
+    if (ts.size()!=1) return 0;
+    Token t0 = ts.get(0);
+    return t0 instanceof ColonTok? 2 : t0 instanceof SemiTok? 1 : 0;
   }
   
   
