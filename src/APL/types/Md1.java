@@ -8,15 +8,15 @@ public abstract class Md1 extends Callable {
   
   protected Md1() { }
   
-  public Value call(         Value x) { throw new SyntaxError("Cannot interpret a 1-modifier as a function", this, x); }
-  public Value call(Value w, Value x) { throw new SyntaxError("Cannot interpret a 1-modifier as a function", this, x); }
+  public Value call(         Value x) { throw new SyntaxError("Cannot interpret a 1-modifier as a function", this); }
+  public Value call(Value w, Value x) { throw new SyntaxError("Cannot interpret a 1-modifier as a function", this); }
   
-  public Value call(Value f,          Value x, Md1Derv derv) { throw new IncorrectArgsError(ln(FmtInfo.def)+" can't be called monadically", derv, x); }
-  public Value call(Value f, Value w, Value x, Md1Derv derv) { throw new IncorrectArgsError(ln(FmtInfo.def)+" can't be called dyadically", derv, w); }
+  public Value call(Value f,          Value x, Md1Derv derv) { throw new IncorrectArgsError(ln(FmtInfo.def)+" can't be called monadically", derv); }
+  public Value call(Value f, Value w, Value x, Md1Derv derv) { throw new IncorrectArgsError(ln(FmtInfo.def)+" can't be called dyadically", derv); }
   
-  public Value callInv (Value f,          Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support monadic inverting", this, x); }
-  public Value callInvX(Value f, Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕩", this, x); }
-  public Value callInvW(Value f, Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕨", this, x); }
+  public Value callInv (Value f,          Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support monadic inverting", this); }
+  public Value callInvX(Value f, Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕩", this); }
+  public Value callInvW(Value f, Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕨", this); }
   public Value under(Value f, Value o, Value x, Md1Derv derv) {
     Value v = o instanceof Fun? o.call(call(f, x, derv)) : o;
     return callInv(f, v);

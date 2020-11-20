@@ -9,7 +9,6 @@ public class SettableArr extends Settable {
   public final int ia;
   public SettableArr(Settable[] arr) {
     ia = arr.length;
-    if (arr.length > 0) this.token = arr[0].token;
     this.arr = arr;
   }
   
@@ -32,9 +31,9 @@ public class SettableArr extends Settable {
         for (Settable c : arr) c.set(ns.getChk(c.name(sc)), update, sc, blame);
         return;
       }
-      throw new LengthError((update?'↩':'←')+": scatter rank ≠1", this, x);
+      throw new LengthError((update?'↩':'←')+": scatter rank ≠1");
     }
-    if (x.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal", this, x);
+    if (x.ia != ia) throw new LengthError((update?'↩':'←')+": scatter argument lengths not equal");
     
     for (int i = 0; i < ia; i++) arr[i].set(x.get(i), update, sc, null);
   }

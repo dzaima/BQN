@@ -37,7 +37,7 @@ public class HArr extends Arr {
   
   
   public Value prototype() {
-    if (ia == 0) throw new DomainError("failed to get prototype", this);
+    if (ia == 0) throw new DomainError("failed to get prototype");
     return arr[0].prototype();
   }
   public Value safePrototype() {
@@ -54,7 +54,7 @@ public class HArr extends Arr {
   public String asString() {
     StringBuilder r = new StringBuilder(ia);
     for (Value v : arr) {
-      if (!(v instanceof Char)) throw new DomainError("Using array containing "+v.humanType(true)+" as string", this);
+      if (!(v instanceof Char)) throw new DomainError("Using array containing "+v.humanType(true)+" as string");
       r.append(((Char) v).chr);
     }
     return r.toString();

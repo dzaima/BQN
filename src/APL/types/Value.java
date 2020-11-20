@@ -32,7 +32,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   // methods for interpreting this as other types
   
-  public /*open*/ double asDouble() { throw new DomainError("Using "+this.humanType(true)+" as a number", this); }
+  public /*open*/ double asDouble() { throw new DomainError("Using "+this.humanType(true)+" as a number"); }
   public /*open*/ int asInt() { throw new DomainError("Using "+humanType(true)+" as integer"); }
   public /*open*/ String asString() {
     char[] cs = new char[ia];
@@ -67,7 +67,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return res;
   }
   public /*open*/ int[] asIntVec() { // also works on rank≡0; immutable
-    if (r() > 1) throw new DomainError("Using rank "+r()+" array as an integer vector", this);
+    if (r() > 1) throw new DomainError("Using rank "+r()+" array as an integer vector");
     return asIntArr();
   }
   
@@ -117,7 +117,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public abstract Value safePrototype(); // what to append to this array
   public Value prototype() {
     Value v = safePrototype();
-    if (v==null) throw new DomainError("Getting prototype of "+this, this);
+    if (v==null) throw new DomainError("Getting prototype of "+this);
     return v;
   }
   
@@ -135,11 +135,11 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   // outdated bad item getting methods; TODO don't use
   public Value at(int[] pos) {
-    if (pos.length != r()) throw new RankError("array rank was "+r()+", tried to get item at rank "+pos.length, this);
+    if (pos.length != r()) throw new RankError("array rank was "+r()+", tried to get item at rank "+pos.length);
     int x = 0;
     for (int i = 0; i < r(); i++) {
-      if (pos[i] < 0) throw new DomainError("Tried to access item at position "+pos[i], this);
-      if (pos[i] >= shape[i]) throw new DomainError("Tried to access item at position "+pos[i]+" while max was "+(shape[i]-1), this);
+      if (pos[i] < 0) throw new DomainError("Tried to access item at position "+pos[i]);
+      if (pos[i] >= shape[i]) throw new DomainError("Tried to access item at position "+pos[i]+" while max was "+(shape[i]-1));
       x+= pos[i];
       if (i != r()-1) x*= shape[i+1];
     }
@@ -207,9 +207,9 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Value identity() { return null; }
   public Pervasion.NN2N dyNum() { return null; }
   
-  public Value callInv (         Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to argument", this); }
-  public Value callInvX(Value w, Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to 𝕩", this); }
-  public Value callInvW(Value w, Value x) { if (eq(w))return this; throw new DomainError(this+"⁼: not equal to 𝕨", this); }
+  public Value callInv (         Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to argument"); }
+  public Value callInvX(Value w, Value x) { if (eq(x))return this; throw new DomainError(this+"⁼: not equal to 𝕩"); }
+  public Value callInvW(Value w, Value x) { if (eq(w))return this; throw new DomainError(this+"⁼: not equal to 𝕨"); }
   
   public Value under (Value o,          Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   public Value underW(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
@@ -217,7 +217,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Value constant(Callable blame) {
     if (this instanceof Callable) {
       if (this instanceof Md1Derv && ((Md1Derv) this).op instanceof ConstBultin) return ((Md1Derv) this).f;
-      throw new DomainError(blame+": Cannot interpret "+humanType(true)+" as a constant", blame, this);
+      throw new DomainError(blame+": Cannot interpret "+humanType(true)+" as a constant", blame);
     }
     return this;
   }

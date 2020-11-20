@@ -16,7 +16,7 @@ public class DivBuiltin extends FnBuiltin {
       for (int i = 0; i < x.length; i++) res[i] = 1/x[i];
     }
     public Value call(BigValue x) {
-      throw new DomainError("reciprocal of biginteger", x);
+      throw new DomainError("reciprocal of biginteger");
     }
   };
   public Value call(Value x) {

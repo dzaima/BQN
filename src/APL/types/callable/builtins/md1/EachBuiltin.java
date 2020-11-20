@@ -51,7 +51,7 @@ public class EachBuiltin extends Md1Builtin {
     }
     
     int mr = Math.min(w.r(), x.r());
-    if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
+    if (!Arr.eqPrefix(w.shape, x.shape, mr)) throw new LengthError("shape prefixes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv);
     
     if (w.r() == x.r()) {
       MutVal res = new MutVal(x.shape);
@@ -107,7 +107,7 @@ public class EachBuiltin extends Md1Builtin {
   }
   
   public static Value underW(Value f, Value o, Value w, Value x, Callable blame) {
-    if (w.r()!=0 && x.r()!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
+    if (w.r()!=0 && x.r()!=0 && !Arrays.equals(w.shape, x.shape)) throw new LengthError("shapes not equal ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
     int ia = Math.max(w.ia, x.ia);
     Value[] res2 = new Value[ia];
     if (w.r()==0 && !(w instanceof Primitive)) w = SingleItemArr.r0(w.first()); // abuse that get doesn't check indexes for simple scalar extension

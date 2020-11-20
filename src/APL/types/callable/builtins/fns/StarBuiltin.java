@@ -60,7 +60,7 @@ public class StarBuiltin extends FnBuiltin {
       if (w.i.signum() == 0) return BigValue.ZERO;
       if (w.i.equals(BigInteger.ONE)) return BigValue.ONE;
       if (w.i.equals(BigValue.MINUS_ONE.i)) return x.i.intValue()%2 == 0? BigValue.ONE : BigValue.MINUS_ONE;
-      if (x.i.bitLength() > 30) throw new DomainError("⋆: 𝕩 too big to calculate (𝕨 ≡ "+w+"; 𝕩 ≡ "+x+")", x); // otherwise intValue might ignore those!
+      if (x.i.bitLength() > 30) throw new DomainError("⋆: 𝕩 too big to calculate (𝕨 ≡ "+w+"; 𝕩 ≡ "+x+")"); // otherwise intValue might ignore those!
       return new BigValue(w.i.pow(x.i.intValue()));
     }
   };

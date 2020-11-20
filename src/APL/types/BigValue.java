@@ -36,7 +36,7 @@ public class BigValue extends Primitive {
   public static BigInteger bigint(Value x) {
     if (x instanceof Num) return bigint(((Num) x).num);
     if (x instanceof BigValue) return ((BigValue) x).i;
-    throw new DomainError("Using "+x.humanType(true)+" as biginteger", x);
+    throw new DomainError("Using "+x.humanType(true)+" as biginteger");
   }
   public static BigInteger bigint(double d) {
     if (Math.abs(d) > Num.MAX_SAFE_DOUBLE) throw new DomainError("creating biginteger from possibly rounded value");
@@ -63,17 +63,17 @@ public class BigValue extends Primitive {
   
   public int asInt() {
     int n = i.intValue();
-    if (!BigInteger.valueOf(n).equals(i)) throw new DomainError("Using biginteger as integer", this);
+    if (!BigInteger.valueOf(n).equals(i)) throw new DomainError("Using biginteger as integer");
     return n;
   }
   public double asDouble() {
-    if (i.abs().compareTo(MAX_SAFE_DOUBLE) > 0) throw new DomainError("Using biginteger as double", this);
+    if (i.abs().compareTo(MAX_SAFE_DOUBLE) > 0) throw new DomainError("Using biginteger as double");
     return i.doubleValue();
   }
   
   public Value safePrototype() { return ZERO; }
   public long longValue() {
-    if (i.bitLength() > 64) throw new DomainError("Using a biginteger with more than 64 bits as long", this);
+    if (i.bitLength() > 64) throw new DomainError("Using a biginteger with more than 64 bits as long");
     return i.longValue();
   }
   

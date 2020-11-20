@@ -30,11 +30,11 @@ public class SlashBuiltin extends FnBuiltin {
           if (xr.read()) sub[p++] = i;
         }
       } else {
-        if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError(blame+": argument contained "+v, blame, x);
+        if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError(blame+": argument contained "+v, blame);
         int[] xi = x.asIntArr();
         for (int i = 0; i < x.ia; i++) {
           int v = xi[i];
-          if (v < 0) throw new DomainError(blame+": argument contained "+v, blame, x);
+          if (v < 0) throw new DomainError(blame+": argument contained "+v, blame);
           for (int j = 0; j < v; j++) {
             sub[p++] = i;
           }
@@ -56,7 +56,7 @@ public class SlashBuiltin extends FnBuiltin {
               for (int j = 0; j < n; j++) res[k][ri+j] = p[k];
             }
             ri+= n;
-          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame, x);
+          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame);
         }
         Value[] resv = new Value[rank];
         for (int i = 0; i < rank; i++) resv[i] = new IntArr(res[i]);
@@ -71,7 +71,7 @@ public class SlashBuiltin extends FnBuiltin {
           if (n > 0) {
             Arr pos = new IntArr(p.clone());
             for (int j = 0; j < n; j++) res[ri++] = pos;
-          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame, x);
+          } else if (n != 0) throw new DomainError(blame+": argument contained "+n, blame);
         }
         return new HArr(res);
       }
@@ -126,7 +126,7 @@ public class SlashBuiltin extends FnBuiltin {
   // private static final byte[] sbuf = new byte[256];
   // private static byte[] indbuf = new byte[256];
   public static Value replicate(Value w, Value x, Callable blame) { // a lot of valuecopy
-    if (x.r()==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame, x);
+    if (x.r()==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame);
     int depth = MatchBuiltin.full(w);
     if (w.r() > 1) {
       if (!Main.vind) throw new DomainError(blame+": 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", blame);
@@ -302,11 +302,11 @@ public class SlashBuiltin extends FnBuiltin {
       am = new int[1][];
       am[0] = w.asIntVec();
     } else {
-      if (w.ia > x.r()) throw new DomainError(blame+": 𝕨 must have less items than ≠≢𝕩 ("+w.ia+" ≡ ≠𝕨, "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame, w);
+      if (w.ia > x.r()) throw new DomainError(blame+": 𝕨 must have less items than ≠≢𝕩 ("+w.ia+" ≡ ≠𝕨, "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame);
       am = new int[w.ia][];
       for (int i = 0; i < w.ia; i++) {
         Value c = w.get(i);
-        if (c.r() > 1) throw new RankError(blame+": depth 2 𝕨 cannot have rank "+c.r()+" items (contained shape "+Main.formatAPL(c.shape)+")", blame, w);
+        if (c.r() > 1) throw new RankError(blame+": depth 2 𝕨 cannot have rank "+c.r()+" items (contained shape "+Main.formatAPL(c.shape)+")", blame);
         if (c.r()==1 && c.ia!=x.shape[i]) throw new LengthError(blame+": wrong replicate length ("+c.ia+" ≡ ≠"+i+"⊏𝕨, shape ≡ "+Main.formatAPL(x.shape)+")", blame);
         am[i] = c.asIntArr();
       }
@@ -357,7 +357,7 @@ public class SlashBuiltin extends FnBuiltin {
   
   public Value underW(Value o, Value w, Value x) {
     Value v = o instanceof Fun? o.call(call(w, x)) : o;
-    if (MatchBuiltin.full(w)!=1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this, w);
+    if (MatchBuiltin.full(w)!=1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this);
     int[] sh;
     if (w.r() > 1) {
       if (!Main.vind) throw new DomainError("⌾/: 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);
@@ -368,9 +368,9 @@ public class SlashBuiltin extends FnBuiltin {
       w = w.ofShape(fsh);
       x = x.ofShape(fsh);
     } else sh = w.shape;
-    if (w.r()!=1 || x.r()!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this, w.r()!=1? w : x);
+    if (w.r()!=1 || x.r()!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this);
     double asum = w.sum();
-    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this, x);
+    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this);
     int ipos = 0;
     int[] wi = w.asIntArr();
     

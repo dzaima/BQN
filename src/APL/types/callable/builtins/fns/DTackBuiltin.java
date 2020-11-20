@@ -50,7 +50,7 @@ public class DTackBuiltin extends FnBuiltin {
       double[] c = x.asDoubleArrClone();
       double[] b = w.asDoubleArr();
       double[] res = new double[x.ia * w.ia];
-      for (int i = 1; i < b.length; i++) if (b[i] == 0) throw new DomainError(blame+": 𝕨 contained a 0 as not the 1st element", blame, w);
+      for (int i = 1; i < b.length; i++) if (b[i] == 0) throw new DomainError(blame+": 𝕨 contained a 0 as not the 1st element", blame);
       int last = b[0] == 0? 1 : 0;
       for (int i = b.length-1; i >= last; i--) {
         int off = x.ia*i;
@@ -74,7 +74,7 @@ public class DTackBuiltin extends FnBuiltin {
         BigInteger wl = wlr.abs();
         int ibase = BigValue.safeInt(base);
         if (ibase <= 1) {
-          if (ibase==1 && sign!=0) throw new DomainError(blame+": 𝕨=1 and 𝕩≠0 isn't possible", blame, x);
+          if (ibase==1 && sign!=0) throw new DomainError(blame+": 𝕨=1 and 𝕩≠0 isn't possible", blame);
           if (ibase < 0) throw new DomainError(blame+": 𝕨 < 0", blame);
         }
         if (sign==0) return EmptyArr.SHAPE0N;
@@ -124,8 +124,8 @@ public class DTackBuiltin extends FnBuiltin {
     double num = x.asDouble();
     if (base <= 1) {
       if (base == 0) return Num.of(num);
-      if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame, w);
-      throw new DomainError(blame+": 𝕨 < 1", blame, w);
+      if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame);
+      throw new DomainError(blame+": 𝕨 < 1", blame);
     }
     ArrayList<Double> res = new ArrayList<>();
     if (num < 0) {

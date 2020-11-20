@@ -74,7 +74,7 @@ public abstract class Arr extends Value {
   }
   public Arr reverseOn(int dim) {
     if (r() == 0) {
-      if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis", this);
+      if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis");
       return this;
     }
     if (dim < 0) dim+= r();
@@ -248,9 +248,9 @@ public abstract class Arr extends Value {
   public static void eqShapes(Value w, Value x) {
     int[] ws = w.shape;
     int[] xs = x.shape;
-    if (ws.length != xs.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")", x);
+    if (ws.length != xs.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")");
     for (int i = 0; i < ws.length; i++) {
-      if (ws[i] != xs[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")", x);
+      if (ws[i] != xs[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")");
     }
   }
   public static void eqShapes(int[] w, int[] x, Callable blame) {

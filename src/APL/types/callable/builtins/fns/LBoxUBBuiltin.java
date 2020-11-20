@@ -19,7 +19,7 @@ public class LBoxUBBuiltin extends FnBuiltin {
   }
   
   public Value under(Value o, Value x) {
-    if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this, x);
+    if (x.ia == 0) throw new LengthError("⌾⊑: called on empty array", this);
     Value v = o instanceof Fun? o.call(call(x)) : o;
     MutVal m = new MutVal(x.shape);
     m.copy(x, 1, 1, x.ia-1);

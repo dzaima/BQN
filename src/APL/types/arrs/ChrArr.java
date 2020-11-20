@@ -31,7 +31,7 @@ public class ChrArr extends Arr {
   }
   
   public String asString() {
-    if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string", this);
+    if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string");
     return s;
   }
   

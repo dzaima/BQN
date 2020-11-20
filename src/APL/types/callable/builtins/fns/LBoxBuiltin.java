@@ -14,15 +14,15 @@ public class LBoxBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⊏"; }
   
   public Value call(Value x) {
-    if (x.r()==0) throw new RankError("⊏: scalar argument isn't allowed", this, x);
-    if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.formatAPL(x.shape)+")", this, x);
+    if (x.r()==0) throw new RankError("⊏: scalar argument isn't allowed", this);
+    if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.formatAPL(x.shape)+")", this);
     int[] nsh = new int[x.r()-1];
     System.arraycopy(x.shape, 1, nsh, 0, nsh.length);
     return MutVal.cut(x, 0, Arr.prod(nsh), nsh);
   }
   
   public Value call(Value w, Value x) {
-    if (x.r()==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this, x);
+    if (x.r()==0) throw new RankError("⊏: scalar 𝕩 isn't allowed", this);
     if (w instanceof Num) return getCell(w.asInt(), x, this);
     
     int wr = w.r();
@@ -93,7 +93,7 @@ public class LBoxBuiltin extends FnBuiltin {
       for (int i = 0; i < wi.length; i++) res.copy(getCell(wi[i], x, this), 0, csz*i, csz);
       return res.get();
     } else {
-      if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this, w);
+      if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this);
       
       int shl = 0;
       Value[] av = w.values();
@@ -140,7 +140,7 @@ public class LBoxBuiltin extends FnBuiltin {
   public Value underW(Value o, Value w, Value x) {
     Value call = call(w, x);
     Value v = o instanceof Fun? o.call(call) : o;
-    if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this, w);
+    if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this);
     if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")");
     int[] is = w.asIntArr();
     if (x.quickIntArr() && v.quickIntArr()) {

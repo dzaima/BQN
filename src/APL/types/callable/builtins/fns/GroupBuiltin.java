@@ -25,7 +25,7 @@ public class GroupBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.r() != 1) throw new RankError("⊔: argument must be a vector", this, x);
+    if (x.r() != 1) throw new RankError("⊔: argument must be a vector", this);
     int depth = MatchBuiltin.full(x);
     if (depth == 1) {
       int[] xi = x.asIntVec();
@@ -38,17 +38,17 @@ public class GroupBuiltin extends FnBuiltin {
       for (int i = 0; i < xi.length; i++) {
         int c = xi[i];
         if (c>=0) ds[c].add(i);
-        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in argument", this, x);
+        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in argument", this);
       }
       Value[] res = new Value[sz];
       for (int i = 0; i < sz; i++) res[i] = new IntArr(Arrays.copyOf(ds[i].ds, ds[i].sz));
       return new HArr(res);
     }
-    if (depth != 2) throw new DomainError("⊔: argument must be depth 1 or 2 (was "+depth+")", this, x);
+    if (depth != 2) throw new DomainError("⊔: argument must be depth 1 or 2 (was "+depth+")", this);
     int[] args = new int[x.ia];
     for (int i = 0; i < args.length; i++) {
       Value c = x.get(i);
-      if (c.r() != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this, x);
+      if (c.r() != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this);
       args[i] = c.ia;
     }
     return call(x, UDBuiltin.on(new IntArr(args), null)); // gives strange errors but whatever
@@ -63,23 +63,23 @@ public class GroupBuiltin extends FnBuiltin {
     int xsz = x.r();
     if (depth == 1) {
       wsz = 1;
-      if (w.r() != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.r()==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this, w);
-      if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this, w);
-      if (w.ia != x.shape[0]) throw new LengthError("⊔: length of 𝕨 must be ⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
+      if (w.r() != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.r()==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this);
+      if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this);
+      if (w.ia != x.shape[0]) throw new LengthError("⊔: length of 𝕨 must be ⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
       wp = new int[][]{w.asIntArr()};
     } else if (depth == 2) {
       wsz = w.ia;
-      if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this, w);
-      if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w);
+      if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this);
+      if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
       wp = new int[w.ia][];
       for (int i = 0; i < w.ia; i++) {
         Value c = w.get(i);
-        if (c.r()!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this, w);
+        if (c.r()!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this);
         wp[i] = c.asIntArr();
         if (c.ia != x.shape[i]) { int[] shs = new int[w.ia]; for (int j = 0; j < w.ia; j++) shs[j] = w.get(j).ia;
-          throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.formatAPL(shs)+" ≡ ≠¨𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this, w); }
+          throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.formatAPL(shs)+" ≡ ≠¨𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this); }
       }
-    } else throw new DomainError("⊔: depth of 𝕨 must be 1 or 2 (was "+depth+")", this, w);
+    } else throw new DomainError("⊔: depth of 𝕨 must be 1 or 2 (was "+depth+")", this);
     
     
     
@@ -91,7 +91,7 @@ public class GroupBuiltin extends FnBuiltin {
       int[] rshs = new int[sz];
       for (int c : poss) {
         if (c>=0) rshs[c]++;
-        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, w);
+        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this);
       }
       if (x.quickIntArr()) {
         int[] xi = x.asIntArr();
@@ -132,7 +132,7 @@ public class GroupBuiltin extends FnBuiltin {
       int[] ca = new int[rsh[i]];
       for (int c : wp[i]) {
         if (c>=0) ca[c]++;
-        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this, w);
+        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this);
       }
       int rp = 0;
       while (rp < sz) {

@@ -34,7 +34,7 @@ public class StileBuiltin extends FnBuiltin {
   };
   
   public Value call(Value x) {
-    return numChrMapM(NF, c->{ throw new DomainError("|char", this, x); }, c -> Num.of(c.size()), x);
+    return numChrMapM(NF, c->{ throw new DomainError("|char", this); }, c -> Num.of(c.size()), x);
   }
   
   

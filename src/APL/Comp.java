@@ -180,7 +180,7 @@ public class Comp {
             Value f = (Value) s.pop();
             Value r = (Value) s.pop();
             if (!(r instanceof Md1)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 1-modifier");
-            Value d = ((Md1) r).derive(f); d.token = r.token;
+            Value d = ((Md1) r).derive(f); if (d instanceof Callable) ((Callable) d).token = ref[i];
             s.push(d);
             break;
           }
@@ -189,7 +189,7 @@ public class Comp {
             Value r = (Value) s.pop();
             Value g = (Value) s.pop();
             if (!(r instanceof Md2)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 2-modifier");
-            Value d = ((Md2) r).derive(f, g); d.token = r.token;
+            Value d = ((Md2) r).derive(f, g); if (d instanceof Callable) ((Callable) d).token = ref[i];
             s.push(d);
             break;
           }
@@ -197,14 +197,14 @@ public class Comp {
             Value r = (Value) s.pop();
             Value g = (Value) s.pop();
             if (!(r instanceof Md2)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 2-modifier");
-            Md1 d = ((Md2) r).derive(g); d.token = r.token;
+            Md1 d = ((Md2) r).derive(g); d.token = ref[i];
             s.push(d);
             break;
           }
           case TR2D: {
             Value f = (Value) s.pop();
             Value g = (Value) s.pop();
-            Atop d = new Atop(f, g); d.token = f.token;
+            Atop d = new Atop(f, g);
             s.push(d);
             break;
           }
@@ -212,7 +212,7 @@ public class Comp {
             Value f = (Value) s.pop();
             Value g = (Value) s.pop();
             Value h = (Value) s.pop();
-            Fork d = new Fork(f, g, h); d.token = f.token;
+            Fork d = new Fork(f, g, h);
             s.push(d);
             break;
           }
@@ -220,7 +220,7 @@ public class Comp {
             Value f = (Value) s.pop();
             Value g = (Value) s.pop();
             Value h = (Value) s.pop();
-            Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h); d.token = f.token;
+            Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h);
             s.push(d);
             break;
           }
@@ -268,7 +268,7 @@ public class Comp {
           }
           case CHKV: {
             Obj v = s.peek();
-            if (v instanceof Nothing) throw new SyntaxError("didn't expect · here", v);
+            if (v instanceof Nothing) throw new SyntaxError("didn't expect · here");
             break;
           }
           case RETN: {
@@ -544,8 +544,8 @@ public class Comp {
       leb128(bc, n, ref);
     }
     
-    public void push(Value o) {
-      add(o.token, PUSH);
+    public void push(Token t, Value o) {
+      add(t, PUSH);
       addNum(addObj(o));
     }
     public int addObj(Value o) {
@@ -888,7 +888,7 @@ public class Comp {
     }
   
     void add(Mut m) {
-      m.push(c);
+      m.push(last, c);
     }
   
     public Token lastTok() {
@@ -1025,7 +1025,7 @@ public class Comp {
             (f=tps.remove(i+1)),
             new ResBC(f.type=='A'? CHKVBC : NOBYTES),
             (  tps.remove(i  )),
-            new ResBC(OP2H)
+            new ResBC(f.lastTok(), OP2H)
           ));
           continue;
         }
@@ -1264,7 +1264,7 @@ public class Comp {
       }
     }
     if (header && tk instanceof ConstTok) {
-      m.push(((ConstTok) tk).val);
+      m.push(tk, ((ConstTok) tk).val);
       m.add(tk, VFYM);
       return;
     }
@@ -1272,7 +1272,7 @@ public class Comp {
   }
   
   public static void compO(Mut m, Token tk) { // assumes tk has been typechecked
-    if ((tk.flags&1)!=0) { m.push(constFold(tk)); return; } // ConstTok, NothingTok
+    if ((tk.flags&1)!=0) { m.push(tk, constFold(tk)); return; } // ConstTok, NothingTok
     if (tk instanceof ParenTok) {
       compO(m, ((ParenTok) tk).ln);
       return;
@@ -1320,10 +1320,10 @@ public class Comp {
     }
     if (tk instanceof OpTok) {
       OpTok op = (OpTok) tk;
-      Value b = builtin(op);
+      Callable b = builtin(op);
       if (b != null) {
         b.token = tk;
-        m.push(b);
+        m.push(tk, b);
         return;
       }
       
@@ -1344,10 +1344,10 @@ public class Comp {
       String n = ((NameTok) tk).name;
       if (((NameTok) tk).val != null) {
         if (n.equals("•args") || n.equals("•path") || n.equals("•name")) {
-          m.push(((NameTok) tk).val);
+          m.push(tk, ((NameTok) tk).val);
         } else if (Scope.isRel(n)) {
           m.var(tk, n, false);
-          m.push(((NameTok) tk).val);
+          m.push(tk, ((NameTok) tk).val);
           m.add(OP1D);
         } else throw new InternalError("bad name "+n);
       }
@@ -1408,16 +1408,16 @@ public class Comp {
       return Arr.create(ps);
     }
     if (t instanceof OpTok) {
-      Value builtin = builtin((OpTok) t);
-      if (builtin == null) throw new ImplementationError(t.source());
-      builtin.token = t;
-      return builtin;
+      Callable b = builtin((OpTok) t);
+      if (b == null) throw new ImplementationError(t.source());
+      b.token = t;
+      return b;
     }
     if (t instanceof NothingTok) return ((NothingTok) t).val;
     throw new ImplementationError("couldn't constant fold "+t.getClass().getSimpleName());
   }
   
-  public static Value builtin(OpTok t) {
+  public static Callable builtin(OpTok t) {
     switch (t.op.charAt(0)) {
       // fns
       // case '⍲': return new NandBuiltin(sc);

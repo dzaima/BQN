@@ -28,7 +28,7 @@ public class Namespace extends APLMap {
   public void set(Value ko, Value v) {
     String k = ko.asString();
     Integer kn = exports.get(k);
-    if (kn==null) throw new ValueError("Setting non-defined namespace field "+ko, ko);
+    if (kn==null) throw new ValueError("Setting non-defined namespace field "+ko);
     sc.vars[kn] = v;
   }
   

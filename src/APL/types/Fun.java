@@ -9,15 +9,15 @@ public abstract class Fun extends Callable {
   protected Fun() { }
   
   public Value call(Value x) {
-    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called monadically", this, x);
+    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called monadically", this);
   }
   public Value call(Value w, Value x) {
-    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called dyadically", this, w);
+    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called dyadically", this);
   }
   
-  public Value callInv (         Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support monadic inverting", this, x); }
-  public Value callInvX(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕩", this, x); }
-  public Value callInvW(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕨", this, x); }
+  public Value callInv (         Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support monadic inverting", this); }
+  public Value callInvX(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕩", this); }
+  public Value callInvW(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕨", this); }
   
   public Value under(Value o, Value x) {
     Value v = o instanceof Fun? o.call(call(x)) : o;
@@ -44,7 +44,7 @@ public abstract class Fun extends Callable {
       for (int i = 0; i < res.length; i++) res[i] = call(x[i]);
     }
     public Value call(BigValue x) {
-      throw new DomainError("bigintegers not allowed here", x);
+      throw new DomainError("bigintegers not allowed here");
     }
   
     public Value call(int[] x, int[] sh) {
@@ -86,7 +86,7 @@ public abstract class Fun extends Callable {
     }
     if (x instanceof Num     ) return nf.call((Num     ) x);
     if (x instanceof BigValue) return nf.call((BigValue) x);
-    throw new DomainError("Expected number, got "+x.humanType(false), this, x);
+    throw new DomainError("Expected number, got "+x.humanType(false), this);
   }
   
   protected Value numChrM(NumMV nf, ChrMV cf, Value x) {
@@ -110,7 +110,7 @@ public abstract class Fun extends Callable {
     if (x instanceof Char    ) return cf.call((Char    ) x);
     if (x instanceof Num     ) return nf.call((Num     ) x);
     if (x instanceof BigValue) return nf.call((BigValue) x);
-    throw new DomainError("Expected either number or character argument, got "+x.humanType(false), this, x);
+    throw new DomainError("Expected either number or character argument, got "+x.humanType(false), this);
   }
   
   protected Value numChrMapM(NumMV nf, ChrMV cf, MapMV mf, Value x) {
@@ -132,7 +132,7 @@ public abstract class Fun extends Callable {
     if (x instanceof Num     ) return nf.call((Num     ) x);
     if (x instanceof APLMap  ) return mf.call((APLMap  ) x);
     if (x instanceof BigValue) return nf.call((BigValue) x);
-    throw new DomainError("Expected either number/char/map, got "+x.humanType(false), this, x);
+    throw new DomainError("Expected either number/char/map, got "+x.humanType(false), this);
   }
   
   

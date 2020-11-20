@@ -25,7 +25,7 @@ public class ShapeBuiltin extends FnBuiltin {
   
   
   public Value call(Value w, Value x) {
-    if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this, w);
+    if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this);
     int[] sh;
     int ia;
     int emptyPos = -1;
@@ -49,7 +49,7 @@ public class ShapeBuiltin extends FnBuiltin {
           else if (v instanceof   FloorBuiltin) emptyMode = 1;
           else if (v instanceof ReverseBuiltin) emptyMode = 2;
           else if (v instanceof UpArrowBuiltin) emptyMode = 3;
-          else throw new DomainError("⥊: shape contained "+v, this, v);
+          else throw new DomainError("⥊: shape contained "+v, this);
         }
       }
     }

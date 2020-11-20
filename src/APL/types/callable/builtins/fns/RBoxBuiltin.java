@@ -35,8 +35,8 @@ public class RBoxBuiltin extends FnBuiltin {
   }
   
   public static Value on(Value w, Value x, Callable blame) {
-    if (x.r() > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame, x);
-    if (w.r() > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame, w);
+    if (x.r() > 1) throw new RankError("⊐: 𝕩 had rank > 1", blame);
+    if (w.r() > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame);
     if (x.ia > 20 && w.ia > 20) {
       if (w.quickIntArr() && x.quickIntArr()) {
         HashMap<Integer, Integer> map = new HashMap<>();

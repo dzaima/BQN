@@ -11,7 +11,7 @@ public class DownArrowBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "↓"; }
   
   public Value call(Value x) {
-    if (x.r()==0) throw new RankError("↓: argument cannot be scalar", this, x);
+    if (x.r()==0) throw new RankError("↓: argument cannot be scalar", this);
     int cells = x.shape[0];
     int csz = CellBuiltin.csz(x);
     Value[] res = new Value[cells+1];

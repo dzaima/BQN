@@ -40,7 +40,7 @@ public class RandBuiltin extends FnBuiltin {
     }
   
     public Value call(BigValue x) {
-      if (x.i.signum()==0) throw new DomainError("?0L", x);
+      if (x.i.signum()==0) throw new DomainError("?0L");
       BigInteger n;
       do {
         n = new BigInteger(x.i.bitLength(), sc.rnd);

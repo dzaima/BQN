@@ -21,7 +21,7 @@ public abstract class APLMap extends Primitive {
   }
   public Value getChk(String k) {
     Value v = get(k);
-    if (v == null) throw new ValueError("Reading non-defined key "+k, null);
+    if (v == null) throw new ValueError("Reading non-defined key "+k);
     return v;
   }
   
@@ -44,8 +44,8 @@ public abstract class APLMap extends Primitive {
   
     public void set(Value x, boolean update, Scope sc, Callable blame) {
       boolean prev = map.get(k) != null;
-      if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame, k);
-      if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame, k);
+      if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame);
+      if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame);
       map.set(k, x);
     }
   

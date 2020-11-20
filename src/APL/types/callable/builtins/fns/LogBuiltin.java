@@ -19,7 +19,7 @@ public class LogBuiltin extends FnBuiltin { // here only to serve as DNF/NF for 
     }
     public Num call(BigValue x) {
       if (x.i.signum() <= 0) {
-        if (x.i.signum() == -1) throw new DomainError("logarithm of negative number", x);
+        if (x.i.signum() == -1) throw new DomainError("logarithm of negative number");
         return Num.NEGINF;
       }
       int len = x.i.bitLength();

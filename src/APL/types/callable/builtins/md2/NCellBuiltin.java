@@ -16,8 +16,8 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value ra = g.call(x);
-    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
-    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this);
+    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.r());
     int[] rsh = Arrays.copyOf(x.shape, rx);
     
@@ -30,8 +30,8 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value ra = g.call(w, x);
-    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this, g);
-    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this, g);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this);
+    if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this);
     int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.r());
     int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.r());
     
@@ -55,12 +55,12 @@ public class NCellBuiltin extends Md2Builtin {
   
   
   private int dim(Value v, int rank) {
-    if (!(v instanceof Num)) throw new DomainError("Expected number, got "+v.humanType(false), this, v);
+    if (!(v instanceof Num)) throw new DomainError("Expected number, got "+v.humanType(false), this);
     double d = ((Num) v).num;
     if (d==0 && Double.doubleToRawLongBits(d)!=0) return 0;
     if (d >=  rank) return 0;
     if (d <= -rank) return rank;
-    if (d%1 != 0) throw new DomainError("Expected integer, got "+d, this, v);
+    if (d%1 != 0) throw new DomainError("Expected integer, got "+d, this);
     int k = (int) d;
     if (k<0) return Math.min(-k, rank);
     else return Math.max(rank-k, 0);

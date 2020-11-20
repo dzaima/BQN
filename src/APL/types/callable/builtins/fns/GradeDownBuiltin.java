@@ -38,7 +38,7 @@ public class GradeDownBuiltin extends FnBuiltin {
       }
     }
     
-    if (x.r() == 0) throw new DomainError("cannot grade rank 0", x);
+    if (x.r() == 0) throw new DomainError("cannot grade rank 0");
     if (x.r() != 1) return gradeDown(new HArr(CellBuiltin.cells(x)));
     
     Integer[] na = new Integer[x.ia];
@@ -71,7 +71,7 @@ public class GradeDownBuiltin extends FnBuiltin {
   
   public Value call(Value w, Value x) {
     if (w.r() > x.r()+1) throw new DomainError("⍒: =𝕨 cannot be greater than =𝕩 ("+Main.formatAPL(w.shape)+"≡≢𝕨; "+Main.formatAPL(x.shape)+"≡≢𝕩)", this);
-    if (w.r() == 0) throw new DomainError("⍒: 𝕨 cannot be a scalar", this, w);
+    if (w.r() == 0) throw new DomainError("⍒: 𝕨 cannot be a scalar", this);
     if (w.r() > 1) {
       int xr = x.r()-w.r()+1;
       x = new HArr(NCellBuiltin.cells(x, xr), Arrays.copyOf(x.shape, xr));

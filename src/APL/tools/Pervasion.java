@@ -26,7 +26,7 @@ public class Pervasion { // implementations must be okay with not being called o
         boolean we = wr < xr; // w is expanded
         int max = Math.max(w.ia, x.ia);
         int min = Math.min(w.ia, x.ia);
-        if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", x);
+        if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")");
         int ext = max/min;
         Value[] n = new Value[max];
         int r = 0;
@@ -73,7 +73,7 @@ public class Pervasion { // implementations must be okay with not being called o
       return Num.of(on(((Num) w).num, ((Num) x).num));
     }
     
-    public /*open*/ Value on(BigValue w, BigValue x) { throw new DomainError("bigintegers not allowed here", x); }
+    public /*open*/ Value on(BigValue w, BigValue x) { throw new DomainError("bigintegers not allowed here"); }
     
     
     

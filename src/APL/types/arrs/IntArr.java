@@ -77,7 +77,7 @@ public class IntArr extends Arr {
   
   public Arr reverseOn(int dim) {
     if (r() == 0) {
-      if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis", this);
+      if (dim != 0) throw new DomainError("rotating a scalar with a non-0 axis");
       return this;
     }
     if (dim < 0) dim+= r();

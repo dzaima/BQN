@@ -20,16 +20,16 @@ public class Format {
       }
       if (v instanceof Char) return String.valueOf(((Char) v).chr);
       if (v instanceof BigValue) return ((BigValue) v).i.toString();
-      throw new DomainError("Cannot format "+v.humanType(true), v);
+      throw new DomainError("Cannot format "+v.humanType(true));
     }
-    if (v.r() > 2) throw new DomainError("Cannot format rank "+v.r()+" array", v);
+    if (v.r() > 2) throw new DomainError("Cannot format rank "+v.r()+" array");
     if (v.r()<=1) {
       if (v instanceof ChrArr) {
         return v.asString();
       } else {
         StringBuilder b = new StringBuilder(v.ia);
         for (Value c : v) {
-          if (!(c instanceof Char)) throw new DomainError("Cannot format array of non-chars", v);
+          if (!(c instanceof Char)) throw new DomainError("Cannot format array of non-chars");
           b.append(((Char) c).chr);
         }
         return b.toString();
@@ -49,7 +49,7 @@ public class Format {
           // b.append(str, y*w, (y+1)*w);
           for (int x = 0; x < w; x++) {
             Value c = v.get(x+y*w);
-            if (!(c instanceof Char)) throw new DomainError("Cannot format array of non-chars", v);
+            if (!(c instanceof Char)) throw new DomainError("Cannot format array of non-chars");
             b.append(((Char) c).chr);
           }
           if (y!=h-1) b.append('\n');

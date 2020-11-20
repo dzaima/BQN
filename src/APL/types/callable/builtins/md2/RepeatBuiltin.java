@@ -82,7 +82,7 @@ public class RepeatBuiltin extends Md2Builtin {
     if (am== 1) return f.callInvW(w, x);
     if (am==-1) return f.callInvW(x, w);
     
-    throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this, g);
+    throw new DomainError("f⌾N: 𝕨-inverting is only possible when N∊¯1 1", this);
   }
   
   public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {

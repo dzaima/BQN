@@ -10,7 +10,7 @@ public class ShBBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "»"; }
   
   public Value call(Value w, Value x) {
-    if (x.scalar()) throw new RankError("»: 𝕩 cannot be scalar", this, x);
+    if (x.scalar()) throw new RankError("»: 𝕩 cannot be scalar", this);
     if (w.r() > x.r()) throw new RankError("»: rank of 𝕨 cannot exceed =𝕩", this);
     JoinBuiltin.check(w, x, this);
     MutVal res = new MutVal(x.shape, x);
@@ -21,7 +21,7 @@ public class ShBBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) {
-    if (x.scalar()) throw new RankError("»: argument cannot be scalar", this, x);
+    if (x.scalar()) throw new RankError("»: argument cannot be scalar", this);
     if (x.ia==0) return x;
     MutVal res = new MutVal(x.shape, x);
     int csz = CellBuiltin.csz(x);

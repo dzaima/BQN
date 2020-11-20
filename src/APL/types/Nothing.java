@@ -9,7 +9,7 @@ public class Nothing extends Primitive {
   
   
   SyntaxError used() {
-    return new SyntaxError("didn't expect ·", this);
+    return new SyntaxError("didn't expect ·");
   }
   
   

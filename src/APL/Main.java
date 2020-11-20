@@ -265,7 +265,7 @@ public class Main {
       if (num == 1) return true;
       if (num == 0) return false;
     }
-    throw new DomainError("Expected boolean, got "+v, v);
+    throw new DomainError("Expected boolean, got "+v);
   }
   
   

@@ -13,7 +13,7 @@ public class EpsBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "∊"; }
   
   public Value call(Value x) {
-    if (x.r() == 0) throw new RankError("∊: argument cannot be scalar", this, x);
+    if (x.r() == 0) throw new RankError("∊: argument cannot be scalar", this);
     Value[] vs;
     BitArr.BA res;
     if (x.r() == 1) {

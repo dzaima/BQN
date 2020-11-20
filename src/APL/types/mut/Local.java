@@ -15,7 +15,7 @@ public class Local extends Settable {
   
   public Value get(Scope sc) {
     Value got = sc.getL(depth, index);
-    if (got == null) throw new ValueError("Getting value of non-existing variable \""+name(sc)+"\"", this);
+    if (got == null) throw new ValueError("Getting value of non-existing variable \""+name(sc)+"\"");
     return got;
   }
   

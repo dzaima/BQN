@@ -52,7 +52,7 @@ public class NotBuiltin extends FnBuiltin {
       }
       return new HArr(arr, o.shape);
     } else if (x instanceof Num) return Num.of(1-((Num) x).num);
-    else throw new DomainError("Expected boolean, got "+x.humanType(false), blame, x);
+    else throw new DomainError("Expected boolean, got "+x.humanType(false), blame);
   }
   
   public static BitArr on(BitArr x) {

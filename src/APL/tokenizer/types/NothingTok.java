@@ -9,7 +9,6 @@ public class NothingTok extends Token {
   public NothingTok(String raw, int spos, int epos) {
     super(raw, spos, epos);
     val = new Nothing();
-    val.token = this;
     type = 'A';
   }
   

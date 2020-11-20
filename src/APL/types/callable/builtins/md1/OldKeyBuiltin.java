@@ -46,7 +46,7 @@ public class OldKeyBuiltin extends Md1Builtin {
       }
       return new HArr(res);
     }
-    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv, f);
+    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv);
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
@@ -56,8 +56,8 @@ public class OldKeyBuiltin extends Md1Builtin {
     }
     if (f instanceof Fun) {
       if (!Arrays.equals(w.shape, x.shape)) {
-        if (w.r() != x.r()) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.r()+" vs "+x.r()+")", derv, x);
-        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv, x);
+        if (w.r() != x.r()) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.r()+" vs "+x.r()+")", derv);
+        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv);
       }
       HashMap<Value, ArrayList<Value>> vals = new HashMap<>();
       ArrayList<Value> order = new ArrayList<>();
@@ -81,6 +81,6 @@ public class OldKeyBuiltin extends Md1Builtin {
       }
       return Arr.create(res);
     }
-    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv, f);
+    throw new DomainError("⌸: 𝔽 must be a function or a map, was "+f.humanType(true), derv);
   }
 }

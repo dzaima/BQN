@@ -13,7 +13,7 @@ public class FindBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⍷"; }
   
   public Value call(Value x) {
-    if (x.r()==0) throw new DomainError("⍷: argument cannot be a scalar", this, x);
+    if (x.r()==0) throw new DomainError("⍷: argument cannot be a scalar", this);
     if (x.ia==0) {
       int[] nsh = x.shape.clone();
       nsh[0] = Math.min(nsh[0], 1);
@@ -36,7 +36,7 @@ public class FindBuiltin extends FnBuiltin {
   }
   
   public Value call(Value w, Value x) {
-    if (w.r() != x.r()) throw new RankError("⍷: argument ranks should be equal ("+w.r()+" ≠ "+x.r()+")", this, x);
+    if (w.r() != x.r()) throw new RankError("⍷: argument ranks should be equal ("+w.r()+" ≠ "+x.r()+")", this);
     BitArr.BC res = new BitArr.BC(x.shape);
     if (w.r() == 1) {
       if (w instanceof BitArr && x instanceof BitArr) {

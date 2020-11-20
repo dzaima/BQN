@@ -25,7 +25,7 @@ public class JoinBuiltin extends FnBuiltin {
     int[] sh0 = vs[0].shape;
     int ir = sh0.length;
     for (Value v : vs) {
-      if (ir!=v.r()) throw new RankError("∾: expected all items to have equal rank", this, v);
+      if (ir!=v.r()) throw new RankError("∾: expected all items to have equal rank", this);
     }
     int or = x.r();
     if (ir < or) throw new RankError("∾: rank of items must be at least the total rank", this);
@@ -230,9 +230,9 @@ public class JoinBuiltin extends FnBuiltin {
     boolean wScalar = w.scalar(), xScalar = x.scalar();
     if (wScalar && xScalar) return cat(SingleItemArr.sh1(w.first()), x, 0, blame);
     if (!wScalar && !xScalar) {
-      if (w.r() != x.r()) throw new RankError("ranks not matchable", blame, x);
+      if (w.r() != x.r()) throw new RankError("ranks not matchable", blame);
       for (int i = 0; i < w.r(); i++) {
-        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame, x);
+        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
       }
     }
     int[] rs = !wScalar? w.shape.clone() : x.shape.clone(); // shape of the result
@@ -281,7 +281,7 @@ public class JoinBuiltin extends FnBuiltin {
   }
   
   public Value under(Value o, Value x) {
-    if (x.r() != 1) throw new NYIError("⌾∾ for rank>1", this, x); // doesn't work 
+    if (x.r() != 1) throw new NYIError("⌾∾ for rank>1", this); // doesn't work 
     Value joined = call(x);
     Value v = o instanceof Fun? o.call(joined) : o;
     Arr.eqShapes(joined.shape, v.shape, this);

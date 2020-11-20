@@ -13,7 +13,7 @@ public class ScanBuiltin extends Md1Builtin {
   
   public Value call(Value f, Value x, Md1Derv derv) {
     if (x.ia == 0) return x;
-    if (x.r() == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this, x);
+    if (x.r() == 0) throw new DomainError("`: rank must be at least 1, argument was a scalar", this);
     int l = Arr.prod(x.shape, 1, x.r());
     if (x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();

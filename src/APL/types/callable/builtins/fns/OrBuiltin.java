@@ -17,7 +17,7 @@ public class OrBuiltin extends FnBuiltin {
   }
   
   public Value call(Value x) { // TODO this isn't stable
-    if (x.r()==0) throw new RankError("∨: argument cannot be scalar", this, x);
+    if (x.r()==0) throw new RankError("∨: argument cannot be scalar", this);
     if (x.ia==0) return x;
     if (x.quickIntArr() && x.r()==1) {
       int[] is = x.asIntArrClone();

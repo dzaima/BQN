@@ -100,7 +100,7 @@ public final class Scope {
   
   public void update(String name, Value val) { // sets wherever var already exists
     Scope sc = owner(name);
-    if (sc == null) throw new SyntaxError("No variable '"+name+"' to update", val);
+    if (sc == null) throw new SyntaxError("No variable '"+name+"' to update");
     sc.set(name, val);
   }
   public void set(int index, Value val) {
@@ -490,16 +490,16 @@ public final class Scope {
       }
       StrMap map = new StrMap();
       for (Value v : x) {
-        if (v.r() != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this, v);
+        if (v.r() != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this);
         map.set(v.get(0), v.get(1));
       }
       return map;
     }
     
     public Value call(Value w, Value x) {
-      if (w.r() != 1) throw new RankError("rank of 𝕨 ≠ 1", this, w);
-      if (x.r() != 1) throw new RankError("rank of 𝕩 ≠ 1", this, x);
-      if (w.ia != x.ia) throw new LengthError("both sides lengths should match", this, x);
+      if (w.r() != 1) throw new RankError("rank of 𝕨 ≠ 1", this);
+      if (x.r() != 1) throw new RankError("rank of 𝕩 ≠ 1", this);
+      if (w.ia != x.ia) throw new LengthError("both sides lengths should match", this);
       StrMap map = new StrMap();
       for (int i = 0; i < w.ia; i++) {
         map.set(w.get(i), x.get(i));

@@ -27,7 +27,7 @@ public class EmptyArr extends Arr {
   
   
   public String asString() {
-    if (r() >= 2) throw new DomainError("Using rank≥2 array as char vector", this);
+    if (r() >= 2) throw new DomainError("Using rank≥2 array as char vector");
     return "";
   }
   
@@ -57,7 +57,7 @@ public class EmptyArr extends Arr {
   }
   
   public Value prototype() {
-    if (proto == null) throw new DomainError("couldn't get prototype", this);
+    if (proto == null) throw new DomainError("couldn't get prototype");
     return proto;
   }
   public Value safePrototype() {
