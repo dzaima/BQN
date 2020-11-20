@@ -115,8 +115,11 @@ public abstract class Sys {
         }
         break;
       case "NF":
-        Value val = Main.exec(rest, csc, defArgs);
-        fi = fi.with(val.asIntVec());
+        if (rest.length() == 0) {
+          println("digits: "+fi.pp+"; range: "+Num.fmt(-fi.pns)+"…"+fi.pne + (ln? "; )ln on" : ""));
+        } else {
+          fi = fi.with(Main.exec(rest, csc, defArgs).asIntVec());
+        }
         break;
       case "BC":
         println(Main.comp(rest, csc, defArgs).fmt());

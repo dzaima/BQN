@@ -155,7 +155,6 @@ public final class Scope {
         case "•null": return Null.NULL;
         case "•map": case "•NS": return new MapGen();
         case "•dl": return new Delay();
-        case "•as": return new AS();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
         case "•vi": return Main.vind? Num.ONE : Num.ZERO;
@@ -956,29 +955,6 @@ public final class Scope {
       Value[] va = new Value[pa.length];
       for (int i = 0; i < pa.length; i++) va[i] = recN(pa[i]);
       return HArr.create(va, x.shape);
-    }
-  }
-  
-  static class AS extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•AS"; }
-    
-    /*
-      0 - bit booleans
-      1 - 32-bit ints
-      2 - 64-bit float
-     */
-    public Value call(Value w, Value x) {
-      int t = w.asInt();
-      switch (t) { default: throw new DomainError("•AS: expected 𝕨∊↕3 (𝕨="+w+")", this);
-        case 0:
-          BitArr.BA res = new BitArr.BA(x.shape);
-          for (int c : x.asIntArr()) res.add(Main.bool(c));
-          return res.finish();
-        case 1:
-          return new IntArr(x.asIntArr(), x.shape);
-        case 2:
-          return new DoubleArr(x.asDoubleArr(), x.shape);
-      }
     }
   }
   
