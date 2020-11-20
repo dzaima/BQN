@@ -1053,42 +1053,55 @@ public final class Scope {
         return Num.NUMS[0];
       }
     }
+    /*
+      1 number 𝕨 - convert to array of that type (supported - 0, 10, 11, 12)
+      2 numbers in 𝕨 - reinterpret from type 0⊑𝕨 to 1⊑𝕨
+     */
     public Value call(Value w, Value x) {
-      int[] is = w.asIntVec();
-      if (is.length != 2) throw new DomainError("•DR: 𝕨 must have 2 items", this);
-      int f = is[0];
-      int t = is[1];
-      if ((f==10 || f==11 || f==60)
-       && (t==10 || t==11 || t==60)
-       && (f==11 ^ t==11)) { // convert float to/from bits/long
-        if (t==11) {
-          if (f==10) return DepthBuiltin.on(new Fun() {
-            public String ln(FmtInfo f) { return "•DR"; }
-            public Value call(Value x) {
-              return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
-            }
-          }, 1, x, this);
-          if (f==60) return DepthBuiltin.on(new Fun() {
-            public String ln(FmtInfo f) { return "•DR"; }
-            public Value call(Value x) {
-              return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
-            }
-          }, 0, x, this);
-        } else {
-          if (t==10) return DepthBuiltin.on(new Fun() {
-            public String ln(FmtInfo f) { return "•DR"; }
-            public Value call(Value x) {
-              return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
-            }
-          }, 0, x, this);
-          if (t==60) return DepthBuiltin.on(new Fun() {
-            public String ln(FmtInfo f) { return "•DR"; }
-            public Value call(Value x) {
-              return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
-            }
-          }, 0, x, this);
+      int[] wi = w.asIntVec();
+      if (wi.length == 2) { 
+        int f = wi[0];
+        int t = wi[1];
+        if ((f==10 || f==11 || f==60)
+         && (t==10 || t==11 || t==60)
+         && (f==11 ^ t==11)) { // convert float to/from bits/long
+          if (t==11) {
+            if (f==10) return DepthBuiltin.on(new Fun() {
+              public String ln(FmtInfo f) { return "•DR"; }
+              public Value call(Value x) {
+                return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
+              }
+            }, 1, x, this);
+            if (f==60) return DepthBuiltin.on(new Fun() {
+              public String ln(FmtInfo f) { return "•DR"; }
+              public Value call(Value x) {
+                return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
+              }
+            }, 0, x, this);
+          } else {
+            if (t==10) return DepthBuiltin.on(new Fun() {
+              public String ln(FmtInfo f) { return "•DR"; }
+              public Value call(Value x) {
+                return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
+              }
+            }, 0, x, this);
+            if (t==60) return DepthBuiltin.on(new Fun() {
+              public String ln(FmtInfo f) { return "•DR"; }
+              public Value call(Value x) {
+                return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
+              }
+            }, 0, x, this);
+          }
         }
-      }
+      } else if (wi.length == 1) {
+        switch (wi[0]) {
+          case 0: return new HArr(x.values(), x.shape);
+          case 10: return new BitArr(x.asBitLongs(), x.shape);
+          case 11: return new DoubleArr(x.asDoubleArr(), x.shape);
+          case 12: return new IntArr(x.asIntArr(), x.shape);
+        }
+        if (wi[0]<100) throw new DomainError("•DR: 𝕨 should be ≥100");
+      } else throw new DomainError("•DR: 𝕨 must have 1 or 2 items (had "+wi.length+")", this);
       throw new NYIError(w+"•DR not implemented", this);
     }
     public Value callInvX(Value w, Value x) {
