@@ -61,7 +61,7 @@ public class ShapeBuiltin extends FnBuiltin {
       mod = x.ia%ia;
       int r = div;
       if (emptyMode==0) {
-        if (mod != 0) throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+w.ln(FmtInfo.dbg)+"; "+(x.ia)+" = ≢𝕩)", this);
+        if (mod != 0) throw new LengthError("⥊: empty dimension not perfect (𝕨 ≡ "+w.ln(FmtInfo.def)+"; "+(x.ia)+" = ≢𝕩)", this);
       } else if (emptyMode!=1) {
         if (mod != 0) r++;
       }
@@ -72,7 +72,7 @@ public class ShapeBuiltin extends FnBuiltin {
     if (x.ia == 0) {
       Value proto = x.safePrototype();
       if (ia==0) return new EmptyArr(sh, proto);
-      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.ln(FmtInfo.dbg), this);
+      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.ln(FmtInfo.def), this);
       return new SingleItemArr(proto, sh);
     }
     if (ia == x.ia) return x.ofShape(sh);

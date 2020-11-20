@@ -9,15 +9,15 @@ public abstract class Fun extends Callable {
   protected Fun() { }
   
   public Value call(Value x) {
-    throw new IncorrectArgsError("function "+ln(FmtInfo.dbg)+" called monadically", this, x);
+    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called monadically", this, x);
   }
   public Value call(Value w, Value x) {
-    throw new IncorrectArgsError("function "+ln(FmtInfo.dbg)+" called dyadically", this, w);
+    throw new IncorrectArgsError("function "+ln(FmtInfo.def)+" called dyadically", this, w);
   }
   
-  public Value callInv (         Value x) { throw new DomainError(ln(FmtInfo.dbg)+" doesn't support monadic inverting", this, x); }
-  public Value callInvX(Value w, Value x) { throw new DomainError(ln(FmtInfo.dbg)+" doesn't support dyadic inverting of 𝕩", this, x); }
-  public Value callInvW(Value w, Value x) { throw new DomainError(ln(FmtInfo.dbg)+" doesn't support dyadic inverting of 𝕨", this, x); }
+  public Value callInv (         Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support monadic inverting", this, x); }
+  public Value callInvX(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕩", this, x); }
+  public Value callInvW(Value w, Value x) { throw new DomainError(ln(FmtInfo.def)+" doesn't support dyadic inverting of 𝕨", this, x); }
   
   public Value under(Value o, Value x) {
     Value v = o instanceof Fun? o.call(call(x)) : o;

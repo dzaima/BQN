@@ -7,7 +7,7 @@ import APL.types.arrs.ChrArr;
 import java.util.HashSet;
 
 public class FmtInfo {
-  public static FmtInfo dbg = new FmtInfo(99, 10, 10);
+  public static FmtInfo def = new FmtInfo(99, 10, 10);
   
   public final int pp;
   public final int pns, pne; // use positional notation in (10*-pns)…(10*pne)

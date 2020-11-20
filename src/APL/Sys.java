@@ -78,7 +78,7 @@ public abstract class Sys {
             Value val = csc.vars[i];
             if (val == null) println("  "+s+": unset");
             else {
-              String vs = val.ln(FmtInfo.dbg);
+              String vs = val.ln(FmtInfo.def);
               println("  "+s+": "+(vs.length()<100 && !vs.contains("\n")? vs : val.humanType(false)));
             }
           } else println("  ("+i+") unused");

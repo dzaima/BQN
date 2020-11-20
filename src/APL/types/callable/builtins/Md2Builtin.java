@@ -9,6 +9,6 @@ public abstract class Md2Builtin extends Md2 {
   }
   
   public int hashCode() {
-    return ln(FmtInfo.dbg).hashCode();
+    return ln(FmtInfo.def).hashCode();
   }
 }

@@ -9,6 +9,6 @@ public abstract class Md1Builtin extends Md1 {
   }
   
   public int hashCode() {
-    return ln(FmtInfo.dbg).hashCode();
+    return ln(FmtInfo.def).hashCode();
   }
 }

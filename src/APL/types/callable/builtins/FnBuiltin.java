@@ -9,6 +9,6 @@ public abstract class FnBuiltin extends Fun {
   }
   
   public int hashCode() {
-    return ln(FmtInfo.dbg).hashCode(); // probably could even pass null and it should work
+    return ln(FmtInfo.def).hashCode(); // probably could even pass null and it should work
   }
 }

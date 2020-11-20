@@ -18,7 +18,7 @@ public class AssertBuiltin extends FnBuiltin {
     try {
       msg = Format.outputFmt(w);
     } catch (Throwable t) {
-      msg = w.ln(FmtInfo.dbg);
+      msg = w.ln(FmtInfo.def);
     }
     throw new APL.errors.AssertionError(msg, this);
   }

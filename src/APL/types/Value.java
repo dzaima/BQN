@@ -239,5 +239,5 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   // public String ln(FmtInfo f) { return FmtInfo.tmp(this); }
   public abstract String ln(FmtInfo f);
   public abstract Value pretty(FmtInfo f); // returns rank 1 or 2 array; elements must be characters or a string of a single glyph
-  public final String toString() { return ln(FmtInfo.dbg); }
+  public final String toString() { return ln(FmtInfo.def); }
 }

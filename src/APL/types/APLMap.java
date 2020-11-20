@@ -56,7 +56,7 @@ public abstract class APLMap extends Primitive {
     public String toString() {
       Value v = get(null);
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;
-      return v == null? "map@"+k : v.ln(FmtInfo.dbg);
+      return v == null? "map@"+k : v.ln(FmtInfo.def);
     }
   }
 }
