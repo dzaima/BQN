@@ -188,8 +188,13 @@ public final class Scope {
           }
         };
         case "•comp": return new FnBuiltin() {
-          public String ln(FmtInfo f) { return "•COMP"; }
+          public String ln(FmtInfo f) { return "•Comp"; }
           
+          /* Argument structure:
+               total: ⟨bytecode ⋄ constants ⋄ inner blocks ⋄ main block ⋄ bodies ⋄ [sind [⋄ eind] ⋄ src]⟩
+               block: ⟨type ⋄ immediateness ⋄ monadic ⋄ dyadic⟩
+               body : ⟨start ⋄ vars ⋄ [exportMask]⟩
+           */
           public Value call(Value x) {
             return call(Num.ONE, x);
           }
@@ -198,10 +203,11 @@ public final class Scope {
             Value bc = x.get(0);
             Value obj = x.get(1);
             Value blk = x.get(2);
-            Value bdy = x.get(3);
-            Value inds = x.ia<5?null:x.get(4);
-            Value inde = x.ia<5?null:x.get(x.ia<=6?4:5); // incl
-            Value src  = x.ia<5?null:x.get(x.ia<=6?5:6);
+            Value out = x.get(3);
+            Value bdy = x.get(4);
+            Value inds = x.ia<6?null:x.get(5);
+            Value inde = x.ia<6?null:x.get(x.ia<=7?5:6); // incl
+            Value src  = x.ia<6?null:x.get(x.ia<=7?6:7);
             
             byte[] bcp = new byte[bc.ia];
             int[] bcis = bc.asIntVec();
@@ -230,28 +236,83 @@ public final class Scope {
             }
             
             BlockTok[] blocks = new BlockTok[blk.ia];
-            for (int i = 0; i < blocks.length; i++) {
-              Value bl = blk.get(i);
-              
-              int type = bl.get(0).asInt();
-              boolean imm = Main.bool(bl.get(1));
-              if (type<0 || type>2) throw new DomainError("•COMP: type must be one of 0, 1 or 2", this);
-              char typec = type==0? (imm?'a':'f') : type==1? 'm' : 'd';
-              int[] mi = bl.get(2).asIntVec();
-              int[] di = bl.get(3).asIntVec();
-              Body[] mb = new Body[mi.length]; for (int j = 0; j < mi.length; j++) mb[j] = bodies[mi[j]];
-              Body[] db = new Body[di.length]; for (int j = 0; j < di.length; j++) db[j] = bodies[di[j]];
-              blocks[i] = new BlockTok(typec, imm, mb, db);
+            BlockTok outBlock = null;
+            ArrayList<BlockTok> newBlocks = new ArrayList<>();
+            for (int i = 0; i < blocks.length+1; i++) {
+              Value bl = i>=blocks.length? out : blk.get(i);
+              BlockTok r;
+              if (bl instanceof BlockTok.Wrapper) {
+                r = ((BlockTok.Wrapper) bl).tk;
+              } else {
+                int type = bl.get(0).asInt();
+                boolean imm = Main.bool(bl.get(1));
+                if (type<0 || type>2) throw new DomainError("•COMP: type must be one of 0, 1 or 2", this);
+                char typec = type==0? (imm?'a':'f') : type==1? 'm' : 'd';
+                int[] mi = bl.get(2).asIntVec();
+                int[] di = bl.get(3).asIntVec();
+                Body[] mb = new Body[mi.length]; for (int j = 0; j < mi.length; j++) mb[j] = bodies[mi[j]];
+                Body[] db = new Body[di.length]; for (int j = 0; j < di.length; j++) db[j] = bodies[di[j]];
+                r = new BlockTok(typec, imm, mb, db);
+                newBlocks.add(r);
+              }
+              if (i>=blocks.length) outBlock = r;
+              else blocks[i] = r;
             }
             Comp c = new Comp(bcp, objp, blocks, ref, Token.COMP);
-            for (BlockTok block : blocks) block.comp = c;
-            if (!allowImm) {
-              BlockTok b0 = blocks[0];
-              BlockTok f = new BlockTok(b0.type=='a'?'f': b0.type, false, b0.bdM, b0.bdD);
-              f.comp = c;
-              return f.eval(Scope.this);
+            for (BlockTok block : newBlocks) block.comp = c;
+            if (!allowImm) return new BlockTok.Wrapper(outBlock);
+            return outBlock.eval(Scope.this);
+          }
+          
+          public Value callInv(Value x) { //noinspection ConstantConditions
+            return Scope.this.get("•decomp").call(x);
+          }
+        };
+        case "•decomp": return new FnBuiltin() {
+          public String ln(FmtInfo f) { return "•Decomp"; }
+          
+          public Value call(Value x) {
+            BlockTok bt = BlockTok.get(x, this);
+            BlockTok[] blksP = bt.comp.blocks;
+            // Value[] blksN = new Value[blksP.length + 1];
+            // for (int i = 0; i < blksP.length; i++) blksN[i] = new BlockTok.Wrapper(blksP[i]);
+            Value[] blksN = new Value[blksP.length];
+            for (int i = 0; i < blksP.length; i++) blksN[i] = new BlockTok.Wrapper(blksP[i]);
+            
+            ArrayList<Value> bodies = new ArrayList<>();
+            HashMap<Body, Integer> bodyMap = new HashMap<>();
+            int[] mbs = body(bodies, bodyMap, bt.bdM);
+            int[] dbs = body(bodies, bodyMap, bt.bdD);
+            Value blk = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
+            
+            return new HArr(new Value[]{
+              new IntArr(bt.comp.bc),
+              new HArr(bt.comp.objs),
+              new HArr(blksN),
+              blk,
+              new HArr(bodies)
+            });
+          }
+          
+          private int[] body(ArrayList<Value> bodies, HashMap<Body, Integer> map, Body[] bs) {
+            int[] r = new int[bs.length];
+            for (int i = 0; i < bs.length; i++) {
+              Body c = bs[i];
+              Integer p = map.get(c);
+              if (p==null) {
+                p = bodies.size();
+                map.put(c, p);
+                Value[] vars = new Value[c.vars.length];
+                for (int j = 0; j < c.vars.length; j++) vars[j] = new ChrArr(c.vars[j]);
+                bodies.add(new HArr(new Value[]{Num.of(c.start), new HArr(vars)})); // TODO export stuff maybe?
+              }
+              r[i] = p;
             }
-            return blocks[0].eval(Scope.this);
+            return r;
+          }
+          
+          public Value callInv(Value x) { //noinspection ConstantConditions
+            return Scope.this.get("•comp").call(x);
           }
         };
         case "•bc": return new Fun() {
@@ -263,7 +324,7 @@ public final class Scope {
           
           public Value call(Value w, Value x) {
             if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
-            BlockTok s = x instanceof FunBlock? ((FunBlock) x).code : x instanceof Md2Block? ((Md2Block) x).code : x instanceof Md1Block? ((Md1Block) x).code : null;
+            BlockTok s = BlockTok.get(x, null);
             if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
             return call(w, Scope.this.get("•comp").call(Num.ZERO, x));
           }
@@ -271,6 +332,8 @@ public final class Scope {
         };
         case "•opt": case "•optimize":
           return new Optimizer();
+        default:
+          throw new IllegalStateException("Unexpected value: " + name);
       }
     }
     Scope c = this;

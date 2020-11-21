@@ -3,8 +3,8 @@ package APL.tokenizer.types;
 import APL.*;
 import APL.errors.*;
 import APL.tokenizer.Token;
-import APL.tools.Body;
-import APL.types.Value;
+import APL.tools.*;
+import APL.types.*;
 import APL.types.callable.blocks.*;
 
 import java.util.*;
@@ -167,7 +167,7 @@ public class BlockTok extends TokArr {
         pi = ci;
       }
       s.append("}");
-    }
+    } else s.append("…}");
     return s.toString();
   }
   
@@ -224,5 +224,26 @@ public class BlockTok extends TokArr {
       if (res != null) return res;
     }
     throw new DomainError("No header matched", this);
+  }
+  
+  
+  public static class Wrapper extends Primitive {
+    public final BlockTok tk;
+    public Wrapper(BlockTok tk) { this.tk = tk; }
+    
+    public boolean eq(Value o) { return o instanceof Wrapper && tk == ((Wrapper) o).tk; }
+    public int hashCode() { return tk.hashCode(); }
+    public String ln(FmtInfo f) { return tk.toRepr(); }
+    public Value pretty(FmtInfo f) { return Format.str("block:"+tk.toRepr()); }
+  }
+  
+  
+  public static BlockTok get(Value v, Callable blame) {
+    if (v instanceof FunBlock) return ((FunBlock) v).code;
+    else if (v instanceof Md1Block) return ((Md1Block) v).code;
+    else if (v instanceof Md2Block) return ((Md2Block) v).code;
+    else if (v instanceof Wrapper) return ((Wrapper) v).tk;
+    else if (blame==null) return null;
+    else throw new DomainError(blame+": argument must be a block", blame);
   }
 }

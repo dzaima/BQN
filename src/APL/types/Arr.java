@@ -290,7 +290,7 @@ public abstract class Arr extends Value {
           int csz = Character.charCount(c);
           if (c < 32) c+= '␀';
           if (c == 127) c = '␡';
-          m.set(o++, csz==1? Char.of((char) c) : new ChrArr(new String(Character.toChars(c)))); // Character.toString(c) ._.
+          m.set(o++, Format.chr(c, csz));
           i+= csz;
         }
         m.set(o++, Char.ASCII['"']);

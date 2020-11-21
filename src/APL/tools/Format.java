@@ -59,7 +59,21 @@ public class Format {
     }
   }
   
-  public static Value str(String s) {
-    return new ChrArr(s); // TODO split graphemes, color escapes, etc idk
+  public static Value str(String s) { // TODO split graphemes, color escapes, etc idk
+    int len = s.codePointCount(0, s.length());
+    if (len==s.length()) return new ChrArr(s);
+    MutVal mv = new MutVal(new int[]{len}, Char.SPACE);
+    int i=0, o=0;
+    while (i < s.length()) {
+      int c = s.codePointAt(i);
+      int csz = Character.charCount(c);
+      mv.set(o++, chr(c, csz));
+      i+= csz;
+    }
+    return mv.get();
+  }
+  
+  public static Value chr(int c, int csz) {
+    return csz==1? Char.of((char) c) : new ChrArr(new String(Character.toChars(c)));
   }
 }
