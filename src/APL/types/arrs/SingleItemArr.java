@@ -95,13 +95,6 @@ public class SingleItemArr extends Arr {
     return r;
   }
   
-  public String ln(FmtInfo f) {
-    if (ia == 0) return super.ln(f);
-    String r = Main.formatAPL(shape) + "⥊";
-    if (!(item instanceof Primitive)) r+= "<";
-    return r + item.ln(f);
-  }
-  
   public Iterator<Value> iterator() {
     return new Iterator<Value>() { int c = 0;
       public boolean hasNext() {

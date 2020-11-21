@@ -10,7 +10,7 @@ err←"err"
     src ↩ {𝕩/˜¬∧`⌾⌽' '=𝕩} src
     got ← Eval⎊"err" src
     exp ← ⍎(p+1)↓𝕩
-    got ≡◶{⟨"`"∾src∾"`: got `"∾𝕨∾"`, expected `"∾𝕩∾"`"⟩}‿⟨⟩○•Pretty exp
+    got ≡◶{⟨"`"∾src∾"`: got "∾𝕨∾", expected "∾𝕩⟩}‿⟨⟩○(1⊸⍕) exp
   }¨ lns
   (0=≠)◶{𝕩:•Out path∾": "∾(⍕lns-○≠msgs)∾" / "∾⍕≠lns}‿{𝕩:•Out path∾": Passed all "∾(⍕≠lns)∾" tests"} msgs
   {•Out"   "∾𝕩}¨msgs
