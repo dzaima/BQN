@@ -2,7 +2,7 @@ package APL.types.arrs;
 
 import APL.Main;
 import APL.errors.DomainError;
-import APL.tools.*;
+import APL.tools.Pervasion;
 import APL.types.*;
 
 import java.util.*;

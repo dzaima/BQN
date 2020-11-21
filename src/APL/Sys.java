@@ -175,7 +175,7 @@ public abstract class Sys {
         if (ni == comp.c.bc.length) break;
         ci = ni;
       }
-      byte lins = comp.c.bc[ci];
+      int lins = comp.c.bc[ci];
       Value r = comp.exec(csc);
       if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
         println(r);

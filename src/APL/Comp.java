@@ -15,7 +15,7 @@ import APL.types.mut.*;
 import java.util.*;
 
 public class Comp {
-  public final byte[] bc;
+  public final int[] bc;
   public final Value[] objs;
   public final BlockTok[] blocks;
   private final Token[] ref;
@@ -23,7 +23,7 @@ public class Comp {
   
   public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always
   
-  public Comp(byte[] bc, Value[] objs, BlockTok[] blocks, Token[] ref, Token tk) {
+  public Comp(int[] bc, Value[] objs, BlockTok[] blocks, Token[] ref, Token tk) {
     this.bc = bc;
     this.objs = objs;
     this.blocks = blocks;
@@ -101,36 +101,36 @@ public class Comp {
         c++;
         switch (bc[i]) {
           case PUSH: {
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             s.push(objs[n]);
             break;
           }
           case VARO: {
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             Value got = sc.getC(objs[n].asString());
             s.push(got);
             break;
           }
           case VARM: {
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             s.push(new Variable(objs[n].asString()));
             break;
           }
           case LOCO: {
-            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n0 = bc[c++];
+            int n1 = bc[c++];
             Value got = sc.getL(n0, n1);
             s.push(got);
             break;
           }
           case LOCM: {
-            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n0 = bc[c++];
+            int n1 = bc[c++];
             s.push(new Local(n0, n1));
             break;
           }
           case ARRO: {
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             Value[] vs = new Value[n];
             for (int j = 0; j < n; j++) {
               vs[n-j-1] = (Value) s.pop();
@@ -139,7 +139,7 @@ public class Comp {
             break;
           }
           case ARRM: {
-            int n=0,h=0,b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             Settable[] vs = new Settable[n];
             for (int j = 0; j < n; j++) {
               vs[n-j-1] = (Settable) s.pop();
@@ -262,7 +262,7 @@ public class Comp {
             break;
           }
           case DFND: {
-            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             s.push(blocks[n].eval(sc));
             break;
           }
@@ -279,7 +279,7 @@ public class Comp {
             break exec;
           }
           case FLDO: {
-            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
             if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
@@ -287,7 +287,7 @@ public class Comp {
             break;
           }
           case FLDM: {
-            int n=0,h=0; byte b; do { b = bc[c]; n|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
             if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
@@ -295,8 +295,8 @@ public class Comp {
             break;
           }
           case NSPM: {
-            int n0=0,h=0,b; do { b = bc[c]; n0|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
-            int n1=0;h=0;   do { b = bc[c]; n1|= (b&0x7f)<<h; h+=7; c++; } while (b<0);
+            int n0 = bc[c++];
+            int n1 = bc[c++];
             Settable[] vs = new Settable[n0];
             for (int j = 0; j < n0; j++) {
               vs[n0-j-1] = (Settable) s.pop();
@@ -463,18 +463,10 @@ public class Comp {
   }
   
   
-  private int l7dec(byte[] bc, int i) {
-    int n=0, h=0;
-    while (true) {
-      if (i >= bc.length) return -1;
-      n|= (bc[i]&0x7f)<<h;
-      h+=7;
-      if (bc[i]>=0) return n;
-      i++;
-    }
+  private int l7dec(int[] bc, int i) {
+    return bc[i];
   }
-  private int l7end(byte[] bc, int i) { // returns first index after end
-    while (i<bc.length && bc[i]<0) i++;
+  private int l7end(int[] bc, int i) { // returns first index after end
     return i+1;
   }
   
@@ -506,7 +498,7 @@ public class Comp {
   
     ArrayList<Value> objs = new ArrayList<>();
     ArrayList<BlockTok> blocks = new ArrayList<>();
-    MutByteArr bc = new MutByteArr(10);
+    MutIntArr bc = new MutIntArr(16);
     ArrayList<Token> ref = new ArrayList<>();
     
     HashMap<String, Integer> vars; // map of varName→index
@@ -540,13 +532,9 @@ public class Comp {
       return exp;
     }
     
-    public void addNum(int n) {
-      leb128(bc, n, ref);
-    }
-    
     public void push(Token t, Value o) {
       add(t, PUSH);
-      addNum(addObj(o));
+      add(addObj(o));
     }
     public int addObj(Value o) {
       int r = objs.size();
@@ -556,7 +544,7 @@ public class Comp {
     
     public void push(BlockTok o) {
       add(o, DFND);
-      addNum(blocks.size());
+      add(blocks.size());
       blocks.add(o);
     }
     
@@ -568,38 +556,29 @@ public class Comp {
       Integer pos = vars.get(s);
       if (pos == null) {
         add(t, mut? VARM : VARO);
-        addNum(addObj(new ChrArr(s)));
+        add(addObj(new ChrArr(s)));
       } else {
         add(t, mut? LOCM : LOCO);
-        add((byte) 0);
-        addNum(pos);
+        add(0);
+        add(pos);
       }
     }
-    
-    public void add(byte nbc) {
-      bc.s(nbc); ref.add(null);
+  
+  
+    public void add(int nbc) {
+      bc.add(nbc); ref.add(null);
     }
     public void add(Token tk, byte nbc) {
-      bc.s(nbc); ref.add(tk);
+      bc.add(nbc); ref.add(tk);
     }
     public void add(Token tk, byte... nbc) {
       for (byte b : nbc) {
-        bc.s(b); ref.add(tk);
+        bc.add(b); ref.add(tk);
       }
     }
     
-    public static void leb128(MutByteArr ba, int n, ArrayList<Token> ref) {
-      do {
-        byte b = (byte) (n&0x7f);
-        n>>= 7;
-        if (n!=0) b|= 0x80;
-        ba.s(b);
-        ref.add(null);
-      } while (n != 0);
-    }
-    
     public Comp finish(Token tk) {
-      assert bc.len == ref.size() : bc.len +" "+ ref.size();
+      assert bc.sz == ref.size() : bc.sz +" "+ ref.size();
       return new Comp(bc.get(), objs.toArray(new Value[0]), blocks.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
@@ -663,7 +642,7 @@ public class Comp {
   
   public static Comp comp(Mut mut, ArrayList<Body> parts, BlockTok tk) { // block
     for (Body b : parts) {
-      b.start = mut.bc.len;
+      b.start = mut.bc.sz;
       mut.newBody(tk.defNames());
       b.addHeader(mut);
       int sz = b.lns.size();
@@ -840,7 +819,7 @@ public class Comp {
     void add(Mut m) {
       o.add(m);
       m.add(tk, mut? FLDM : FLDO);
-      m.addNum(m.addObj(new ChrArr(k)));
+      m.add(m.addObj(new ChrArr(k)));
     }
   
     Res mut(boolean create, boolean export) { // TODO use create?
@@ -1208,7 +1187,7 @@ public class Comp {
     if (tk instanceof StrandTok) {
       List<Token> tks = ((StrandTok) tk).tokens;
       for (Token c : tks) compM(m, c, create, header);
-      m.add(tk, ARRM); m.addNum(tks.size());
+      m.add(tk, ARRM); m.add(tks.size());
       return;
     }
     arraytok: if (tk instanceof ArrayTok) {
@@ -1232,11 +1211,11 @@ public class Comp {
           compM(m, parts.get(0), create, header);
         }
         m.add(tk, NSPM);
-        m.addNum(tks.size());
-        m.addNum(m.addObj(new HArr(nsKeys)));
+        m.add(tks.size());
+        m.add(m.addObj(new HArr(nsKeys)));
       } else {
         for (Token c : tks) compM(m, c, create, header);
-        m.add(tk, ARRM); m.addNum(tks.size());
+        m.add(tk, ARRM); m.add(tks.size());
       }
       return;
     }
@@ -1360,7 +1339,7 @@ public class Comp {
       for (Token c : tks) compO(m, c);
       if (Main.debug) Main.printlvl--;
       
-      m.add(tk, ARRO); m.addNum(tks.size());
+      m.add(tk, ARRO); m.add(tks.size());
       return;
     }
     if (tk instanceof ArrayTok) {
@@ -1369,7 +1348,7 @@ public class Comp {
       for (Token c : tks) compO(m, c);
       if (Main.debug) Main.printlvl--;
       
-      m.add(tk, ARRO); m.addNum(tks.size());
+      m.add(tk, ARRO); m.add(tks.size());
       return;
     }
     if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok) { // TODO should this be here?

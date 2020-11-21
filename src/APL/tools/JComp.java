@@ -48,7 +48,7 @@ public class JComp {
       int mstack = 0;
       
       
-      byte[] bc = comp.bc;
+      int[] bc = comp.bc;
       int i = start;
       int cstack=0;
       loop: while (i != bc.length) {
@@ -56,7 +56,7 @@ public class JComp {
         i++;
         switch (bc[pi]) { default: throw new DomainError("Unimplemented bytecode "+bc[pi]);
           case PUSH: {
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.aload(0);
             fn.getfield(JFn.class, "vals", Value[].class);
             fn.iconst(n);
@@ -67,7 +67,7 @@ public class JComp {
           }
           
           case VARO: {
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.aload(SC);
             fn.ldc(comp.objs[n].asString());
             fn.invvirt(Scope.class, "getC", met(Value.class, String.class));
@@ -76,7 +76,7 @@ public class JComp {
             break;
           }
           case VARM: {
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.new_(Variable.class); fn.dup();
             fn.ldc(comp.objs[n].asString());
             fn.invspec(Variable.class, "<init>", met(void.class, String.class));
@@ -87,8 +87,8 @@ public class JComp {
   
   
           case LOCO: {
-            int n0=0,h=0,b; do { b = bc[i]; n0|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-            int n1=0;h=0;   do { b = bc[i]; n1|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n0 = bc[i++];
+            int n1 = bc[i++];
             fn.aload(SC);
             for (int j = 0; j < n0; j++) fn.getfield(Scope.class, "parent", Scope.class);
             fn.getfield(Scope.class, "vars", Value[].class);
@@ -98,8 +98,8 @@ public class JComp {
             break;
           }
           case LOCM: {
-            int n0=0,h=0,b; do { b = bc[i]; n0|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
-            int n1=0;h=0;   do { b = bc[i]; n1|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n0 = bc[i++];
+            int n1 = bc[i++];
             fn.new_(Local.class); fn.dup();
             fn.iconst(n0); fn.iconst(n1);
             fn.invspec(Local.class, "<init>", met(void.class, int.class, int.class));
@@ -110,7 +110,7 @@ public class JComp {
           
           
           case ARRO: {
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.iconst(n); fn.anewarray(Value.class);
             for (int j = 0; j < n; j++) {
                                 // .. v a
@@ -127,7 +127,7 @@ public class JComp {
             break;
           }
           case ARRM: {
-            int n=0,h=0,b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             
             fn.iconst(n); fn.anewarray(Settable.class);
             for (int j = 0; j < n; j++) {
@@ -317,7 +317,7 @@ public class JComp {
             break;
           }
           case DFND: {
-            int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.aload(0);
             fn.getfield(JFn.class, "blocks", BlockTok[].class);
             fn.iconst(n);
@@ -329,7 +329,7 @@ public class JComp {
             break;
           }
           case FLDO: { Met.Lbl l = fn.lbl();
-            int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");
@@ -343,7 +343,7 @@ public class JComp {
             break;
           }
           case FLDM: { Met.Lbl l = fn.lbl();
-            int n=0,h=0; byte b; do { b = bc[i]; n|= (b&0x7f)<<h; h+=7; i++; } while (b<0);
+            int n = bc[i++];
             fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");

@@ -1,8 +1,6 @@
 package APL.tools;
 
-import APL.tokenizer.Token;
-
-import java.util.*;
+import java.util.Arrays;
 
 public class MutByteArr { 
   public byte[] bs;
@@ -68,15 +66,6 @@ public class MutByteArr {
     assert (short)v == v;
     u((v>>8)&0xff);
     u( v    &0xff);
-  }
-  
-  public void leb128(int n) {
-    do {
-      byte b = (byte) (n&0x7f);
-      n>>= 7;
-      if (n!=0) b|= 0x80;
-      s(b);
-    } while (n != 0);
   }
   
   public byte[] get() {

@@ -7,7 +7,6 @@ import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.*;
-import APL.types.callable.blocks.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.fns.*;
 import APL.types.callable.builtins.md2.DepthBuiltin;
@@ -209,9 +208,7 @@ public final class Scope {
             Value inde = x.ia<6?null:x.get(x.ia<=7?5:6); // incl
             Value src  = x.ia<6?null:x.get(x.ia<=7?6:7);
             
-            byte[] bcp = new byte[bc.ia];
-            int[] bcis = bc.asIntVec();
-            for (int i = 0; i < bcp.length; i++) bcp[i] = (byte) bcis[i];
+            int[] bcp = bc.asIntVec();
             Token[] ref = new Token[bcp.length];
             if(inds!=null) {
               int[] is = inds.asIntArr();
