@@ -7,14 +7,16 @@ import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
 import APL.types.callable.*;
+import APL.types.callable.blocks.*;
 import APL.types.callable.builtins.*;
 import APL.types.callable.builtins.fns.*;
 import APL.types.callable.builtins.md2.DepthBuiltin;
+import APL.types.callable.trains.*;
 
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 
 
@@ -138,9 +140,15 @@ public final class Scope {
         case "•import": return new Import(this);
         case "•pretty": return new Pretty(this);
         case "•out": return new Out(this);
-        case "•ty": return new TY();
+        case "•type": return new Type();
         case "•dr": return new DR();
+        case "•glyph": return new Glyph();
+        case "•source": return new Source();
+        case "•decompose": return new Decompose();
         case "•lns": return new Lns();
+        case "•fchars": return new FIO('c');
+        case "•flines": return new FIO('l');
+        case "•fbytes": return new FIO('b');
         case "•sh": return new Shell();
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
@@ -638,7 +646,77 @@ public final class Scope {
     public Value call(String path, Value x) { return call(x); }
   }
   public static boolean isRel(String name) {
-    return name.equals("•import") || name.equals("•lns") || name.equals("•ex");
+    return name.equals("•import") || name.equals("•lns") || name.equals("•ex") || name.equals("•fchars") || name.equals("•flines") || name.equals("•fbytes");
+  }
+  
+  private static class FIO extends RelFn {
+    public String ln(FmtInfo f) {
+      return type=='b'? "•FBytes" : type=='l'? "•FLines" : "•FChars";
+    }
+    private final char type;
+    public FIO(char type) {
+      this.type = type;
+    }
+  
+    public Value call(String path, Value x) {
+      Path p = Sys.path(path, x.asString());
+      try {
+        if (type=='l') {
+          List<String> l = Files.readAllLines(p, StandardCharsets.UTF_8);
+          Value[] v = new Value[l.size()];
+          for (int i = 0; i < v.length; i++) v[i] = new ChrArr(l.get(i));
+          return new HArr(v);
+        }
+        byte[] bs = Files.readAllBytes(p);
+        // if (type=='b') return new IntArr(bs);
+        if (type=='b') {
+          char[] cs = new char[bs.length];
+          for (int i = 0; i < bs.length; i++) cs[i] = (char) (bs[i]&0xff);
+          return new ChrArr(cs);
+        }
+        // type=='c'
+        return new ChrArr(new String(bs, StandardCharsets.UTF_8));
+      } catch (IOException e) {
+        throw new ValueError(ln(null)+": Couldn't read file \""+p+"\"");
+      }
+    }
+  
+    public Value call(String path, Value w, Value x) {
+      Path p = Sys.path(path, w.asString());
+      try {
+        if (type=='l') {
+          MutByteArr b = new MutByteArr();
+          if (x.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have rank 1", this);
+          for (Value c : x) {
+            if (c.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have items of rank 1", this);
+            b.add(c.asString().getBytes(StandardCharsets.UTF_8));
+            b.s((byte) '\n');
+          }
+          Files.write(p, b.get());
+        }
+        if (type=='b') {
+          byte[] xb = new byte[x.ia];
+          if (x.ia==0 || x.get(0) instanceof Num) {
+            int[] xi = x.asIntArr();
+            for (int i = 0; i < xi.length; i++) xb[i] = (byte)xi[i];
+          } else {
+            String xs = x.asString();
+            for (int i = 0; i < xs.length(); i++) {
+              char c = xs.charAt(i);
+              if (c>=256) throw new DomainError("•FBytes: Expected 𝕩 to consist of characters ≤@+255", this);
+              xb[i] = (byte) c;
+            }
+          }
+          Files.write(p, xb);
+        }
+        if (type=='c') {
+          Files.write(p, x.asString().getBytes(StandardCharsets.UTF_8));
+        }
+        return w;
+      } catch (IOException e) {
+        throw new ValueError("Couldn't write to file \""+p+"\"");
+      }
+    }
   }
   
   private static class Lns extends RelFn {
@@ -646,7 +724,7 @@ public final class Scope {
     
     public Value call(String path, Value x) {
       Path p = Sys.path(path, x.asString());
-      String[] a = Main.readFile(p).split("\n"); // TODO this should read relative to here
+      String[] a = Main.readFile(p).split("\n");
       Value[] o = new Value[a.length];
       for (int i = 0; i < a.length; i++) {
         o[i] = Main.toAPL(a[i]);
@@ -1019,8 +1097,8 @@ public final class Scope {
   }
   
   
-  public static class TY extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•TY"; }
+  public static class Type extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Type"; }
     /*
      0 - array
      1 - number
@@ -1047,6 +1125,37 @@ public final class Scope {
       return Num.NUMS[99];
     }
   }
+  public static class Glyph extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Glyph"; }
+    
+    public Value call(Value x) {
+      if (x instanceof FnBuiltin || x instanceof Md1Builtin || x instanceof Md2Builtin) return new ChrArr(x.ln(null));
+      throw new DomainError("•Glyph: Expected argument to be a built-in function or modifier");
+    }
+  }
+  public static class Source extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Source"; }
+  
+    public Value call(Value x) {
+      return new ChrArr(BlockTok.get(x, this).source());
+    }
+  }
+  
+  public static class Decompose extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Decompose"; }
+  
+    public Value call(Value x) {
+      if (x instanceof FnBuiltin || x instanceof Md1Builtin || x instanceof Md2Builtin) return new HArr(new Value[]{Num.ZERO, x});
+      if (x instanceof FunBlock || x instanceof Md1Block || x instanceof Md2Block) return new HArr(new Value[]{Num.ONE, x});
+      if (x instanceof Atop) return new HArr(new Value[]{Num.NUMS[2],               ((Atop) x).g, ((Atop) x).h});
+      if (x instanceof Fork) return new HArr(new Value[]{Num.NUMS[3], ((Fork) x).f, ((Fork) x).g, ((Fork) x).h});
+      if (x instanceof Md1Derv) return new HArr(new Value[]{Num.NUMS[4], ((Md1Derv) x).f, ((Md1Derv) x).op});
+      if (x instanceof Md2Derv) return new HArr(new Value[]{Num.NUMS[5], ((Md2Derv) x).f, ((Md2Derv) x).op, ((Md2Derv) x).g});
+      if (x instanceof Md2HalfDerv) return new HArr(new Value[]{Num.NUMS[7], ((Md2HalfDerv) x).op, ((Md2HalfDerv) x).g});
+      return new HArr(new Value[]{Num.MINUS_ONE, x});
+    }
+  }
+  
   public static class DR extends FnBuiltin {
     public String ln(FmtInfo f) { return "•DR"; }
     

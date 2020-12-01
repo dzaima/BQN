@@ -4,8 +4,8 @@ import APL.tools.FmtInfo;
 import APL.types.*;
 
 public class Atop extends Fun {
-  private final Value g;
-  private final Value h;
+  public final Value g;
+  public final Value h;
   public Atop(Value g, Value h) {
     this.g = g;
     this.h = h;

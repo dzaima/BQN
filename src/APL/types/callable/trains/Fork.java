@@ -5,7 +5,7 @@ import APL.tools.FmtInfo;
 import APL.types.*;
 
 public class Fork extends Fun {
-  private final Value f, g, h;
+  public final Value f, g, h;
   public Fork(Value f, Value g, Value h) {
     this.f = f;
     this.g = g;

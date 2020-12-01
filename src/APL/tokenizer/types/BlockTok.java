@@ -244,6 +244,6 @@ public class BlockTok extends TokArr {
     else if (v instanceof Md2Block) return ((Md2Block) v).code;
     else if (v instanceof Wrapper) return ((Wrapper) v).tk;
     else if (blame==null) return null;
-    else throw new DomainError(blame+": argument must be a block", blame);
+    else throw new DomainError(blame+": Argument must be a block", blame);
   }
 }

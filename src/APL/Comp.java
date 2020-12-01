@@ -568,11 +568,11 @@ public class Comp {
     public void add(int nbc) {
       bc.add(nbc); ref.add(null);
     }
-    public void add(Token tk, byte nbc) {
+    public void add(Token tk, int nbc) {
       bc.add(nbc); ref.add(tk);
     }
-    public void add(Token tk, byte... nbc) {
-      for (byte b : nbc) {
+    public void add(Token tk, int... nbc) {
+      for (int b : nbc) {
         bc.add(b); ref.add(tk);
       }
     }
@@ -779,15 +779,15 @@ public class Comp {
     }
   }
   static class ResBC extends Res {
-    private final byte[] bc;
+    private final int[] bc;
     private final Token tk;
     
-    public ResBC(byte... bc) {
+    public ResBC(int... bc) {
       super('\0');
       this.bc = bc;
       this.tk = null;
     }
-    public ResBC(Token tk, byte... bc) {
+    public ResBC(Token tk, int... bc) {
       super('\0');
       this.bc = bc;
       this.tk = tk;
@@ -890,8 +890,8 @@ public class Comp {
     return bc;
   }
   
-  private static final byte[] NOBYTES = new byte[0];
-  private static final byte[] CHKVBC = new byte[]{CHKV};
+  private static final int[] NOINTS = EmptyArr.NOINTS;
+  private static final int[] CHKVBC = new int[]{CHKV};
   
   
   private static void printlvl(String s) {
@@ -973,7 +973,7 @@ public class Comp {
           if (c.c!=null && f.c!=null) {
             tps.add(i, new ResCf('f', ((Md1) c.c).derive(f.c), c.lastTok()));
           } else tps.add(i, new ResMix('f', c, f,
-            new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
+            new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOINTS),
             new ResBC(c.lastTok(), OP1D)
           ));
           continue;
@@ -987,9 +987,9 @@ public class Comp {
             if (g.c instanceof Nothing || f.c instanceof Nothing) throw new SyntaxError("didn't expect · here", g.c instanceof Nothing? g.lastTok() : f.lastTok() );
             tps.add(i, new ResCf('f', ((Md2) c.c).derive(f.c, g.c), f.lastTok()));
           } else tps.add(i, new ResMix('f',
-            g, new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOBYTES),
+            g, new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOINTS),
             c,
-            f, new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOBYTES),
+            f, new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOINTS),
             new ResBC(c.lastTok(), OP2D)
           ));
           continue;
@@ -1002,7 +1002,7 @@ public class Comp {
           Res f;
           tps.add(i, new ResMix('m',
             (f=tps.remove(i+1)),
-            new ResBC(f.type=='A'? CHKVBC : NOBYTES),
+            new ResBC(f.type=='A'? CHKVBC : NOINTS),
             (  tps.remove(i  )),
             new ResBC(f.lastTok(), OP2H)
           ));
@@ -1035,7 +1035,7 @@ public class Comp {
             if (Main.debug) printlvl(k+" "+a+" "+v);
             tps.addLast(new ResMix(v,
               tps.removeLast(),
-              new ResBC(ov=='A'? CHKVBC : NOBYTES),
+              new ResBC(ov=='A'? CHKVBC : NOINTS),
               tps.removeLast(), // empty
               tps.removeLast().mut(a!='↩', a=='⇐'),
               new ResBC(a=='↩'? SETU : SETN)

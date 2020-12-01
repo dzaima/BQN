@@ -47,12 +47,6 @@ public class MutByteArr {
     u( v     &0xff);
   }
   
-  public void u(byte[] v, int s, int e) {
-    while (len+e>=bs.length) dbl();
-    System.arraycopy(v, s, bs, len, e-s);
-    len+= e-s;
-  }
-  
   public void s(byte v) {
     if (len>=bs.length) dbl();
     bs[len++] = v;
@@ -66,6 +60,12 @@ public class MutByteArr {
     assert (short)v == v;
     u((v>>8)&0xff);
     u( v    &0xff);
+  }
+  
+  public void add(byte[] a) {
+    while (len+a.length >= bs.length) dbl();
+    System.arraycopy(a, 0, bs, len, a.length);
+    len+= a.length;
   }
   
   public byte[] get() {
