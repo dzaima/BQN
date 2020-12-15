@@ -180,7 +180,7 @@ public abstract class Arr extends Value {
   }
   
   public boolean eq(Value x) {
-    if (!Arrays.equals(shape, x.shape)) return false;
+    if (!Arrays.equals(shape, x.shape) || !(x instanceof Arr)) return false;
     int xh = ((Arr) x).hash;
     if (hash!=0 && xh!=0 && hash!=xh) return false;
     
