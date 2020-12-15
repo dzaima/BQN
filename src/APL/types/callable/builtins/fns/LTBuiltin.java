@@ -1,5 +1,6 @@
 package APL.types.callable.builtins.fns;
 
+import APL.errors.DomainError;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -35,5 +36,10 @@ public class LTBuiltin extends FnBuiltin {
   
   public Value call(Value w, Value x) {
     return DF.call(w, x);
+  }
+  
+  public Value callInv(Value x) {
+    if (x.r()!=0 || x instanceof Primitive) throw new DomainError("<⁼: called on "+(x.r()!=0? "array with rank "+x.r() : "atom"), this);
+    return x.first();
   }
 }
