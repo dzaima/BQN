@@ -909,9 +909,13 @@ public final class Scope {
   
     public Value call(Value w, Value x) {
       int wi = w.asInt();
-      if (Math.abs(wi)==2) return Format.str(x.ln(sc.sys.fi));
-      Value v = x.pretty(sc.sys.fi);
-      return wi<0? v : new ChrArr(FmtInfo.fmt(v));
+      if (Math.abs(wi)==2) {
+        String v = x.ln(sc.sys.fi);
+        return wi==2? new ChrArr(v) : Format.str(v);
+      } else {
+        Value v = x.pretty(sc.sys.fi);
+        return wi<0? v : new ChrArr(FmtInfo.fmt(v));
+      }
     }
   }
   private static class Out extends FnBuiltin {
