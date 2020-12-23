@@ -32,7 +32,7 @@ public class MinusBuiltin extends FnBuiltin {
   };
   
   public Value call(Value x) {
-    return numChrM(NF, Char::swap, x);
+    return numM(NF, x);
   }
   
   public Pervasion.NN2N dyNum() { return DF; }

@@ -134,6 +134,7 @@ public final class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
+        case "•nanos": return new Num(System.nanoTime() - Main.startingNanos);
         case "•time": return new Timer(this);
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex(this);
@@ -288,15 +289,29 @@ public final class Scope {
             HashMap<Body, Integer> bodyMap = new HashMap<>();
             int[] mbs = body(bodies, bodyMap, bt.bdM);
             int[] dbs = body(bodies, bodyMap, bt.bdD);
-            Value blk = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
+            Token[] ref    = bt.comp.ref;
+            IntArr bcR     = new IntArr(bt.comp.bc);
+            HArr   objR    = new HArr(bt.comp.objs);
+            HArr   blksR   = new HArr(blksN);
+            Value  blkR    = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
+            HArr   bodiesR = new HArr(bodies);
             
-            return new HArr(new Value[]{
-              new IntArr(bt.comp.bc),
-              new HArr(bt.comp.objs),
-              new HArr(blksN),
-              blk,
-              new HArr(bodies)
-            });
+            int[] inds = new int[ref.length];
+            int[] inde = new int[ref.length];
+            int cIs=0, cIe=-1;
+            String src = null;
+            for (int i = 0; i < ref.length; i++) {
+              if (ref[i]!=null) {
+                cIs = ref[i].spos;
+                cIe = ref[i].epos;
+                if(src==null) src=ref[i].raw;
+                else if (!src.equals(ref[i].raw)) { cIe=-1; break; }
+              }
+              inds[i] = cIs;
+              inde[i] = cIe-1;
+            }
+            if (cIe!=-1) return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR, new IntArr(inds), new IntArr(inde), new ChrArr(src)});
+            else         return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR});
           }
           
           private int[] body(ArrayList<Value> bodies, HashMap<Body, Integer> map, Body[] bs) {

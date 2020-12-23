@@ -18,7 +18,7 @@ public class Comp {
   public final int[] bc;
   public final Value[] objs;
   public final BlockTok[] blocks;
-  private final Token[] ref;
+  public final Token[] ref;
   private final Token tk;
   
   public static int compileStart = 1; // at which iteration of calling the function should it be compiled to Java bytecode; negative for never, 0 for always

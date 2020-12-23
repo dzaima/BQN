@@ -23,6 +23,7 @@ public class Main {
   public static final ChrArr digits = toAPL("0123456789");
   static int printlvl = 0;
   static final long startingMillis = System.currentTimeMillis();
+  static final long startingNanos = System.nanoTime();
   public static Scanner console;
   public static void main(String[] args) {
     colorful = System.console() != null && System.getenv().get("TERM") != null;
