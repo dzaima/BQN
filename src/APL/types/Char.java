@@ -56,7 +56,18 @@ public class Char extends Primitive {
   }
   
   public String ln(FmtInfo f) {
-    if (spec()) return "@+" + (+chr);
+    if (spec()) {
+      switch (chr) {
+        case 0: return "@";
+        case 9: return "\\t";
+        case 10: return "\\n";
+        case 13: return "\\r";
+        default:
+          String s = Integer.toHexString(chr);
+          if (s.length()==1) s = "0"+s;
+          return "\\x"+s;
+      }
+    }
     return "'"+chr+"'";
   }
   public Value pretty(FmtInfo f) {

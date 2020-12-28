@@ -353,7 +353,7 @@ public final class Scope {
         case "•opt": case "•optimize":
           return new Optimizer();
         default:
-          throw new IllegalStateException("Unexpected value: " + name);
+          throw new DomainError("Undefined system constant "+name);
       }
     }
     Scope c = this;

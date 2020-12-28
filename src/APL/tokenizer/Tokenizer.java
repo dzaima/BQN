@@ -1,7 +1,8 @@
 package APL.tokenizer;
 
-import APL.errors.SyntaxError;
+import APL.errors.*;
 import APL.tokenizer.types.*;
+import APL.tools.Format;
 import APL.types.*;
 
 import java.math.BigInteger;
@@ -246,6 +247,27 @@ public class Tokenizer {
         } else if (c == '‿') {
           tokens.add(new StranderTok(raw, i, i+1));
           i++;
+        } else if (c == '\\') {
+          if (next==' ') throw new DomainError("Unfinished backslash literal");
+          c = next;
+          i+= 2;
+          int chr;
+          if (c=='0') chr = '\0';
+          else if (c=='n') chr = '\n';
+          else if (c=='r') chr = '\r';
+          else if (c=='t') chr = '\t';
+          else if (c=='x' || c=='u') {
+            chr = 0;
+            i--;
+            while (++i<len) {
+              c = raw.charAt(i);
+              if (c>='0'&&c<='9') chr = chr*16 + c-'0';
+              else if (c>='a'&&c<='f' || c>='A'&&c<='F') chr = chr*16 + 10+(c-'a' & 31);
+              else break;
+            }
+            if (li+2==i) throw new DomainError("Empty \\"+next+" escape", new ErrTok(raw, li, i));
+          } else throw new DomainError("Unrecognized backslash sequence: '\\"+c+"'", new ErrTok(raw, li, i));
+          tokens.add(new ChrTok(raw, li, i, Format.chr(chr)));
         } else if (c == '\'') {
           if (i+2 >= len) throw new SyntaxError("unfinished character literal", new ErrTok(raw, li));
           if (raw.charAt(i+2) != '\'') {

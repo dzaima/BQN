@@ -76,4 +76,7 @@ public class Format {
   public static Value chr(int c, int csz) {
     return csz==1? Char.of((char) c) : new ChrArr(new String(Character.toChars(c)));
   }
+  public static String chr(int c) {
+    return Character.charCount(c)==1? Character.toString((char) c) : new String(Character.toChars(c));
+  }
 }
