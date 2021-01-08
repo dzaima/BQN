@@ -10,7 +10,11 @@ public class ChrTok extends ConstTok {
     if (str.length() != 1) throw new SyntaxError("Characters must be UTF-16", this);
   }
   
-  @Override public String toRepr() {
+  public ChrTok(String line, int spos, int epos, char chr) {
+    this(line, spos, epos, String.valueOf(chr));
+  }
+  
+  public String toRepr() {
     return source();
   }
 }

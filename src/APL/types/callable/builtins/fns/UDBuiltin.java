@@ -25,8 +25,8 @@ public class UDBuiltin extends FnBuiltin {
         return new HArr(res);
       }
     }
+    if (x.r()!=1) throw new DomainError(blame+": argument must be an atom or vector ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame);
     if (Main.vind) { // •VI←1
-      if (x.r() != 1) throw new DomainError(blame+": 𝕩 must be a vector ("+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame);
       int dim = x.ia;
       int[] shape = x.asIntVec();
       int prod = Arr.prod(shape);
@@ -51,7 +51,7 @@ public class UDBuiltin extends FnBuiltin {
       }
       return new HArr(res);
     } else { // •VI←0
-      int[] shape = x.asIntVec();
+      int[] shape = x.asIntArr();
       int ia = Arr.prod(shape);
       Value[] arr = new Value[ia];
       int i = 0;

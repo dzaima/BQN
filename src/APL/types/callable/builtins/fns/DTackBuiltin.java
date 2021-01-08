@@ -86,7 +86,7 @@ public class DTackBuiltin extends FnBuiltin {
             else         for (int i = 0; i < len; i++) res[len-i-1] = wl.testBit(i)? BigValue.MINUS_ONE : BigValue.ZERO;
             return new HArr(res);
           } else if (sign == 1) {
-            BitArr.BA res = new BitArr.BA(len);
+            BitArr.BA res = new BitArr.BA(new int[]{len},true);
             for (int i = 0; i < len; i++) res.add(wl.testBit(len-i-1));
             return res.finish();
           } else {

@@ -8,7 +8,7 @@ public class StrTok extends ConstTok {
     super(line, spos, epos, new ChrArr(str));
   }
   
-  @Override public String toRepr() {
+  public String toRepr() {
     return source();
   }
 }

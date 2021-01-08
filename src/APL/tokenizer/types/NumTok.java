@@ -8,11 +8,7 @@ public class NumTok extends ConstTok {
     super(line, spos, epos, Num.of(d));
   }
   
-  @Override public String toTree(String p) {
-    return p+"num : " + val + "\n";
-  }
-  
-  @Override public String toRepr() {
+  public String toRepr() {
     return source();
   }
 }

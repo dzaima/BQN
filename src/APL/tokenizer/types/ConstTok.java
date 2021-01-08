@@ -1,6 +1,7 @@
 package APL.tokenizer.types;
 
 import APL.tokenizer.Token;
+import APL.tools.FmtInfo;
 import APL.types.Value;
 
 public abstract class ConstTok extends Token {
@@ -10,5 +11,10 @@ public abstract class ConstTok extends Token {
     super(raw, spos, epos);
     this.val = val;
     type = 'a';
+  }
+  
+  
+  public String toTree(String p) {
+    return p+(getClass().getSimpleName())+" val="+val.ln(FmtInfo.def)+"\n";
   }
 }

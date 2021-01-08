@@ -6,18 +6,24 @@ import APL.tools.Format;
 import APL.types.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Tokenizer {
-  private static final char[] validNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
-  private static final String ops = "⍺⍵⍶⍹+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶◴⍕⎊˝˙!»«";
+  private static final String ops = "+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶◴⍕⎊˝˙!»«";
+  private static final HashSet<Character> opsHS = new HashSet<>();
+  static {
+    for (int i = 0; i < ops.length(); i++) {
+      opsHS.add(ops.charAt(i));
+    }
+  }
   public static final String surrogateOps = "𝕩𝕏𝕨𝕎𝕗𝔽𝕘𝔾𝕤𝕊𝕣ℝ";
   private static boolean validNameStart(char c) {
-    for (char l : validNames) if (l == c) return true;
-    return false;
+    // for (char l : validNames) if (l == c) return true;
+    // return false;
+    return c>='a' & c<='z'  |  c>='A' & c<='Z'  |  c=='_';
   }
   public static boolean validNameMid(char c) {
-    return validNameStart(c) || c >= '0' && c <= '9';
+    return validNameStart(c) | c>='0' & c<='9';
   }
   static class Line {
     final ArrayList<Token> ts;
@@ -88,7 +94,6 @@ public class Tokenizer {
   public static BasicLines tokenize(String raw, Value[] args) {
     return tokenize(raw, false, args);
   }
-  
   @SuppressWarnings("StringConcatenationInLoop")
   public static BasicLines tokenize(String raw, boolean pointless, Value[] args) { // pointless means unevaled things get tokens; mainly for syntax highlighting
     int li = 0;
@@ -145,6 +150,7 @@ public class Tokenizer {
             case '}':
               if (pointless) r = new BlockTok(raw, closed.pos, i+1, lineTokens, true);
               else r = new BlockTok(raw, closed.pos, i+1, lineTokens);
+              // else r = new ArrayTok(raw, closed.pos, i+1, lineTokens);
               break;
             case '⟩':
               r = new ArrayTok(raw, closed.pos, i+1, lineTokens);
@@ -165,7 +171,7 @@ public class Tokenizer {
           while (i < len && validNameMid(raw.charAt(i))) i++;
           String name = raw.substring(li, i);
           tokens.add(new NameTok(raw, li, i, name, args));
-        } else if ("∞π".indexOf(c)!=-1  ||  c=='¯' && "∞π".indexOf(next)!=-1) {
+        } else if (('∞'==c | 'π'==c)  |  c=='¯' & ('∞'==next | 'π'==next)) {
           boolean neg = c=='¯';
           i+= neg? 2 : 1;
           double v = (neg? next : c) == '∞'? Double.POSITIVE_INFINITY : Math.PI;
@@ -221,7 +227,7 @@ public class Tokenizer {
         } else if (c == '.') {
           i++;
           tokens.add(new DotTok(raw, li, i));
-        } else if (ops.contains(cS)) {
+        } else if (opsHS.contains(c)) {
           i++;
           tokens.add(new OpTok(raw, li, i, cS));
         } else if (c == 55349) { // low surrogate pair of double-struck chars

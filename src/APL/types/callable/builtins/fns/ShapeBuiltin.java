@@ -32,7 +32,11 @@ public class ShapeBuiltin extends FnBuiltin {
     int emptyMode = 2; // 0-∘(exact); 1-⌊(discard); 2-⌽(recycle); 3-↑(pad)
     if (w.quickDoubleArr()) {
       sh = w.asIntVec();
-      ia = Arr.prod(sh);
+      ia = 1;
+      for (int c : sh) {
+        ia*= c;
+        if (c < 0) throw new DomainError("⥊: didn't expect "+Num.formatInt(c)+" in shape", this);
+      }
     } else {
       sh = new int[w.ia];
       ia = 1;
@@ -42,6 +46,7 @@ public class ShapeBuiltin extends FnBuiltin {
           int c = v.asInt();
           sh[i] = c;
           ia*= c;
+          if (c < 0) throw new DomainError("⥊: didn't expect "+Num.formatInt(c)+" in shape", this);
         } else {
           if (emptyPos!=-1) throw new DomainError("⥊: contained multiple specials", this);
           emptyPos = i;
@@ -89,7 +94,7 @@ public class ShapeBuiltin extends FnBuiltin {
       return new SingleItemArr(x.first(), sh);
     } else if (x instanceof BitArr) {
       BitArr xb = (BitArr) x;
-      BitArr.BA res = new BitArr.BA(sh);
+      BitArr.BA res = new BitArr.BA(sh, false);
       int full = ia/xb.ia;
       int frac = ia%xb.ia;
       for (int i = 0; i < full; i++) res.add(xb);

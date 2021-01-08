@@ -1,8 +1,8 @@
 package APL;
 
 import APL.errors.*;
-import APL.tokenizer.Tokenizer;
-import APL.tokenizer.types.BasicLines;
+import APL.tokenizer.*;
+import APL.tokenizer.types.*;
 import APL.tools.FmtInfo;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -52,8 +52,8 @@ public abstract class Sys {
         if (rest.length()==0) ln = !ln;
         else println(Main.exec(rest, csc, defArgs).ln(fi));
         break;
-      case "TOKENIZE"    : BasicLines tk = Tokenizer.tokenize(rest,defArgs); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
-      case "TOKENIZEREPR": println(Tokenizer.tokenize(rest,defArgs).toRepr()); break;
+      case "TOKENIZE"    : BasicLines tk = Main.tokenize(rest,defArgs); Comp.typeof(tk); Comp.flags(tk); println(tk.toTree("")); break;
+      case "TOKENIZEREPR": println(Main.tokenize(rest,defArgs).toRepr()); break;
       case "CLASS"       : Value r = Main.exec(rest, csc, defArgs); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : Arr e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
       case "ATYPE"       : println(Main.exec(rest, csc, defArgs).humanType(false)); break;
@@ -128,7 +128,15 @@ public abstract class Sys {
         println(Main.comp(Main.exec(rest, csc, defArgs).asString(), csc, defArgs).fmt());
         break;
       case "TOKTYPE":
-        println(String.valueOf(Comp.typeof(Tokenizer.tokenize(rest,defArgs).tokens.get(0))));
+        println(String.valueOf(Comp.typeof(Main.tokenize(rest,defArgs).tokens.get(0))));
+        break;
+      case "NTOK":
+        LineTok nt = new LineTok("…", 0, 1, new Tk2(rest, defArgs).tkLine());
+        System.out.println(nt.toTree(""));
+        System.out.println(nt.toRepr());
+        break;
+      case "NEV":
+        System.out.println(Comp.comp(new Tk2(rest, defArgs).tkBlock(), csc).exec(csc));
         break;
       default:
         throw new SyntaxError("Undefined user command");
@@ -156,7 +164,7 @@ public abstract class Sys {
       Main.toAPL(spl[0]), // path
     };
     String code = Main.readFile(path);
-    return Comp.compN(Tokenizer.tokenize(code, rargs), sc).exec(sc);
+    return Comp.compN(Main.tokenize(code, rargs), sc).exec(sc);
   }
   public Value execFile(Path path, Scope sc) {
     return execFile(path, EmptyArr.SHAPE0S, sc);

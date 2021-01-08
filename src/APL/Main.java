@@ -2,6 +2,7 @@ package APL;
 
 import APL.errors.*;
 import APL.tokenizer.*;
+import APL.tokenizer.types.BasicLines;
 import APL.tools.Format;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -229,10 +230,15 @@ public class Main {
   }
   
   public static Value exec(String s, Scope sc, Value[] args) {
-    return Comp.comp(Tokenizer.tokenize(s, args), sc).exec(sc);
+    return Comp.comp(tokenize(s, args), sc).exec(sc);
   }
   public static Comp.SingleComp comp(String s, Scope sc, Value[] args) {
-    return Comp.comp(Tokenizer.tokenize(s, args), sc);
+    return Comp.comp(tokenize(s, args), sc);
+  }
+  // public static boolean newTk = true;
+  public static BasicLines tokenize(String s, Value[] args) {
+    // if (!newTk) return Tokenizer.tokenize(s, args);
+    return new Tk2(s, args).tkBlock();
   }
   
   public static void printdbg(Object... args) {

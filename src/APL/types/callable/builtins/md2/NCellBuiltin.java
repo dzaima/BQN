@@ -57,13 +57,13 @@ public class NCellBuiltin extends Md2Builtin {
   private int dim(Value v, int rank) {
     if (!(v instanceof Num)) throw new DomainError("Expected number, got "+v.humanType(false), this);
     double d = ((Num) v).num;
-    if (d==0 && Double.doubleToRawLongBits(d)!=0) return 0;
-    if (d >=  rank) return 0;
-    if (d <= -rank) return rank;
-    if (d%1 != 0) throw new DomainError("Expected integer, got "+d, this);
-    int k = (int) d;
-    if (k<0) return Math.min(-k, rank);
-    else return Math.max(rank-k, 0);
+    int i = (int) d;
+    if (i==0 && Double.doubleToRawLongBits(d)!=0) return 0;
+    if (d!=i && Math.floor(d)!=d) throw new DomainError("Expected integer, got "+Num.fmt(d), this);
+    if (i >=  rank) return 0;
+    if (i <= -rank) return rank;
+    if (i<0) return Math.min(-i, rank);
+    else return Math.max(rank-i, 0);
   }
   
   

@@ -187,13 +187,13 @@ public class Pervasion { // implementations must be okay with not being called o
       if (x.quickDoubleArr() && w instanceof Num) {
         double wd = ((Num) w).num;
         if (Num.isBool(wd) && x instanceof BitArr) return on(wd==1, (BitArr) x);
-        BitArr.BA res = new BitArr.BA(x.shape);
+        BitArr.BA res = new BitArr.BA(x.shape,true);
         if (Num.isInt(wd) && x.quickIntArr()) on((int) wd, x.asIntArr(), res);
         else on(wd, x.asDoubleArr(), res);
         return res.finish();
       }
       if (w instanceof Char && x instanceof ChrArr) {
-        BitArr.BA res = new BitArr.BA(x.shape);
+        BitArr.BA res = new BitArr.BA(x.shape,true);
         on(((Char) w).chr, ((ChrArr) x).s.toCharArray(), res);
         return res.finish();
       }
@@ -203,13 +203,13 @@ public class Pervasion { // implementations must be okay with not being called o
       if (w.quickDoubleArr() && x instanceof Num) {
         double xd = ((Num) x).num;
         if (w instanceof BitArr && Num.isBool(xd)) return on((BitArr) w, xd==1);
-        BitArr.BA res = new BitArr.BA(w.shape);
+        BitArr.BA res = new BitArr.BA(w.shape,true);
         if (w.quickIntArr() && Num.isInt(xd)) on(w.asIntArr(), (int) xd, res);
         else on(w.asDoubleArr(), xd, res);
         return res.finish();
       }
       if (w instanceof ChrArr && x instanceof Char) {
-        BitArr.BA res = new BitArr.BA(w.shape);
+        BitArr.BA res = new BitArr.BA(w.shape,true);
         on(((ChrArr) w).s.toCharArray(), ((Char) x).chr, res);
         return res.finish();
       }
@@ -223,13 +223,13 @@ public class Pervasion { // implementations must be okay with not being called o
           on(wl, ((BitArr) x).arr, res);
           return new BitArr(res, x.shape);
         }
-        BitArr.BA res = new BitArr.BA(x.shape);
+        BitArr.BA res = new BitArr.BA(x.shape,true);
         if (w.quickIntArr() && x.quickIntArr()) on(w.asIntArr(), x.asIntArr(), res);
         else on(w.asDoubleArr(), x.asDoubleArr(), res);
         return res.finish();
       }
       if (w instanceof ChrArr && x instanceof ChrArr) {
-        BitArr.BA res = new BitArr.BA(x.shape);
+        BitArr.BA res = new BitArr.BA(x.shape,true);
         on(((ChrArr) w).s.toCharArray(), ((ChrArr) x).s.toCharArray(), res);
         return res.finish();
       }

@@ -496,19 +496,19 @@ public class Comp {
     boolean topLvl;
     public Mut(boolean topLvl) { this.topLvl = topLvl; }
   
-    ArrayList<Value> objs = new ArrayList<>();
-    ArrayList<BlockTok> blocks = new ArrayList<>();
+    ArrayList<Value> objs = new ArrayList<>(16);
+    ArrayList<BlockTok> blocks = new ArrayList<>(16);
     MutIntArr bc = new MutIntArr(16);
-    ArrayList<Token> ref = new ArrayList<>();
+    ArrayList<Token> ref = new ArrayList<>(16);
     
     HashMap<String, Integer> vars; // map of varName→index
     ArrayList<String> varnames;
     HashSet<String> exported;
     public void newBody(String[] preset) {
-      varnames = new ArrayList<>();
-      exported = null;
+      varnames = new ArrayList<>(preset.length);
       Collections.addAll(varnames, preset);
-      vars = new HashMap<>();
+      exported = null;
+      vars = new HashMap<>(preset.length);
       for (int i = 0; i < preset.length; i++) vars.put(preset[i], i);
     }
     
@@ -707,28 +707,6 @@ public class Comp {
     }
     return true;
   }
-  private static boolean isS(DQ tps, String pt, int off) { // O=[aAf] in non-!
-    int pi = 0;
-    int ti = off;
-    int tsz = tps.size();
-    while (pi<pt.length()) {
-      char c = pt.charAt(pi++);
-      if (c != '|') {
-        if (ti==tsz) return false;
-        char t = tps.get(ti++).type;
-        if (c=='O') {
-          if (t!='f' && t!='a' && t!='A') return false;
-        } else {
-          if (c == '!') {
-            if (t == pt.charAt(pi++)) return false;
-          } else {
-            if (t != c) return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
   
   static abstract class Res {
     char type;
@@ -778,16 +756,43 @@ public class Comp {
       return tk==null? type+"" : tk.source();
     }
   }
-  static class ResBC extends Res {
-    private final int[] bc;
+  static class ResChk extends Res {
+    private final boolean check;
     private final Token tk;
     
-    public ResBC(int... bc) {
+    public ResChk(boolean check) {
+      super('\0');
+      this.check = check;
+      this.tk = null;
+    }
+    public ResChk(Token tk, boolean check) {
+      super('\0');
+      this.check = check;
+      this.tk = tk;
+    }
+    
+    void add(Mut m) {
+      if (check) m.add(tk, CHKV);
+    }
+    
+    public Token lastTok() {
+      return null;
+    }
+    
+    public String toString() {
+      return check? "CHKV" : "NOOP";
+    }
+  }
+  static class ResBC extends Res {
+    private final int bc;
+    private final Token tk;
+    
+    public ResBC(int bc) {
       super('\0');
       this.bc = bc;
       this.tk = null;
     }
-    public ResBC(Token tk, int... bc) {
+    public ResBC(Token tk, int bc) {
       super('\0');
       this.bc = bc;
       this.tk = tk;
@@ -802,7 +807,7 @@ public class Comp {
     }
     
     public String toString() {
-      return Arrays.toString(bc);
+      return String.valueOf(bc);
     }
   }
   static class ResGet extends Res {
@@ -879,31 +884,24 @@ public class Comp {
     }
   }
   
-  public static byte[] cat(byte[][] bcs) {
-    int am = 0;
-    for (byte[] bc : bcs) am+= bc.length;
-    byte[] bc = new byte[am];
-    for (int i=0, j=0; i < bcs.length; i++) {
-      System.arraycopy(bcs[i], 0, bc, j, bcs[i].length);
-      j+= bcs[i].length;
-    }
-    return bc;
-  }
-  
   private static final int[] NOINTS = EmptyArr.NOINTS;
-  private static final int[] CHKVBC = new int[]{CHKV};
+  private static final int[] CHKV_A = new int[]{CHKV};
   
   
   private static void printlvl(String s) {
     System.out.println(Main.repeat(" ", Main.printlvl*2) + s);
   }
-  public static void collect(DQ tps, boolean train, boolean last, Mut mut) {
+  public static void collect(DQ tps, boolean train, boolean last) {
     while (true) {
       if (Main.debug) printlvl(tps.toString());
       if (tps.size() <= 1) break;
       if (tps.peekFirst().type=='.' || tps.get(1).type=='.'  &&  !last) break;
-      if (last && tps.size()>=3 && tps.get(1).type=='.'
-       ||         tps.size()>=3 && tps.get(2).type=='.') {
+      char fType = tps.peekFirst().type;
+      char lType = tps.peekLast().type;
+      if (tps.size()>=3 && (
+           last && tps.get(1).type=='.' 
+        || tps.get(2).type=='.')
+      ) {
         int s = tps.get(1).type=='.'? 0 : 1;
         do {
           Res m = tps.remove(s);
@@ -917,100 +915,134 @@ public class Comp {
           tps.add(s, new ResGet(m, ks, k.type, d.lastTok()));
         } while (tps.size()>=s+3 && tps.get(s+1).type=='.');
       }
-      if (train) { // trains only
-        if (isE(tps, "d!|Off", 4, last)) {
-          if (Main.debug) printlvl("match F F F");
-          Res h = tps.removeLast();
-          Res g = tps.removeLast();
-          Res f = tps.removeLast();
-          if (h.c!=null && g.c!=null && f.c!=null) {
-            if (f.c instanceof Nothing) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
-            else tps.addLast(new ResCf('f', new Fork(f.c, g.c, h.c), h.lastTok()));
-          } else {
-            tps.addLast(new ResMix('f', h, g, f, new ResBC(f.type=='A'? TR3O : TR3D) ));
+      if (tps.sz>=(last?2:3)) {
+        if (train) { // trains only
+          if (lType=='f' && tps.getL(1).type=='f') {
+            if (isE(tps, "d!|Off", 4, last)) {
+              if (Main.debug) printlvl("match F F F");
+              Res h = tps.removeLast();
+              Res g = tps.removeLast();
+              Res f = tps.removeLast();
+              if (h.c!=null && g.c!=null && f.c!=null) {
+                if (f.c instanceof Nothing) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
+                else tps.addLast(new ResCf('f', new Fork(f.c, g.c, h.c), h.lastTok()));
+              } else {
+                tps.addLast(new ResMix('f', h, g, f, new ResBC(f.type=='A'? TR3O : TR3D) ));
+              }
+              continue;
+            }
+            if (isE(tps, "[⇐←↩]|ff", 4, last)) {
+              if (Main.debug) printlvl("match F F");
+              Res h = tps.removeLast();
+              Res g = tps.removeLast();
+              if (h.c!=null && g.c!=null) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
+              else tps.addLast(new ResMix('f', h, g, new ResBC(TR2D)));
+              continue;
+            }
           }
-          continue;
-        }
-        if (isE(tps, "[⇐←↩]|ff", 4, last)) {
-          if (Main.debug) printlvl("match F F");
-          Res h = tps.removeLast();
-          Res g = tps.removeLast();
-          if (h.c!=null && g.c!=null) tps.addLast(new ResCf('f', new Atop(g.c, h.c), h.lastTok()));
-          else tps.addLast(new ResMix('f', h, g, new ResBC(TR2D)));
-          continue;
-        }
-      } else { // value expressions
-        if (isE(tps, "d!|afa", 4, last)) {
-          if (Main.debug) printlvl("match a F a");
-          Res x = tps.removeLast();
-          Res f = tps.removeLast();
-          Res w = tps.removeLast();
-          tps.addLast(new ResMix(x.type,
-            x, f, w,
-            new ResBC(f.lastTok(), x.type=='A' | w.type=='A'? FN2O : FN2C)
-          ));
-          continue;
-        }
-        if (isE(tps, "[da]!|fa", 4, last)) {
-          if (Main.debug) printlvl("match F a");
-          Res x = tps.removeLast();
-          Res f = tps.removeLast();
-          tps.addLast(new ResMix(x.type,
-            x, f,
-            new ResBC(f.lastTok(), x.type=='A'? FN1O : FN1C)
-          ));
-          continue;
+        } else { // value expressions
+          if (tps.getL(1).type=='f' && isArr(lType)) {
+            char g3 = tps.sz>2? norm(tps.getL(2).type) : 0;
+            if (g3=='a') {
+              if (tps.sz>3? tps.getL(3).type!='d' : last) {
+                if (Main.debug) printlvl("match a F a");
+                Res x = tps.removeLast();
+                Res f = tps.removeLast();
+                Res w = tps.removeLast();
+                tps.addLast(new ResMix(x.type,
+                  x, f, w,
+                  new ResBC(f.lastTok(), x.type=='A' | w.type=='A'? FN2O : FN2C)
+                ));
+                continue;
+              }
+            } else {
+              if (g3!='d') {
+                if (Main.debug) printlvl("match F a");
+                Res x = tps.removeLast();
+                Res f = tps.removeLast();
+                tps.addLast(new ResMix(x.type,
+                  x, f,
+                  new ResBC(f.lastTok(), x.type=='A'? FN1O : FN1C)
+                ));
+                continue;
+              }
+            }
+          }
+          // if (isE(tps, "d!|afa", 4, last)) {
+          //   if (Main.debug) printlvl("match a F a");
+          //   Res x = tps.removeLast();
+          //   Res f = tps.removeLast();
+          //   Res w = tps.removeLast();
+          //   tps.addLast(new ResMix(x.type,
+          //     x, f, w,
+          //     new ResBC(f.lastTok(), x.type=='A' | w.type=='A'? FN2O : FN2C)
+          //   ));
+          //   continue;
+          // }
+          // if (isE(tps, "[da]!|fa", 4, last)) {
+          //   if (Main.debug) printlvl("match F a");
+          //   Res x = tps.removeLast();
+          //   Res f = tps.removeLast();
+          //   tps.addLast(new ResMix(x.type,
+          //     x, f,
+          //     new ResBC(f.lastTok(), x.type=='A'? FN1O : FN1C)
+          //   ));
+          //   continue;
+          // }
         }
       }
       // all
       
       int i = last? 0 : 1; // hopefully this doesn't need to be looping
-      if (tps.get(0).type!='d') {
-        if (isS(tps, "Om", i)) {
-          if (Main.debug) printlvl("match O m");
-          Res c=tps.remove(i+1);
-          Res f=tps.remove(i  );
-          if (c.c!=null && f.c!=null) {
-            tps.add(i, new ResCf('f', ((Md1) c.c).derive(f.c), c.lastTok()));
-          } else tps.add(i, new ResMix('f', c, f,
-            new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOINTS),
-            new ResBC(c.lastTok(), OP1D)
-          ));
-          continue;
+      if (tps.sz >= 2+i) {
+        char o1Type = last? fType : tps.get(1).type;
+        char o2Type = tps.get(i+1).type;
+        if (fType!='d' && isOperand(o1Type)) {
+          if (o2Type=='m') {
+            if (Main.debug) printlvl("match O m");
+            Res c=tps.remove(i+1);
+            Res f=tps.remove(i  );
+            if (c.c!=null && f.c!=null) {
+              tps.add(i, new ResCf('f', ((Md1) c.c).derive(f.c), c.lastTok()));
+            } else tps.add(i, new ResMix('f', c, f,
+              new ResChk(f.lastTok(), f.type=='A'),
+              new ResBC(c.lastTok(), OP1D)
+            ));
+            continue;
+          }
+          if (tps.sz>=3+i && o2Type=='d' && isOperand(tps.get(i + 2).type)) {
+            if (Main.debug) printlvl("match O d O "+i);
+            Res g=tps.remove(i+2);
+            Res c=tps.remove(i+1);
+            Res f=tps.remove(i  );
+            if (g.c!=null && c.c!=null && f.c!=null) {
+              if (g.c instanceof Nothing || f.c instanceof Nothing) throw new SyntaxError("didn't expect · here", g.c instanceof Nothing? g.lastTok() : f.lastTok() );
+              tps.add(i, new ResCf('f', ((Md2) c.c).derive(f.c, g.c), f.lastTok()));
+            } else tps.add(i, new ResMix('f',
+              g, new ResChk(g.lastTok(), g.type=='A'),
+              c,
+              f, new ResChk(f.lastTok(), f.type=='A'),
+              new ResBC(c.lastTok(), OP2D)
+            ));
+            continue;
+          }
         }
-        if (isS(tps, "OdO", i)) {
-          if (Main.debug) printlvl("match O d O "+i);
-          Res g=tps.remove(i+2);
-          Res c=tps.remove(i+1);
-          Res f=tps.remove(i  );
-          if (g.c!=null && c.c!=null && f.c!=null) {
-            if (g.c instanceof Nothing || f.c instanceof Nothing) throw new SyntaxError("didn't expect · here", g.c instanceof Nothing? g.lastTok() : f.lastTok() );
-            tps.add(i, new ResCf('f', ((Md2) c.c).derive(f.c, g.c), f.lastTok()));
-          } else tps.add(i, new ResMix('f',
-            g, new ResBC(g.lastTok(), g.type=='A'? CHKVBC : NOINTS),
-            c,
-            f, new ResBC(f.lastTok(), f.type=='A'? CHKVBC : NOINTS),
-            new ResBC(c.lastTok(), OP2D)
-          ));
-          continue;
-        }
-      }
-      if (isS(tps, "dO", i)) {
-        char t0 = tps.get(0).type;
-        if (i==0 || t0!='a' && t0!='A' && t0!='f') {
-          if (Main.debug) printlvl("match dO");
-          Res f;
-          tps.add(i, new ResMix('m',
-            (f=tps.remove(i+1)),
-            new ResBC(f.type=='A'? CHKVBC : NOINTS),
-            (  tps.remove(i  )),
-            new ResBC(f.lastTok(), OP2H)
-          ));
-          continue;
+        if (o1Type=='d' && isOperand(o2Type)) { // isS(tps, "dO", i)
+          if (i==0 || !isOperand(fType)) {
+            if (Main.debug) printlvl("match dO");
+            Res f;
+            tps.add(i, new ResMix('m',
+              (f=tps.remove(i+1)),
+              new ResChk(f.type=='A'),
+              (  tps.remove(i  )),
+              new ResBC(f.lastTok(), OP2H)
+            ));
+            continue;
+          }
         }
       }
       
-      if (isE(tps, ".!|af↩a", 5, last)) {
+      if (isE(tps, ".!|af↩a", 5, last)) { //tps.sz>=4+i && isArr(lType) && tps.getL(1).type=='↩' && tps.getL(2).type=='f' && isArr(tps.getL(3).type) 
         if (Main.debug) printlvl("af↩a");
         tps.addLast(new ResMix('a',
           tps.removeLast(),
@@ -1022,11 +1054,11 @@ public class Comp {
         continue;
       }
       set: if (tps.size() >= (last? 3 : 4)) {
-        char a = tps.get(tps.size()-2).type;
+        char a = tps.getL(1).type;
         if (a=='←' || a=='↩' || a=='⇐') {
-          char k = tps.get(tps.size()-3).type;
-          char v = tps.get(tps.size()-1).type;
-          char p = tps.size()>=4? tps.get(tps.size()-4).type : 0;
+          char k = tps.getL(2).type;
+          char v = lType;
+          char p = tps.size()>=4? tps.getL(3).type : 0;
           if (p=='d') break set;
           char ov = v;
           v = norm(v);
@@ -1035,17 +1067,23 @@ public class Comp {
             if (Main.debug) printlvl(k+" "+a+" "+v);
             tps.addLast(new ResMix(v,
               tps.removeLast(),
-              new ResBC(ov=='A'? CHKVBC : NOINTS),
+              new ResChk(ov=='A'),
               tps.removeLast(), // empty
               tps.removeLast().mut(a!='↩', a=='⇐'),
               new ResBC(a=='↩'? SETU : SETN)
             ));
             continue;
-          } else if (last) throw new SyntaxError(a+": Cannot assign with different types", ((ResTk) tps.get(tps.size() - 2)).tk);
+          } else if (last) throw new SyntaxError(a+": Cannot assign with different types", ((ResTk) tps.getL(1)).tk);
         }
       }
       break;
     }
+  }
+  static boolean isOperand(char c) {
+    return c=='a' | c=='A' | c=='f';
+  }
+  static boolean isArr(char c) {
+    return c=='a' | c=='A';
   }
   
   public static char typeof(Token t) {
@@ -1061,7 +1099,7 @@ public class Comp {
       return t.type = 'a';
     } else if (t instanceof OpTok) {
       OpTok op = (OpTok) t;
-      Value b = builtin(op);
+      Value b = ((OpTok) t).b;
       if (b==null) {
         String s = op.op;
         switch (s) {
@@ -1069,9 +1107,9 @@ public class Comp {
             return t.type = 'A';
           case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣": case "•":
             return t.type = 'a';
-          case "𝔾": case "𝔽": case "𝕏": case "𝕎": case "𝕊": case "ℝ": case "⍎":
+          case "𝔾": case "𝔽": case "𝕏": case "𝕎": case "𝕊": case "⍎":
             return t.type = 'f';
-          default: throw new ImplementationError("Undefined unknown built-in "+s, op);
+          default: throw new ImplementationError("Undefined built-in "+s, op);
         }
       } else {
         return t.type = b instanceof Fun? 'f' : b instanceof Md1? 'm' : b instanceof Md2? 'd' : 'a';
@@ -1089,12 +1127,12 @@ public class Comp {
       if (prev == 'd') { // ends with d[fa], so equivalent to (last == 'm') below
         for (int i = 0; i < tps.length-2; i++) { // must not touch the last [fa] though (and while at it, d neither) 
           char tp = tps[i];
-          if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
+          if (isOperand(tp)) return t.type = 'f';
         }
         return t.type = 'm';
       } else {
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
-        if (last=='a' || last=='A') {
+        if (isArr(last)) {
           for (char tp : tps) if (tp=='←' || tp=='↩' || tp=='⇐') return t.type = 'a'; // {x←𝕨} discards the optionality property
           return t.type = last; // not as arg of modifier
         }
@@ -1102,7 +1140,7 @@ public class Comp {
         
         if (last == 'm') { // complicated because (_a←_b←_c) vs (⊢+ ⊢+ +˜)
           for (char tp : tps) {
-            if (tp=='a' || tp=='A' || tp=='f') return t.type = 'f';
+            if (isOperand(tp)) return t.type = 'f';
           }
           return t.type = 'm';
         }
@@ -1137,7 +1175,7 @@ public class Comp {
     }
     if (t instanceof OpTok) {
       if (((OpTok) t).op.equals("⍎")) return t.flags = 0;
-      if (builtin((OpTok) t)==null) return t.flags = 6;
+      if (((OpTok) t).b==null) return t.flags = 6;
       return t.flags = 7;
     }
     throw new ImplementationError("didn't check for "+t.getClass().getSimpleName());
@@ -1277,10 +1315,10 @@ public class Comp {
       while (i>=0) {
         Res c = new ResTk(ts.get(i));
         tps.addFirst(c);
-        collect(tps, train, false, m);
+        collect(tps, train, false);
         i--;
       }
-      collect(tps, train, true, m);
+      collect(tps, train, true);
       if (Main.debug) Main.printlvl--;
       
       if (tps.size()!=1) {
@@ -1299,9 +1337,8 @@ public class Comp {
     }
     if (tk instanceof OpTok) {
       OpTok op = (OpTok) tk;
-      Callable b = builtin(op);
+      Callable b = op.b;
       if (b != null) {
-        b.token = tk;
         m.push(tk, b);
         return;
       }
@@ -1311,7 +1348,7 @@ public class Comp {
         case "𝕨": case "𝕘": case "𝕗": case "𝕩": case "𝕤": case "𝕣":
           m.var(tk, s, false);
           return;
-        case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊": case "ℝ":
+        case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊":
           m.var(tk, new String(new char[]{55349, (char) (s.charAt(1)+26)}), false); // lowercase
           return;
         case "⍎": m.add(op, SPEC, EVAL ); return;
@@ -1387,9 +1424,8 @@ public class Comp {
       return Arr.create(ps);
     }
     if (t instanceof OpTok) {
-      Callable b = builtin((OpTok) t);
+      Callable b = ((OpTok) t).b;
       if (b == null) throw new ImplementationError(t.source());
-      b.token = t;
       return b;
     }
     if (t instanceof NothingTok) return ((NothingTok) t).val;
@@ -1504,11 +1540,11 @@ public class Comp {
       // case '⍬': return new DoubleArr(DoubleArr.EMPTY);
   
   
-      case '⍎': case '•': case 'ℝ': // the lone double-struck
+      case '⍎': case '•': // the lone double-struck
       case 55349: // double-struck surrogate pair
         return null;
   
-      default: throw new ImplementationError("no built-in " + t.op + " defined in Comp", t);
+      default: throw new SyntaxError("Unknown token `"+t.op+"` (\\u"+Tk2.hex4(t.op.charAt(0))+")", t);
     }
   }
   
@@ -1531,8 +1567,16 @@ public class Comp {
       if (i>=es.length) return es[i-es.length];
       return es[i];
     }
+    Res getL(int i) {
+      i = e-i-1;
+      if (i>=0) return es[i];
+      return es[i+es.length];
+    }
     Res peekFirst() {
       return es[s];
+    }
+    Res peekLast() {
+      return e==0? es[es.length-1] : es[e-1];
     }
     
     

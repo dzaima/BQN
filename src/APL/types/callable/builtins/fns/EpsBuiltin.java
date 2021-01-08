@@ -17,7 +17,7 @@ public class EpsBuiltin extends FnBuiltin {
     Value[] vs;
     BitArr.BA res;
     if (x.r() == 1) {
-      res = new BitArr.BA(x.shape);
+      res = new BitArr.BA(x.shape,true);
       if (x.quickIntArr()) {
         HashSet<Integer> seen = new HashSet<>();
         for (int c : x.asIntArr()) res.add(seen.add(c));
@@ -25,7 +25,7 @@ public class EpsBuiltin extends FnBuiltin {
       }
       vs = x.values();
     } else {
-      res = new BitArr.BA(new int[]{x.shape[0]});
+      res = new BitArr.BA(new int[]{x.shape[0]},true);
       vs = CellBuiltin.cells(x);
     }
     HashSet<Value> seen = new HashSet<>();
@@ -41,7 +41,7 @@ public class EpsBuiltin extends FnBuiltin {
       }
       return Num.ZERO;
     }
-    BitArr.BA res = new BitArr.BA(w.shape);
+    BitArr.BA res = new BitArr.BA(w.shape,true);
     if (w.ia>20 && x.ia>20) { // TODO these (and in ⊐) shouldn't be random numbers
       HashSet<Value> vs = new HashSet<>();
       for (Value c : x) vs.add(c);

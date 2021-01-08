@@ -111,7 +111,7 @@ public abstract class Arr extends Value {
     da: if (v[0] instanceof Num) {
       ia: if (Num.isInt(((Num) v[0]).num)) {
         ba: if (Num.isBool(((Num) v[0]).num)) {
-          BitArr.BA res = new BitArr.BA(sh);
+          BitArr.BA res = new BitArr.BA(sh,true);
           for (Value c : v) {
             if (!(c instanceof Num)) break da;
             double d = ((Num) c).num;

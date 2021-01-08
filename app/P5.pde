@@ -362,7 +362,7 @@ static Value p(Value[] cols, Value extra, int pos, Value def) {
 static Value p(Value[] cols, Value extra, int pos) {
   if (pos>=cols.length) {
     pos-= cols.length;
-    if (pos>=extra.ia) throw new LengthError("Not enough provided items", extra);
+    if (pos>=extra.ia) throw new LengthError("Not enough provided items");
     return new SingleItemArr(extra.get(pos), cols[0].shape);
   }
   return cols[pos];
@@ -435,7 +435,7 @@ static int col(Value v) {
 }
 static float fg(Value v, int i) {
   if (v.r()>1) throw new RankError("Expected vector argument, got shape "+Main.formatAPL(v.shape), null);
-  if (i >= v.ia) throw new LengthError("Expected at least "+(i+1)+" items, got "+v.ia, null);
+  if (i >= v.ia) throw new LengthError("Expected at least "+(i+1)+" items, got "+v.ia);
   return (float) v.get(i).asDouble();
 }
 

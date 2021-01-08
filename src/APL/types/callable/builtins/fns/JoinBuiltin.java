@@ -14,7 +14,13 @@ public class JoinBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "∾"; }
   
   public Value call(Value x) {
-    simple: if (x.r() == 1) {
+    int or = x.r();
+    simple: if (or <= 1) {
+      if (or==0) {
+        if (x instanceof Primitive) throw new RankError("∾: argument must be an array", this);
+        Value f = x.first();
+        return f instanceof Primitive? SingleItemArr.r0(f) : f;
+      }
       for (Value c : x) if (c.r()!=1) break simple;
       Value joined = JoinBuiltin.joinVec(x);
       if (joined != null) return joined;
@@ -27,7 +33,6 @@ public class JoinBuiltin extends FnBuiltin {
     for (Value v : vs) {
       if (ir!=v.r()) throw new RankError("∾: expected all items to have equal rank", this);
     }
-    int or = x.r();
     if (ir < or) throw new RankError("∾: rank of items must be at least the total rank", this);
   
     int[] fsh = new int[ir];
@@ -217,7 +222,7 @@ public class JoinBuiltin extends FnBuiltin {
     boolean wb = w instanceof BitArr;
     boolean xb = x instanceof BitArr;
     
-    BitArr.BA res = new BitArr.BA(sh);
+    BitArr.BA res = new BitArr.BA(sh,false);
     if (wb) res.add((BitArr) w);
     else    res.add(Main.bool(w));
     if (xb) res.add((BitArr) x);

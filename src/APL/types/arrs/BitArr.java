@@ -130,33 +130,34 @@ public final class BitArr extends Arr {
   public static class BA { // bit adder
     private final long[] a; // no trailing garbage allowed!
     private final int[] sh;
-    private int i, o = 0; // index, offset
-    public BA(int am) {
-      this.a = new long[sizeof(am)];
-      sh = new int[]{am};
-    }
-    public BA(int[] sh) {
+    private int i = 0, o = 0; // index, offset
+    private final boolean mode;
+    public BA(int[] sh, boolean mode) {
       this.a = new long[sizeof(sh)];
       this.sh = sh;
-    }
-    public BA(long[] a, int start, int[] sh) {
-      this.a = a;
-      i = start>>6;
-      o = start & 63;
-      this.sh = sh;
-    }
-    public void add(boolean b) {
-      a[i]|= (b? 1L : 0L)<<o;
-      if (++o == 64) {
-        o = 0;
-        i++;
-      }
+      this.mode = mode;
+      reg = 0;
     }
     
-    public void add(long l) { // expects a 0 or 1
-      a[i]|= l<<o;
+    private static long reg;
+    public void add(boolean b) {
+      // reg|= (b? 1L : 0L)<<o;
+      // if (++o == 64) {
+      //   o = 0;
+      //   a[i] = reg;
+      //   reg = 0;
+      //   i++;
+      // }
+      // a[i]|= (b? 1L : 0L)<<o;
+      // if (++o == 64) {
+      //   o = 0;
+      //   i++;
+      // }
+      
+      reg = reg*2 + (b?1:0);
       if (++o == 64) {
         o = 0;
+        a[i] = Long.reverse(reg);
         i++;
       }
     }
@@ -177,6 +178,9 @@ public final class BitArr extends Arr {
     }
     
     public BitArr finish() {
+      // System.out.println(i+" "+o+" "+reg);
+      // if (mode & o!=0 & i<a.length) a[i] = reg;
+      if (mode & o!=0 & i<a.length) a[i] = Long.reverse(reg<<64-o);
       return new BitArr(a, sh);
     }
   }
