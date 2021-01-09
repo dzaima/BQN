@@ -14,9 +14,12 @@ public class ShABuiltin extends FnBuiltin {
     if (w.r() > x.r()) throw new RankError("«: rank of 𝕨 cannot exceed =𝕩", this);
     JoinBuiltin.check(w, x, this);
     MutVal res = new MutVal(x.shape, x);
-    int mid = Math.max(0, x.ia-w.ia);
-    res.copy(x, x.ia-mid, 0, mid);
-    res.copy(w, 0, mid, x.ia-mid);
+    if (w.ia < x.ia) {
+      res.copy(x, w.ia, 0, x.ia-w.ia);
+      res.copy(w, 0, x.ia-w.ia, w.ia);
+    } else {
+      res.copy(w, w.ia-x.ia, 0, x.ia);
+    }
     return res.get();
   }
   

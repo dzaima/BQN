@@ -11,7 +11,13 @@ public class OpTok extends Token {
   public OpTok(String line, int spos, int epos, String op) {
     super(line, spos, epos);
     this.op = op;
-    this.b = Comp.builtin(this);
+    this.b = Comp.builtin(op.charAt(0), this);
+    if (b != null) b.token = this;
+  }
+  public OpTok(String line, int spos, int epos, char op) {
+    super(line, spos, epos);
+    this.op = String.valueOf(op);
+    this.b = Comp.builtin(op, this);
     if (b != null) b.token = this;
   }
   

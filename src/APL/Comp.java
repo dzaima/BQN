@@ -1432,8 +1432,8 @@ public class Comp {
     throw new ImplementationError("couldn't constant fold "+t.getClass().getSimpleName());
   }
   
-  public static Callable builtin(OpTok t) {
-    switch (t.op.charAt(0)) {
+  public static Callable builtin(char c, OpTok t) {
+    switch (c) {
       // fns
       // case '⍲': return new NandBuiltin(sc);
       // case '⍱': return new NorBuiltin(sc);
@@ -1544,7 +1544,7 @@ public class Comp {
       case 55349: // double-struck surrogate pair
         return null;
   
-      default: throw new SyntaxError("Unknown token `"+t.op+"` (\\u"+Tk2.hex4(t.op.charAt(0))+")", t);
+      default: throw new SyntaxError("Unknown token `"+t.toRepr()+"` (\\u"+Tk2.hex4(c)+")", t);
     }
   }
   
