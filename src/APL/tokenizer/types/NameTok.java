@@ -17,7 +17,7 @@ public class NameTok extends Token {
     if (rawName.length()<=2 && type=='d') throw new SyntaxError("\""+rawName+"\" is an invalid name", this);
     boolean isSys = rawName.charAt(0) == '•';
     String name0 = (isSys? rawName.substring(1) : rawName).toLowerCase();
-    String name1 = type=='a' || type=='f'? name0 : type=='d'? name0.substring(1,name0.length()-1) : name0.substring(1);
+    String name1 = name0.replace("_", "");
     name = isSys? '•'+name1 : name1;
     if (isSys) switch (name) {
       case "•args": if (args==null) throw new SyntaxError("using •args outside of file", this); val=args[0]; break;

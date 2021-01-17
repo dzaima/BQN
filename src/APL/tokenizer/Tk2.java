@@ -161,37 +161,37 @@ public class Tk2 {
             break;
           }
           int numStart = i;
-          while (c>='0' && c<='9') { // regular integer part
+          while (c>='0' & c<='9' | c=='_') { // regular integer part
             if (++i>=len) break; c = rC[i];
           }
           dot: if (c=='.') { // fractional part
             if (++i>=len) break dot; c = rC[i]; // skip '.'
-            while (c>='0' && c<='9') {                       // skip digits
+            while (c>='0' & c<='9' | c=='_') {  // skip digits
               if (++i>=len) break; c = rC[i];
             }
           } else if (c=='L') { // bigint
-            BigInteger v = new BigInteger(r.substring(numStart, i));
+            BigInteger v = new BigInteger(r.substring(numStart, i).replace("_", ""));
             ++i;
             res.add(new BigTok(r, li, i, new BigValue(neg? v.negate() : v)));
             break;
           }
           if (c=='e' | c=='E') { // exponent
             if(         ++i>=len) err("Unfinished number",li,i); c = rC[i]; // skip e/E
-            boolean eNeg = c=='¯'; int eNegPos = i-li;
+            boolean eNeg = c=='¯'; int eNegPos = i-li-(neg?1:0);
             if (eNeg && ++i>=len) err("Unfinished number",li,i); c = rC[i]; // skip ¯ if needed
             if (c<'0' | c>'9')           err("Unfinished number",li,i); i++; // make sure there's at least one exponent digit and skip it
-            while (i<len && (c=rC[i])>='0' & c<='9') i++;
+            while (i<len && (c=rC[i])>='0' & c<='9' | c=='_') i++;
             double v;
             if (eNeg) {
               char[] cs = new char[i-numStart]; r.getChars(numStart, i, cs, 0);
               cs[eNegPos] = '-';
-              v = Double.parseDouble(new String(cs));
+              v = Double.parseDouble(new String(cs).replace("_", ""));
             } else {
-              v = Double.parseDouble(r.substring(numStart, i));
+              v = Double.parseDouble(r.substring(numStart, i).replace("_", ""));
             }
             res.add(new NumTok(r, li, i, neg? -v : v));
           } else { // no exponent, simple
-            double v = Double.parseDouble(r.substring(numStart, i));
+            double v = Double.parseDouble(r.substring(numStart, i).replace("_", ""));
             res.add(new NumTok(r, li, i, neg? -v : v));
           }
           break;
