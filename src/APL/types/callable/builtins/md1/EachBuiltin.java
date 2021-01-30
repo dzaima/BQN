@@ -71,7 +71,11 @@ public class EachBuiltin extends Md1Builtin {
   }
   
   public Value callInv(Value f, Value x) {
-    if (!(f instanceof Fun)) throw new DomainError("can't invert A¨", this);
+    return onInv(f, x, this);
+  }
+  public static Value onInv(Value f, Value x, Callable blame) {
+    if (x instanceof Primitive) throw new DomainError("F¨⁼: argument cannot be an atom", blame); 
+    if (!(f instanceof Fun)) throw new DomainError("can't invert A¨", blame);
     Value[] n = new Value[x.ia];
     for (int i = 0; i < n.length; i++) {
       n[i] = f.callInv(x.get(i));

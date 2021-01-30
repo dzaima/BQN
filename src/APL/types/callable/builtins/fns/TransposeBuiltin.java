@@ -112,7 +112,7 @@ public class TransposeBuiltin extends FnBuiltin {
     int[] ts = w.asIntVec();
     int l = ts.length;
     if (l == 0) {
-      if (x.scalar()) throw new DomainError("⍉⁼: Result of ⍉ must be an array");
+      if (x.scalar()) throw new DomainError("⍉⁼: Result of ⍉ must be an array", this);
       return x;
     }
     int r = x.r();

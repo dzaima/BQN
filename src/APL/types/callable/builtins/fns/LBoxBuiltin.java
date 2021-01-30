@@ -141,7 +141,7 @@ public class LBoxBuiltin extends FnBuiltin {
     Value call = call(w, x);
     Value v = o instanceof Fun? o.call(call) : o;
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this);
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")");
+    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")", this);
     int[] is = w.asIntArr();
     if (x.quickIntArr() && v.quickIntArr()) {
       int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();

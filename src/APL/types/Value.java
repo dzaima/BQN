@@ -220,10 +220,11 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public Value under (Value o,          Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   public Value underW(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
   public Value underA(Value o, Value w, Value x) { throw new DomainError("Cannot execute under "+humanType(true)); }
-  public Value constant(Callable blame) {
+  public Value constant(Callable blame, boolean error) {
     if (this instanceof Callable) {
       if (this instanceof Md1Derv && ((Md1Derv) this).op instanceof ConstBultin) return ((Md1Derv) this).f;
-      throw new DomainError(blame+": Cannot interpret "+humanType(true)+" as a constant", blame);
+      if (error) throw new DomainError(blame+": Cannot interpret "+humanType(true)+" as a constant", blame);
+      return null;
     }
     return this;
   }

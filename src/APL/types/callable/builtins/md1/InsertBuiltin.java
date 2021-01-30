@@ -26,7 +26,7 @@ public class InsertBuiltin extends Md1Builtin {
           System.arraycopy(x.shape, 2, sh, 1, x.shape.length-2);
           return new EmptyArr(sh, x.fItemS());
         }
-        throw new DomainError("˝: reducing array with shape "+ Main.formatAPL(x.shape)+" with a function without an identity value");
+        throw new DomainError("˝: reducing array with shape "+ Main.formatAPL(x.shape)+" with a function without an identity value", this);
       }
       return new SingleItemArr(id, csh);
     }

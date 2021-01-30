@@ -118,4 +118,15 @@ public class ScanBuiltin extends Md1Builtin {
     }
     return Arr.create(res);
   }
+  
+  public Value callInv(Value f, Value x) {
+    if (x.r()==0) throw new DomainError("F´⁼: argument had rank 0");
+    if (x.ia==0) return x;
+    Value[] res = new Value[x.ia];
+    int l = Arr.prod(x.shape, 1, x.r());
+    int i = 0;
+    for (; i < l; i++) res[i] = x.get(i);
+    for (; i < x.ia; i++) res[i] = f.callInvX(x.get(i-l), x.get(i));
+    return Arr.create(res, x.shape);
+  }
 }

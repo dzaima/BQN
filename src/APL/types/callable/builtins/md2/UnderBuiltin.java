@@ -21,7 +21,7 @@ public class UnderBuiltin extends Md2Builtin {
     return g.under(new BindA(g.call(w), f), x);
   }
   public Value callInvX(Value f, Value g, Value w, Value x) {
-    return g.under(new BindA(g.call(w), InvBuiltin.invertW(f)), x);
+    return g.under(new BindA(g.call(w), InvBuiltin.invertX(f)), x);
   }
   public Value callInvW(Value f, Value g, Value w, Value x) { // structural inverse is not possible; fall back to computational inverse
     Value w1 = g.call(w);

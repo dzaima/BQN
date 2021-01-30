@@ -15,5 +15,16 @@ public class AtopBuiltin extends Md2Builtin {
     return f.call(g.call(w, x));
   }
   
-  // +TODO inverses (from OldJotDiaeresisBuiltin)
+  
+  public Value callInv(Value f, Value g, Value x) {
+    return f.callInv(g.callInv(x));
+  }
+  
+  public Value callInvX(Value f, Value g, Value w, Value x) {
+    return g.callInvX(w, f.callInv(x));
+  }
+  public Value callInvW(Value f, Value g, Value w, Value x) {
+    return g.callInvW(f.callInv(w), x);
+  }
+  // TODO under
 }

@@ -1,7 +1,7 @@
 package APL.types.callable.builtins.md1;
 
 import APL.Main;
-import APL.errors.LengthError;
+import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -40,6 +40,47 @@ public class CellBuiltin extends Md1Builtin {
     
     Value[] res = new Value[wc.length];
     for (int i = 0; i < res.length; i++) res[i] = f.call(wc[i], xc[i]);
+    return GTBuiltin.merge(res, new int[]{res.length}, this);
+  }
+  
+  public Value callInv(Value f, Value x) {
+    if (x.r()==0) throw new DomainError("F˘⁼: argument had rank 0", this);
+    Value[] cells = cells(x);
+    for (int i = 0; i < cells.length; i++) {
+      Value c = f.callInv(cells[i]);
+      if (c instanceof Primitive) throw new DomainError("F˘⁼: F returned an atom", this);
+      cells[i] = c;
+    }
+    return GTBuiltin.merge(cells, new int[]{cells.length}, this);
+  }
+  public Value callInvX(Value f, Value w, Value x) {
+    if (x.r()==0) throw new DomainError("F˘⁼: 𝕩 had rank 0", this);
+    Value[] wc = w.r()==0? ext(w, x.shape[0]) : cells(w);
+    Value[] xc = cells(x);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (wc.length == 0) return EmptyArr.SHAPE0Q;
+    
+    Value[] res = new Value[wc.length];
+    for (int i = 0; i < res.length; i++) {
+      Value c = f.callInvX(wc[i], xc[i]);
+      if (c instanceof Primitive) throw new DomainError("F˘⁼: F returned an atom", this);
+      res[i] = c;
+    }
+    return GTBuiltin.merge(res, new int[]{res.length}, this);
+  }
+  public Value callInvW(Value f, Value w, Value x) {
+    if (w.r()==0) throw new DomainError("F˘˜⁼: 𝕨 had rank 0", this);
+    Value[] wc = cells(w);
+    Value[] xc = x.r()==0? ext(x, w.shape[0]) : cells(x);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (wc.length == 0) return EmptyArr.SHAPE0Q;
+    
+    Value[] res = new Value[wc.length];
+    for (int i = 0; i < res.length; i++) {
+      Value c = f.callInvW(wc[i], xc[i]);
+      if (c instanceof Primitive) throw new DomainError("F˘˜⁼: F returned an atom", this);
+      res[i] = c;
+    }
     return GTBuiltin.merge(res, new int[]{res.length}, this);
   }
   

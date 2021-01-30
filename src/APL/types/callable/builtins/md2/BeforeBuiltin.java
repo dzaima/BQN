@@ -17,10 +17,16 @@ public class BeforeBuiltin extends Md2Builtin {
   }
   
   public Value callInv(Value f, Value g, Value x) {
-    return g.callInvX(f.constant(this), x);
+    return g.callInvX(f.constant(this, true), x);
+  }
+  public Value callInvX(Value f, Value g, Value a, Value w) {
+    return g.callInvX(f.call(a), w);
+  }
+  public Value callInvW(Value f, Value g, Value a, Value w) {
+    return f.callInv(g.callInvW(a, w));
   }
   
   public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
-    return g.underW(o, f.constant(this), x);
+    return g.underW(o, f.constant(this, true), x);
   }
 }

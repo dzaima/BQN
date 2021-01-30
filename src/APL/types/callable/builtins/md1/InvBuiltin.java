@@ -38,7 +38,7 @@ public class InvBuiltin extends Md1Builtin {
     };
   }
   
-  public static Fun invertW(Value f) {
+  public static Fun invertX(Value f) {
     return new Fun() {
       public String ln(FmtInfo f) { return "⁼"; }
       public Value call(Value w, Value x) {
@@ -51,7 +51,7 @@ public class InvBuiltin extends Md1Builtin {
     };
   }
   
-  public static Fun invertA(Value f) {
+  public static Fun invertW(Value f) {
     return new Fun() {
       public String ln(FmtInfo f) { return "˜⁼˜"; }
       public Value call(Value w, Value x) {

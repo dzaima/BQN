@@ -12,6 +12,9 @@ public final class TableBuiltin extends Md1Builtin {
   public Value call(Value f, Value x, Md1Derv derv) {
     return EachBuiltin.on(f, x);
   }
+  public Value callInv(Value f, Value x) {
+    return EachBuiltin.onInv(f, x, this);
+  }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) { // TODO use valuecopy
     int ia = w.ia*x.ia;
