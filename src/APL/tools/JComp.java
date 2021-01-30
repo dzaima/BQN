@@ -291,22 +291,19 @@ public class JComp {
             mstack = Math.max(mstack, cstack+2);
             break;
           }
-          case SETM: {
-            // v f k     →
-            // v k f K v
-                            // v f k
-            fn.swap();      // v k f
-            fn.astore(TMP); // v k
-            fn.dup2();      // v k v k
-            fn.aload(SC);   // v k v k sc
-            fn.invvirt(Settable.class, "get", met(Value.class, Scope.class)); // v k v K
-            fn.aload(TMP);  // v k v K f
-            fn.dup_x2();    // v k f v K f
-            fn.pop();       // v k f v K
-            fn.swap();      // v k f K v
-            fn.invvirt(Value.class, "call",  met(Value.class, Value.class, Value.class)); // v k n
-            fn.iconst(1); fn.aload(SC); fn.aconst_null(); // v k n true sc null
-            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class));
+          case SETM: {       // v f k
+            fn.astore(TMP);  // v f
+            fn.swap();       // f v
+            fn.astore(TMP2); // f
+            fn.aload(TMP);   // f k
+            fn.dup_x1();     // k f k
+            fn.aload(SC);    // k f k sc
+            fn.invvirt(Settable.class, "get", met(Value.class, Scope.class)); // k f K
+            fn.aload(TMP2);  // k f K v
+            fn.invvirt(Value.class, "call",  met(Value.class, Value.class, Value.class)); // k n
+            fn.dup_x1();     // n k n
+            fn.iconst(1); fn.aload(SC); fn.aconst_null(); // n k n true sc null
+            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class)); // n
             mstack = Math.max(mstack, cstack+3);
             cstack-= 2;
             break;

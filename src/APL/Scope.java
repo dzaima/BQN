@@ -121,7 +121,7 @@ public final class Scope {
           rnd = new Random(val.asInt());
           break;
         default:
-          throw new DomainError("setting unknown quad "+key);
+          throw new DomainError("Setting undefined system value "+key);
       }
     } else {
       Integer k = varMap().get(key);
@@ -353,7 +353,7 @@ public final class Scope {
         case "•opt": case "•optimize":
           return new Optimizer();
         default:
-          throw new DomainError("Undefined system constant "+name);
+          throw new DomainError("Undefined system value "+name);
       }
     }
     Scope c = this;

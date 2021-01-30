@@ -242,8 +242,9 @@ public class Comp {
             Settable k = (Settable) s.pop();
             Value    f = (Value   ) s.pop();
             Value    v = (Value   ) s.pop();
-            k.set(f.call(k.get(sc), v), true, sc, null);
-            s.push(v);
+            Value    r = f.call(k.get(sc), v);
+            k.set(r, true, sc, null);
+            s.push(r);
             break;
           }
           case SETH: {
