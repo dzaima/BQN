@@ -596,7 +596,7 @@ public final class Scope {
     
     public Value call(Value x) {
       if (x instanceof Primitive || x instanceof ChrArr || x instanceof BitArr || x instanceof SingleItemArr) return x;
-      return Arr.create(x.values(), shape);
+      return Arr.create(x.values(), x.shape);
     }
   }
   private static class ClassGetter extends FnBuiltin {

@@ -356,8 +356,20 @@ public class SlashBuiltin extends FnBuiltin {
   // }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? o.call(call(w, x)) : o;
-    if (MatchBuiltin.full(w)!=1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this);
+    Value call = call(w, x);
+    Value v = o instanceof Fun? o.call(call) : o;
+    int depth = MatchBuiltin.full(w);
+    if (depth!=1) {
+      if (depth>1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this);
+      int wi = w.asInt();
+      if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⥊: Expected F to not change its arguments shape", this);
+      if (wi==0) return x;
+      Value[] vs = new Value[x.ia];
+      for (int i = 0; i < x.ia; i++) vs[i] = v.get(i*wi);
+      Value r = new HArr(vs);
+      if (!replicate(w, r, this).eq(v)) throw new DomainError("F⌾/: Result of F not invertible", this);
+      return r;
+    }
     int[] sh;
     if (w.r() > 1) {
       if (!Main.vind) throw new DomainError("⌾/: 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);

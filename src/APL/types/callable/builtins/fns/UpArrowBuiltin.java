@@ -8,6 +8,8 @@ import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 import APL.types.callable.builtins.md1.CellBuiltin;
 
+import java.util.Arrays;
+
 public class UpArrowBuiltin extends FnBuiltin {
   
   public String ln(FmtInfo f) { return "↑"; }
@@ -201,5 +203,12 @@ public class UpArrowBuiltin extends FnBuiltin {
     }
     
     return Arr.create(r, s);
+  }
+  
+  public Value callInv(Value x) {
+    if (x.ia==0) throw new DomainError("↑⁼: Argument had 0 items", this);
+    Value r = x.get(x.ia-1);
+    if (!call(r).eq(x)) throw new DomainError("↑⁼: Argument isn't a prefix array", this);
+    return r;
   }
 }

@@ -140,29 +140,20 @@ public class ShapeBuiltin extends FnBuiltin {
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value v = o instanceof Fun? o.call(call(w, x)) : o;
-    for (int i = 0; i < w.ia; i++) {
-      Value c = w.get(i);
-      if (!(c instanceof Num)) { // a‿⟨⟩‿b ⥊ w - must use all items
-        if (x.r() == 0 && v.first() instanceof Primitive) return v.first();
-        if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
-        return v.ofShape(x.shape);
-      }
-    }
-    int[] sh = w.asIntVec();
-    int am = Arr.prod(sh);
-    if (am > x.ia) throw new DomainError("⌾("+Main.formatAPL(sh)+"⥊) applied on array with "+x.ia+" items", this);
-    if (!Arrays.equals(sh, v.shape)) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
-    Value[] vs = new Value[x.ia];
-    System.arraycopy(v.values(), 0, vs, 0, am);
-    System.arraycopy(x.values(), am, vs, am, vs.length-am);
-    return Arr.create(vs, x.shape);
+    Value call = call(w, x);
+    Value v = o instanceof Fun? o.call(call) : o;
+    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⥊: Expected F to not change its arguments shape", this);
+    if (call.ia > x.ia) throw new DomainError("⌾⥊: Result of ⥊ had more elements than 𝕩", this);
+    MutVal r = new MutVal(x.shape, x, x.ia);
+    r.copy(v, 0, 0, v.ia);
+    r.copy(x, v.ia, v.ia, x.ia-v.ia);
+    return r.get();
   }
   
   
   public Value under(Value o, Value x) {
     Value v = o instanceof Fun? o.call(call(x)) : o;
-    if (v.ia != x.ia) throw new DomainError("⌾⥊ expected equal amount of output & output items", this);
+    if (v.ia != x.ia) throw new DomainError("⌾⥊: Expected equal amount of output & output items", this);
     return v.ofShape(x.shape);
   }
   

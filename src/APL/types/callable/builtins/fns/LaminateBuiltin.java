@@ -1,8 +1,12 @@
 package APL.types.callable.builtins.fns;
 
+import APL.errors.DomainError;
 import APL.tools.FmtInfo;
 import APL.types.Value;
 import APL.types.callable.builtins.FnBuiltin;
+import APL.types.callable.builtins.md1.CellBuiltin;
+
+import java.util.Arrays;
 
 public class LaminateBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "≍"; }
@@ -17,5 +21,24 @@ public class LaminateBuiltin extends FnBuiltin {
     nsh[0] = 1;
     System.arraycopy(x.shape, 0, nsh, 1, x.r());
     return x.ofShape(nsh);
+  }
+  
+  public Value callInv(Value x) {
+    if (x.r()==0 || x.shape[0]!=1) throw new DomainError("≍⁼: Argument shape should start with 1", this);
+    return x.ofShape(Arrays.copyOfRange(x.shape, 1, x.shape.length));
+  }
+  
+  public Value callInvX(Value w, Value x) {
+    Value[] c = CellBuiltin.cells(x);
+    if (c.length!=2) throw new DomainError("≍⁼: Expected 𝕩 to have 2 cells", this);
+    if (!c[0].eq(w)) throw new DomainError("≍⁼: 𝕨 didn't match expected", this);
+    return c[1];
+  }
+  
+  public Value callInvW(Value w, Value x) {
+    Value[] c = CellBuiltin.cells(w);
+    if (c.length!=2) throw new DomainError("≍˜⁼: Expected 𝕨 to have 2 cells", this);
+    if (!c[1].eq(x)) throw new DomainError("≍˜⁼: 𝕩 didn't match expected", this);
+    return c[0];
   }
 }

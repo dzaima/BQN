@@ -17,7 +17,7 @@ public class AtopBuiltin extends Md2Builtin {
   
   
   public Value callInv(Value f, Value g, Value x) {
-    return f.callInv(g.callInv(x));
+    return g.callInv(f.callInv(x));
   }
   
   public Value callInvX(Value f, Value g, Value w, Value x) {

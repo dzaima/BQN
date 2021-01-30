@@ -23,7 +23,7 @@ public abstract class Fun extends Callable {
     Value v = o instanceof Fun? o.call(call(x)) : o;
     return callInv(v);
   }
-  public Value underW(Value o, Value w, Value x) {
+  public Value underW(Value o, Value w, Value x) { // TODO rename
     Value v = o instanceof Fun? o.call(call(w, x)) : o;
     return callInvX(w, v);
   }

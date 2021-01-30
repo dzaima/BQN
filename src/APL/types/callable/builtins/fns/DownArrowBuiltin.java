@@ -1,6 +1,6 @@
 package APL.types.callable.builtins.fns;
 
-import APL.errors.RankError;
+import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
 import APL.types.arrs.*;
@@ -58,5 +58,12 @@ public class DownArrowBuiltin extends FnBuiltin {
       ls[i] = ls[i]>0? ls[i]-sh[i] : ls[i]+sh[i];
     }
     return UpArrowBuiltin.undo(ls, v, x, this);
+  }
+  
+  public Value callInv(Value x) {
+    if (x.ia==0) throw new DomainError("↓⁼: Argument had 0 items", this);
+    Value r = x.first();
+    if (!call(r).eq(x)) throw new DomainError("↓⁼: Argument isn't a suffix array", this);
+    return r;
   }
 }

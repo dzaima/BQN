@@ -198,7 +198,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
   
   
   
-  public void set(int p, Value x) {
+  public void set(int p, Value x) { // force-overrides
     switch (mode) { default: throw new IllegalStateException();
       case 0:
         guess(x);
@@ -209,6 +209,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
           double d = ((Num) x).num;
           if (d!=1 & d!=0) { move(Num.isInt(d)? 4 : 2); set(p, x); return; }
           if (d==1) ls[p>>6]|= 1L<<(p&63);
+          else ls[p>>6]&= ~(1L<<(p&63));
         } else { move(5); set(p, x); }
         return;
       case 2:

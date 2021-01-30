@@ -3,7 +3,7 @@ package APL.types.callable.builtins.fns;
 import APL.errors.*;
 import APL.tools.*;
 import APL.types.*;
-import APL.types.arrs.DoubleArr;
+import APL.types.arrs.*;
 import APL.types.callable.builtins.FnBuiltin;
 
 import java.util.Arrays;
@@ -144,5 +144,17 @@ public class TransposeBuiltin extends FnBuiltin {
       res[Indexer.fromShape(sh, c)] = x.simpleAt(d);
     }
     return Arr.create(res, sh);
+  }
+  
+  public Value underW(Value o, Value w, Value x) {
+    Value call = call(w, x);
+    Value v = o instanceof Fun? o.call(call) : o;
+    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊘: Expected F to not change its arguments shape", this);
+    if (call.r()==x.r()) return callInvX(w, v);
+    int[] inds = call(w, new IntArr(UDBuiltin.on(x.ia), x.shape)).asIntArr();
+    MutVal mv = new MutVal(x.shape, x, x.ia);
+    mv.copy(x, 0, 0, x.ia);
+    for (int c = 0; c < v.ia; c++) mv.set(inds[c], v.get(c));
+    return mv.get();
   }
 }
