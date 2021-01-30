@@ -8,10 +8,7 @@ import APL.types.callable.builtins.FnBuiltin;
 
 public class CeilingBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⌈"; }
-  
-  public Value identity() {
-    return Num.NEGINF;
-  }
+  public Value identity() { return Num.NEGINF; }
   
   public Value call(Value x) {
     if (x instanceof Arr) {

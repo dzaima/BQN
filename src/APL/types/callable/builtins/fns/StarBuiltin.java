@@ -9,6 +9,7 @@ import java.math.BigInteger;
 
 public class StarBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⋆"; }
+  public Value identity() { return Num.ONE; }
   
   public static final NumMV NF = new NumMV() {
     public Value call(Num x) {

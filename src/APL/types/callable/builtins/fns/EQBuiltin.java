@@ -8,6 +8,7 @@ import APL.types.callable.builtins.FnBuiltin;
 
 public class EQBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "="; }
+  public Value identity() { return Num.ONE; }
   
   public Value call(Value x) {
     return Num.of(x.r());

@@ -8,6 +8,7 @@ import APL.types.callable.builtins.FnBuiltin;
 
 public class MinusBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "-"; }
+  public Value identity() { return Num.ZERO; }
   
   public static final NumMV NF = new NumMV() {
     public Value call(Num x) {

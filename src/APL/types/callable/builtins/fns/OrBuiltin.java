@@ -11,10 +11,7 @@ import java.util.Arrays;
 
 public class OrBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "∨"; }
-  
-  public Value identity() {
-    return Num.ZERO;
-  }
+  public Value identity() { return Num.ZERO; }
   
   public Value call(Value x) { // TODO this isn't stable
     if (x.r()==0) throw new RankError("∨: argument cannot be scalar", this);

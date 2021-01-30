@@ -7,6 +7,7 @@ import APL.types.callable.builtins.FnBuiltin;
 
 public class DivBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "÷"; }
+  public Value identity() { return Num.ONE; }
   
   private static final NumMV NF = new NumMV() {
     public Value call(Num x) {

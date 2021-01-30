@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 public class GTBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return ">"; }
+  public Value identity() { return Num.ZERO; }
   
   public Value call(Value x) {
     if (x instanceof Arr && x.ia>0 && !x.quickDepth1()) {

@@ -9,10 +9,7 @@ import APL.types.callable.builtins.FnBuiltin;
 
 public class PlusBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "+"; }
-  
-  public Value identity() {
-    return Num.ZERO;
-  }
+  public Value identity() { return Num.ZERO; }
   
   public Value call(Value x) {
     return x; // TODO

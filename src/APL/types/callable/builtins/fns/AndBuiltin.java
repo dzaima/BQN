@@ -11,10 +11,7 @@ import java.util.Arrays;
 
 public class AndBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "∧"; }
-  
-  public Value identity() {
-    return Num.ONE;
-  }
+  public Value identity() { return Num.ONE; }
   
   public Value call(Value x) {
     if (x.r()==0) throw new RankError("∧: argument cannot be scalar", this);

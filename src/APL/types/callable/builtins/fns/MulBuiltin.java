@@ -10,10 +10,7 @@ import java.math.BigInteger;
 
 public class MulBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "×"; }
-  
-  public Value identity() {
-    return Num.ONE;
-  }
+  public Value identity() { return Num.ONE; }
   
   private static final NumMV NF = new NumMV() {
     public Value call(Num x) {
