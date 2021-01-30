@@ -16,7 +16,7 @@ public class CellBuiltin extends Md1Builtin {
   public String ln(FmtInfo f) { return "˘"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
-    if (x.r() == 0) return f.call(x);
+    if (x.r() == 0) return rq1(f.call(x));
     //if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     if (x.shape[0] == 0) return EmptyArr.SHAPE0Q;
     
@@ -32,7 +32,7 @@ public class CellBuiltin extends Md1Builtin {
     // if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     // Value[] ac = cells(a);
     // Value[] wc = cells(w);
-    if (w.r()==0 && x.r()==0) return f.call(w, x);
+    if (w.r()==0 && x.r()==0) return rq1(f.call(w, x));
     Value[] wc = w.r()==0? ext(w, x.shape[0]) : cells(w);
     Value[] xc = x.r()==0? ext(x, w.shape[0]) : cells(x);
     if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
@@ -41,6 +41,11 @@ public class CellBuiltin extends Md1Builtin {
     Value[] res = new Value[wc.length];
     for (int i = 0; i < res.length; i++) res[i] = f.call(wc[i], xc[i]);
     return GTBuiltin.merge(res, new int[]{res.length}, this);
+  }
+  
+  private static Value rq1(Value x) { // require depth ≥1
+    if (x instanceof Primitive) return SingleItemArr.r0(x);
+    return x;
   }
   
   public Value callInv(Value f, Value x) {
