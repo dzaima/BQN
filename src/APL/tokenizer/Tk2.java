@@ -244,12 +244,14 @@ public class Tk2 {
         default:
           if ((char)(c-'a')<=('z'-'a') | (char)(c-'A')<=('Z'-'A') | c=='_' | c=='•') {
             i++;
-            if (c=='_' && n=='\uD835') { // "𝕣".charAt(0/1↓)
-              if (i+2>=len || rC[i+1]!='\uDD63') err("Invalid name", li, len);
-              boolean md2 = i+3<len && rC[i+2]=='_';
-              i+= md2? 3 : 2;
-              res.add(new NameTok(r, li, i, md2? "_𝕣_" : "_𝕣", args));
-              break;
+            if (c=='_') {
+              if (n=='\uD835') { // "𝕣".charAt(0/1↓)
+                if (i+2>=len || rC[i+1]!='\uDD63') err("Invalid name", li, i+1);
+                boolean md2 = i+3<len && rC[i+2]=='_';
+                i+= md2? 3 : 2;
+                res.add(new NameTok(r, li, i, md2? "_𝕣_" : "_𝕣", args));
+                break;
+              } else if (n>='0' & n<='9') err("Name cannot start with a number", li, i+1);
             }
             while (i<len && validNameMid(rC[i])) i++;
             if (c=='•' && li+1==i) res.add(new OpTok(r, li, i, '•'));

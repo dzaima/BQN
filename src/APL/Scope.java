@@ -1,6 +1,7 @@
 package APL;
 
 import APL.errors.*;
+import APL.errors.AssertionError;
 import APL.tokenizer.Token;
 import APL.tokenizer.types.*;
 import APL.tools.*;
@@ -193,6 +194,42 @@ public final class Scope {
           public Value call(Value x) {
             sys.ucmd(x.asString());
             return null;
+          }
+        };
+        case "•fillfn": return new Fun() {
+          public String ln(FmtInfo f) { return "•_FillFn_"; }
+          public Value call(Value x) {
+            return x.fItem();
+          }
+          public Value call(Value w, Value x) {
+            if (x instanceof Arr) return CustomFillArr.of((Arr) x, w.fMineS());
+            return x;
+          }
+        };
+        case "•fillby": return new Md2Builtin() {
+          public String ln(FmtInfo f) { return "•_fillBy_"; }
+          
+          public Value call(Value f, Value g, Value x, Md2Derv derv) {
+            Value r = f.call(x);
+            Value xf = x.fItemS();
+            if (r instanceof Arr && xf!=null) {
+              try {
+                return CustomFillArr.of((Arr) r, g.call(xf).fMineS());
+              } catch (Throwable ignored) { }
+            }
+            return r;
+          }
+          
+          public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
+            Value r = f.call(w, x);
+            Value xf = x.fItemS();
+            Value wf = w.fItemS();
+            if (r instanceof Arr && xf!=null) {
+              try {
+                return CustomFillArr.of((Arr) r, g.call(wf, xf).fMineS());
+              } catch (Throwable ignored) { }
+            }
+            return r;
           }
         };
         case "•comp": return new FnBuiltin() {
@@ -502,6 +539,50 @@ public final class Scope {
     double ms = ns/1e6;
     if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, 99, 99)+" seconds");
     return Main.toAPL(Num.format(ms, 3, 99, 99)+"ms");
+  }
+  
+  private static class CustomFillArr extends Arr {
+    public final Arr v;
+    private final Value fill;
+    public CustomFillArr(Arr r, Value fill) {
+      super(r.shape, r.ia);
+      this.v = r;
+      this.fill = fill;
+    }
+    
+    public static Value of(Arr base, Value fill) {
+      if (base.quickDepth1()) {
+        assert base.fItemS().eq(fill);
+        return base;
+      }
+      if (base instanceof CustomFillArr) return new CustomFillArr(((CustomFillArr) base).v, fill);
+      if (base.ia==0) return new EmptyArr(base.shape, fill);
+      return new CustomFillArr(base, fill);
+    }
+    
+    public Arr v(Arr v) { return new CustomFillArr(v, fill); }
+    
+    public Value fItemS() { return fill; }
+    public Value fMineS() { return v(((Arr) super.fMineS())); }
+    
+    public Value            get(int i) { return v.get(i);             }
+    public Arr      reverseOn(int dim) { return v(v.reverseOn(dim));  }
+    public Value     ofShape(int[] sh) { return v((Arr)v.ofShape(sh));}
+    public int              hashCode() { return v.hashCode();         }
+    public String           asString() { return v.asString();         }
+    public Value[]            values() { return v.values();           }
+    public Value[]       valuesClone() { return v.valuesClone();      }
+    public int[]            asIntArr() { return v.asIntArr();         }
+    public int[]       asIntArrClone() { return v.asIntArrClone();    }
+    public double[]      asDoubleArr() { return v.asDoubleArr();      }
+    public double[] asDoubleArrClone() { return v.asDoubleArrClone(); }
+    public double                sum() { return v.sum();              }
+    public long[]         asBitLongs() { return v.asBitLongs();       }
+    public boolean    quickDoubleArr() { return v.quickDoubleArr();   }
+    public boolean       quickIntArr() { return v.quickIntArr();      }
+    public boolean       quickDepth1() { return v.quickDepth1();      }
+    public int               arrInfo() { return v.arrInfo();          }
+    public Iterator<Value>  iterator() { return v.iterator();         }
   }
   
   

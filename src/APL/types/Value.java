@@ -112,7 +112,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public /*open*/ int atomInfo() {
     return Pervasion.ATM_UNK;
   }
-  public boolean scalar() { return r() == 0; }
+  public final boolean scalar() { return r() == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
   public abstract Value fItemS(); // what to append to this array
   public Value fItem() {
@@ -140,7 +140,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   
   // outdated bad item getting methods; TODO don't use
-  public Value at(int[] pos) {
+  public final Value at(int[] pos) {
     if (pos.length != r()) throw new RankError("array rank was "+r()+", tried to get item at rank "+pos.length);
     int x = 0;
     for (int i = 0; i < r(); i++) {
@@ -151,7 +151,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return get(x);
   }
-  public Value at(int[] pos, Value def) { // 0-indexed
+  public final Value at(int[] pos, Value def) { // 0-indexed
     int x = 0;
     for (int i = 0; i < r(); i++) {
       if (pos[i] < 0 || pos[i] >= shape[i]) return def;
@@ -160,7 +160,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return get(x);
   }
-  public Value simpleAt(int[] pos) {
+  public final Value simpleAt(int[] pos) {
     int x = 0;
     for (int i = 0; i < r(); i++) {
       x+= pos[i];
@@ -169,13 +169,13 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return get(x);
   }
   
-  public boolean equals(Object obj) {
+  public final boolean equals(Object obj) {
     return obj instanceof Value && eq((Value) obj);
   }
   public abstract boolean eq(Value o);
   public abstract int hashCode();
   
-  public int compareTo(Value x) {
+  public final int compareTo(Value x) {
     Value w = this;
     
     if (w instanceof Num       && x instanceof Num      ) return Double.compare(((Num) w).num, ((Num) x).num);

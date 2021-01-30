@@ -357,10 +357,10 @@ public class JComp {
             fn.dup();
             fn.is(Nothing.class);
             fn.ifeq0(l);
-              fn.astore(TMP);
+              fn.pop();
               fn.new_(ValueError.class); fn.dup();
-              fn.ldc("Didn't expect · here"); fn.aload(TMP);
-              fn.invspec(ValueError.class, "<init>", met(void.class, String.class, Tokenable.class));
+              fn.ldc("Didn't expect · here");
+              fn.invspec(ValueError.class, "<init>", met(void.class, String.class));
               fn.athrow();
             l.here();
             mstack = Math.max(mstack, cstack+3);

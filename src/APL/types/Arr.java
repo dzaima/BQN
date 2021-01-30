@@ -18,10 +18,10 @@ public abstract class Arr extends Value {
     super(shape, ia);
   }
   
-  public Value call(         Value x) { return this; }
-  public Value call(Value w, Value x) { return this; }
+  public final Value call(         Value x) { return this; }
+  public final Value call(Value w, Value x) { return this; }
   
-  public String basicFormat(boolean quote) {
+  public final String basicFormat(boolean quote) {
     if (ia == 0) {
       Value pr = fItemS();
       if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : pr==null? "⟨⟩" : "0⥊<"+pr.ln(FmtInfo.def); // def is fine as it's gonna be just 0s and spaces anyways
@@ -41,7 +41,7 @@ public abstract class Arr extends Value {
     }
     return null;
   }
-  public String ln(FmtInfo fi) {
+  public final String ln(FmtInfo fi) {
     String f = basicFormat(true);
     if (f != null) return f;
     if (r() == 0) return "<" + get(0).ln(fi);
@@ -233,7 +233,7 @@ public abstract class Arr extends Value {
     return hash;
   }
   
-  protected int shapeHash(int hash) {
+  protected final int shapeHash(int hash) {
     int h = 0;
     for (int i : shape) {
       h = h*31 + i;
@@ -276,7 +276,7 @@ public abstract class Arr extends Value {
   }
   
   
-  public Value pretty(FmtInfo f) { // assumes a single Char is guaranteed to be a single character
+  public final Value pretty(FmtInfo f) { // assumes a single Char is guaranteed to be a single character
     if (ia==0) return Format.str(ln(f));
     int r = r();
     Value g0 = first();
