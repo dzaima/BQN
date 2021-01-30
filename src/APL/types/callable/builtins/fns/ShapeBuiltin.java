@@ -27,19 +27,17 @@ public class ShapeBuiltin extends FnBuiltin {
   public Value call(Value w, Value x) {
     if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this);
     int[] sh;
-    int ia;
     int emptyPos = -1;
     int emptyMode = 2; // 0-∘(exact); 1-⌊(discard); 2-⌽(recycle); 3-↑(pad)
+    int ia = 1;
     if (w.quickDoubleArr()) {
       sh = w.asIntVec();
-      ia = 1;
       for (int c : sh) {
         ia*= c;
         if (c < 0) throw new DomainError("⥊: didn't expect "+Num.formatInt(c)+" in shape", this);
       }
     } else {
       sh = new int[w.ia];
-      ia = 1;
       for (int i = 0; i < sh.length; i++) {
         Value v = w.get(i);
         if (v instanceof Num) {
@@ -58,7 +56,7 @@ public class ShapeBuiltin extends FnBuiltin {
         }
       }
     }
-  
+    
     int mod = 0;
     if (emptyPos!=-1) {
       if (ia==0) throw new DomainError("⥊: cannot compute axis if the resulting array is empty", this);
@@ -73,19 +71,20 @@ public class ShapeBuiltin extends FnBuiltin {
       sh[emptyPos] = r;
       ia*= r;
     }
-  
+    
     if (x.ia == 0) {
-      Value proto = x.safePrototype();
-      if (ia==0) return new EmptyArr(sh, proto);
-      if (proto==null) throw new DomainError("⥊: unknown prototype when resizing empty array to shape "+w.ln(FmtInfo.def), this);
-      return new SingleItemArr(proto, sh);
+      Value fill = x.fItemS();
+      if (ia==0) return new EmptyArr(sh, fill);
+      if (fill==null) throw new DomainError("⥊: unknown fill when resizing empty array to shape "+w.ln(FmtInfo.def), this);
+      return new SingleItemArr(fill, sh);
     }
+    if (ia == 0) return new EmptyArr(sh, x.fItemS());
     if (ia == x.ia) return x.ofShape(sh);
     
     if (emptyMode==3) {
       MutVal v = new MutVal(sh, x);
       v.copy(x, 0, 0, x.ia);
-      if (mod != 0) v.fill(x.safePrototype(), x.ia, v.ia); // x won't be empty, so there must be a prototype
+      if (mod != 0) v.fill(x.fItemS(), x.ia, v.ia); // x won't be empty, so there must be a prototype
       return v.get();
     }
     

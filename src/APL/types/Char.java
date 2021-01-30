@@ -41,7 +41,7 @@ public class Char extends Primitive {
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
     return new ChrArr(String.valueOf(chr), sh);
   }
-  public Value safePrototype() { return SPACE; }
+  public Value fItemS() { return SPACE; }
   public String asString() { return String.valueOf(chr); }
   public int atomInfo() { return Pervasion.ATM_CHR; }
   

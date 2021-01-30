@@ -19,8 +19,11 @@ public abstract class Primitive extends Value {
   }
   
   
-  public Value safePrototype() {
+  public Value fItemS() {
     return null;
+  }
+  public Value fMineS() {
+    return fItemS();
   }
   
   public int arrInfo() {

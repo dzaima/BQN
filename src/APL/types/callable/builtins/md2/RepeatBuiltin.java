@@ -69,7 +69,7 @@ public class RepeatBuiltin extends Md2Builtin {
       int i = (int) ((Num) c).num;
       return i==0? z : i<0? n[-i-1] : p[i-1];
     }
-    if (c.ia==0) return new EmptyArr(EmptyArr.SHAPE0, z.safePrototype());
+    if (c.ia==0) return new EmptyArr(EmptyArr.SHAPE0, z.fItemS());
     Value[] vs = new Value[c.ia];
     for (int i = 0; i < vs.length; i++) vs[i] = replace(c.get(i), n, z, p);
     return Arr.create(vs, c.shape);

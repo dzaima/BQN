@@ -25,7 +25,7 @@ public class ShBBuiltin extends FnBuiltin {
     if (x.ia==0) return x;
     MutVal res = new MutVal(x.shape, x);
     int csz = CellBuiltin.csz(x);
-    res.fill(x.prototype(), 0, csz);
+    res.fill(x.fItem(), 0, csz);
     res.copy(x, 0, csz, x.ia-csz);
     return res.get();
   }

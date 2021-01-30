@@ -52,7 +52,7 @@ public class UpArrowBuiltin extends FnBuiltin {
       } else if (d > s) overtake = true;
     }
     if (overtake) {
-      Value proto = x.prototype();
+      Value proto = x.fItem();
       MutVal res = new MutVal(sh);
       if (x.r()<=1 && gsh.length==1) {
         if (off[0]==0) {
@@ -89,19 +89,12 @@ public class UpArrowBuiltin extends FnBuiltin {
   public static Value on(int[] sh, int[] off, Value x) { // valuecopy
     int rank = sh.length;
     assert rank==off.length && rank>=x.r();
+    for (int j : sh) if (j == 0) return new EmptyArr(sh, x.fItemS());
     if (rank > x.r()) {
-      boolean empty = false; // has to be empty or all leading 1s
       int d = rank - x.r();
-      for (int i = 0; i < d; i++) {
-        if (sh[i] == 0) { empty = true; break; }
-      }
-      if (empty) {
-        return new EmptyArr(sh, x.safePrototype());
-      } else {
-        int[] ssh  = new int[x.r()]; System.arraycopy(sh , d, ssh , 0, x.r());
-        int[] soff = new int[x.r()]; System.arraycopy(off, d, soff, 0, x.r());
-        return on(ssh, soff, x).ofShape(sh);
-      }
+      int[] ssh  = new int[x.r()]; System.arraycopy(sh , d, ssh , 0, x.r());
+      int[] soff = new int[x.r()]; System.arraycopy(off, d, soff, 0, x.r());
+      return on(ssh, soff, x).ofShape(sh);
     }
     if (rank == 1) {
       int s = off[0];

@@ -29,7 +29,7 @@ public class ShABuiltin extends FnBuiltin {
     MutVal res = new MutVal(x.shape, x);
     int csz = CellBuiltin.csz(x);
     res.copy(x, csz, 0, x.ia-csz);
-    res.fill(x.prototype(), x.ia-csz, x.ia);
+    res.fill(x.fItem(), x.ia-csz, x.ia);
     return res.get();
   }
 }

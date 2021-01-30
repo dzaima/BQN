@@ -51,15 +51,16 @@ public class UDBuiltin extends FnBuiltin {
       }
       return new HArr(res);
     } else { // •VI←0
-      int[] shape = x.asIntArr();
-      int ia = Arr.prod(shape);
-      Value[] arr = new Value[ia];
+      int[] sh = x.asIntArr();
+      int ia = Arr.prod(sh);
+      Value[] res = new Value[ia];
       int i = 0;
-      for (int[] c : new Indexer(shape)) {
-        arr[i] = new IntArr(c.clone());
+      for (int[] c : new Indexer(sh)) {
+        res[i] = new IntArr(c.clone());
         i++;
       }
-      return new HArr(arr, shape);
+      if (res.length==0) return new EmptyArr(sh, new SingleItemArr(Num.ZERO, new int[]{sh.length}));
+      return new HArr(res, sh);
     }
   }
   public static int[] on(int am) {

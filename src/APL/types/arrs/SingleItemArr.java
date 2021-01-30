@@ -38,11 +38,11 @@ public class SingleItemArr extends Arr {
     return Main.repeat(String.valueOf(c), ia);
   }
   
-  public Value prototype() {
-    return item.prototype();
+  public Value fItem() {
+    return item.fMineS();
   }
-  public Value safePrototype() {
-    return item.safePrototype();
+  public Value fItemS() {
+    return item.fMineS();
   }
   
   public Value ofShape(int[] sh) {

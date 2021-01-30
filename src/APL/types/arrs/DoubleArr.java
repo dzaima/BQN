@@ -66,8 +66,8 @@ public class DoubleArr extends Arr {
   public boolean quickDoubleArr() { return true; }
   public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) { return new DoubleArr(arr, sh); }
-  public Value prototype() { return Num.ZERO; }
-  public Value safePrototype() { return Num.ZERO; }
+  public Value fItem() { return Num.ZERO; }
+  public Value fItemS() { return Num.ZERO; }
   public int arrInfo() { return Pervasion.ARR_F64; }
   
   public int hashCode() {

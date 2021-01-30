@@ -56,16 +56,16 @@ public class EmptyArr extends Arr {
     return proto==Char.SPACE? Pervasion.ARR_C16 : Pervasion.ARR_BIT;
   }
   
-  public Value prototype() {
+  public Value fItem() {
     if (proto == null) throw new DomainError("couldn't get prototype");
     return proto;
   }
-  public Value safePrototype() {
+  public Value fItemS() {
     return proto;
   }
-  
-  
-  
+  public Value fMineS() {
+    return this;
+  }
   
   private static final Iterator<Value> EIT = new Iterator<Value>() {
     public boolean hasNext() { return false; }

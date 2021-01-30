@@ -14,7 +14,7 @@ public class LBoxUBBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⊑"; }
   
   public Value call(Value x) {
-    if (x.ia == 0) return x.prototype();
+    if (x.ia == 0) return x.fItem();
     return x.first();
   }
   

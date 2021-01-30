@@ -23,9 +23,9 @@ public abstract class Arr extends Value {
   
   public String basicFormat(boolean quote) {
     if (ia == 0) {
-      Value pr = safePrototype();
-      if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : "⟨⟩";
-      else return Main.formatAPL(shape) + "⥊" + (pr instanceof Char? "@" : pr instanceof Num? "0" : "⟨⟩");
+      Value pr = fItemS();
+      if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : pr==null? "⟨⟩" : "0⥊<"+pr.ln(FmtInfo.def); // def is fine as it's gonna be just 0s and spaces anyways
+      else return Main.formatAPL(shape) + "⥊" + (pr instanceof Char? "@" : pr instanceof Num? "0" : pr==null? "⟨⟩" : "<"+pr.ln(FmtInfo.def));
     }
     if (r() == 1) { // strings
       StringBuilder all = new StringBuilder();
@@ -101,6 +101,21 @@ public abstract class Arr extends Value {
     return Arr.create(res, shape);
   }
   
+  
+  public Value fMineS() {
+    Value[] vs = new Value[ia];
+    if (ia==0) {
+      Value f = fItemS();
+      if (f==null) return null;
+      return new EmptyArr(shape, f);
+    }
+    for (int i = 0; i < ia; i++) {
+      Value c = get(i).fMineS();
+      if (c==null) return null;
+      vs[i] = c;
+    }
+    return new HArr(vs, shape);
+  }
   
   public static Arr create(Value[] v) {
     return create(v, new int[]{v.length});

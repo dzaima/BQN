@@ -19,7 +19,7 @@ public class ObliqueBuiltin extends Md1Builtin {
     int szM = Math.max(H, W);
     int szm = Math.min(H, W);
     int ram = H + W - 1;
-    if (ram <= 0) return new EmptyArr(EmptyArr.SHAPE0, x.safePrototype());
+    if (ram <= 0) return new EmptyArr(EmptyArr.SHAPE0, x.fItemS());
     
     Value[] res = new Value[ram];
     

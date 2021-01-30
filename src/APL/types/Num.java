@@ -81,7 +81,7 @@ public class Num extends Primitive {
   
   public boolean quickIntArr() { return isInt(num); }
   public boolean quickDoubleArr() { return true; }
-  public Value safePrototype() { return ZERO; }
+  public Value fItemS() { return ZERO; }
   public int atomInfo() {
     int iv = (int)num;
     return iv==num? ((iv&1)==iv? Pervasion.ATM_BIT : Pervasion.ATM_I32) : Pervasion.ATM_F64;

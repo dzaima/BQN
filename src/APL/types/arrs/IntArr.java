@@ -63,8 +63,8 @@ public class IntArr extends Arr {
   public boolean quickIntArr() { return true; }
   public boolean quickDepth1() { return true; }
   public Value ofShape(int[] sh) { return new IntArr(arr, sh); }
-  public Value prototype() { return Num.ZERO; }
-  public Value safePrototype() { return Num.ZERO; }
+  public Value fItem() { return Num.ZERO; }
+  public Value fItemS() { return Num.ZERO; }
   public int arrInfo() { return Pervasion.ARR_I32; }
   
   public int hashCode() {

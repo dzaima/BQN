@@ -18,7 +18,7 @@ public final class TableBuiltin extends Md1Builtin {
     int[] sh = new int[w.r() + x.r()];
     System.arraycopy(w.shape, 0, sh, 0, w.r());
     System.arraycopy(x.shape, 0, sh, w.r(), x.r());
-    if (ia==0) return new EmptyArr(sh, w.safePrototype());
+    if (ia==0) return new EmptyArr(sh, w.fItemS());
     
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();

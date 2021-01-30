@@ -42,6 +42,7 @@ public class GroupBuiltin extends FnBuiltin {
       }
       Value[] res = new Value[sz];
       for (int i = 0; i < sz; i++) res[i] = new IntArr(Arrays.copyOf(ds[i].ds, ds[i].sz));
+      if (sz==0) return new EmptyArr(EmptyArr.SHAPE0, new EmptyArr(EmptyArr.SHAPE0, Num.ZERO));
       return new HArr(res);
     }
     if (depth != 2) throw new DomainError("⊔: argument must be depth 1 or 2 (was "+depth+")", this);
@@ -88,6 +89,7 @@ public class GroupBuiltin extends FnBuiltin {
       int sz = -1;
       for (int i : poss) sz = Math.max(sz, i);
       sz++;
+      if (sz==0) return new EmptyArr(EmptyArr.SHAPE0, new EmptyArr(EmptyArr.SHAPE0, x.fItemS()));
       int[] rshs = new int[sz];
       for (int c : poss) {
         if (c>=0) rshs[c]++;
@@ -114,7 +116,9 @@ public class GroupBuiltin extends FnBuiltin {
         if (c>=0) vs[c][idxs[c]++] = x.get(i);
       }
       Value[] res = new Value[sz];
-      for (int i = 0; i < sz; i++) res[i] = Arr.create(vs[i]);
+      for (int i = 0; i < sz; i++) {
+        res[i] = vs[i].length>0? Arr.create(vs[i]) : new EmptyArr(EmptyArr.SHAPE0, x.fItemS());
+      }
       return new HArr(res);
     }
   
@@ -126,6 +130,7 @@ public class GroupBuiltin extends FnBuiltin {
       rsh[i] = max+1;
     }
     int sz = Arr.prod(rsh);
+    if (sz==0) return new EmptyArr(rsh, new EmptyArr(rsh, x.fItemS()));
     int[][] rshs = new int[sz][xsz];
     int repl = 1;
     for (int i = wsz-1; i >= 0; i--) {
@@ -142,9 +147,7 @@ public class GroupBuiltin extends FnBuiltin {
       }
       repl*= rsh[i];
     }
-    for (int[] c : rshs) {
-      System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
-    }
+    for (int[] c : rshs) System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
   
     MutVal[] vs = new MutVal[sz];
     for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);

@@ -15,7 +15,7 @@ public class Nothing extends Primitive {
   
   
   public String asString() { throw used(); }
-  public Value safePrototype() { throw used(); }
+  public Value fItemS() { throw used(); }
   public Value ofShape(int[] sh) { throw used(); }
   
   

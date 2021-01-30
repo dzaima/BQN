@@ -36,13 +36,13 @@ public class HArr extends Arr {
   public Value[] valuesClone() { return arr.clone(); }
   
   
-  public Value prototype() {
+  public Value fItem() {
     if (ia == 0) throw new DomainError("failed to get prototype");
-    return arr[0].prototype();
+    return arr[0].fMineS();
   }
-  public Value safePrototype() {
+  public Value fItemS() {
     if (ia == 0) return null;
-    return arr[0].safePrototype();
+    return arr[0].fMineS();
   }
   public Value ofShape(int[] sh) {
     assert ia == Arr.prod(sh);

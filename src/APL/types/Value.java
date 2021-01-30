@@ -114,9 +114,15 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   }
   public boolean scalar() { return r() == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
-  public abstract Value safePrototype(); // what to append to this array
-  public Value prototype() {
-    Value v = safePrototype();
+  public abstract Value fItemS(); // what to append to this array
+  public Value fItem() {
+    Value v = fItemS();
+    if (v==null) throw new DomainError("Getting prototype of "+this);
+    return v;
+  }
+  public abstract Value fMineS(); // return null on unknown
+  public Value fMine() {
+    Value v = fMineS();
     if (v==null) throw new DomainError("Getting prototype of "+this);
     return v;
   }

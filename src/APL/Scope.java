@@ -182,14 +182,14 @@ public final class Scope {
         };
         case "•r": return new Md2Builtin() {
           public String ln(FmtInfo f) { return "•_R_"; }
-  
+          
           public Value call(Value f, Value g, Value x, Md2Derv derv) {
             return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
         case "•u": return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•U"; }
-  
+          
           public Value call(Value x) {
             sys.ucmd(x.asString());
             return null;
