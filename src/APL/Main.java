@@ -73,18 +73,18 @@ public class Main {
                     break;
                   case 'e':
                     String code = args[++i];
-                    exec(code, sys.gsc, null);
+                    exec(code, sys.gsc, sys.defArgs);
                     break;
                   case 'p':
                     code = args[++i];
-                    println(Format.outputFmt(exec(code, sys.gsc, null)));
+                    println(Format.outputFmt(exec(code, sys.gsc, sys.defArgs)));
                     break;
                   case 'i':
                     StringBuilder s = new StringBuilder();
                     while (console.hasNext()) {
                       s.append(console.nextLine()).append('\n');
                     }
-                    exec(s.toString(), sys.gsc, null);
+                    exec(s.toString(), sys.gsc, sys.defArgs);
                     break;
                   case 'r':
                     REPL = true;
@@ -130,7 +130,7 @@ public class Main {
                       for (byte b : bytes) {
                         res.append(CODEPAGE.charAt(b & 0xff));
                       }
-                      exec(res.toString(), sys.gsc, null);
+                      exec(res.toString(), sys.gsc, sys.defArgs);
                     } catch (IOException e) {
                       e.printStackTrace();
                       throw new DomainError("couldn't read file");
@@ -146,7 +146,7 @@ public class Main {
             if (si == -1) throw new DomainError("argument `"+p+"` didn't contain a `←`");
             String qk = p.substring(0, si);
             String qv = p.substring(si+1);
-            sys.gsc.set(qk, exec(qv, sys.gsc, null));
+            sys.gsc.set(qk, exec(qv, sys.gsc, sys.defArgs));
           } else {
             throw new DomainError("Unknown command-line argument "+p);
           }
