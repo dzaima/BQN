@@ -1,13 +1,14 @@
 A PC & Android app made in [Processing](https://processing.org/)
 
 ## Usage
-1. Go to `app/java8/` and execute `./convert.py` (in a linux shell)
-2. Open `app/` in Processing and run
+1. build dzaima/BQN for java 8 (by running `./build8` in the base directory)
+2. run `./cpJar` in the `app` directory
+3. Open `app/` in Processing and run
 
 ### Compile for Android:
-3. Install the Android mode in Processing (see top right corner → `Java`; requires Processing 3) and switch to it
-4. In `PS.pde` change the first line to `/*`
-5. Either run in Android Mode with a device connected, or File → Export Signed Package to generate an APK
+4. Install the Android mode in Processing (see top right corner → `Java`; requires Processing 3) and switch to it
+5. In `PS.pde` change the first line to `/*`
+6. Either run in Android Mode with a device connected, or File → Export Signed Package to generate an APK
 
 
 ---

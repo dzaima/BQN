@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 rm -f BQN.jar
 mkdir -p classes
-javac -d ./classes $(find src -name '*.java')
+javac --release 8 -d ./classes $(find src -name '*.java') || echo "Note: ./build8 can only be run in Java 9 and later. Use ./build on java 8"
 cd classes
 jar cvfe BQN.jar BQN.Main * > /dev/null
 mv BQN.jar ../BQN.jar
