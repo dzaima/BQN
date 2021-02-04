@@ -85,14 +85,18 @@ public class Comp {
     }
   }
   
+  
+  public static boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable");
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
-      if (body.gen!=null) return body.gen.get(sc, body);
-      if (body.iter++>=compileStart && compileStart>=0) {
-        body.gen = new JComp(this, body.start).r;
+      if (JCOMP) {
         if (body.gen!=null) return body.gen.get(sc, body);
-        else body.iter = Integer.MIN_VALUE;
+        if (body.iter++>=compileStart && compileStart>=0) {
+          body.gen = new JComp(this, body.start).r;
+          if (body.gen!=null) return body.gen.get(sc, body);
+          else body.iter = Integer.MIN_VALUE;
+        }
       }
       Stk s = new Stk();
       exec: while (true) {

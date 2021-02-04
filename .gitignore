@@ -2,6 +2,7 @@ out
 src/build
 .idea/
 BQN.jar
+nBQN
 BQN.iml
 
 app/java8/classes/
