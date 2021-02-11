@@ -95,7 +95,7 @@ public class ScanBuiltin extends Md1Builtin {
   }
   
   public Value callInv(Value f, Value x) {
-    if (x.r()==0) throw new DomainError("F´⁼: argument had rank 0");
+    if (x.r()==0) throw new DomainError("F`⁼: argument had rank 0");
     if (x.ia==0) return x;
     Value[] res = new Value[x.ia];
     int l = Arr.prod(x.shape, 1, x.r());
