@@ -11,6 +11,7 @@ import java.util.*;
 
 public class BlockTok extends TokArr {
   public Comp comp;
+  private ArrayList<Body> allBodies;
   public final boolean immediate;
   public final static boolean immBlock = true;
   public final Body[] bdM;
@@ -87,8 +88,7 @@ public class BlockTok extends TokArr {
     } else {
       immediate = false;
     }
-    Comp.Mut mut = new Comp.Mut(false); // TODO why is this still a thing
-    comp = Comp.comp(mut, bodies, this);
+    this.allBodies = bodies;
     
     ArrayList<Body> db   = new ArrayList<>(); ArrayList<Body> mb   = new ArrayList<>();
     ArrayList<Body> dbxi = new ArrayList<>(); ArrayList<Body> mbxi = new ArrayList<>();
@@ -102,10 +102,14 @@ public class BlockTok extends TokArr {
     bdDwi = dbwi.toArray(new Body[0]);
   }
   
+  public void compile(Comp.Mut p) {
+    comp = Comp.comp(new Comp.Mut(p), allBodies, this);
+    allBodies = null;
+  }
+  
   public BlockTok(String line, int spos, int epos, List<Token> tokens, boolean pointless) { // for pointless
     super(line, spos, epos, tokens);
     assert pointless;
-    comp = null;
     immediate = false;
     bdM=bdD = bdMxi=bdDxi = bdDwi = null;
   }

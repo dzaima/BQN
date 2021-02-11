@@ -498,8 +498,8 @@ public class Comp {
   
   
   public static class Mut {
-    boolean topLvl;
-    public Mut(boolean topLvl) { this.topLvl = topLvl; }
+    Mut p;
+    public Mut(Mut p) { this.p = p; }
   
     ArrayList<Value> objs = new ArrayList<>(16);
     ArrayList<BlockTok> blocks = new ArrayList<>(16);
@@ -508,8 +508,11 @@ public class Comp {
     
     HashMap<String, Integer> vars; // map of varName→index
     ArrayList<String> varnames;
+    ArrayList<BlockTok> cBlocks = new ArrayList<>(16);
     HashSet<String> exported;
     public void newBody(String[] preset) {
+      for (BlockTok c : cBlocks) c.compile(this);
+      cBlocks.clear();
       varnames = new ArrayList<>(preset.length);
       Collections.addAll(varnames, preset);
       exported = null;
@@ -551,6 +554,7 @@ public class Comp {
       add(o, DFND);
       add(blocks.size());
       blocks.add(o);
+      cBlocks.add(o);
     }
     
     public void nvar(String name) {
@@ -558,18 +562,24 @@ public class Comp {
       varnames.add(name);
     }
     public void var(Token t, String s, boolean mut) {
-      Integer pos = vars.get(s);
-      if (pos == null) {
-        add(t, mut? VARM : VARO);
-        add(addObj(new ChrArr(s)));
-      } else {
-        add(t, mut? LOCM : LOCO);
-        add(0);
-        add(pos);
-      }
+      Mut c = this;
+      int d = 0;
+      do {
+        Integer pos = c.vars.get(s);
+        if (pos!=null) {
+          add(t, mut? LOCM : LOCO);
+          add(d);
+          add(pos);
+          return;
+        }
+        d++;
+        c = c.p;
+      } while (c!=null);
+      add(t, mut? VARM : VARO);
+      add(addObj(new ChrArr(s)));
     }
-  
-  
+    
+    
     public void add(int nbc) {
       bc.add(nbc); ref.add(null);
     }
@@ -584,6 +594,7 @@ public class Comp {
     
     public Comp finish(Token tk) {
       assert bc.sz == ref.size() : bc.sz +" "+ ref.size();
+      for (BlockTok c : cBlocks) c.compile(this);
       return new Comp(bc.get(), objs.toArray(new Value[0]), blocks.toArray(new BlockTok[0]), ref.toArray(new Token[0]), tk);
     }
   }
@@ -596,7 +607,7 @@ public class Comp {
     public String fmt() { return c.fmt(); }
   }
   public static SingleComp comp(TokArr lns, Scope sc) { // non-block
-    Mut mut = new Mut(sc.parent==null);
+    Mut mut = new Mut(null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
     for (int i = 0; i < sz; i++) {
@@ -611,7 +622,7 @@ public class Comp {
     return new SingleComp(mut.finish(lns), new Body(new ArrayList<>(lns.tokens), 'a', false));
   }
   public static SingleComp compN(TokArr lns, Scope sc) { // non-block
-    Mut mut = new Mut(sc.parent==null);
+    Mut mut = new Mut(null);
     Body b = new Body(new ArrayList<>(lns.tokens), 'a', false);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
@@ -1219,7 +1230,7 @@ public class Comp {
       String name = ((NameTok) tk).name;
       if (create) {
         if (m.vars.containsKey(name)) {
-          if (!m.topLvl) throw Local.redefine(name, tk);
+          if (m.p!=null) throw Local.redefine(name, tk);
         } else if (name.charAt(0)!='•') {
           m.nvar(name);
         }

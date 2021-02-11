@@ -1,8 +1,0 @@
-# things that should pass but wont't due to intentionally not (yet) complete implementation
-
-# assignment
-b←1 ⋄ {F←{b+𝕩} ⋄ r←F⎊'e' 𝕩 ⋄ b←10 ⋄ r∾F⎊'e' 𝕩}0 # 'e'‿10
-
-# headers
-{2+2} # 4
-b←1 ⋄ {b←5 ⋄ b ; x←b ⋄ b←0 ⋄ b‿𝕩}2 # err
