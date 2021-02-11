@@ -251,10 +251,6 @@ public class Main {
     print("\n");
   }
   
-  public static String explain(Token tok) {
-    return tok.toRepr();
-  }
-  
   
   public static boolean isBool(Value x) {
     if (!(x instanceof Num)) return false;
