@@ -626,25 +626,25 @@ public class Comp {
     Body b = new Body(new ArrayList<>(lns.tokens), 'a', false);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
-    boolean pushed = false;
+    LineTok last = null;
     for (int i = 0; i < sz; i++) {
-      if (pushed) mut.add(POPS);
+      if (last!=null) mut.add(POPS);
       LineTok ln = (LineTok) lns.tokens.get(i);
       if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
         compE(mut, ln.tokens.get(0));
       } else {
         typeof(ln); flags(ln);
         compO(mut, ln);
-        if (ln.type=='A') mut.add(CHKV);
-        pushed = true;
+        last = ln;
       }
     }
     b.vars = mut.getVars();
     b.setExp(mut.getExp());
     if (b.exp==null) {
+      if (last!=null && last.type=='A') mut.add(CHKV);
       mut.add(RETN);
     } else {
-      if (pushed) mut.add(POPS);
+      if (last!=null) mut.add(POPS);
       mut.add(RETD);
     }
     
@@ -662,25 +662,25 @@ public class Comp {
       mut.newBody(tk.defNames());
       b.addHeader(mut);
       int sz = b.lns.size();
-      boolean pushed = false;
+      LineTok last = null;
       for (int j = 0; j < sz; j++) {
-        if (pushed) mut.add(POPS);
+        if (last!=null) mut.add(POPS);
         LineTok ln = (LineTok) b.lns.get(j);
         if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
           compE(mut, ln.tokens.get(0));
         } else {
           typeof(ln); flags(ln);
           compO(mut, ln);
-          if (ln.type=='A') mut.add(CHKV);
-          pushed = true;
+          last = ln;
         }
       }
       b.vars = mut.getVars();
       b.setExp(mut.getExp());
       if (b.exp==null) {
+        if (last!=null && last.type=='A') mut.add(CHKV);
         mut.add(RETN);
       } else {
-        if (pushed) mut.add(POPS);
+        if (last!=null) mut.add(POPS);
         mut.add(RETD);
       }
     }
