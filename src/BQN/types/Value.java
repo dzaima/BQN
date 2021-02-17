@@ -178,7 +178,11 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public final int compareTo(Value x) {
     Value w = this;
     
-    if (w instanceof Num       && x instanceof Num      ) return Double.compare(((Num) w).num, ((Num) x).num);
+    if (w instanceof Num       && x instanceof Num) {
+      double wd = ((Num) w).num;
+      double xd = ((Num) x).num;
+      return (wd>xd?1:0)-(wd<xd?1:0);
+    }
     if (w instanceof Char      && x instanceof Char     ) return ((Char) w).compareTo((Char) x);
     if (w instanceof Num       && x instanceof Char     ) return -1;
     if (w instanceof Char      && x instanceof Num      ) return  1;
