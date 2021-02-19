@@ -25,7 +25,7 @@ public class SettableNS extends Settable {
   }
   
   public boolean seth(Value x, Scope sc) {
-    if (!(x instanceof APLMap)) throw new DomainError("Expected to assign to a namespace", blame);
+    if (!(x instanceof APLMap)) throw new DomainError("Expected to assign to a namespace");
     APLMap ns = (APLMap) x;
     for (int i = 0; i < keys.length; i++) {
       Value key = keys[i];
