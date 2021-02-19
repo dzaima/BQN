@@ -173,6 +173,7 @@ public final class Scope {
         case "•pfr": return Profiler.results();
         case "•stdin": return new Stdin();
         case "•big": return new Big();
+        case "•math": return MathNS.INSTANCE;
         case "•rand": return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•RAND"; }
           
