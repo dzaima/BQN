@@ -17,16 +17,16 @@ public class SettableNS extends Settable {
   }
   
   public void set(Value x, boolean update, Scope sc, Callable blame) {
-    if (!(x instanceof Namespace)) throw new DomainError("Expected to assign to a namespace", blame);
-    Namespace ns = (Namespace) x;
+    if (!(x instanceof APLMap)) throw new DomainError("Expected to assign to a namespace", blame);
+    APLMap ns = (APLMap) x;
     for (int i = 0; i < keys.length; i++) {
       vals[i].set(ns.getChk(keys[i].asString()), update, sc, blame);
     }
   }
   
   public boolean seth(Value x, Scope sc) {
-    if (!(x instanceof Namespace)) throw new DomainError("Expected to assign to a namespace");
-    Namespace ns = (Namespace) x;
+    if (!(x instanceof APLMap)) throw new DomainError("Expected to assign to a namespace", blame);
+    APLMap ns = (APLMap) x;
     for (int i = 0; i < keys.length; i++) {
       Value key = keys[i];
       Value val = ns.get(key);
