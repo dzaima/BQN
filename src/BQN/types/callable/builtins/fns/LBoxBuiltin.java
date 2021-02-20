@@ -145,7 +145,7 @@ public class LBoxBuiltin extends FnBuiltin {
     int[] is = w.asIntArr();
     if (x.quickIntArr() && v.quickIntArr()) {
       int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();
-      for (int i = 0; i < is.length; i++) res[is[i]] = vi[i];
+      for (int i = 0; i < is.length; i++) res[Indexer.scal(is[i], res.length, this)] = vi[i];
       return new IntArr(res, x.shape);
     }
     Value[] res = x.valuesClone();

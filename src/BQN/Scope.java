@@ -14,6 +14,7 @@ import BQN.types.callable.builtins.md2.DepthBuiltin;
 import BQN.types.callable.trains.*;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -174,6 +175,16 @@ public final class Scope {
         case "•stdin": return new Stdin();
         case "•big": return new Big();
         case "•math": return MathNS.INSTANCE;
+        case "•jload": return new FnBuiltin() {
+          public String ln(FmtInfo f) { return "•JLoad"; }
+          public Value call(Value x) {
+            try {
+              return (Value) Class.forName(x.asString()).getConstructor().newInstance();
+            } catch (Throwable e) {
+              throw new ImplementationError(e);
+            }
+          }
+        };
         case "•rand": return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•RAND"; }
           
