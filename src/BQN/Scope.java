@@ -144,6 +144,8 @@ public final class Scope {
         case "•out": return new Out(this);
         case "•type": return new Type();
         case "•dr": return new DR();
+        case "•eval": return new EvalBuiltin(this);
+        case "•bqn": return new EvalBuiltin.NewEval(sys);
         case "•glyph": return new Glyph();
         case "•source": return new Source();
         case "•decompose": return new Decompose();
