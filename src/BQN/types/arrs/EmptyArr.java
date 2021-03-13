@@ -8,9 +8,10 @@ import java.util.Iterator;
 
 public class EmptyArr extends Arr {
   public static final int[] SHAPE0 = new int[]{0};
-  public static final EmptyArr SHAPE0Q = new EmptyArr(SHAPE0, null);
-  public static final EmptyArr SHAPE0N = new EmptyArr(SHAPE0, Num.ZERO);
-  public static final EmptyArr SHAPE0S = new EmptyArr(SHAPE0, Char.SPACE);
+  public static final EmptyArr SHAPE0Q  = new EmptyArr(SHAPE0, null);
+  public static final EmptyArr SHAPE0N  = new EmptyArr(SHAPE0, Num.ZERO);
+  public static final EmptyArr SHAPE0S  = new EmptyArr(SHAPE0, Char.SPACE);
+  public static final EmptyArr SHAPE0SV = new EmptyArr(SHAPE0, SHAPE0S);
   public static final int[] NOINTS = new int[0];
   public static final Value[] NOVALUES = new Value[0];
   public static final String[] NOSTRS = new String[0];

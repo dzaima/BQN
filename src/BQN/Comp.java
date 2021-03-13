@@ -1375,13 +1375,14 @@ public class Comp {
     if (tk instanceof NameTok) {
       String n = ((NameTok) tk).name;
       if (((NameTok) tk).val != null) {
-        if (n.equals("•args") || n.equals("•path") || n.equals("•name")) {
+        int rel = Scope.rel(n);
+        if (rel<=4) {
           m.push(tk, ((NameTok) tk).val);
-        } else if (Scope.isRel(n)) {
+        } else if (rel==5) {
           m.var(tk, n, false);
           m.push(tk, ((NameTok) tk).val);
           m.add(OP1D);
-        } else throw new InternalError("bad name "+n);
+        } else throw new IllegalStateException();
       }
       else m.var(tk, n, false);
       return;

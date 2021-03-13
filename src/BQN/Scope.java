@@ -14,7 +14,6 @@ import BQN.types.callable.builtins.md2.DepthBuiltin;
 import BQN.types.callable.trains.*;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -157,7 +156,7 @@ public final class Scope {
         case "•a": return Main.uAlphabet;
         case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
-        case "•args": case "•path": case "•name": throw new ImplementationError(name+": should've been handled at compile");
+        case "•args": case "•path": case "•name": case "•state": throw new ImplementationError(name+": should've been handled at compile");
         case "•l":
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser();
@@ -754,8 +753,24 @@ public final class Scope {
     public Value call(String path, Value w, Value x) { return call(w, x); }
     public Value call(String path, Value x) { return call(x); }
   }
-  public static boolean isRel(String name) {
-    return name.equals("•import") || name.equals("•lns") || name.equals("•ex") || name.equals("•fchars") || name.equals("•flines") || name.equals("•fbytes");
+  private static final HashMap<String, Integer> REL = new HashMap<>();
+  static {
+    REL.put("•path"  , 1);
+    REL.put("•name"  , 2);
+    REL.put("•args"  , 3);
+    REL.put("•state" , 4);
+    
+    REL.put("•import", 5);
+    REL.put("•lns"   , 5);
+    REL.put("•ex"    , 5);
+    REL.put("•fchars", 5);
+    REL.put("•flines", 5);
+    REL.put("•fbytes", 5);
+    
+  }
+  public static int rel(String name) {
+    Integer r = REL.get(name);
+    return r==null?0:r;
   }
   
   private static class FIO extends RelFn {

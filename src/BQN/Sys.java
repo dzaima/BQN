@@ -26,7 +26,7 @@ public abstract class Sys {
     gsc = csc = new Scope(this);
     Path p = Paths.get(".").toAbsolutePath().normalize();
     cd = p.toString();
-    defArgs = new Value[]{EmptyArr.SHAPE0S, EmptyArr.SHAPE0S, new ChrArr(p.toString())};
+    defArgs = new Value[]{new ChrArr(p.toString()), EmptyArr.SHAPE0S, EmptyArr.SHAPE0SV};
   }
   
   public void ucmd(String cr) {
@@ -159,9 +159,9 @@ public abstract class Sys {
   public Value execFile(Path path, Value args, Scope sc) {
     String[] spl = split(path);
     Value[] rargs = new Value[]{
-      args,               // args
-      Main.toAPL(spl[1]), // name
       Main.toAPL(spl[0]), // path
+      Main.toAPL(spl[1]), // name
+      args,               // args
     };
     String code = Main.readFile(path);
     return Comp.compN(Main.tokenize(code, rargs), sc).exec(sc);

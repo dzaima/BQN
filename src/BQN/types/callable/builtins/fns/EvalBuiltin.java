@@ -31,5 +31,8 @@ public class EvalBuiltin extends FnBuiltin {
     public Value call(Value x) {
       return Main.exec(x.asString(), new Scope(sys), null);
     }
+    public Value call(Value w, Value x) {
+      return Main.exec(x.asString(), new Scope(sys), w.values());
+    }
   }
 }
