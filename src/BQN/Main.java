@@ -162,7 +162,8 @@ public class Main {
         throw e;
       }
     }
-    if (args.length == 0 || REPL) {
+    if (args.length==0 || REPL) {
+      sys.gsc.markREPL();
       while (true) {
         if (debug) printlvl = 0;
         if (!silentREPL) print("   ");

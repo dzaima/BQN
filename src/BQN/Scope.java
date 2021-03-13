@@ -56,6 +56,10 @@ public final class Scope {
     sys = p.sys;
     rnd = p.rnd;
   }
+  public static final Value REPL_MARK = new Nothing();
+  public void markREPL() {
+    if (vars.length<1 || vars[0]==null) vars[0] = REPL_MARK;
+  }
   
   public HashMap<String, Integer> varMap() {
     if (varMap==null) {

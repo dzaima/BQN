@@ -22,9 +22,10 @@ public class Local extends Settable {
   public void set(Value x, boolean update, Scope sc, Callable blame) {
     sc = sc.owner(depth);
     if (update ^ sc.vars[index]!=null) {
-      if (update) throw new ValueError("no variable \""+name(sc)+"\" to update", blame);
-      else {
-        if (sc.parent!=null) throw redefine(name(sc), blame); // allow top-level redeclarations 
+      if (update) {
+        throw new ValueError("no variable \""+name(sc)+"\" to update", blame);
+      } else {
+        if (sc.parent!=null | sc.vars[0]!=Scope.REPL_MARK) throw redefine(name(sc), blame); // allow top-level redeclarations 
       }
     }
     sc.vars[index] = x;
