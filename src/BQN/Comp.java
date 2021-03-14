@@ -121,16 +121,17 @@ public class Comp {
             break;
           }
           case LOCO: {
-            int n0 = bc[c++];
-            int n1 = bc[c++];
-            Value got = sc.getL(n0, n1);
+            int depth = bc[c++];
+            int index = bc[c++];
+            Value got = sc.getL(depth, index);
+            if (got==null) throw new ValueError("Reading variable before creation");
             s.push(got);
             break;
           }
           case LOCM: {
-            int n0 = bc[c++];
-            int n1 = bc[c++];
-            s.push(new Local(n0, n1));
+            int depth = bc[c++];
+            int index = bc[c++];
+            s.push(new Local(depth, index));
             break;
           }
           case ARRO: {

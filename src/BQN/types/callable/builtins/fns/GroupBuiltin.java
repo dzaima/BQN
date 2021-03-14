@@ -62,18 +62,36 @@ public class GroupBuiltin extends FnBuiltin {
     int[][] wp;
     int wsz;
     int xsz = x.r();
-    if (depth == 1) {
+    int max = -1;
+    if (depth <= 1) {
       wsz = 1;
-      if (w.r() != 1) throw new RankError("⊔: depth 1 𝕨 must have rank 1 "+(w.r()==0? "(was a scalar)" : "(had shape "+Main.formatAPL(w.shape)+")"), this);
+      if (w.r() != 1) {
+        if (!Arr.eqPrefix(w.shape, x.shape, w.r())) throw new RankError("⊔: shape of depth 1 rank "+w.r()+" 𝕨 must be a prefix of 𝕩 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)");
+        int[] xsh;
+        if (w.r()==0) {
+          xsh = new int[x.r()+1]; System.arraycopy(x.shape, 0, xsh, 1, x.r());
+        } else {
+          xsh = Arrays.copyOfRange(x.shape, w.r()-1, x.r());
+        }
+        xsh[0] = w.ia;
+        x = x.ofShape(xsh);
+        w = w.ofShape(new int[]{w.ia});
+        xsz = x.r();
+      }
       if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this);
-      if (w.ia != x.shape[0]) throw new LengthError("⊔: length of 𝕨 must be ⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
-      wp = new int[][]{w.asIntArr()};
+      int[] wi = w.asIntArr();
+      if (w.ia != x.shape[0]) {
+        if (w.ia != x.shape[0]+1) throw new LengthError("⊔: length of 𝕨 must be one of 0‿1+⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
+        max = wi[wi.length-1];
+        wp = new int[][]{Arrays.copyOf(wi, w.ia-1)};
+        for (int c : wp[0]) if (c >= max) throw new LengthError("⊔: tail element of 𝕨 must be the biggest", this);
+      } else wp = new int[][]{wi};
     } else if (depth == 2) {
       wsz = w.ia;
       if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this);
       if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
-      wp = new int[w.ia][];
-      for (int i = 0; i < w.ia; i++) {
+      wp = new int[wsz][];
+      for (int i = 0; i < wsz; i++) {
         Value c = w.get(i);
         if (c.r()!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this);
         wp[i] = c.asIntArr();
@@ -87,8 +105,10 @@ public class GroupBuiltin extends FnBuiltin {
     if (x.r()==1) { // fast path
       int[] poss = wp[0];
       int sz = -1;
-      for (int i : poss) sz = Math.max(sz, i);
-      sz++;
+      if (max==-1) {
+        for (int c : poss) sz = Math.max(sz, c);
+        sz++;
+      } else sz = max;
       if (sz==0) return new EmptyArr(EmptyArr.SHAPE0, new EmptyArr(EmptyArr.SHAPE0, x.fItemS()));
       int[] rshs = new int[sz];
       for (int c : poss) {
@@ -125,9 +145,12 @@ public class GroupBuiltin extends FnBuiltin {
     int csz = Arr.prod(x.shape, wsz, xsz);
     int[] rsh = new int[wsz];
     for (int i = 0; i < wsz; i++) {
-      int max = -1;
-      for (int c : wp[i]) max = Math.max(max, c);
-      rsh[i] = max+1;
+      int sz = -1;
+      if (max==-1) {
+        for (int c : wp[i]) sz = Math.max(sz, c);
+        sz++;
+      } else sz = max;
+      rsh[i] = sz;
     }
     int sz = Arr.prod(rsh);
     if (sz==0) return new EmptyArr(rsh, new EmptyArr(rsh, x.fItemS()));
@@ -135,7 +158,8 @@ public class GroupBuiltin extends FnBuiltin {
     int repl = 1;
     for (int i = wsz-1; i >= 0; i--) {
       int[] ca = new int[rsh[i]];
-      for (int c : wp[i]) {
+      int[] cwp = wp[i];
+      for (int c : cwp) {
         if (c>=0) ca[c]++;
         else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this);
       }
