@@ -288,16 +288,16 @@ public class Comp {
             int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
-            if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
-            s.push(((APLMap) m).getChk(k));
+            if (!(m instanceof BQNObj)) throw new DomainError("Expected value to the left of '.' to be a map");
+            s.push(((BQNObj) m).getChk(k));
             break;
           }
           case FLDM: {
             int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
-            if (!(m instanceof APLMap)) throw new DomainError("Expected value to the left of '.' to be a map");
-            s.push(((APLMap) m).getMut(k));
+            if (!(m instanceof BQNObj)) throw new DomainError("Expected value to the left of '.' to be a map");
+            s.push(((BQNObj) m).getMut(k));
             break;
           }
           case NSPM: {

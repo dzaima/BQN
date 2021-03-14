@@ -12,6 +12,7 @@ import BQN.types.callable.builtins.*;
 import BQN.types.callable.builtins.fns.*;
 import BQN.types.callable.builtins.md2.DepthBuiltin;
 import BQN.types.callable.trains.*;
+import BQN.types.mut.*;
 
 import java.io.*;
 import java.net.*;
@@ -167,7 +168,6 @@ public final class Scope {
         case "•gc": System.gc(); return new Num(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
         case "•gclog": return new GCLog(this);
         case "•null": return Null.NULL;
-        case "•map": case "•NS": return new MapGen();
         case "•dl": return new Delay();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
@@ -649,45 +649,6 @@ public final class Scope {
     }
   }
   
-  private static class MapGen extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•MAP"; }
-    
-    public Value call(Value x) {
-      if (x instanceof StrMap) {
-        StrMap wm = (StrMap) x;
-        // Scope sc;
-        // HashMap<String, Obj> vals;
-        // if (wm.sc == null) {
-        //   sc = null;
-        //   vals = new HashMap<>(wm.vals);
-        // } else {
-        //   sc = new Scope(wm.sc.parent);
-        //   sc.vars.putAll(wm.vals);
-        //   vals = sc.vars;
-        // }
-        // return new StrMap(sc, vals);
-        return new StrMap(new HashMap<>(wm.vals));
-      }
-      StrMap map = new StrMap();
-      for (Value v : x) {
-        if (v.r() != 1 || v.ia != 2) throw new RankError("•MAP: input pairs should be 2-item vectors", this);
-        map.set(v.get(0), v.get(1));
-      }
-      return map;
-    }
-    
-    public Value call(Value w, Value x) {
-      if (w.r() != 1) throw new RankError("rank of 𝕨 ≠ 1", this);
-      if (x.r() != 1) throw new RankError("rank of 𝕩 ≠ 1", this);
-      if (w.ia != x.ia) throw new LengthError("both sides lengths should match", this);
-      StrMap map = new StrMap();
-      for (int i = 0; i < w.ia; i++) {
-        map.set(w.get(i), x.get(i));
-      }
-      return map;
-    }
-  }
-  
   private static class Optimizer extends FnBuiltin {
     public String ln(FmtInfo f) { return "•OPT"; }
     
@@ -860,18 +821,18 @@ public final class Scope {
       return Arr.create(o);
     }
     
-    String get(APLMap m, String key, String def) {
+    String get(BQNObj m, String key, String def) {
       Value got = m.get(key);
       if (got != null) return got.asString();
       return def;
     }
     
     public Value call(String path, Value w, Value x) {
-      if (w instanceof APLMap) {
+      if (w instanceof BQNObj) {
         try {
           URL url = new URL(x.asString());
           HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-          APLMap m = (APLMap) w;
+          BQNObj m = (BQNObj) w;
           String content = get(m, "content", "");
           conn.setRequestMethod(get(m, "method", "POST"));
           
@@ -881,7 +842,7 @@ public final class Scope {
           
           Value eo = m.get("e");
           if (eo != null) {
-            APLMap e = (APLMap) eo;
+            BQNObj e = (BQNObj) eo;
             Value[][] kv = e.kvPair();
             for (int i = 0; i < kv[0].length; i++) {
               conn.setRequestProperty(kv[0][i].asString(), kv[1][i].asString());
@@ -935,7 +896,7 @@ public final class Scope {
     }
     
     public Value call(Value w, Value x) {
-      APLMap m = (APLMap) w;
+      BQNObj m = (BQNObj) w;
       
       File dir = null;
       Value diro = m.get("dir");
@@ -1253,7 +1214,7 @@ public final class Scope {
       if (x instanceof      Md1) return Num.NUMS[4];
       if (x instanceof      Md2) return Num.NUMS[5];
       if (x instanceof BigValue) return Num.NUMS[6];
-      if (x instanceof   APLMap) return Num.NUMS[7];
+      if (x instanceof BQNObj) return Num.NUMS[7];
       return Num.NUMS[99];
     }
   }
@@ -1326,7 +1287,7 @@ public final class Scope {
         if (x instanceof       Md2) return Num.NUMS[50];
         if (x instanceof  BigValue) return Num.NUMS[60];
         if (x instanceof Namespace) return Num.NUMS[70];
-        if (x instanceof    APLMap) return Num.NUMS[71];
+        if (x instanceof BQNObj) return Num.NUMS[71];
         return Num.NUMS[0];
       }
     }

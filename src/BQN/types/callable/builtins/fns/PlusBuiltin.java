@@ -26,6 +26,9 @@ public class PlusBuiltin extends FnBuiltin {
     public int[] on(int   w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.addExact(w   ,x[i]);}return res;}catch(ArithmeticException e){return null;}}
     public int[] on(int[] w, int   x) {try{int[]res=new int[w.length];for(int i=0;i<w.length;i++) {res[i]=Math.addExact(w[i],x   );}return res;}catch(ArithmeticException e){return null;}}
     public int[] on(int[] w, int[] x) {try{int[]res=new int[x.length];for(int i=0;i<x.length;i++) {res[i]=Math.addExact(w[i],x[i]);}return res;}catch(ArithmeticException e){return null;}}
+    // public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {long r=w   +(long)x[i];if(r!=(int)r)return null;res[i]=(int)r;}return res;}
+    // public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {long r=w[i]+(long)x   ;if(r!=(int)r)return null;res[i]=(int)r;}return res;}
+    // public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {long r=w[i]+(long)x[i];if(r!=(int)r)return null;res[i]=(int)r;}return res;}
     // public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}
     // public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}
     // public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x[i],r=res[i]= cw+cx;if(u(cw,cx,r))return null;}return res;}

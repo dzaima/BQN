@@ -14,15 +14,15 @@ public class OldKeyBuiltin extends Md1Builtin {
   public String ln(FmtInfo f) { return "⌸"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
-    if (f instanceof APLMap) {
+    if (f instanceof BQNObj) {
       if (x.r() > 1) {
         Value[] arr = new Value[x.ia];
         for (int i = 0; i < x.ia; i++) {
-          arr[i] = ((APLMap) f).get(x.get(i));
+          arr[i] = ((BQNObj) f).get(x.get(i));
         }
         return Arr.create(arr, x.shape);
       }
-      return ((APLMap) f).get(x);
+      return ((BQNObj) f).get(x);
     }
     if (f instanceof Fun) {
       int i = 0;
@@ -50,8 +50,8 @@ public class OldKeyBuiltin extends Md1Builtin {
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
-    if (f instanceof APLMap) {
-      ((APLMap) f).set(w, x);
+    if (f instanceof BQNObj) {
+      ((BQNObj) f).set(w, x);
       return x;
     }
     if (f instanceof Fun) {

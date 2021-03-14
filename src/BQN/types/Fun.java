@@ -64,7 +64,7 @@ public abstract class Fun extends Callable {
     }
   }
   public interface MapMV {
-    Value call(APLMap x);
+    Value call(BQNObj x);
   }
   
   
@@ -130,7 +130,7 @@ public abstract class Fun extends Callable {
     }
     if (x instanceof Char    ) return cf.call((Char    ) x);
     if (x instanceof Num     ) return nf.call((Num     ) x);
-    if (x instanceof APLMap  ) return mf.call((APLMap  ) x);
+    if (x instanceof BQNObj  ) return mf.call((BQNObj  ) x);
     if (x instanceof BigValue) return nf.call((BigValue) x);
     throw new DomainError("Expected either number/char/map, got "+x.humanType(false), this);
   }

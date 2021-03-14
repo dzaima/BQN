@@ -6,7 +6,7 @@ import BQN.tools.FmtInfo;
 import BQN.types.arrs.ChrArr;
 import BQN.types.mut.Settable;
 
-public abstract class APLMap extends Primitive {
+public abstract class BQNObj extends Primitive {
   
   public MapPointer getMut(Value k) {
     return new MapPointer(this, k);
@@ -30,10 +30,10 @@ public abstract class APLMap extends Primitive {
   abstract public int size();
   
   public static class MapPointer extends Settable {
-    private final APLMap map;
+    private final BQNObj map;
     private final Value k;
     
-    MapPointer(APLMap map, Value k) {
+    MapPointer(BQNObj map, Value k) {
       this.map = map;
       this.k = k;
     }

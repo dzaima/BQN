@@ -1,13 +1,14 @@
-package BQN.types;
+package BQN.types.mut;
 
 import BQN.Scope;
 import BQN.errors.ValueError;
 import BQN.tools.*;
+import BQN.types.*;
 import BQN.types.arrs.ChrArr;
 
 import java.util.HashMap;
 
-public class Namespace extends APLMap {
+public class Namespace extends BQNObj {
   private final Scope sc;
   private final HashMap<String, Integer> exports;
   public Namespace(Scope sc, HashMap<String, Integer> exports) {

@@ -34,9 +34,9 @@ public class LBoxUBBuiltin extends FnBuiltin {
   }
   
   public static Value on(Value w, Value x, Callable blame) {
-    if (x instanceof APLMap) {
+    if (x instanceof BQNObj) {
       Value[] res = new Value[w.ia];
-      APLMap map = (APLMap) x;
+      BQNObj map = (BQNObj) x;
       Value[] vs = w.values();
       for (int i = 0; i < w.ia; i++) {
         res[i] = map.getChk(vs[i].asString());

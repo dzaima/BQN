@@ -327,29 +327,29 @@ public class JComp {
           }
           case FLDO: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
-            fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");
               fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
               fn.athrow();
             l.here(); // }
-            fn.cast(APLMap.class);
+            fn.cast(BQNObj.class);
             fn.ldc(comp.objs[n].asString());
-            fn.invvirt(APLMap.class, "getChk", met(Value.class, String.class));
+            fn.invvirt(BQNObj.class, "getChk", met(Value.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             break;
           }
           case FLDM: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
-            fn.dup(); fn.is(APLMap.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");
               fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
               fn.athrow();
             l.here(); // }
-            fn.cast(APLMap.class);
+            fn.cast(BQNObj.class);
             fn.ldc(comp.objs[n].asString());
-            fn.invvirt(APLMap.class, "getMut", met(APLMap.MapPointer.class, String.class));
+            fn.invvirt(BQNObj.class, "getMut", met(BQNObj.MapPointer.class, String.class));
             mstack = Math.max(mstack, cstack+3);
             break;
           }

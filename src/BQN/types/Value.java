@@ -237,7 +237,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     if (this instanceof Arr     )return article? "an array"     : "array";
     if (this instanceof Char    )return article? "a character"  : "character";
     if (this instanceof Num     )return article? "a number"     : "number";
-    if (this instanceof APLMap  )return article? "a map"        : "map";
+    if (this instanceof BQNObj  )return article? "a map"        : "map";
     if (this instanceof Fun     )return article? "a function"   : "function";
     if (this instanceof Null    )return article? "null"         : "null";
     if (this instanceof Md1     )return article? "a 1-modifier" : "1-modifier";

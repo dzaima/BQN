@@ -1,8 +1,9 @@
 package BQN.types.callable.builtins;
 
 import BQN.errors.*;
-import BQN.tools.*;
+import BQN.tools.FmtInfo;
 import BQN.types.*;
+import BQN.types.mut.SimpleMap;
 
 public class MathNS extends SimpleMap {
   public String ln(FmtInfo f) { return "•math"; }

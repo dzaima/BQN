@@ -1,10 +1,11 @@
-package BQN.types;
+package BQN.types.mut;
 
 import BQN.errors.SyntaxError;
 import BQN.tools.FmtInfo;
+import BQN.types.*;
 import BQN.types.arrs.ChrArr;
 
-public abstract class SimpleMap extends APLMap {
+public abstract class SimpleMap extends BQNObj {
   public Value get(Value k) {
     return getv(k.asString());
   }

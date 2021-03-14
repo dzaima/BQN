@@ -26,8 +26,8 @@ public class SettableArr extends Settable {
   
   public void set(Value x, boolean update, Scope sc, Callable blame) {
     if (x.r() != 1) {
-      if (x instanceof APLMap) {
-        APLMap ns = (APLMap) x;
+      if (x instanceof BQNObj) {
+        BQNObj ns = (BQNObj) x;
         for (Settable c : arr) c.set(ns.getChk(c.name(sc)), update, sc, blame);
         return;
       }
@@ -40,8 +40,8 @@ public class SettableArr extends Settable {
   
   public boolean seth(Value x, Scope sc) {
     if (x.r() != 1) {
-      if (x instanceof APLMap) {
-        APLMap ns = (APLMap) x;
+      if (x instanceof BQNObj) {
+        BQNObj ns = (BQNObj) x;
         for (Settable c : arr) {
           Value val = ns.get(c.name(sc));
           if (val==null) return false;
