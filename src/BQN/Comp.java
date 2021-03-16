@@ -93,7 +93,7 @@ public class Comp {
       if (JCOMP) {
         if (body.gen!=null) return body.gen.get(sc, body);
         if (body.iter++>=compileStart && compileStart>=0) {
-          body.gen = new JComp(this, body.start).r;
+          body.gen = new JBQNComp(this, body.start).r;
           if (body.gen!=null) return body.gen.get(sc, body);
           else body.iter = Integer.MIN_VALUE;
         }

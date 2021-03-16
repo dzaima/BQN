@@ -5,10 +5,6 @@ BQN.jar
 nBQN
 BQN.iml
 
-app/java8/classes/
-app/java8/srcm/
-app/java8/err
-
 app/code/APL8\.jar
 app/android/
 app/build

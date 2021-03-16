@@ -213,7 +213,7 @@ public final class Scope {
           }
         };
         case "•fillfn": return new Fun() {
-          public String ln(FmtInfo f) { return "•_FillFn_"; }
+          public String ln(FmtInfo f) { return "•FillFn"; }
           public Value call(Value x) {
             return x.fItem();
           }
