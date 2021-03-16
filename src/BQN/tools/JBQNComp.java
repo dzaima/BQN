@@ -16,11 +16,6 @@ public class JBQNComp extends JBC {
   public final JFn r;
   public JBQNComp(Comp comp, int start) {
     
-    
-    
-    ArrayList<Met> methods = new ArrayList<>();
-    ArrayList<Fld> fields = new ArrayList<>();
-    
     {
       Met fn = new Met(0x1001, "<init>", "()V", 1);
       fn.aload(0);
@@ -413,68 +408,12 @@ public class JBQNComp extends JBC {
     String name = "gen" + ctr++;
     int this_class = CONSTANT_Class("BQN/"+name);
     int super_class = CONSTANT_Class(JFn.class);
-    int code_att = CONSTANT_Utf8("Code");
-    // int smt_att = CONSTANT_Utf8("StackMapTable");
-    
-    
-    
-    MutByteArr res = new MutByteArr();
-    res.u(0xCA,0xFE,0xBA,0xBE); // magic
-    res.u2(0x00); res.u2(49); // version
-    res.u2(constants.size()+1); // constant count
-    
-    byte[][] map = new byte[constants.size()][];
-    constants.forEach((k, v) -> map[v-1] = k.bs);
-    for (byte[] c : map) res.u(c); // constants
-    
-    res.u2(0x0021); // access flags; ACC_PUBLIC ACC_SUPER
-    res.u2(this_class);
-    res.u2(super_class);
-    res.u2(0); // interface count
-    // no interfaces
-    
-    res.u2(fields.size()); // field count
-    for (Fld f : fields) {
-      res.u2(f.acc);
-      res.u2(f.name);
-      res.u2(f.type);
-      res.u2(0); // attribute count
+    byte[] bc = finish(this_class, super_class);
+    if (bc==null) {
+      r = null;
+      return;
     }
-    
-    res.u2(methods.size()); // method count
-    for (Met c : methods) {
-      c.finish();
-      if (c.len > 65500) {
-        r = null;
-        return;
-      }
-      res.u2(c.acc);
-      res.u2(c.name);
-      res.u2(c.type);
-      res.u2(1); // attribute count
-      res.u2(code_att);
-      res.u4(12+c.len); // 20+c.len+c.smt.len with stackmapable attribute
-      res.u2(c.mstack); // max_stack
-      res.u2(c.localc); // max locals
-      res.u4(c.len);
-      res.u(c.get());
-      res.u2(0); // exception table length
-      // no exceptions
-      res.u2(0);
-      // res.u2(1); // attribute count
-      // res.u2(smt_att);
-      // res.u4(c.smt.len+2);
-      // res.u2(c.smtc);
-      // res.b(c.smt.get());
-    }
-    res.u2(0); // attribute count
-    // no attributes
-    // try {
-    //   Files.write(Path.of("src","APL","tools","gen0.class"), res.get());
-    // } catch (Throwable e) {
-    //   e.printStackTrace();
-    // }
-    Class<?> def = l.def(null, res.get(), 0, res.len);
+    Class<?> def = l.def(null, bc, 0, bc.length);
     try {
       JFn o = (JFn) def.getDeclaredConstructor().newInstance();
       o.vals = comp.objs;

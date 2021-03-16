@@ -7,11 +7,14 @@ import java.util.*;
 public class JBC {
   HashMap<Const, Integer> constants = new HashMap<>();
   static int ctr = 0;
+  public ArrayList<Met> methods = new ArrayList<>();
+  public ArrayList<Fld> fields = new ArrayList<>();
+  public MutIntArr interfaces = new MutIntArr(1);
+  public int access_flags = 0x0021; // access flags; default: ACC_PUBLIC ACC_SUPER
   
   
-  
-  static final Ldr l = new Ldr();
-  static class Ldr extends ClassLoader {
+  public static final Ldr l = new Ldr();
+  public static class Ldr extends ClassLoader {
     public Class<?> def(String name, byte[] b, int off, int len) throws ClassFormatError {
       return defineClass(name, b, off, len);
     }
@@ -88,11 +91,11 @@ public class JBC {
   }
   
   
-  static void u2(byte[] a, int pos, int v) {
+  public static void u2(byte[] a, int pos, int v) {
     a[pos  ] = (byte) ((v>>8)&0xff);
     a[pos+1] = (byte) ( v    &0xff);
   }
-  static void u4(byte[] a, int pos, int v) {
+  public static void u4(byte[] a, int pos, int v) {
     a[pos  ] = (byte) ((v>>24)&0xff);
     a[pos+1] = (byte) ((v>>16)&0xff);
     a[pos+2] = (byte) ((v>> 8)&0xff);
@@ -100,10 +103,10 @@ public class JBC {
   }
   
   
-  static String name(Class<?> c) {
+  public static String name(Class<?> c) {
     return c.getName().replace(".", "/");
   }
-  static String fname(Class<?> c) {
+  public static String fname(Class<?> c) {
     if (c.isPrimitive()) {
         if (c==boolean.class) return "Z";
         if (c==byte   .class) return "B";
@@ -119,7 +122,7 @@ public class JBC {
     if (c.isArray()) return n;
     return "L"+n+";";
   }
-  static String met(Class<?> ret, Class<?>... args) {
+  public static String met(Class<?> ret, Class<?>... args) {
     StringBuilder res = new StringBuilder("(");
     for (Class<?> c : args) res.append(fname(c));
     res.append(')').append(fname(ret));
@@ -127,8 +130,8 @@ public class JBC {
   }
   
   
-  static class Const implements Comparable<Const> {
-    byte[] bs;
+  public static class Const implements Comparable<Const> {
+    public byte[] bs;
   
     public Const(byte[] bs) { this.bs = bs; }
   
@@ -160,7 +163,7 @@ public class JBC {
   
   
   
-  class Met extends MutByteArr {
+  public class Met extends MutByteArr {
     public final int acc, name, type;
     public int mstack = 0; // max stack size
     public int localc; // local variable count
@@ -175,30 +178,30 @@ public class JBC {
       this.localc = argc; // in case the arguments aren't used
     }
   
-    void aload(int i) { // get local variable
+    public void aload(int i) { // get local variable
       localc = Math.max(i+1, localc);
       if (i<4) u(42+i);
       else if (i<256) u(25, i);
       else throw new NYIError("aload>255");
     }
-    void astore(int i) { // store local variable
+    public void astore(int i) { // store local variable
       localc = Math.max(i+1, localc);
       if (i<4) u(75+i);
       else if (i<256) u(58, i);
       else throw new NYIError("astore>255");
     }
-    void iload(int i) { // get local var int
+    public void iload(int i) { // get local var int
       localc = Math.max(i+1, localc);
       if (i<4) u(26+i);
       else if (i<256) u(21, i);
       else throw new NYIError("iload>255");
     }
     
-    void aaload () { u(50); } // get array item
-    void aastore() { u(83); } // set array item
+    public void aaload () { u(50); } // get array item
+    public void aastore() { u(83); } // set array item
     
-    void aconst_null() { u(1); } // push null
-    void iconst(int i) { // push integer constant
+    public void aconst_null() { u(1); } // push null
+    public void iconst(int i) { // push integer constant
       if (i>=-1 && i<=5) u(3+i);
       else if (( byte)i == i) { u(16); s (i); }
       else if ((short)i == i) { u(17); s2(i); }
@@ -208,7 +211,7 @@ public class JBC {
         else {         u(19); u2(pos); }
       }
     }
-    public void ldc(String str) {
+    public void ldc(String str) { // push string constant
       byte[] bs = new byte[3]; bs[0] = 8;
       JBC.u2(bs, 1, CONSTANT_Utf8(str));
       int v = JBC.this.get(bs);
@@ -216,15 +219,15 @@ public class JBC {
       else { u(19); u2(v); }
     }
   
-    void invvirt (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
-    void invspec (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
-    void invstat (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
-    void getfield(String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
+    public void invvirt (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
+    public void invspec (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
+    public void invstat (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
+    public void getfield(String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
   
-    void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,       type ); }
-    void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,       type ); }
-    void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,       type ); }
-    void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, fname(type)); }
+    public void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,       type ); }
+    public void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,       type ); }
+    public void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,       type ); }
+    public void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, fname(type)); }
     
     public void new_     (String cls) { u(187); u2(CONSTANT_Class(cls)); }
     public void anewarray(String cls) { u(189); u2(CONSTANT_Class(cls)); }
@@ -240,16 +243,16 @@ public class JBC {
     }
     public void cast(Class<?> c) { cast(name(c)); }
     
-    void vret() { u(177); } // return void
-    void aret() { u(176); } // return object
-    void athrow(){u(191); } // throw ToS
+    public void vret() { u(177); } // return void
+    public void aret() { u(176); } // return object
+    public void athrow(){u(191); } // throw ToS
     
-    void swap  () { u( 95); } // ab → ba
-    void dup   () { u( 89); } // a → aa
-    void dup2  () { u( 92); } // ab → abab
-    void dup_x1() { u( 90); } // ab → bab
-    void dup_x2() { u( 91); } // abc → cabc
-    void pop   () { u( 87); } // .. a → ..
+    public void swap  () { u( 95); } // ab → ba
+    public void dup   () { u( 89); } // a → aa
+    public void dup2  () { u( 92); } // ab → abab
+    public void dup_x1() { u( 90); } // ab → bab
+    public void dup_x2() { u( 91); } // abc → cabc
+    public void pop   () { u( 87); } // .. a → ..
     
     public void ifeq0   (Lbl l) { u(153); l.add2(); }
     public void ifne0   (Lbl l) { u(154); l.add2(); }
@@ -301,8 +304,8 @@ public class JBC {
         pos = len;
       }
     }
-    
-    void finish() {
+  
+    public void finish() {
       // ArrayList<Integer> lend = new ArrayList<>();
       for (Lbl l : ls) {
         int to = l.pos;
@@ -328,10 +331,79 @@ public class JBC {
     }
   }
   
-  class Fld {
+  public byte[] finish(int this_class, int super_class) {
+    int code_att = CONSTANT_Utf8("Code");
+    // int smt_att = CONSTANT_Utf8("StackMapTable");
+    
+    MutByteArr res = new MutByteArr();
+    res.u(0xCA,0xFE,0xBA,0xBE); // magic
+    res.u2(0x00); res.u2(49); // version
+    res.u2(constants.size()+1); // constant count
+    
+    byte[][] map = new byte[constants.size()][];
+    constants.forEach((k, v) -> map[v-1] = k.bs);
+    for (byte[] c : map) res.u(c); // constants
+    
+    res.u2(access_flags);
+    res.u2(this_class);
+    res.u2(super_class);
+    res.u2(interfaces.sz); // interface count
+    for (int i = 0; i < interfaces.sz; i++) res.u2(interfaces.is[i]);
+    
+    res.u2(fields.size()); // field count
+    for (Fld f : fields) {
+      res.u2(f.acc);
+      res.u2(f.name);
+      res.u2(f.type);
+      res.u2(0); // attribute count
+    }
+    
+    res.u2(methods.size()); // method count
+    for (Met c : methods) {
+      c.finish();
+      if (c.len > 65500) return null;
+      res.u2(c.acc);
+      res.u2(c.name);
+      res.u2(c.type);
+      if ((c.acc&0x0500)!=0) {
+        res.u2(0); // attribute count; no code
+        if (c.len>0) throw new ImplementationError("abstract/native Met had code!");
+      } else {
+        res.u2(1); // attribute count
+        res.u2(code_att);
+        res.u4(12+c.len); // 20+c.len+c.smt.len with stackmapable attribute
+        res.u2(c.mstack); // max_stack
+        res.u2(c.localc); // max locals
+        res.u4(c.len);
+        res.u(c.get());
+        res.u2(0); // exception table length
+        // no exceptions
+        res.u2(0); // attributes for code
+        // no attributes
+        // res.u2(1); // attribute count
+        // res.u2(smt_att);
+        // res.u4(c.smt.len+2);
+        // res.u2(c.smtc);
+        // res.b(c.smt.get());
+      }
+    }
+    res.u2(0); // attribute count
+    // no attributes
+    // try {
+    //   Files.write(Path.of("src","APL","tools","gen0.class"), res.get());
+    // } catch (Throwable e) {
+    //   e.printStackTrace();
+    // }
+    return res.get();
+  }
+  
+  public class Fld {
     public final int acc, name, type;
   
-    Fld(int acc, String name, String type) {
+    public Fld(int acc, String name, Class<?> cls) {
+      this(acc, name, fname(cls));
+    }
+    public Fld(int acc, String name, String type) {
       this.acc = acc;
       this.name = CONSTANT_Utf8(name);
       this.type = CONSTANT_Utf8(type);
