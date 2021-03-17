@@ -14,7 +14,6 @@ import java.util.Scanner;
 
 @SuppressWarnings("WeakerAccess") // for use as a library
 public class Main {
-  public static final String CODEPAGE = "\0\0\0\0\0\0\0\0\0\t\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~÷×↑↓⌈⌊≠∊⍺⍴⍵⍳∍⋾⎕⍞⌸⌺⍇⍁⍂⌻⌼⍃⍄⍈⍌⍍⍐⍓⍔⍗⍯⍰⍠⌹⊆⊇⍶⍸⍹⍘⍚⍛⍜⍊≤≥⍮ϼ⍷⍉⌽⊖⊙⌾○∘⍟⊗¨⍨⍡⍥⍩⍣⌾⍤⊂⊃∩∪⊥⊤∆∇⍒⍋⍫⍱⍲∨∧⍬⊣⊢⌷⍕⍎←→⍅⍆⍏⍖⌿⍀⍪≡≢⍦⍧⍭‽⍑∞…√ᑈᐵ¯⍝⋄⌶⍙";
   public static boolean debug = false;
   public static boolean vind = false; // vector indexing
   public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
@@ -53,8 +52,6 @@ public class Main {
                   println("-b     : disable boxing");
                   println("-c     : disable colorful printing");
                   println("-q     : enable quoting strings");
-                  println("-D file: run the file as SBCS");
-                  println("-E a b : encode the file A in the SBCS, save as B");
                   println("If given no arguments, an implicit -r will be added");
                   System.exit(0);
                   break;
@@ -104,37 +101,6 @@ public class Main {
                     break;
                   case 'c':
                     colorful = false;
-                    break;
-                  case 'E': {
-                    String origS = readFile(args[++i]);
-                    byte[] res = new byte[origS.length()];
-                    for (int j = 0; j < origS.length(); j++) {
-                      char chr = origS.charAt(j);
-                      int index = CODEPAGE.indexOf(chr);
-                      if (index == -1) throw new DomainError("error encoding character "+chr+" (dec "+(+chr)+")");
-                      res[j] = (byte) index;
-                    }
-                    String conv = args[++i];
-                    try (FileOutputStream stream = new FileOutputStream(conv)) {
-                      stream.write(res);
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                      throw new DomainError("couldn't write file");
-                    }
-                    break;
-                  }
-                  case 'D':
-                    try {
-                      byte[] bytes = Files.readAllBytes(new File(args[++i]).toPath());
-                      StringBuilder res = new StringBuilder();
-                      for (byte b : bytes) {
-                        res.append(CODEPAGE.charAt(b & 0xff));
-                      }
-                      exec(res.toString(), sys.gsc, sys.defArgs);
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                      throw new DomainError("couldn't read file");
-                    }
                     break;
                   default:
                     throw new DomainError("Unknown command-line argument -"+c);

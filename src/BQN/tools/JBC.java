@@ -219,15 +219,17 @@ public class JBC {
       else { u(19); u2(v); }
     }
   
-    public void invvirt (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
-    public void invspec (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
-    public void invstat (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
-    public void getfield(String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
+    public void invvirt  (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
+    public void invspec  (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
+    public void invstat  (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
+    public void getfield (String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
+    public void getstatic(String cls, String name, String type) { u(178); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
   
-    public void invvirt (Class<?> cls, String name, String   type) { invvirt (name(cls), name,       type ); }
-    public void invspec (Class<?> cls, String name, String   type) { invspec (name(cls), name,       type ); }
-    public void invstat (Class<?> cls, String name, String   type) { invstat (name(cls), name,       type ); }
-    public void getfield(Class<?> cls, String name, Class<?> type) { getfield(name(cls), name, fname(type)); }
+    public void invvirt  (Class<?> cls, String name, String   type) { invvirt  (name(cls), name,       type ); }
+    public void invspec  (Class<?> cls, String name, String   type) { invspec  (name(cls), name,       type ); }
+    public void invstat  (Class<?> cls, String name, String   type) { invstat  (name(cls), name,       type ); }
+    public void getfield (Class<?> cls, String name, Class<?> type) { getfield (name(cls), name, fname(type)); }
+    public void getstatic(Class<?> cls, String name, Class<?> type) { getstatic(name(cls), name, fname(type)); }
     
     public void new_     (String cls) { u(187); u2(CONSTANT_Class(cls)); }
     public void anewarray(String cls) { u(189); u2(CONSTANT_Class(cls)); }
@@ -262,6 +264,13 @@ public class JBC {
     public void ifle0   (Lbl l) { u(158); l.add2(); }
     public void goto_   (Lbl l) { u(167); l.add2(); }
     public void ifnenull(Lbl l) { u(199); l.add2(); } // branch if pop!=null
+  
+    public void i2f() { u(134); }
+    public void i2d() { u(135); }
+    public void i2c() { u(146); }
+    public void i2b() { u(145); }
+    public void i2s() { u(147); }
+    public void i2l() { u(133); }
     
     
     int lookupStart;

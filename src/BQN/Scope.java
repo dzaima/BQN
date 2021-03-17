@@ -159,7 +159,6 @@ public final class Scope {
         case "•fbytes": return new FIO('b');
         case "•sh": return new Shell();
         case "•a": return Main.uAlphabet;
-        case "•av": return Main.toAPL(Main.CODEPAGE);
         case "•d": return Main.digits;
         case "•args": case "•path": case "•name": case "•state": throw new ImplementationError(name+": should've been handled at compile");
         case "•l":
