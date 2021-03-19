@@ -59,7 +59,7 @@ public class UDBuiltin extends FnBuiltin {
         res[i] = new IntArr(c.clone());
         i++;
       }
-      if (res.length==0) return new EmptyArr(sh, new SingleItemArr(Num.ZERO, new int[]{sh.length}));
+      if (res.length==0) return new EmptyArr(sh, new SingleItemArr(Num.ZERO, Arr.vecsh(sh.length)));
       return new HArr(res, sh);
     }
   }

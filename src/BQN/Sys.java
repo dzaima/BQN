@@ -214,4 +214,6 @@ public abstract class Sys {
   }
   
   public abstract String input();
+  public abstract boolean hasInput();
+  
 }

@@ -62,7 +62,7 @@ public class Format {
   public static Value str(String s) { // TODO split graphemes, color escapes, etc idk
     int len = s.codePointCount(0, s.length());
     if (len==s.length()) return new ChrArr(s);
-    MutVal mv = new MutVal(new int[]{len}, Char.SPACE);
+    MutVal mv = new MutVal(Arr.vecsh(len), Char.SPACE);
     int i=0, o=0;
     while (i < s.length()) {
       int c = s.codePointAt(i);

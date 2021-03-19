@@ -15,12 +15,12 @@ public class DoubleArr extends Arr {
     this.arr = arr;
   }
   public DoubleArr(double[] arr) { // 1D
-    super(new int[]{arr.length}, arr.length);
+    super(vecsh(arr.length), arr.length);
     this.arr = arr;
   }
   
   public DoubleArr(ArrayList<Double> arrl) {
-    super(new int[]{arrl.size()}, arrl.size());
+    super(vecsh(arrl.size()), arrl.size());
     arr = new double[ia];
     int j = 0;
     for (double d : arrl) arr[j++] = d;

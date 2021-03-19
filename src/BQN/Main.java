@@ -18,13 +18,16 @@ public class Main {
   public static boolean vind = false; // vector indexing
   public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
   public static boolean colorful = true;
-  static final ChrArr uAlphabet = toAPL("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  static final ChrArr lAlphabet = toAPL("abcdefghijklmnopqrstuvwxyz");
-  public static final ChrArr digits = toAPL("0123456789");
+  public static final boolean SAFE = false;
   static int printlvl = 0;
   static final long startingMillis = System.currentTimeMillis();
   static final long startingNanos = System.nanoTime();
   public static Scanner console;
+  
+  
+  static final ChrArr uAlphabet = new ChrArr("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  static final ChrArr lAlphabet = new ChrArr("abcdefghijklmnopqrstuvwxyz");
+  public static final ChrArr digits = new ChrArr("0123456789");
   public static void main(String[] args) {
     colorful = System.console() != null && System.getenv().get("TERM") != null;
     console = new Scanner(System.in);
@@ -147,9 +150,8 @@ public class Main {
       System.exit(0);
     }
     
-    public String input() {
-      return Main.console.nextLine();
-    }
+    public String input() { return Main.console.nextLine(); }
+    public boolean hasInput() { return Main.console.hasNextLine(); }
     
     public void println(String s) {
       System.out.println(s);
@@ -249,4 +251,8 @@ public class Main {
     for (int i = 0; i < l; i++) r.append(s);
     return r.toString();
   }
+  
+  public static void unsafe(Callable v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
+  public static void unsafe(String   v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
+  
 }

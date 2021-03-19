@@ -12,11 +12,11 @@ public class HArr extends Arr {
     arr = v;
   }
   public HArr(ArrayList<Value> v) { // 1D
-    super(new int[]{v.size()});
+    super(vecsh(v.size()));
     arr = v.toArray(new Value[0]);
   }
   public HArr(Value[] v) { // 1D
-    super(new int[]{v.length}, v.length);
+    super(vecsh(v.length), v.length);
     arr = v;
   }
   

@@ -197,8 +197,8 @@ public class JBC {
       else throw new NYIError("iload>255");
     }
     
-    public void aaload () { u(50); } // get array item
-    public void aastore() { u(83); } // set array item
+    public void aaload () { u(50); } // get array item; arr,index → val
+    public void aastore() { u(83); } // set array item; arr,index,val → ⟨⟩
     
     public void aconst_null() { u(1); } // push null
     public void iconst(int i) { // push integer constant
@@ -238,6 +238,15 @@ public class JBC {
     public void new_     (Class<?> cls) { new_     (name(cls)); }
     public void anewarray(Class<?> cls) { anewarray(name(cls)); }
     public void is       (Class<?> cls) { is       (name(cls)); }
+    
+    public void newarrayb() { u(188); u(4); } // boolean[]
+    public void newarrayC() { u(188); u(5); }
+    public void newarrayF() { u(188); u(6); }
+    public void newarrayD() { u(188); u(7); }
+    public void newarrayB() { u(188); u(8); } // byte[]
+    public void newarrayS() { u(188); u(9); }
+    public void newarrayI() { u(188); u(10); }
+    public void newarrayL() { u(188); u(11); }
     
     public void cast(String cls) {
       u(192);

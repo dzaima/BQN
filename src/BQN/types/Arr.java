@@ -118,7 +118,7 @@ public abstract class Arr extends Value {
   }
   
   public static Arr create(Value[] v) {
-    return create(v, new int[]{v.length});
+    return create(v, vecsh(v.length));
   }
   public static Arr create(Value[] v, int[] sh) { // note, doesn't attempt individual item squeezing
     assert Arr.prod(sh) == v.length : v.length+" ≢ ×´"+Main.formatAPL(sh);
@@ -164,7 +164,7 @@ public abstract class Arr extends Value {
   }
   
   public static Arr create(ArrayList<Value> v) {
-    return create(v, new int[]{v.size()});
+    return create(v, vecsh(v.size()));
   }
   public static Arr create(ArrayList<Value> v, int[] sh) { // note, doesn't attempt individual item squeezing
     if (v.size() == 0) return new EmptyArr(sh, null);
@@ -458,5 +458,13 @@ public abstract class Arr extends Value {
   private static boolean simple(Value v) {
     if (v instanceof Char) return !((Char) v).spec();
     return v instanceof Num || v instanceof BigValue;
+  }
+  
+  
+  private static final int[][] is = new int[128][1];
+  static { for (int i = 0; i < is.length; i++) is[i][0] = i; }
+  public static int[] vecsh(int l) {
+    if (l>=0 && l<is.length) return is[l];
+    return new int[]{l};
   }
 }

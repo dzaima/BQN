@@ -128,6 +128,19 @@ public class GroupBuiltin extends FnBuiltin {
         for (int i = 0; i < sz; i++) res[i] = new IntArr(vs[i]);
         return new HArr(res);
       }
+      if (x instanceof ChrArr) {
+        String xs = ((ChrArr)x).s;
+        int[] idxs = new int[sz];
+        char[][] vs = new char[sz][];
+        for (int i = 0; i < sz; i++) vs[i] = new char[rshs[i]];
+        for (int i = 0; i < x.ia; i++) {
+          int c = poss[i];
+          if (c>=0) vs[c][idxs[c]++] = xs.charAt(i);
+        }
+        Value[] res = new Value[sz];
+        for (int i = 0; i < sz; i++) res[i] = new ChrArr(vs[i]);
+        return new HArr(res);
+      }
       int[] idxs = new int[sz];
       Value[][] vs = new Value[sz][];
       for (int i = 0; i < sz; i++) vs[i] = new Value[rshs[i]];

@@ -10,7 +10,7 @@ public class ChrArr extends Arr {
   public String s;
   
   public ChrArr(String s) {
-    super(new int[]{s.length()}, s.length());
+    super(vecsh(s.length()), s.length());
     this.s = s;
   }
   public ChrArr(String s, int[] sh) {

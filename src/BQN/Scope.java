@@ -154,9 +154,9 @@ public final class Scope {
         case "•source": return new Source();
         case "•decompose": return new Decompose();
         case "•lns": return new Lns();
-        case "•fchars": return new FIO('c');
-        case "•flines": return new FIO('l');
-        case "•fbytes": return new FIO('b');
+        case "•fchars": return new FChars();
+        case "•flines": return new FLines();
+        case "•fbytes": return new FBytes();
         case "•sh": return new Shell();
         case "•a": return Main.uAlphabet;
         case "•d": return Main.digits;
@@ -164,22 +164,22 @@ public final class Scope {
         case "•l":
         case "•la": return Main.lAlphabet;
         case "•erase": return new Eraser();
-        case "•gc": System.gc(); return new Num(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-        case "•gclog": return new GCLog(this);
+        case "•gc":  Main.unsafe("GC"); System.gc(); return new Num(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        case "•gclog": Main.unsafe("GC"); return new GCLog(this);
         case "•null": return Null.NULL;
-        case "•dl": return new Delay();
+        case "•dl": Main.unsafe("•DL"); return new Delay();
         case "•ucs": return new UCS();
         case "•hash": return new Hasher();
-        case "•vi": return Main.vind? Num.ONE : Num.ZERO;
+        case "•vi": Main.unsafe("•VI"); return Main.vind? Num.ONE : Num.ZERO;
         case "•class": return new ClassGetter();
-        case "•pfx": return new Profiler(this);
-        case "•pfo": return new Profiler.ProfilerOp(this);
-        case "•pfc": return new Profiler.ProfilerMd2(this);
-        case "•pfr": return Profiler.results();
-        case "•stdin": return new Stdin();
+        case "•pfx": Main.unsafe("•pfx"); return new Profiler(this);
+        case "•pfo": Main.unsafe("•pfo"); return new Profiler.ProfilerOp(this);
+        case "•pfc": Main.unsafe("•pfc"); return new Profiler.ProfilerMd2(this);
+        case "•pfr": Main.unsafe("•pfr"); return Profiler.results();
+        case "•stdin": return new Stdin(this);
         case "•big": return new Big();
         case "•math": return MathNS.INSTANCE;
-        case "•jload": return new FnBuiltin() {
+        case "•jload": Main.unsafe("•JLoad"); return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•JLoad"; }
           public Value call(Value x) {
             try {
@@ -203,7 +203,7 @@ public final class Scope {
             return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
           }
         };
-        case "•u": return new FnBuiltin() {
+        case "•u": Main.unsafe("•U"); return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•U"; }
           
           public Value call(Value x) {
@@ -247,7 +247,7 @@ public final class Scope {
             return r;
           }
         };
-        case "•comp": return new FnBuiltin() {
+        case "•comp": Main.unsafe("•Comp"); return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•Comp"; }
           
           /* Argument structure:
@@ -326,7 +326,7 @@ public final class Scope {
             return Scope.this.get("•decomp").call(x);
           }
         };
-        case "•decomp": return new FnBuiltin() {
+        case "•decomp": Main.unsafe("•Decomp"); return new FnBuiltin() {
           public String ln(FmtInfo f) { return "•Decomp"; }
           
           public Value call(Value x) {
@@ -668,7 +668,7 @@ public final class Scope {
     public String ln(FmtInfo f) { return "•EX"; }
   
     private final Scope sc;
-    public Ex(Scope sc) { this.sc = sc; }
+    public Ex(Scope sc) { this.sc = sc; Main.unsafe(this); }
     
     public Value call(String path, Value x) {
       return call(path, EmptyArr.SHAPE0S, x);
@@ -682,7 +682,7 @@ public final class Scope {
     public String ln(FmtInfo f) { return "•Import"; }
     
     private final Scope sc;
-    public Import(Scope sc) { this.sc = sc; }
+    public Import(Scope sc) { this.sc = sc; Main.unsafe(this); }
     
     public Value call(String path, Value x) {
       Path p = Sys.path(path, x.asString());
@@ -701,6 +701,9 @@ public final class Scope {
   }
   
   abstract static class RelFn extends Md1 {
+    public RelFn() {
+      Main.unsafe(this);
+    }
     public Value derive(Value f) {
       String path = f==Nothing.inst? null : f.asString();
       return new FnBuiltin() {
@@ -737,69 +740,92 @@ public final class Scope {
     return r==null?0:r;
   }
   
-  private static class FIO extends RelFn {
-    public String ln(FmtInfo f) {
-      return type=='b'? "•FBytes" : type=='l'? "•FLines" : "•FChars";
-    }
-    private final char type;
-    public FIO(char type) {
-      this.type = type;
-    }
-  
+  private static class FLines extends RelFn {
+    public String ln(FmtInfo f) { return "•FLines"; }
+    
     public Value call(String path, Value x) {
       Path p = Sys.path(path, x.asString());
       try {
-        if (type=='l') {
-          List<String> l = Files.readAllLines(p, StandardCharsets.UTF_8);
-          Value[] v = new Value[l.size()];
-          for (int i = 0; i < v.length; i++) v[i] = new ChrArr(l.get(i));
-          return new HArr(v);
-        }
-        byte[] bs = Files.readAllBytes(p);
-        // if (type=='b') return new IntArr(bs);
-        if (type=='b') {
-          char[] cs = new char[bs.length];
-          for (int i = 0; i < bs.length; i++) cs[i] = (char) (bs[i]&0xff);
-          return new ChrArr(cs);
-        }
-        // type=='c'
-        return new ChrArr(new String(bs, StandardCharsets.UTF_8));
+        List<String> l = Files.readAllLines(p, StandardCharsets.UTF_8);
+        Value[] v = new Value[l.size()];
+        for (int i = 0; i < v.length; i++) v[i] = new ChrArr(l.get(i));
+        return new HArr(v);
       } catch (IOException e) {
         throw new ValueError(ln(null)+": Couldn't read file \""+p+"\"");
       }
     }
-  
+    
     public Value call(String path, Value w, Value x) {
       Path p = Sys.path(path, w.asString());
       try {
-        if (type=='l') {
-          MutByteArr b = new MutByteArr();
-          if (x.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have rank 1", this);
-          for (Value c : x) {
-            if (c.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have items of rank 1", this);
-            b.add(c.asString().getBytes(StandardCharsets.UTF_8));
-            b.s((byte) '\n');
+        MutByteArr b = new MutByteArr();
+        if (x.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have rank 1", this);
+        for (Value c : x) {
+          if (c.r()!=1) throw new RankError("•FLines: Expected 𝕩 to have items of rank 1", this);
+          b.add(c.asString().getBytes(StandardCharsets.UTF_8));
+          b.s((byte) '\n');
+        }
+        Files.write(p, b.get());
+        return w;
+      } catch (IOException e) {
+        throw new ValueError("Couldn't write to file \""+p+"\"");
+      }
+    }
+  }
+  private static class FChars extends RelFn {
+    public String ln(FmtInfo f) { return "•FChars"; }
+    
+    public Value call(String path, Value x) {
+      Path p = Sys.path(path, x.asString());
+      try {
+        return new ChrArr(new String(Files.readAllBytes(p), StandardCharsets.UTF_8));
+      } catch (IOException e) {
+        throw new ValueError(ln(null)+": Couldn't read file \""+p+"\"");
+      }
+    }
+    
+    public Value call(String path, Value w, Value x) {
+      Path p = Sys.path(path, w.asString());
+      try {
+        Files.write(p, x.asString().getBytes(StandardCharsets.UTF_8));
+        return w;
+      } catch (IOException e) {
+        throw new ValueError("Couldn't write to file \""+p+"\"");
+      }
+    }
+  }
+  private static class FBytes extends RelFn {
+    public String ln(FmtInfo f) { return "•FBytes"; }
+    
+    public Value call(String path, Value x) {
+      Path p = Sys.path(path, x.asString());
+      try {
+        byte[] bs = Files.readAllBytes(p);
+        char[] cs = new char[bs.length];
+        for (int i = 0; i < bs.length; i++) cs[i] = (char) (bs[i]&0xff);
+        return new ChrArr(cs);
+        // type=='c'
+      } catch (IOException e) {
+        throw new ValueError(ln(null)+": Couldn't read file \""+p+"\"");
+      }
+    }
+    
+    public Value call(String path, Value w, Value x) {
+      Path p = Sys.path(path, w.asString());
+      try {
+        byte[] xb = new byte[x.ia];
+        if (x.ia==0 || x.get(0) instanceof Num) {
+          int[] xi = x.asIntArr();
+          for (int i = 0; i < xi.length; i++) xb[i] = (byte)xi[i];
+        } else {
+          String xs = x.asString();
+          for (int i = 0; i < xs.length(); i++) {
+            char c = xs.charAt(i);
+            if (c>=256) throw new DomainError("•FBytes: Expected 𝕩 to consist of characters ≤@+255", this);
+            xb[i] = (byte) c;
           }
-          Files.write(p, b.get());
         }
-        if (type=='b') {
-          byte[] xb = new byte[x.ia];
-          if (x.ia==0 || x.get(0) instanceof Num) {
-            int[] xi = x.asIntArr();
-            for (int i = 0; i < xi.length; i++) xb[i] = (byte)xi[i];
-          } else {
-            String xs = x.asString();
-            for (int i = 0; i < xs.length(); i++) {
-              char c = xs.charAt(i);
-              if (c>=256) throw new DomainError("•FBytes: Expected 𝕩 to consist of characters ≤@+255", this);
-              xb[i] = (byte) c;
-            }
-          }
-          Files.write(p, xb);
-        }
-        if (type=='c') {
-          Files.write(p, x.asString().getBytes(StandardCharsets.UTF_8));
-        }
+        Files.write(p, xb);
         return w;
       } catch (IOException e) {
         throw new ValueError("Couldn't write to file \""+p+"\"");
@@ -889,6 +915,7 @@ public final class Scope {
   
   private static class Shell extends FnBuiltin {
     public String ln(FmtInfo f) { return "•SH"; }
+    public Shell() { Main.unsafe(this); }
     
     public Value call(Value x) {
       return exec(x, null, null, false);
@@ -969,17 +996,20 @@ public final class Scope {
   
   private static class Stdin extends FnBuiltin {
     public String ln(FmtInfo f) { return "•STDIN"; }
+  
+    private final Scope sc;
+    Stdin(Scope sc) { this.sc = sc; }
     
     public Value call(Value x) {
       if (x instanceof Num) {
         int n = x.asInt();
         ArrayList<Value> res = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) res.add(Main.toAPL(Main.console.nextLine()));
+        for (int i = 0; i < n; i++) res.add(new ChrArr(sc.sys.input()));
         return new HArr(res);
       }
       if (x.ia == 0) {
         ArrayList<Value> res = new ArrayList<>();
-        while (Main.console.hasNext()) res.add(Main.toAPL(Main.console.nextLine()));
+        while (sc.sys.hasInput()) res.add(new ChrArr(sc.sys.input()));
         return new HArr(res);
       }
       throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
@@ -1319,7 +1349,7 @@ public final class Scope {
             if (t==10) return DepthBuiltin.on(new Fun() {
               public String ln(FmtInfo f) { return "•DR"; }
               public Value call(Value x) {
-                return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, new int[]{64});
+                return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, Arr.vecsh(64));
               }
             }, 0, x, this);
             if (t==60) return DepthBuiltin.on(new Fun() {

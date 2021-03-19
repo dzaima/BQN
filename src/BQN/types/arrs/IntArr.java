@@ -11,11 +11,11 @@ public class IntArr extends Arr {
     this.arr = arr;
   }
   public IntArr(int[] arr) {
-    super(new int[]{arr.length}, arr.length);
+    super(vecsh(arr.length), arr.length);
     this.arr = arr;
   }
   public IntArr(byte[] arr) {
-    super(new int[]{arr.length}, arr.length);
+    super(vecsh(arr.length), arr.length);
     int[] a = new int[ia];
     for (int i = 0; i < ia; i++) a[i] = arr[i]&0xff;
     this.arr = a;

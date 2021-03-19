@@ -103,7 +103,7 @@ public class UpArrowBuiltin extends FnBuiltin {
         BitArr xb = (BitArr) x;
         long[] ls = new long[BitArr.sizeof(l)];
         System.arraycopy(xb.arr, 0, ls, 0, ls.length);
-        return new BitArr(ls, new int[]{l});
+        return new BitArr(ls, Arr.vecsh(l));
       }
       
       return MutVal.cut(x, s, l, new int[]{l});

@@ -25,7 +25,7 @@ public class EpsBuiltin extends FnBuiltin {
       }
       vs = x.values();
     } else {
-      res = new BitArr.BA(new int[]{x.shape[0]},true);
+      res = new BitArr.BA(Arr.vecsh(x.shape[0]),true);
       vs = CellBuiltin.cells(x);
     }
     HashSet<Value> seen = new HashSet<>();
