@@ -633,6 +633,7 @@ public class Comp {
       LineTok ln = (LineTok) lns.tokens.get(i);
       if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
         compE(mut, ln.tokens.get(0));
+        last = null;
       } else {
         typeof(ln); flags(ln);
         compO(mut, ln);
@@ -669,6 +670,7 @@ public class Comp {
         LineTok ln = (LineTok) b.lns.get(j);
         if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
           compE(mut, ln.tokens.get(0));
+          last = null;
         } else {
           typeof(ln); flags(ln);
           compO(mut, ln);
