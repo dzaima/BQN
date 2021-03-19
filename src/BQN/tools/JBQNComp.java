@@ -346,6 +346,30 @@ public class JBQNComp extends JBC {
             mstack = Math.max(mstack, cstack+3);
             break;
           }
+          case NSPM: {
+            int n0 = bc[i++];
+            int n1 = bc[i++];
+            fn.iconst(n0); fn.anewarray(Settable.class);
+            for (int j = 0; j < n0; j++) {
+                                 // .. v a
+              fn.dup_x1();       // .. a v a
+              fn.swap();         // .. a a v
+              fn.iconst(n0-j-1); // .. a a v n
+              fn.swap();         // .. a a n v
+              fn.aastore();      // .. a
+            }
+            fn.new_(SettableNS.class); //   a o
+            fn.dup_x1();               // o a o
+            fn.swap();                 // o o a
+            fn.aload(0);
+            fn.getfield(JFn.class, "vals", Value[].class);
+            fn.iconst(n1);
+            fn.aaload();
+            fn.invspec(SettableNS.class, "<init>", met(void.class, Settable[].class, Value.class));
+            mstack = Math.max(cstack+4, mstack);
+            cstack-= n0-1;
+            break;
+          }
           case CHKV: { Met.Lbl l = fn.lbl();
             fn.dup();
             fn.is(Nothing.class);
