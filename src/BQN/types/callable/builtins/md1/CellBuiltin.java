@@ -50,6 +50,7 @@ public class CellBuiltin extends Md1Builtin {
   
   public Value callInv(Value f, Value x) {
     if (x.r()==0) throw new DomainError("F˘⁼: argument had rank 0", this);
+    if (x.ia==0) throw new DomainError("F˘⁼: argument had 0 items", this);
     Value[] cells = cells(x);
     for (int i = 0; i < cells.length; i++) {
       Value c = f.callInv(cells[i]);

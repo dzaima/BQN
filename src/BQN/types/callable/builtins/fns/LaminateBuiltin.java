@@ -29,6 +29,7 @@ public class LaminateBuiltin extends FnBuiltin {
   }
   
   public Value callInvX(Value w, Value x) {
+    if (x.r()==0) throw new DomainError("≍⁼: 𝕩 cannot be a scalar", this);
     Value[] c = CellBuiltin.cells(x);
     if (c.length!=2) throw new DomainError("≍⁼: Expected 𝕩 to have 2 cells", this);
     if (!c[0].eq(w)) throw new DomainError("≍⁼: 𝕨 didn't match expected", this);
@@ -36,6 +37,7 @@ public class LaminateBuiltin extends FnBuiltin {
   }
   
   public Value callInvW(Value w, Value x) {
+    if (x.r()==0) throw new DomainError("≍⁼: 𝕨 cannot be a scalar", this);
     Value[] c = CellBuiltin.cells(w);
     if (c.length!=2) throw new DomainError("≍˜⁼: Expected 𝕨 to have 2 cells", this);
     if (!c[1].eq(x)) throw new DomainError("≍˜⁼: 𝕩 didn't match expected", this);

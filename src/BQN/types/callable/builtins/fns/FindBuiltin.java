@@ -56,14 +56,14 @@ public class FindBuiltin extends FnBuiltin {
         double[] xd = x.asDoubleArr();
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
-            if (wd[ia] != xd[ia + ir]) continue w;
+            if (wd[ia] != xd[ia+ir]) continue w;
           }
           res.set(ir);
         }
       } else {
         w: for (int ir = 0; ir < x.ia-w.ia+1; ir++) {
           for (int ia = 0; ia < w.ia; ia++) {
-            if (!w.get(ia).eq(x.get(ia + ir))) continue w;
+            if (!w.get(ia).eq(x.get(ia+ir))) continue w;
           }
           res.set(ir);
         }

@@ -24,19 +24,15 @@ public class Char extends Primitive {
     return new Char(c);
   }
   
+  public char asChar() { return chr; }
+  
+  
   
   public Char upper() { return Char.of(Character.toUpperCase(chr)); }
   public Char lower() { return Char.of(Character.toLowerCase(chr)); }
-  public Char swap() {
-    if (Character.isUpperCase(chr)) return lower();
-    if (Character.isLowerCase(chr)) return upper();
-    return this;
-  }
   public int getCase() {
     return Character.isUpperCase(chr)? 1 : Character.isLowerCase(chr)? -1 : 0;
   }
-  
-  
   
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
     return new ChrArr(String.valueOf(chr), sh);

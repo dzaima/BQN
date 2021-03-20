@@ -191,9 +191,13 @@ public class Tk2 {
             }
             res.add(new NumTok(r, li, i, neg? -v : v));
           } else { // no exponent, simple
-            if (numStart==i && neg) throw new SyntaxError("Standalone `¯`");
-            double v = Double.parseDouble(r.substring(numStart, i).replace("_", ""));
-            res.add(new NumTok(r, li, i, neg? -v : v));
+            String av = r.substring(numStart, i).replace("_", "");
+            try {
+              double v = Double.parseDouble(av);
+              res.add(new NumTok(r, li, i, neg? -v : v));
+            } catch (NumberFormatException e) {
+              err("Bad number", li, i);
+            }
           }
           break;
         

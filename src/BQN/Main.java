@@ -199,10 +199,10 @@ public class Main {
   }
   
   public static Value exec(String s, Scope sc, Value[] args) {
-    return Comp.comp(tokenize(s, args), sc).exec(sc);
+    return Comp.comp(tokenize(s, args), sc, false).exec(sc);
   }
   public static Comp.SingleComp comp(String s, Scope sc, Value[] args) {
-    return Comp.comp(tokenize(s, args), sc);
+    return Comp.comp(tokenize(s, args), sc, false);
   }
   // public static boolean newTk = true;
   public static BasicLines tokenize(String s, Value[] args) {

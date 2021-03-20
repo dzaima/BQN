@@ -1,7 +1,7 @@
 package BQN.types.callable.builtins.fns;
 
 import BQN.Main;
-import BQN.errors.DomainError;
+import BQN.errors.*;
 import BQN.tools.*;
 import BQN.types.*;
 import BQN.types.callable.builtins.FnBuiltin;
@@ -24,6 +24,10 @@ public class ReverseBuiltin extends FnBuiltin {
   
   
   public Value call(Value w, Value x) {
+    if (x.r()==0) {
+      if (w.ia==0) return x;
+      throw new RankError("⌽: atom 𝕩 is only allowed when ⟨⟩≡𝕨", this);
+    }
     if (w instanceof Primitive) return on(w.asInt(), x);
     int[] wi = w.asIntVec();
     if (wi.length > x.r()) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.formatAPL(x.shape))+" ≡ ≢𝕩, "+Main.formatAPL(wi)+" ≡ 𝕨)", this);

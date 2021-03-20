@@ -27,12 +27,16 @@ public class Pervasion { // implementations must be okay with not being called o
         int max = Math.max(w.ia, x.ia);
         int min = Math.min(w.ia, x.ia);
         if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")");
-        int ext = max/min;
-        Value[] n = new Value[max];
-        int r = 0;
-        if (we) for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = call(c, x.get(r)); r++; } }
-        else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = call(w.get(r), c); r++; } }
-        return Arr.create(n, we? x.shape : w.shape);
+        if (min>0) {
+          Value[] n = new Value[max];
+          int ext = max/min;
+          int r = 0;
+          if (we) for (int i = 0; i < min; i++) { Value c = w.get(i); for (int j = 0; j < ext; j++) { n[r] = call(c, x.get(r)); r++; } }
+          else    for (int i = 0; i < min; i++) { Value c = x.get(i); for (int j = 0; j < ext; j++) { n[r] = call(w.get(r), c); r++; } }
+          return Arr.create(n, we? x.shape : w.shape);
+        } else {
+          return we? x : w;
+        }
       }
     }
     

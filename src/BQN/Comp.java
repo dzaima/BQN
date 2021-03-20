@@ -332,7 +332,12 @@ public class Comp {
       }
       return (Value) s.peek();
     } catch (Throwable t) {
-      APLError e = t instanceof APLError? (APLError) t : new ImplementationError(t);
+      APLError e;
+      if (t instanceof APLError) e = (APLError) t;
+      else {
+        if (t instanceof OutOfMemoryError || t instanceof StackOverflowError) e = new SystemError(t instanceof StackOverflowError? "Stack overflow" : "Out of memory", t);
+        else e = new ImplementationError(t);
+      }
       Tokenable fn = body.gen!=null? null : ref[i];
       if (e.blame == null) {
         e.blame = fn!=null? fn : tk;
@@ -607,11 +612,11 @@ public class Comp {
     public Value exec(Scope sc) { return c.exec(sc, b); }
     public String fmt() { return c.fmt(); }
   }
-  public static SingleComp comp(TokArr lns, Scope sc) { // non-block
+  public static SingleComp comp(TokArr lns, Scope sc, boolean allowEmpty) { // non-block
     Mut mut = new Mut(null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
-    if (sz==0) throw new SyntaxError("Executing empty code");
+    if (!allowEmpty && sz==0) throw new SyntaxError("Executing empty code");
     for (int i = 0; i < sz; i++) {
       Token ln = lns.tokens.get(i); typeof(ln); flags(ln);
       compO(mut, ln);

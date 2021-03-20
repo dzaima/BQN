@@ -15,10 +15,12 @@ public class UDBuiltin extends FnBuiltin {
   }
   public static Value on(Value x, Callable blame) {
     if (x instanceof Primitive) {
+      int n = x.asInt();
+      if (n<0) throw new DomainError(blame+": negative argument", blame);
       if (x instanceof Num) {
-        return new IntArr(on(x.asInt()));
+        return new IntArr(on(n));
       } else if (x instanceof BigValue) {
-        Value[] res = new Value[x.asInt()];
+        Value[] res = new Value[n];
         for (int i = 0; i < res.length; i++) {
           res[i] = new BigValue(i);
         }
@@ -52,6 +54,9 @@ public class UDBuiltin extends FnBuiltin {
       return new HArr(res);
     } else { // •VI←0
       int[] sh = x.asIntArr();
+      for (int c : sh) {
+        if (c<0) throw new DomainError(blame+": didn't expect negative numbers in argument", blame);
+      }
       int ia = Arr.prod(sh);
       Value[] res = new Value[ia];
       int i = 0;

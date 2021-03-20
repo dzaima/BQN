@@ -20,6 +20,7 @@ public class SlashBuiltin extends FnBuiltin {
   }
   public static Value on(Value x, Callable blame) {
     int sum = (int) x.sum();
+    if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError(blame+": argument contained "+v, blame);
     if (x.r() == 1) {
       int[] sub = new int[sum];
       int p = 0;
@@ -30,7 +31,6 @@ public class SlashBuiltin extends FnBuiltin {
           if (xr.read()) sub[p++] = i;
         }
       } else {
-        if (sum<0) for (Value v : x) if (v.asDouble() < 0) throw new DomainError(blame+": argument contained "+v, blame);
         int[] xi = x.asIntArr();
         for (int i = 0; i < x.ia; i++) {
           int v = xi[i];
@@ -84,9 +84,14 @@ public class SlashBuiltin extends FnBuiltin {
     for (int i = 0; i < sh.length; i++) { sh[i]+= 1; ia*= sh[i]; }
     int[] arr = new int[ia];
     if (x.quickDoubleArr()) {
-      for (int c : x.asIntArr()) arr[c]++;
+      for (int c : x.asIntArr()) {
+        if (c<0) throw new DomainError("/⁼: 𝕩 contained a negative number", this);
+        arr[c]++;
+      }
     } else {
-      for (Value v : x) arr[Indexer.fromShape(sh, v.asIntVec())]++;
+      for (Value v : x) {
+        arr[Indexer.fromShapeChk(sh, v.asIntVec(), this)]++;
+      }
     }
     return new IntArr(arr, sh);
   }
@@ -316,8 +321,14 @@ public class SlashBuiltin extends FnBuiltin {
     System.arraycopy(x.shape, am.length, rsh, am.length, x.r()-am.length);
     for (int i = 0; i < am.length; i++) {
       int s = 0;
-      if (am[i].length == 1) s = am[i][0]*x.shape[i];
-      else for (int k : am[i]) s+= k;
+      if (am[i].length == 1) {
+        int k = am[i][0];
+        if (k<0) throw new DomainError(blame+": didn't expect negative number", blame);
+        s = k*x.shape[i];
+      } else for (int k : am[i]) {
+        if (k<0) throw new DomainError(blame+": didn't expect negative number", blame);
+        s+= k;
+      }
       rsh[i] = s;
     }
     

@@ -55,9 +55,9 @@ public class StileBuiltin extends FnBuiltin {
     public void on(double[] w, double   x, double[] res) { for(int i=0; i<w.length; i++) { double cw=w[i],cx=x   ,r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r; } }
     public void on(double[] w, double[] x, double[] res) { for(int i=0; i<w.length; i++) { double cw=w[i],cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r; } }
     
-    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
-    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ,r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
-    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i],r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
+    public int[] on(int   w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w   ,cx=x[i];if(cw==-cw)return null;int r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
+    public int[] on(int[] w, int   x) {int[]res=new int[w.length];for(int i=0;i<w.length;i++) {int cw=w[i],cx=x   ;if(cw==-cw)return null;int r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
+    public int[] on(int[] w, int[] x) {int[]res=new int[x.length];for(int i=0;i<x.length;i++) {int cw=w[i],cx=x[i];if(cw==-cw)return null;int r=cx%cw;if (r!=0 & (cw>=0^cx>=0))r+= cw; res[i]=r;}return res;}
   };
   public Value call(Value w, Value x) {
     return DF.call(w, x);

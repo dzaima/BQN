@@ -90,8 +90,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     if (sh.length != pos.length) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
     int x = 0;
     for (int i = 0; i < sh.length; i++) {
-      x+= pos[i];
-      if (pos[i]<0 || pos[i]>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
+      int c = pos[i];
+      x+= c;
+      if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
     }
     return x;
@@ -103,7 +104,6 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     int[] ds = pos.asIntArr();
     for (int i = 0; i < sh.length; i++) {
       int c = ds[i];
-      c-= 0;
       x+= c;
       if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
@@ -121,7 +121,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   }
   
   // checks for rank & bound errors
-  // •VI←1 and sh.length≡1 allows for a shortcut of items (1 2 3 ←→ ⊂1 2 3)
+  // •VI←1 and sh.length≡1 allows for a shortcut of items (1 2 3 ←→ <1 2 3)
   public static PosSh poss(Value v, int[] ish, Callable blame) {
     // if (v instanceof Primitive) return new PosSh(new int[]{v.asInt()}, Rank0Arr.SHAPE);
     if (Main.vind) { // •VI←1

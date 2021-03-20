@@ -136,7 +136,7 @@ public abstract class Sys {
         System.out.println(nt.toRepr());
         break;
       case "NEV":
-        System.out.println(Comp.comp(new Tk2(rest, defArgs).tkBlock(), csc).exec(csc));
+          System.out.println(Comp.comp(new Tk2(rest, defArgs).tkBlock(), csc, false).exec(csc));
         break;
       default:
         throw new SyntaxError("Undefined user command");
@@ -175,7 +175,7 @@ public abstract class Sys {
     if (s.startsWith(")")) {
       ucmd(s.substring(1));
     } else {
-      Comp.SingleComp comp = Main.comp(s, csc, defArgs);
+      Comp.SingleComp comp = Comp.comp(Main.tokenize(s, defArgs), csc, true);
       if (comp.c.bc.length==0) return;
       int ci = 0;
       while (true) {

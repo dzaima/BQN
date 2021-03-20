@@ -94,6 +94,7 @@ public class LBoxBuiltin extends FnBuiltin {
       return res.get();
     } else {
       if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this);
+      if (xr<w.ia) throw new RankError("⊏: =𝕩 can't be greater than ≠𝕨", this);
       
       int shl = 0;
       Value[] av = w.values();

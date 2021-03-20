@@ -38,9 +38,6 @@ public class SingleItemArr extends Arr {
     return Main.repeat(String.valueOf(c), ia);
   }
   
-  public Value fItem() {
-    return item.fMineS();
-  }
   public Value fItemS() {
     return item.fMineS();
   }
