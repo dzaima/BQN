@@ -191,6 +191,7 @@ public class Tk2 {
             }
             res.add(new NumTok(r, li, i, neg? -v : v));
           } else { // no exponent, simple
+            if (numStart==i && neg) throw new SyntaxError("Standalone `¯`");
             double v = Double.parseDouble(r.substring(numStart, i).replace("_", ""));
             res.add(new NumTok(r, li, i, neg? -v : v));
           }
@@ -264,6 +265,7 @@ public class Tk2 {
       }
     }
     if (hasStrands) {
+      if (res.size()==1) throw new SyntaxError("Standalone `‿`");
       ArrayList<Token> stranded = new ArrayList<>(res.size()-2);
       int done = 0;
       for (int ss = 0; ss < res.size(); ss++) {

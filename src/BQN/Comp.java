@@ -611,6 +611,7 @@ public class Comp {
     Mut mut = new Mut(null);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
+    if (sz==0) throw new SyntaxError("Executing empty code");
     for (int i = 0; i < sz; i++) {
       Token ln = lns.tokens.get(i); typeof(ln); flags(ln);
       compO(mut, ln);
@@ -627,6 +628,7 @@ public class Comp {
     Body b = new Body(new ArrayList<>(lns.tokens), 'a', false);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
+    if (sz==0) throw new SyntaxError("Executing empty code");
     LineTok last = null;
     for (int i = 0; i < sz; i++) {
       if (last!=null) mut.add(POPS);
@@ -664,6 +666,7 @@ public class Comp {
       mut.newBody(tk.defNames());
       b.addHeader(mut);
       int sz = b.lns.size();
+      if (sz==0) throw new SyntaxError("Executing empty code");
       LineTok last = null;
       for (int j = 0; j < sz; j++) {
         if (last!=null) mut.add(POPS);
@@ -1063,13 +1066,11 @@ public class Comp {
       
       if (isE(tps, ".!|af↩a", 5, last)) { //tps.sz>=4+i && isArr(lType) && tps.getL(1).type=='↩' && tps.getL(2).type=='f' && isArr(tps.getL(3).type) 
         if (Main.debug) printlvl("af↩a");
-        tps.addLast(new ResMix('a',
-          tps.removeLast(),
-          tps.removeLast(),
-          tps.removeLast(), // empty
-          tps.removeLast().mut(false, false),
-          new ResBC(SETM)
-        ));
+        Res val = tps.removeLast();
+                  tps.removeLast(); // ↩
+        Res fn  = tps.removeLast();
+        Res mut = tps.removeLast().mut(false, false);
+        tps.addLast(new ResMix('a', val, fn, mut, new ResBC(SETM) ));
         continue;
       }
       set: if (tps.size() >= (last? 3 : 4)) {
@@ -1084,11 +1085,13 @@ public class Comp {
           k = norm(k); // 𝕨↩ is a possibility
           if (k==v) {
             if (Main.debug) printlvl(k+" "+a+" "+v);
+            Res val = tps.removeLast();
+                      tps.removeLast(); // ↩/←/⇐
+            Res mut = tps.removeLast().mut(a!='↩', a=='⇐');
             tps.addLast(new ResMix(v,
-              tps.removeLast(),
+              val,
               new ResChk(ov=='A'),
-              tps.removeLast(), // empty
-              tps.removeLast().mut(a!='↩', a=='⇐'),
+              mut,
               new ResBC(a=='↩'? SETU : SETN)
             ));
             continue;
@@ -1408,8 +1411,8 @@ public class Comp {
       m.add(tk, ARRO); m.add(tks.size());
       return;
     }
-    if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok) { // TODO should this be here?
-      return;
+    if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok || tk instanceof StranderTok || tk instanceof ColonTok || tk instanceof SemiTok || tk instanceof DotTok) {
+      throw new SyntaxError("Standalone `"+tk.source()+"`");
     }
     if (tk instanceof BlockTok) {
       m.push((BlockTok) tk);
