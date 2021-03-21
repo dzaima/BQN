@@ -83,6 +83,7 @@ public class GroupBuiltin extends FnBuiltin {
       if (w.ia != x.shape[0]) {
         if (w.ia != x.shape[0]+1) throw new LengthError("⊔: length of 𝕨 must be one of 0‿1+⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
         max = wi[wi.length-1];
+        if (max<-1) throw new DomainError("⊔: didn't expect "+max+" in 𝕨", this);
         wp = new int[][]{Arrays.copyOf(wi, w.ia-1)};
         for (int c : wp[0]) if (c >= max) throw new LengthError("⊔: tail element of 𝕨 must be the biggest", this);
       } else wp = new int[][]{wi};

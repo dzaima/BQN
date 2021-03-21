@@ -57,7 +57,12 @@ public class UDBuiltin extends FnBuiltin {
       for (int c : sh) {
         if (c<0) throw new DomainError(blame+": didn't expect negative numbers in argument", blame);
       }
-      int ia = Arr.prod(sh);
+      long iat = 1;
+      for (int c : sh) {
+        iat*= c;
+        if (iat>Integer.MAX_VALUE) throw new DomainError(blame+": argument too large", blame);
+      }
+      int ia = (int)iat;
       Value[] res = new Value[ia];
       int i = 0;
       for (int[] c : new Indexer(sh)) {
