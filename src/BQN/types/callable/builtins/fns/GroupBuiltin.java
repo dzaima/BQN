@@ -66,7 +66,7 @@ public class GroupBuiltin extends FnBuiltin {
     if (depth <= 1) {
       wsz = 1;
       if (w.r() != 1) {
-        if (!Arr.eqPrefix(w.shape, x.shape, w.r())) throw new RankError("⊔: shape of depth 1 rank "+w.r()+" 𝕨 must be a prefix of 𝕩 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)");
+        if (x.shape.length<w.r() || !Arr.eqPrefix(w.shape, x.shape, w.r())) throw new RankError("⊔: shape of depth 1 rank "+w.r()+" 𝕨 must be a prefix of 𝕩 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)");
         int[] xsh;
         if (w.r()==0) {
           xsh = new int[x.r()+1]; System.arraycopy(x.shape, 0, xsh, 1, x.r());

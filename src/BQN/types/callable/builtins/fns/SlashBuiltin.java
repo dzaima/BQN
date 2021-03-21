@@ -32,7 +32,8 @@ public class SlashBuiltin extends FnBuiltin {
         }
       } else {
         int[] xi = x.asIntArr();
-        for (int i = 0; i < x.ia; i++) {
+        for (int c : xi) if (c<0) throw new DomainError(blame+": argument contained "+c, blame);
+        for (int i = 0; i < xi.length; i++) {
           int v = xi[i];
           if (v < 0) throw new DomainError(blame+": argument contained "+v, blame);
           for (int j = 0; j < v; j++) {
@@ -43,6 +44,7 @@ public class SlashBuiltin extends FnBuiltin {
       return new IntArr(sub);
     } else {
       int[] xi = x.asIntArr();
+      for (int c : xi) if (c<0) throw new DomainError(blame+": argument contained "+c, blame);
       if (Main.vind) { // •VI←1
         int[][] res = new int[x.r()][sum];
         int ri = 0;
