@@ -23,7 +23,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     rank = sh.length;
     this.offsets = offsets;
     c = Arrays.copyOf(offsets, sh.length);
-    int tia = 1; for (int i : sh) tia*= i; ia = tia;
+    long tia = 1;
+    for (int i : sh) { tia*= i; if (tia<0) throw new DomainError("Array shape too big"); }
+    ia = (int)tia;
   }
   public Indexer(int[] sh) {
     shape = sh;
@@ -31,7 +33,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     c = new int[sh.length];
     if (sh.length < zeroOffsets.length) offsets = zeroOffsets;
     else zeroOffsets = this.offsets = new int[sh.length];
-    int tia = 1; for (int i : sh) tia*= i; ia = tia;
+    long tia = 1;
+    for (int i : sh) { tia*= i; if (tia>Integer.MAX_VALUE) throw new DomainError("Array shape too big"); }
+    ia = (int)tia;
   }
   
   public int pos() {

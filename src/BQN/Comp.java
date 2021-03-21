@@ -1089,6 +1089,7 @@ public class Comp {
           v = norm(v);
           k = norm(k); // 𝕨↩ is a possibility
           if (k==v) {
+            if (k!='a'&k!='A'&k!='f'&k!='m'&k!='d') throw new SyntaxError("Cannot assign", ((ResTk) tps.getL(1)).tk);
             if (Main.debug) printlvl(k+" "+a+" "+v);
             Res val = tps.removeLast();
                       tps.removeLast(); // ↩/←/⇐
@@ -1235,7 +1236,7 @@ public class Comp {
     }
     throw new SyntaxError("Cannot export "+tk, tk);
   }
-  public static void  compM(Mut m, Token tk, boolean create, boolean header) {
+  public static void compM(Mut m, Token tk, boolean create, boolean header) {
     assert tk.type != 0;
     if (tk instanceof NameTok) {
       String name = ((NameTok) tk).name;

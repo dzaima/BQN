@@ -53,7 +53,7 @@ public class Tk2 {
     ArrayList<Token> lns = new ArrayList<>();
     while (true) {
       TkRes<Token> ct = tkLine(i);
-      if (!ct.ct.isEmpty()) lns.add(new LineTok(r, i, ct.e+1, ct.ct));
+      if (!ct.ct.isEmpty()) lns.add(new LineTok(r, i, ct.e, ct.ct));
       i = ct.e;
       if (i>=r.length()) break;
       char c = r.charAt(i);
