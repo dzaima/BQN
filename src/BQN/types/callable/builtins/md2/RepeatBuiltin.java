@@ -13,6 +13,14 @@ public class RepeatBuiltin extends Md2Builtin {
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value gf = g.call(x);
     
+    if (gf instanceof Num) {
+      int l = gf.asInt();
+      Value c = x;
+      if (l>0) for (int i = 0; i <  l; i++) c = f.call(c);
+      else     for (int i = 0; i < -l; i++) c = f.callInv(c);
+      return c;
+    }
+    
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
     Value nx = x; Value[] neg = new Value[bs[0]]; for (int i = 0; i < bs[0]; i++) neg[i] = nx = f.callInv(nx);
@@ -24,18 +32,21 @@ public class RepeatBuiltin extends Md2Builtin {
     if (g instanceof Fun) throw new DomainError("(f⌾g)A cannot be inverted", this);
     
     int am = g.asInt();
-    if (am < 0) {
-      for (int i = 0; i < -am; i++) {
-        x = f.call(x);
-      }
-    } else for (int i = 0; i < am; i++) {
-      x = f.callInv(x);
-    }
+    if (am < 0) for (int i = 0; i < -am; i++) x = f.call   (x);
+    else        for (int i = 0; i <  am; i++) x = f.callInv(x);
     return x;
   }
   
   public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value gf = g.call(w, x);
+  
+    if (gf instanceof Num) {
+      int l = gf.asInt();
+      Value c = x;
+      if (l>0) for (int i = 0; i <  l; i++) c = f.call    (w, c);
+      else     for (int i = 0; i < -l; i++) c = f.callInvX(w, c);
+      return c;
+    }
     
     int[] bs = new int[2]; bounds(bs, gf); bs[0]*=-1; // min, max
     
@@ -46,13 +57,8 @@ public class RepeatBuiltin extends Md2Builtin {
   
   public Value callInvX(Value f, Value g, Value w, Value x) {
     int am = g.asInt();
-    if (am < 0) {
-      for (int i = 0; i < -am; i++) {
-        x = f.call(w, x);
-      }
-    } else for (int i = 0; i < am; i++) {
-      x = f.callInvX(w, x);
-    }
+    if (am < 0) for (int i = 0; i < -am; i++) x = f.call    (w, x);
+    else        for (int i = 0; i <  am; i++) x = f.callInvX(w, x);
     return x;
   }
   
