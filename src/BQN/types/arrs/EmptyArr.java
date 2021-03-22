@@ -28,7 +28,7 @@ public class EmptyArr extends Arr {
   
   
   public String asString() {
-    if (r() >= 2) throw new DomainError("Using rank≥2 array as char vector");
+    if (r() > 1) throw new DomainError("Using rank "+r()+" array as char vector");
     return "";
   }
   

@@ -32,7 +32,7 @@ public class SingleItemArr extends Arr {
   
   
   public String asString() {
-    if (r() >= 2) throw new DomainError("Using rank≥2 array as string");
+    if (r() > 1) throw new DomainError("Using rank "+r()+" array as string");
     if (!(item instanceof Char)) throw new DomainError("Using non-char array as string");
     char c = ((Char) item).chr;
     return Main.repeat(String.valueOf(c), ia);

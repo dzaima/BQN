@@ -373,29 +373,30 @@ public class SlashBuiltin extends FnBuiltin {
     Value v = o instanceof Fun? o.call(call) : o;
     int depth = MatchBuiltin.full(w);
     if (depth!=1) {
-      if (depth>1) throw new NYIError("⌾/: 𝕨 of / must be a boolean vector", this);
+      if (depth>1) throw new NYIError("𝔽⌾(b⊸/): 𝕨 of / must be a boolean vector", this);
       int wi = w.asInt();
-      if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⥊: Expected F to not change its arguments shape", this);
+      if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("𝔽⌾(b⊸/): Expected F to not change its arguments shape", this);
       if (wi==0) return x;
       Value[] vs = new Value[x.ia];
       for (int i = 0; i < x.ia; i++) vs[i] = v.get(i*wi);
       Value r = new HArr(vs);
-      if (!replicate(w, r, this).eq(v)) throw new DomainError("F⌾/: Result of F not invertible", this);
+      if (!replicate(w, r, this).eq(v)) throw new DomainError("𝔽⌾(b⊸/): Result of F not invertible", this);
       return r;
     }
     int[] sh;
     if (w.r() > 1) {
-      if (!Main.vind) throw new DomainError("⌾/: 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);
-      if (w.r() != x.r()) throw new DomainError("⌾/: if 1<=𝕨 then 𝕨 and 𝕩 must have equal ranks ("+w.r()+" vs "+x.r()+")", this);
-      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError("⌾/: if 1<=𝕨 then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+      if (!Main.vind) throw new DomainError("𝔽⌾(b⊸/): 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);
+      if (w.r() != x.r()) throw new DomainError("𝔽⌾(b⊸/): if `1 < =b` then b and 𝕩 must have equal ranks ("+w.r()+" vs "+x.r()+")", this);
+      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError("⌾/: if `1 < =b` then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
       sh = w.shape;
       int[] fsh = {w.ia};
       w = w.ofShape(fsh);
       x = x.ofShape(fsh);
     } else sh = w.shape;
-    if (w.r()!=1 || x.r()!=1) throw new DomainError("⌾/: dyadic inverting only possible on rank 1 arguments", this);
+    if (w.r()!=1 | x.r()!=1) throw new DomainError("𝔽⌾(b⊸/): dyadic inverting only possible on rank 1 arguments", this);
+    if (v.r()!=1) throw new DomainError("𝔽⌾(b⊸/): expected 𝔽 to not change rank", this);
     double asum = w.sum();
-    if (asum != v.ia) throw new LengthError("𝕗⌾/: expected 𝕗 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this);
+    if (asum != v.ia) throw new LengthError("𝔽⌾(b⊸/): expected 𝔽 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this);
     int ipos = 0;
     int[] wi = w.asIntArr();
     
@@ -405,7 +406,7 @@ public class SlashBuiltin extends FnBuiltin {
       int[] res = new int[x.ia];
       for (int i = 0; i < wi.length; i++) {
         int d = wi[i];
-        if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d), this);
+        if (d!=0 && d!=1) throw new DomainError("𝔽⌾(b⊸/): `b` must be a boolean vector, contained "+Num.fmt(d), this);
         if (d == 1) res[i] = vi[ipos++];
         else res[i] = xi[i];
       }
@@ -414,7 +415,7 @@ public class SlashBuiltin extends FnBuiltin {
     Value[] res = new Value[x.ia];
     for (int i = 0; i < wi.length; i++) {
       int d = wi[i];
-      if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d), this);
+      if (d!=0 && d!=1) throw new DomainError("𝔽⌾(b⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d), this);
       if (d == 1) res[i] = v.get(ipos++);
       else res[i] = x.get(i);
     }

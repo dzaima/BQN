@@ -36,6 +36,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public /*open*/ int asInt() { throw new DomainError("Using "+humanType(true)+" as integer"); }
   public /*open*/ char asChar() { throw new DomainError("Using "+humanType(true)+" as character"); }
   public /*open*/ String asString() {
+    if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string");
     char[] cs = new char[ia];
     for (int i = 0; i < ia; i++) cs[i] = get(i).asChar();
     return new String(cs);

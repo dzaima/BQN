@@ -48,6 +48,7 @@ public class HArr extends Arr {
   
   
   public String asString() {
+    if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string");
     StringBuilder r = new StringBuilder(ia);
     for (Value v : arr) {
       if (!(v instanceof Char)) throw new DomainError("Using array containing "+v.humanType(true)+" as string");
