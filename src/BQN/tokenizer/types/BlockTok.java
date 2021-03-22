@@ -19,6 +19,7 @@ public class BlockTok extends TokArr {
   public final Body[] bdMxi;
   public final Body[] bdDxi;
   public final Body[] bdDwi;
+  public final Body singleBody;
   
   public BlockTok(String line, int spos, int epos, ArrayList<Token> tokens) {
     super(line, spos, epos, tokens);
@@ -90,12 +91,16 @@ public class BlockTok extends TokArr {
     }
     this.allBodies = bodies;
     
+    if (bodies.size()==1) singleBody = bodies.get(0);
+    else singleBody = null;
+    
     ArrayList<Body> db   = new ArrayList<>(); ArrayList<Body> mb   = new ArrayList<>();
     ArrayList<Body> dbxi = new ArrayList<>(); ArrayList<Body> mbxi = new ArrayList<>();
     ArrayList<Body> dbwi = new ArrayList<>();
     for (Body c : bodies) {
       if (c.arity!='m') (c.inverse==0? db : c.inverse==1? dbxi : dbwi).add(c);
       if (c.arity!='d') (c.inverse==0? mb :               mbxi       ).add(c);
+      if (c.arity=='\0') c.arity = 'a';
     }
     bdD   = db  .toArray(new Body[0]); bdM   = mb  .toArray(new Body[0]);
     bdDxi = dbxi.toArray(new Body[0]); bdMxi = mbxi.toArray(new Body[0]);
@@ -112,6 +117,7 @@ public class BlockTok extends TokArr {
     assert pointless;
     immediate = false;
     bdM=bdD = bdMxi=bdDxi = bdDwi = null;
+    singleBody = null;
   }
   
   
@@ -122,6 +128,7 @@ public class BlockTok extends TokArr {
     bdM = mb;
     bdD = db;
     bdMxi=bdDxi = bdDwi = new Body[0];
+    singleBody = null;
   }
   
   public static boolean funType(Token t, BlockTok dt) { // returns if can be immediate, mutates dt's type
@@ -219,14 +226,25 @@ public class BlockTok extends TokArr {
   public Value exec(Scope psc, Value w, Value[] vb, int inv) {
     Scope sc = new Scope(psc, "sure");
     boolean dy = w != null;
-    for (Body b : inv==0? (dy? bdD : bdM) : inv==1? (dy? bdDxi : bdMxi) : bdDwi) {
-      sc.varNames = b.vars; // no cloning is suuuuurely fiiine
-      sc.vars = new Value[b.vars.length]; // TODO decide some nicer way than just creating a new array per header
-      System.arraycopy(vb, 0, sc.vars, 0, vb.length);
-      sc.varAm = b.vars.length;
-      Value res = comp.exec(sc, b);
-      if (res != null) return res;
-      sc.removeMap();
+    Body b0 = this.singleBody;
+    if (b0!=null) {
+      if (b0.inverse==inv & (b0.arity=='a' | (b0.arity=='d')==dy)) {
+        sc.varNames = b0.vars;
+        sc.vars = Arrays.copyOf(vb, b0.vars.length);
+        
+        sc.varAm = b0.vars.length;
+        Value res = comp.exec(sc, b0);
+        if (res != null) return res;
+      }
+    } else {
+      for (Body b : inv==0? (dy? bdD : bdM) : inv==1? (dy? bdDxi : bdMxi) : bdDwi) {
+        sc.varNames = b.vars; // no cloning is suuuuurely fiiine
+        sc.vars = Arrays.copyOf(vb, b.vars.length); // TODO decide some nicer way than just creating a new array per header
+        sc.varAm = b.vars.length;
+        Value res = comp.exec(sc, b);
+        if (res != null) return res;
+        sc.removeMap();
+      }
     }
     throw new DomainError("No header matched", this);
   }
