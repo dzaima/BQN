@@ -2,7 +2,7 @@ package BQN.errors;
 
 import BQN.types.Tokenable;
 
-public class NYIError extends APLError { // AKA LazyError
+public class NYIError extends BQNError { // AKA LazyError
   public NYIError(String s) {
     super(s);
   }

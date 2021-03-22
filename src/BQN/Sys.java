@@ -17,7 +17,7 @@ public abstract class Sys {
   public Scope gsc; // global/top-level scope
   public Scope csc; // current scope in which things happen
   public boolean ln;
-  public APLError lastError = null;
+  public BQNError lastError = null;
   public Value[] defArgs;
   public String cd;
   public FmtInfo fi = new FmtInfo(14, 10, 10);
@@ -96,7 +96,7 @@ public abstract class Sys {
           for (char c : rest.toCharArray()) if (c>'9' || c<'0') { num = false; break; }
           if (num) {
             if (lastError == null) { println("no stack to )cs to"); break; }
-            ArrayList<APLError.Frame> trace = lastError.trace;
+            ArrayList<BQNError.Frame> trace = lastError.trace;
             csc = trace.get(trace.size()-Integer.parseInt(rest)).sc;
           } else {
             Value v = Main.exec(rest, csc, defArgs);
@@ -197,7 +197,7 @@ public abstract class Sys {
     } catch (Throwable t) { report(t); }
   }
   public void report(Throwable t) {
-    APLError err = lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
+    BQNError err = lastError = t instanceof BQNError? (BQNError) t : new ImplementationError(t);
     err.print(this);
   }
   

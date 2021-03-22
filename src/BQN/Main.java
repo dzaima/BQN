@@ -117,7 +117,7 @@ public class Main {
             throw new DomainError("Unknown command-line argument "+p);
           }
         }
-      } catch (APLError e) {
+      } catch (BQNError e) {
         e.print(sys);
         System.out.println("Stack:");
         e.stack(sys);

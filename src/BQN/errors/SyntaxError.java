@@ -2,7 +2,7 @@ package BQN.errors;
 
 import BQN.types.Tokenable;
 
-public class SyntaxError extends APLError {
+public class SyntaxError extends BQNError {
   public SyntaxError(String s) {
     super(s);
   }

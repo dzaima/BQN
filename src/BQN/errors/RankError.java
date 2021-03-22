@@ -2,7 +2,7 @@ package BQN.errors;
 
 import BQN.types.Tokenable;
 
-public class RankError extends APLError {
+public class RankError extends BQNError {
   public RankError(String s) {
     super(s);
   }

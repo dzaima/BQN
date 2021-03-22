@@ -2,7 +2,7 @@ package BQN.errors;
 
 import BQN.types.Tokenable;
 
-public class DomainError extends APLError {
+public class DomainError extends BQNError {
   public DomainError(String s) {
     super(s);
   }

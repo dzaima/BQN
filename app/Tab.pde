@@ -166,7 +166,7 @@ static class REPL extends Tab {
                   a.saveStrings(arg, new String[]{t});
                   if (ex) try {
                     it.exec(ta.allText());
-                  } catch (APLError e) {
+                  } catch (BQNError e) {
                     e.print(((DzaimaBQN)it).sys);
                   }
                   //if (ex) Main.exec(ta.allText(), ((DzaimaBQN) it).sys.gsc);
@@ -199,7 +199,7 @@ static class REPL extends Tab {
         String[] res = it.repl(line);
         for (String ln : res) textln(ln);
       } catch (Throwable t) {
-        APLError e = t instanceof APLError? (APLError)t : new ImplementationError(t);
+        BQNError e = t instanceof BQNError? (BQNError)t : new ImplementationError(t);
         e.print(((DzaimaBQN)it).sys);
       }
     }

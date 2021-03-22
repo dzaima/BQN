@@ -2,7 +2,7 @@ package BQN.errors;
 
 import BQN.types.Tokenable;
 
-public class ImplementationError extends APLError {
+public class ImplementationError extends BQNError {
   public ImplementationError(String s) {
     super(s);
   }

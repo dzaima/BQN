@@ -6,21 +6,21 @@ import BQN.types.*;
 
 import java.util.*;
 
-public abstract class APLError extends RuntimeException {
+public abstract class BQNError extends RuntimeException {
   public Tokenable blame;
   public Tokenable obj;
   public ArrayList<Frame> trace = new ArrayList<>();
   
   
-  protected APLError(String msg) {
+  protected BQNError(String msg) {
     super(msg);
   }
-  protected APLError(String msg, Tokenable blame) {
+  protected BQNError(String msg, Tokenable blame) {
     super(msg);
     if (blame instanceof Callable) this.blame = blame;
     else this.obj = blame;
   }
-  protected APLError(String msg, Tokenable blame, Tokenable obj) {
+  protected BQNError(String msg, Tokenable blame, Tokenable obj) {
     super(msg);
     this.blame = blame;
     this.obj = obj;
@@ -75,7 +75,7 @@ public abstract class APLError extends RuntimeException {
     for (int i = 0; i < trace.size(); i++) {
       sys.println((trace.size()-i) + ":");
       Frame f = trace.get(i);
-      APLError.println(f.msgs, sys);
+      BQNError.println(f.msgs, sys);
       boolean bc = true;
       for (Mg c : f.msgs) {
         //noinspection StringEquality

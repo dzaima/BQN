@@ -337,8 +337,8 @@ public class Comp {
       }
       return (Value) s.peek();
     } catch (Throwable t) {
-      APLError e;
-      if (t instanceof APLError) e = (APLError) t;
+      BQNError e;
+      if (t instanceof BQNError) e = (BQNError) t;
       else {
         if (t instanceof OutOfMemoryError || t instanceof StackOverflowError) e = new SystemError(t instanceof StackOverflowError? "Stack overflow" : "Out of memory", t);
         else e = new ImplementationError(t);
@@ -347,10 +347,10 @@ public class Comp {
       if (e.blame == null) {
         e.blame = fn!=null? fn : tk;
       }
-      ArrayList<APLError.Mg> mgs = new ArrayList<>();
-      APLError.Mg.add(mgs, tk, '¯');
-      APLError.Mg.add(mgs, fn, '^');
-      e.trace.add(new APLError.Frame(sc, mgs, this, body.start));
+      ArrayList<BQNError.Mg> mgs = new ArrayList<>();
+      BQNError.Mg.add(mgs, tk, '¯');
+      BQNError.Mg.add(mgs, fn, '^');
+      e.trace.add(new BQNError.Frame(sc, mgs, this, body.start));
       throw e;
     }
   }

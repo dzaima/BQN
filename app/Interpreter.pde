@@ -141,7 +141,7 @@ static class DzaimaBQN extends Interpreter {
       Obj v = Main.exec(code, dzaimaSC, sys.defArgs);
       if (v == null) return new String[0];
       return v.toString().split("\n");
-    } catch (APLError e) {
+    } catch (BQNError e) {
       e.print(sys);
       return new String[0];
     } catch (Throwable e) {
@@ -154,7 +154,7 @@ static class DzaimaBQN extends Interpreter {
       //}
       //e.printStackTrace();
       //return lns.toArray(new String[0]);
-      APLError ae = e instanceof APLError? (APLError)e : new ImplementationError(e);
+      BQNError ae = e instanceof BQNError? (BQNError)e : new ImplementationError(e);
       ae.print(sys);
       return new String[0];
     }
@@ -181,7 +181,7 @@ static class Ed extends Editor {
       sc.set(name, Main.exec(val, sc, sc.sys.defArgs));
     } catch (Throwable t) {
       println(t.getMessage());
-      glSys.lastError = t instanceof APLError? (APLError) t : new ImplementationError(t);
+      glSys.lastError = t instanceof BQNError? (BQNError) t : new ImplementationError(t);
     }
   }
 }
