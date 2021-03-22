@@ -159,8 +159,8 @@ public abstract class Sys {
   public Value execFile(Path path, Value args, Scope sc) {
     String[] spl = split(path);
     Value[] rargs = new Value[]{
-      Main.toAPL(spl[0]), // path
-      Main.toAPL(spl[1]), // name
+      new ChrArr(spl[0]), // path
+      new ChrArr(spl[1]), // name
       args,               // args
     };
     String code = Main.readFile(path);

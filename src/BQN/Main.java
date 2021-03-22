@@ -64,7 +64,7 @@ public class Main {
                   case 'f':
                     String name = args[++i]; i++;
                     Value[] gargs = new Value[args.length-i];
-                    for (int j = 0; j < gargs.length; j++) gargs[j] = Main.toAPL(args[i+j]);
+                    for (int j = 0; j < gargs.length; j++) gargs[j] = new ChrArr(args[i+j]);
                     sys.execFile(Sys.path(sys.cd, name), new HArr(gargs), sys.gsc);
                     i = args.length;
                     break;
@@ -235,11 +235,6 @@ public class Main {
       if (num == 0) return false;
     }
     throw new DomainError("Expected boolean, got "+v);
-  }
-  
-  
-  public static ChrArr toAPL(String s) { // TODO remove
-    return new ChrArr(s);
   }
   
   

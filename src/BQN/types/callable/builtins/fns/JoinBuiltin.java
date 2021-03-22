@@ -34,7 +34,7 @@ public class JoinBuiltin extends FnBuiltin {
       if (ir!=v.r()) throw new RankError("∾: expected all items to have equal rank", this);
     }
     if (ir < or) throw new RankError("∾: rank of items must be at least the total rank", this);
-  
+    
     int[] fsh = new int[ir];
     System.arraycopy(sh0, or, fsh, or, ir-or);
     
@@ -98,7 +98,7 @@ public class JoinBuiltin extends FnBuiltin {
           s.getChars(0, s.length(), cs, ri);
           ri+= s.length();
         }
-        return Main.toAPL(new String(cs));
+        return new ChrArr(new String(cs));
         
         
       } else {
@@ -126,7 +126,7 @@ public class JoinBuiltin extends FnBuiltin {
             chki++;
           }
           double[] ds = new double[am];
-    
+          
           int ri = 0;
           for (int i = 0; i < x.ia; i++) {
             Value v = x.get(i);

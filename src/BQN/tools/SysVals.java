@@ -130,10 +130,10 @@ public class SysVals {
   
   ////////////////////// TIMING \\\\\\\\\\\\\\\\\\\\\\
   public static Value formatTime(double ns) {
-    if (ns < 1000) return Main.toAPL(Num.format(ns, 3, 99, 99)+"ns");
+    if (ns < 1000) return new ChrArr(Num.format(ns, 3, 99, 99)+"ns");
     double ms = ns/1e6;
-    if (ms > 500) return Main.toAPL(Num.format(ms/1000d, 3, 99, 99)+" seconds");
-    return Main.toAPL(Num.format(ms, 3, 99, 99)+"ms");
+    if (ms > 500) return new ChrArr(Num.format(ms/1000d, 3, 99, 99)+" seconds");
+    return new ChrArr(Num.format(ms, 3, 99, 99)+"ms");
   }
   static class Runtime extends Fun {
     public String ln(FmtInfo f) { return "•Runtime"; }
@@ -389,7 +389,7 @@ public class SysVals {
       Path p = Sys.path(path, x.asString());
       String[] a = Main.readFile(p).split("\n");
       Value[] o = new Value[a.length];
-      for (int i = 0; i < a.length; i++) o[i] = Main.toAPL(a[i]);
+      for (int i = 0; i < a.length; i++) o[i] = new ChrArr(a[i]);
       return Arr.create(o);
     }
     
@@ -436,7 +436,7 @@ public class SysVals {
           ArrayList<Value> vs = new ArrayList<>();
           try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
             String ln;
-            while ((ln = rd.readLine()) != null) vs.add(Main.toAPL(ln));
+            while ((ln = rd.readLine()) != null) vs.add(new ChrArr(ln));
           }
           return new HArr(vs);
         } catch (MalformedURLException e) {
@@ -565,8 +565,8 @@ public class SysVals {
         byte[] out = readAllBytes(p.getInputStream());
         byte[] err = readAllBytes(p.getErrorStream());
         if (raw) return new HArr(new Value[]{ret, new IntArr(out), new IntArr(err)});
-        else return new HArr(new Value[]{ret, Main.toAPL(new String(out, StandardCharsets.UTF_8)),
-          Main.toAPL(new String(err, StandardCharsets.UTF_8))});
+        else return new HArr(new Value[]{ret, new ChrArr(new String(out, StandardCharsets.UTF_8)),
+          new ChrArr(new String(err, StandardCharsets.UTF_8))});
       } catch (Throwable e) {
         throw new DomainError("Failed to execute: "+e.getMessage());
       }
@@ -767,7 +767,7 @@ public class SysVals {
     public Value call(Value w, Value x) {
       if (w instanceof Num) w = new IntArr(new int[]{w.asInt(), 10});
       BlockTok s = BlockTok.get(x, null);
-      if (s != null) return Main.toAPL(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
+      if (s != null) return new ChrArr(s.comp.fmt(w.get(0).asInt(), w.get(1).asInt()));
       return call(w, new Compiler(sc).call(Num.ZERO, x));
     }
     
@@ -993,7 +993,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•_R_"; }
     
     public Value call(Value f, Value g, Value x, Md2Derv derv) {
-      return Main.toAPL(x.asString().replaceAll(f.asString(), g.asString()));
+      return new ChrArr(x.asString().replaceAll(f.asString(), g.asString()));
     }
   }
   static class Delay extends FnBuiltin {
@@ -1144,7 +1144,7 @@ public class SysVals {
       ks.sort((a, b) -> Double.compare(pfRes.get(b).ms, pfRes.get(a).ms));
       for (String k : ks) {
         Pr pr = pfRes.get(k);
-        arr[p[0]++] = Main.toAPL(k);
+        arr[p[0]++] = new ChrArr(k);
         arr[p[0]++] = new Num(pr.am);
         arr[p[0]++] = new Num(Math.floor(pr.ms*1e6      )/1e6);
         arr[p[0]++] = new Num(Math.floor(pr.ms*1e6/pr.am)/1e6);

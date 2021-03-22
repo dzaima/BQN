@@ -3,6 +3,7 @@ package BQN.types.mut;
 import BQN.*;
 import BQN.errors.SyntaxError;
 import BQN.types.*;
+import BQN.types.arrs.ChrArr;
 
 public class Quad extends Settable {
   
@@ -12,7 +13,7 @@ public class Quad extends Settable {
   }
   
   public Value get(Scope sc) {
-    return Main.toAPL(sc.sys.input());
+    return new ChrArr(sc.sys.input());
   }
   
   public boolean seth(Value x, Scope sc) {
