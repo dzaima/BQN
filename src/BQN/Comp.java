@@ -588,7 +588,7 @@ public class Comp {
         d++;
         c = c.p;
       } while (c!=null);
-      if (s.startsWith("•")) {
+      if (!mut && s.startsWith("•")) {
         Value v = SysVals.getStatic(s);
         if (v!=null) {
           push(t, v);
