@@ -62,7 +62,7 @@ public class Namespace extends BQNObj {
     StringBuilder res = new StringBuilder("{");
     exports.forEach((key, value) -> {
       if (res.length() != 1) res.append(" ⋄ ");
-      Value v = sc.vars[value].pretty(f);
+      String v = sc.vars[value].ln(f);
       res.append(key).append("⇐").append(v);
     });
     f.v.remove(this);
