@@ -143,15 +143,26 @@ public class LBoxBuiltin extends FnBuiltin {
     Value v = o instanceof Fun? o.call(call) : o;
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this);
     if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(call.shape)+", got "+Main.fArr(v.shape)+")", this);
-    int[] is = w.asIntArr();
-    if (x.quickIntArr() && v.quickIntArr()) {
-      int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();
-      for (int i = 0; i < is.length; i++) res[Indexer.scal(is[i], res.length, this)] = vi[i];
-      return new IntArr(res, x.shape);
+    if (w instanceof Primitive) {
+      int ms = w.asInt()*v.ia;
+      if (ms<0) ms+= x.ia; // regular call should have made sure it makes sense
+      MutVal res = new MutVal(x.shape, x);
+      res.copy(x, 0, 0, ms);
+      res.copy(v, 0, ms, v.ia);
+      res.copy(x, ms+v.ia, ms+v.ia, x.ia-ms-v.ia);
+      return res.get();
+    } else {
+      if (v.shape.length!=1 || w.r()!=1) throw new NYIError("⌾(vec⊸⊏) for high rank arrays", this);
+      int[] is = w.asIntArr();
+      if (x.quickIntArr() && v.quickIntArr()) {
+        int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();
+        for (int i = 0; i < is.length; i++) res[Indexer.scal(is[i], res.length, this)] = vi[i];
+        return new IntArr(res, x.shape);
+      }
+      Value[] res = x.valuesClone();
+      for (int i = 0; i < is.length; i++) res[is[i]] = v.get(i);
+      return Arr.create(res, x.shape);
     }
-    Value[] res = x.valuesClone();
-    for (int i = 0; i < is.length; i++) res[is[i]] = v.get(i);
-    return Arr.create(res, x.shape);
   }
   public Value under(Value o, Value x) {
     Value call = call(x);
