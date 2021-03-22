@@ -20,14 +20,11 @@ public class Main {
   public static boolean colorful = true;
   public static final boolean SAFE = false;
   static int printlvl = 0;
-  static final long startingMillis = System.currentTimeMillis();
-  static final long startingNanos = System.nanoTime();
+  public static final long startingMillis = System.currentTimeMillis();
+  public static final long startingNanos = System.nanoTime();
   public static Scanner console;
   
   
-  static final ChrArr uAlphabet = new ChrArr("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  static final ChrArr lAlphabet = new ChrArr("abcdefghijklmnopqrstuvwxyz");
-  public static final ChrArr digits = new ChrArr("0123456789");
   public static void main(String[] args) {
     colorful = System.console() != null && System.getenv().get("TERM") != null;
     console = new Scanner(System.in);

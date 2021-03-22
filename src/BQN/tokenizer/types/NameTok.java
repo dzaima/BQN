@@ -3,6 +3,7 @@ package BQN.tokenizer.types;
 import BQN.Scope;
 import BQN.errors.SyntaxError;
 import BQN.tokenizer.Token;
+import BQN.tools.SysVals;
 import BQN.types.*;
 import BQN.types.arrs.*;
 
@@ -20,7 +21,7 @@ public class NameTok extends Token {
     String name0 = (isSys? rawName.substring(1) : rawName).toLowerCase();
     String name1 = name0.replace("_", "");
     name = isSys? '•'+name1 : name1;
-    if (isSys) switch (Scope.rel(name)) {
+    if (isSys) switch (SysVals.rel(name)) {
       case 1: if (args==null||args[0]==null) throw new SyntaxError("•path hasn't been defined", this); val=args[0]; break;
       case 2: if (args==null||args[1]==null) throw new SyntaxError("•name hasn't been defined", this); val=args[1]; break;
       case 3: if (args==null||args[2]==null) throw new SyntaxError("•args hasn't been defined", this); val=args[2]; break;

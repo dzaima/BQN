@@ -8,7 +8,7 @@ import BQN.types.callable.builtins.fns.EvalBuiltin;
 import BQN.types.callable.trains.*;
 import BQN.types.mut.*;
 
-import java.util.*;
+import java.util.HashMap;
 
 import static BQN.Comp.*;
 
@@ -388,6 +388,15 @@ public class JBQNComp extends JBC {
             cstack++;
             break loop;
           }
+          case SYSV: {
+            int id = bc[i++];
+            fn.iconst(id);
+            fn.aload(SC);
+            fn.invstat(SysVals.class, "get", met(Value.class, int.class, Scope.class));
+            cstack++;
+            mstack = Math.max(mstack, cstack+1);
+            break;
+          }
           case SPEC: {
             switch(bc[i++]) {
               case EVAL:
@@ -452,6 +461,7 @@ public class JBQNComp extends JBC {
       r = null;
       return;
     }
+    // try { Files.write(Paths.get(name+".class"), bc); } catch (IOException e) { e.printStackTrace(); }
     Class<?> def = l.def(null, bc, 0, bc.length);
     try {
       lastObjs = comp.objs;

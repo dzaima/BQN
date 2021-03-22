@@ -61,10 +61,10 @@ public class Comp {
   public static final byte FLDM = 27; // N; set field objs[N] from ToS
   public static final byte NSPM = 28; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
   public static final byte RETD = 29; // return a namespace of exported items
-  
-  public static final byte SPEC = 30; // special
-  public static final byte   EVAL = 0; // ⍎
-  public static final byte   STDIN = 1; // •
+  public static final byte SYSV = 30; // N; get system function N
+  public static final byte SPEC = 31; // special
+  public static final byte   EVAL   = 0; // ⍎
+  public static final byte   STDIN  = 1; // •
   public static final byte   STDOUT = 2; // •←
   
   
@@ -86,7 +86,7 @@ public class Comp {
   }
   
   
-  public static boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable");
+  public static final boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable");
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
@@ -284,6 +284,11 @@ public class Comp {
             s.push(new Namespace(sc, body.exp));
             break exec;
           }
+          case SYSV: {
+            int id = bc[c++];
+            s.push(SysVals.get(id, sc));
+            break;
+          }
           case FLDO: {
             int n = bc[c++];
             Obj m = s.pop();
@@ -391,6 +396,7 @@ public class Comp {
           case NSPM: cs = "NSPM " + l7dec(bc, i) + " " + safeObj(l7dec(bc, i=l7end(bc, i))); i = l7end(bc, i); break;
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
+          case SYSV: cs = "SYSV " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case FLDO: cs = "FLDO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
           case FLDM: cs = "FLDM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
@@ -459,6 +465,7 @@ public class Comp {
       case VARO: case VARM:
       case ARRO: case ARRM:
       case FLDO: case FLDM:
+      case SYSV:
         return l7end(bc, i+1);
       case FN1C: case FN2C: case FN1O: case FN2O:
       case OP1D: case OP2D: case OP2H:
@@ -581,6 +588,18 @@ public class Comp {
         d++;
         c = c.p;
       } while (c!=null);
+      if (s.startsWith("•")) {
+        Value v = SysVals.getStatic(s);
+        if (v!=null) {
+          push(t, v);
+          return;
+        }
+        int id = SysVals.getID(s);
+        if (id>=0) {
+          add(t, SYSV, id);
+          return;
+        }
+      }
       add(t, mut? VARM : VARO);
       add(addObj(new ChrArr(s)));
     }
@@ -1387,7 +1406,7 @@ public class Comp {
     if (tk instanceof NameTok) {
       String n = ((NameTok) tk).name;
       if (((NameTok) tk).val != null) {
-        int rel = Scope.rel(n);
+        int rel = SysVals.rel(n);
         if (rel<=4) {
           m.push(tk, ((NameTok) tk).val);
         } else if (rel==5) {
