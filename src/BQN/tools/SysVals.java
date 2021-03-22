@@ -19,6 +19,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class SysVals {
   public static HashMap<String, Value> vsMap = new HashMap<>();
@@ -37,11 +38,11 @@ public class SysVals {
     define("•timed", new Timed());
     define("•ctime", CompTimer::new);
     
-    define("•import", Import::new ); REL.put("•import", 5);
-    define("•flines", new FLines()); REL.put("•flines", 5);
-    define("•fchars", new FChars()); REL.put("•fchars", 5);
-    define("•fbytes", new FBytes()); REL.put("•fbytes", 5);
-    define("•lns"   , new Lns   ()); REL.put("•lns"   , 5);
+    define ("•import", Import::new); REL.put("•import", 5);
+    defineU("•flines", FLines::new); REL.put("•flines", 5);
+    defineU("•fchars", FChars::new); REL.put("•fchars", 5);
+    defineU("•fbytes", FBytes::new); REL.put("•fbytes", 5);
+    defineU("•lns"   , Lns::new   ); REL.put("•lns"   , 5);
     REL.put("•path"  , 1);
     REL.put("•name"  , 2);
     REL.put("•args"  , 3);
@@ -73,17 +74,17 @@ public class SysVals {
     define("•decomp", Decompiler::new);
     define("•erase", Eraser::new);
     define("•gclog", GCLog::new);
-    define("•jload", new JLoad());
-    define("•jclass", new JClass());
     define("•opt", new Optimizer());
+    define("•jclass", new JClass());
+    defineU("•jload", JLoad::new);
     
     define("•rand", Rand::new);
     define("•r", new Replace());
-    define("•delay", new Delay());
     define("•hash", new Hash());
     define("•fillfn", new FillFn());
     define("•fillby", new FillBy());
     define("•big", new Big());
+    defineU("•delay", Delay::new);
   
     define("•pfx", sc -> { Main.unsafe("•pfx"); return new Profiler(sc); });
     define("•pfo", sc -> { Main.unsafe("•pfo"); return new ProfilerOp(sc); });
@@ -101,6 +102,10 @@ public class SysVals {
   public static void define(String name, Value obj) {
     assert name.equals(name.toLowerCase()) && name.startsWith("•") && name.indexOf('_')==-1;
     vsMap.put(name, obj);
+  }
+  public static void defineU(String name, Supplier<Value> f) {
+    if (!Main.SAFE) { define(name, f.get()); return; }
+    define(name, sc -> { Main.unsafe(name); return null; });
   }
   
   public static Value getStatic(String name) {
@@ -950,6 +955,14 @@ public class SysVals {
       public int hashCode() { return actualHashCode(); }
     }
   }
+  static class Optimizer extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•OPT"; }
+    
+    public Value call(Value x) {
+      if (x instanceof Primitive || x instanceof ChrArr || x instanceof BitArr || x instanceof SingleItemArr) return x;
+      return Arr.create(x.values(), x.shape);
+    }
+  }
   static class JClass extends FnBuiltin {
     public String ln(FmtInfo f) { return "•JClass"; }
     
@@ -965,14 +978,6 @@ public class SysVals {
       } catch (Throwable e) {
         throw new ImplementationError(e);
       }
-    }
-  }
-  static class Optimizer extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•OPT"; }
-    
-    public Value call(Value x) {
-      if (x instanceof Primitive || x instanceof ChrArr || x instanceof BitArr || x instanceof SingleItemArr) return x;
-      return Arr.create(x.values(), x.shape);
     }
   }
   

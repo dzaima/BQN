@@ -34,6 +34,12 @@ public class MathNS extends SimpleMap {
     public void call(double[] res, double[] x) { for (int i = 0; i < x.length; i++) res[i] = Math.atan(x[i]); }
   });
   
+  static {
+    sin.inv = asin; asin.inv = sin;
+    cos.inv = acos; acos.inv = cos;
+    tan.inv = atan; atan.inv = tan;
+  }
+  
   public Value getv(String s) {
     switch (s) {
       case "sin": return sin;
@@ -53,11 +59,18 @@ public class MathNS extends SimpleMap {
   private static class MB extends FnBuiltin {
     public final Fun.NumMV f;
     public final String name;
+    public Fun inv;
     public MB(String name, Fun.NumMV f) {
       this.f = f;
       this.name = "•math."+name;
     }
     public Value call(Value x) { return numM(f, x); }
+  
+    public Value callInv(Value x) {
+      if (inv==null) return super.callInv(x);
+      return inv.call(x);
+    }
+  
     public String ln(FmtInfo f) { return name; }
   }
 }
