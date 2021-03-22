@@ -139,8 +139,9 @@ public final class Scope {
     if (name.startsWith("•")) {
       switch (name) {
         case "•millis": return new Num(System.currentTimeMillis() - Main.startingMillis);
-        case "•nanos": return new Num(System.nanoTime() - Main.startingNanos);
+        case "•runtime": return RUNTIME;
         case "•time": return new Timer(this);
+        case "•timed": return new Timed();
         case "•ctime": return new CompTimer(this);
         case "•ex": return new Ex(this);
         case "•import": return new Import(this);
@@ -496,26 +497,72 @@ public final class Scope {
       int n = options[0];
       int mode = options.length>=2? options[1] : 0;
       String test = x.asString();
-      Comp.SingleComp testCompiled = Main.comp(test, sc, null);
+      Comp.SingleComp tcS = Main.comp(test, sc, null);
+      Comp tcC = tcS.c;
+      Body tcB = tcS.b;
       if (mode==2) {
         double[] r = new double[n];
         for (int i = 0; i < n; i++) {
           long start = System.nanoTime();
-          testCompiled.exec(sc);
+          tcC.exec(sc, tcB);
           long end = System.nanoTime();
-          r[i] = end-start;
+          r[i] = (end-start)*1e-9;
         }
         return new DoubleArr(r);
       } else {
-        long sns = System.nanoTime();
-        for (int i = 0; i < n; i++) testCompiled.exec(sc);
+        long sns;
+        if (Comp.JCOMP && n>1000 && Comp.compileStart<2 && Comp.compileStart>=0) {
+          JFn g = new JBQNComp(tcC, tcB.start).r;
+          if (g==null) throw new DomainError("•Time: couldn't compile", this);
+          sns = System.nanoTime();
+          for (int i = 0; i < n; i++) g.get(sc, tcB);
+        } else {
+          sns = System.nanoTime();
+          for (int i = 0; i < n; i++) tcC.exec(sc, tcB);
+        }
         long ens = System.nanoTime();
         double ns = (ens-sns) / (double)n;
-        if (mode==1) return new Num(ns);
+        if (mode==1) return new Num(ns*1e-9);
         else return formatTime(ns);
       }
     }
   }
+  static class Timed extends Md1 {
+    public String ln(FmtInfo f) { return "•_timed"; }
+    
+    public Value call(Value f, Value x, Md1Derv derv) {
+      return call(f, Num.ONE, x, derv);
+    }
+    public Value call(Value f, Value w, Value x, Md1Derv derv) {
+      int[] options = w.asIntVec();
+      int n = options[0];
+      int mode = options.length>=2? options[1] : 0;
+      if (mode==2) {
+        double[] r = new double[n];
+        for (int i = 0; i < n; i++) {
+          long start = System.nanoTime();
+          f.call(x);
+          long end = System.nanoTime();
+          r[i] = (end-start)*1e-9;
+        }
+        return new DoubleArr(r);
+      } else {
+        long sns = System.nanoTime();
+        for (int i = 0; i < n; i++) f.call(x);
+        long ens = System.nanoTime();
+        double ns = (ens-sns) / (double)n;
+        if (mode==1) return new Num(ns*1e-9);
+        else return formatTime(ns);
+      }
+    }
+  }
+  static Fun RUNTIME = new Fun() {
+    public String ln(FmtInfo f) { return "•Runtime"; }
+  
+    public Value call(Value x) {
+      return new Num((System.nanoTime()-Main.startingNanos)*1e-9);
+    }
+  };
   
   
   static class CompTimer extends Fun {
@@ -536,7 +583,7 @@ public final class Scope {
           long start = System.nanoTime();
           Main.comp(str, sc, null);
           long end = System.nanoTime();
-          r[i] = end-start;
+          r[i] = (end-start)*1e-9;
         }
         return new DoubleArr(r);
       } else {
@@ -544,7 +591,7 @@ public final class Scope {
         for (int i = 0; i < n; i++) Main.comp(str, sc, null);
         long ens = System.nanoTime();
         double ns = (ens-sns) / (double)n;
-        if (mode==1) return new Num(ns);
+        if (mode==1) return new Num(ns*1e-9);
         else return formatTime(ns);
       }
     }

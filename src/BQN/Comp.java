@@ -606,7 +606,7 @@ public class Comp {
   }
   
   
-  public static class SingleComp {
+  public static final class SingleComp {
     public final Comp c; public final Body b;
     public SingleComp(Comp c, Body b) { this.c = c; this.b = b; }
     public Value exec(Scope sc) { return c.exec(sc, b); }
