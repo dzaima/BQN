@@ -16,6 +16,7 @@ public class JBQNComp extends JBC {
   public final JFn r;
   public JBQNComp(Comp comp, int start) {
     
+    String name = "BQN/gen" + ctr++;
     {
       Met fn = new Met(0x1001, "<init>", "()V", 1);
       fn.aload(0);
@@ -25,9 +26,9 @@ public class JBQNComp extends JBC {
       methods.add(fn);
     }
     
+    boolean[] usedObj = new boolean[comp.objs.length];
+    boolean[] usedBlock = new boolean[comp.blocks.length];
     {
-      
-      
       Met fn = new Met(0x0001, "get", met(Value.class, Scope.class, Body.class), 3);
       // aload 0 - this (JFn); 1 - scope; 2 - body; 3,4,5 - temp values
       int SC   = 1;
@@ -50,10 +51,7 @@ public class JBQNComp extends JBC {
         switch (bc[pi]) { default: throw new DomainError("Unimplemented bytecode "+bc[pi]);
           case PUSH: {
             int n = bc[i++];
-            fn.aload(0);
-            fn.getfield(JFn.class, "vals", Value[].class);
-            fn.iconst(n);
-            fn.aaload();
+            fn.getstatic(name, "o"+n, fname(Value.class)); usedObj[n] = true;
             mstack = Math.max(mstack, cstack+2);
             cstack++;
             break;
@@ -308,10 +306,7 @@ public class JBQNComp extends JBC {
           }
           case DFND: {
             int n = bc[i++];
-            fn.aload(0);
-            fn.getfield(JFn.class, "blocks", BlockTok[].class);
-            fn.iconst(n);
-            fn.aaload();
+            fn.getstatic(name, "b"+n, fname(BlockTok.class)); usedBlock[n] = true;
             fn.aload(SC);
             fn.invvirt(BlockTok.class, "eval", met(Value.class, Scope.class));
             mstack = Math.max(mstack, cstack+3);
@@ -361,10 +356,7 @@ public class JBQNComp extends JBC {
             fn.new_(SettableNS.class); //   a o
             fn.dup_x1();               // o a o
             fn.swap();                 // o o a
-            fn.aload(0);
-            fn.getfield(JFn.class, "vals", Value[].class);
-            fn.iconst(n1);
-            fn.aaload();
+            fn.getstatic(name, "o"+n1, fname(Value.class)); usedObj[n1] = true;
             fn.invspec(SettableNS.class, "<init>", met(void.class, Settable[].class, Value.class));
             mstack = Math.max(cstack+4, mstack);
             cstack-= n0-1;
@@ -428,10 +420,33 @@ public class JBQNComp extends JBC {
       methods.add(fn);
     }
     
+    {
+      Met fn = new Met(0x1008, "<clinit>", "()V", 1);
+      for (int i = 0; i < usedObj.length; i++) {
+        if (usedObj[i]) {
+          fields.add(new Fld(0x001A, "o"+i, Value.class));
+          fn.getstatic(JBQNComp.class, "lastObjs", Value[].class);
+          fn.iconst(i);
+          fn.aaload();
+          fn.putstatic(name, "o"+i, fname(Value.class));
+        }
+      }
+      for (int i = 0; i < usedBlock.length; i++) {
+        if (usedBlock[i]) {
+          fields.add(new Fld(0x001A, "b"+i, BlockTok.class));
+          fn.getstatic(JBQNComp.class, "lastBlocks", BlockTok[].class);
+          fn.iconst(i);
+          fn.aaload();
+          fn.putstatic(name, "b"+i, fname(BlockTok.class));
+        }
+      }
+      fn.vret();
+      fn.mstack = 2;
+      methods.add(fn);
+    }
     
-    String name = "gen" + ctr++;
-    int this_class = CONSTANT_Class("BQN/"+name);
     int super_class = CONSTANT_Class(JFn.class);
+    int this_class = CONSTANT_Class(name);
     byte[] bc = finish(this_class, super_class);
     if (bc==null) {
       r = null;
@@ -439,14 +454,15 @@ public class JBQNComp extends JBC {
     }
     Class<?> def = l.def(null, bc, 0, bc.length);
     try {
-      JFn o = (JFn) def.getDeclaredConstructor().newInstance();
-      o.vals = comp.objs;
-      o.blocks = comp.blocks;
-      // Method get = o.getClass().getDeclaredMethod("get", Scope.class);
-      // System.out.println(get.invoke(o, new Object[]{null}));
-      r = o;
+      lastObjs = comp.objs;
+      lastBlocks = comp.blocks;
+      r = (JFn) def.getDeclaredConstructor().newInstance();
+      lastObjs = null;
+      lastBlocks = null;
     } catch (Throwable e) {
       throw new ImplementationError(e);
     }
   }
+  public static Value[] lastObjs; // not thread-safe, whatever
+  public static BlockTok[] lastBlocks;
 }

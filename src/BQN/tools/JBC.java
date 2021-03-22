@@ -223,13 +223,15 @@ public class JBC {
     public void invspec  (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
     public void invstat  (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
     public void getfield (String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
-    public void getstatic(String cls, String name, String type) { u(178); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
+    public void getstatic(String cls, String name, String type) { u(178); u2(CONSTANT_Fieldref (cls, name, type)); } // get static field from pop
+    public void putstatic(String cls, String name, String type) { u(179); u2(CONSTANT_Fieldref (cls, name, type)); } // push static field
   
     public void invvirt  (Class<?> cls, String name, String   type) { invvirt  (name(cls), name,       type ); }
     public void invspec  (Class<?> cls, String name, String   type) { invspec  (name(cls), name,       type ); }
     public void invstat  (Class<?> cls, String name, String   type) { invstat  (name(cls), name,       type ); }
     public void getfield (Class<?> cls, String name, Class<?> type) { getfield (name(cls), name, fname(type)); }
     public void getstatic(Class<?> cls, String name, Class<?> type) { getstatic(name(cls), name, fname(type)); }
+    public void putstatic(Class<?> cls, String name, Class<?> type) { putstatic(name(cls), name, fname(type)); }
     
     public void new_     (String cls) { u(187); u2(CONSTANT_Class(cls)); }
     public void anewarray(String cls) { u(189); u2(CONSTANT_Class(cls)); }
