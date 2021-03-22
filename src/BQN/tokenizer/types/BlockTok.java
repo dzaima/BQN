@@ -225,7 +225,7 @@ public class BlockTok extends TokArr {
   
   public Value exec(Scope psc, Value w, Value[] vb, int inv) {
     Scope sc = new Scope(psc, "sure");
-    boolean dy = w != null;
+    boolean dy = w!=null;
     Body b0 = this.singleBody;
     if (b0!=null) {
       if (b0.inverse==inv & (b0.arity=='a' | (b0.arity=='d')==dy)) {
@@ -234,7 +234,7 @@ public class BlockTok extends TokArr {
         
         sc.varAm = b0.vars.length;
         Value res = comp.exec(sc, b0);
-        if (res != null) return res;
+        if (res!=null) return res;
       }
     } else {
       for (Body b : inv==0? (dy? bdD : bdM) : inv==1? (dy? bdDxi : bdMxi) : bdDwi) {
@@ -242,7 +242,7 @@ public class BlockTok extends TokArr {
         sc.vars = Arrays.copyOf(vb, b.vars.length); // TODO decide some nicer way than just creating a new array per header
         sc.varAm = b.vars.length;
         Value res = comp.exec(sc, b);
-        if (res != null) return res;
+        if (res!=null) return res;
         sc.removeMap();
       }
     }

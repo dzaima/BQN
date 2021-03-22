@@ -16,12 +16,10 @@ public class FunBlock extends Fun {
   }
   
   public Value call(Value x) { // 𝕊𝕩𝕨···
-    Main.printdbg("FunBlock call", x);
     return code.exec(sc, null, new Value[]{this, x, Nothing.inst}, 0);
   }
   
   public Value call(Value w, Value x) { // 𝕊𝕩𝕨···
-    Main.printdbg("FunBlock call", w, x);
     return code.exec(sc, w, new Value[]{this, x, w}, 0);
   }
   
