@@ -1418,10 +1418,13 @@ public class Comp {
       else m.var(tk, n, false);
       return;
     }
-    if (tk instanceof StrandTok) { // +TODO (+↓) check for type A
+    if (tk instanceof StrandTok) {
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<Token> tks = ((StrandTok) tk).tokens;
-      for (Token c : tks) compO(m, c);
+      for (Token c : tks) {
+        compO(m, c);
+        if (c.type=='A') m.add(tk, CHKV);
+      }
       if (Main.debug) Main.printlvl--;
       
       m.add(tk, ARRO); m.add(tks.size());
@@ -1430,7 +1433,10 @@ public class Comp {
     if (tk instanceof ArrayTok) {
       if (Main.debug) { printlvl("parsing "+tk.source()); Main.printlvl++; }
       List<Token> tks = ((ArrayTok) tk).tokens;
-      for (Token c : tks) compO(m, c);
+      for (Token c : tks) {
+        compO(m, c);
+        if (c.type=='A') m.add(tk, CHKV);
+      }
       if (Main.debug) Main.printlvl--;
       
       m.add(tk, ARRO); m.add(tks.size());
@@ -1462,13 +1468,19 @@ public class Comp {
     if (t instanceof StrandTok) {
       List<Token> ts = ((StrandTok) t).tokens;
       Value[] ps = new Value[ts.size()];
-      for (int i = 0; i < ps.length; i++) ps[i] = constFold(ts.get(i));
+      for (int i = 0; i < ps.length; i++) {
+        ps[i] = constFold(ts.get(i));
+        if (ps[i]==Nothing.inst) throw new SyntaxError("Storing · in array");
+      }
       return Arr.create(ps);
     }
     if (t instanceof ArrayTok) {
       List<Token> ts = ((ArrayTok) t).tokens;
       Value[] ps = new Value[ts.size()];
-      for (int i = 0; i < ps.length; i++) ps[i] = constFold(ts.get(i));
+      for (int i = 0; i < ps.length; i++) {
+        ps[i] = constFold(ts.get(i));
+        if (ps[i]==Nothing.inst) throw new SyntaxError("Storing · in array");
+      }
       return Arr.create(ps);
     }
     if (t instanceof OpTok) {
