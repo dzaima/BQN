@@ -129,7 +129,7 @@ public abstract class BQNError extends RuntimeException {
     public ArrayList<Mg> msgs;
     public final Comp comp;
     public final int idx;
-  
+    
     public Frame(Scope sc, ArrayList<Mg> msgs, Comp comp, int idx) {
       
       this.sc = sc;

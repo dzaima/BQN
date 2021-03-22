@@ -15,7 +15,7 @@ public class NEBuiltin extends FnBuiltin {
     return Num.of(x.shape[0]);
   }
   
-
+  
   private static final Pervasion.NN2N DFn = new Pervasion.NN2N() { // purely for dyNum
     public double on(double w, double x) { return w==x? 0 : 1; }
     public void on(double   w, double[] x, double[] res) { for (int i = 0; i < x.length; i++) { res[i] = (w   !=x[i])?1:0; } }

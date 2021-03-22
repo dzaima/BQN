@@ -45,7 +45,7 @@ public class GradeUpBuiltin extends FnBuiltin {
     Integer[] na = new Integer[x.ia];
     for (int i = 0; i < na.length; i++) na[i] = i;
     Arrays.sort(na, (a, b) -> x.get(a).compareTo(x.get(b)));
-  
+    
     int[] res = new int[na.length];
     for (int i = 0; i < na.length; i++) res[i] = na[i];
     return res;
@@ -82,7 +82,7 @@ public class GradeUpBuiltin extends FnBuiltin {
     if (w.quickIntArr() && x.quickIntArr()) {
       int[] wi = w.asIntArr();
       int[] xi = x.asIntArr();
-  
+      
       for (int i = 0; i < w.ia-1; i++) {
         if (wi[i] > wi[i+1]) throw new DomainError("⍋: 𝕨 must be sorted", this);
       }
@@ -119,4 +119,3 @@ public class GradeUpBuiltin extends FnBuiltin {
     return new IntArr(res, x.shape);
   }
 }
-

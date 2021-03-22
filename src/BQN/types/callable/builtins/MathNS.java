@@ -65,12 +65,12 @@ public class MathNS extends SimpleMap {
       this.name = "•math."+name;
     }
     public Value call(Value x) { return numM(f, x); }
-  
+    
     public Value callInv(Value x) {
       if (inv==null) return super.callInv(x);
       return inv.call(x);
     }
-  
+    
     public String ln(FmtInfo f) { return name; }
   }
 }

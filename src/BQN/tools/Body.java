@@ -115,9 +115,9 @@ public class Body {
       int fi = bi-1;
       int gi = bi+1;
       int xi = bi+1 + (gx?1:0) + inverse;
-  
+      
       Token st = ts.get(bi);
-  
+      
       if (gx  &&  (fi>=0) != (gi<sz)) throw new SyntaxError("Header must either specify both operands or none", st);
       if (!fx || fi>=0) {
         if (wi>0   ) throw new SyntaxError("Invalid header", ts.get(0   ));

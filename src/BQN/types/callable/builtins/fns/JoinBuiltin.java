@@ -109,7 +109,7 @@ public class JoinBuiltin extends FnBuiltin {
             chki++;
           }
           int[] is = new int[am];
-    
+          
           int ri = 0;
           for (int i = 0; i < x.ia; i++) {
             Value v = x.get(i);

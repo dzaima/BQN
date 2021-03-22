@@ -20,7 +20,7 @@ public class MinusBuiltin extends FnBuiltin {
     public Value call(BigValue x) {
       return new BigValue(x.i.negate());
     }
-  
+    
     public Value call(int[] x, int[] sh) {
       int[] r = new int[x.length];
       for (int i = 0; i < r.length; i++) {

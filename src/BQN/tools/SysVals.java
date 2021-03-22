@@ -85,7 +85,7 @@ public class SysVals {
     define("•fillby", new FillBy());
     define("•big", new Big());
     defineU("•delay", Delay::new);
-  
+    
     define("•pfx", sc -> { Main.unsafe("•pfx"); return new Profiler(sc); });
     define("•pfo", sc -> { Main.unsafe("•pfo"); return new ProfilerOp(sc); });
     define("•pfc", sc -> { Main.unsafe("•pfc"); return new ProfilerMd2(sc); });
@@ -262,7 +262,7 @@ public class SysVals {
         }
       };
     }
-  
+    
     public Value call(String path, Value w, Value x) { return call(w, x); }
     public Value call(String path, Value x) { return call(x); }
   }
@@ -407,11 +407,11 @@ public class SysVals {
           BQNObj m = (BQNObj) w;
           String content = get(m, "content", "");
           conn.setRequestMethod(get(m, "method", "POST"));
-
+          
           conn.setRequestProperty("Content-Type", get(m, "type", "POST"));
           conn.setRequestProperty("Content-Language", get(m, "language", "en-US"));
           conn.setRequestProperty("Content-Length", Integer.toString(content.length()));
-
+          
           Value eo = m.get("e");
           if (eo != null) {
             BQNObj e = (BQNObj) eo;
@@ -420,18 +420,18 @@ public class SysVals {
               conn.setRequestProperty(kv[0][i].asString(), kv[1][i].asString());
             }
           }
-
+          
           Value cache = m.get("cache");
           conn.setUseCaches(cache!=null && Main.bool(cache));
           conn.setDoOutput(true);
-
+          
           if (content.length() != 0) {
             DataOutputStream os = new DataOutputStream(conn.getOutputStream());
             os.writeBytes(content);
             os.close();
           }
-
-
+          
+          
           InputStream is = conn.getInputStream();
           ArrayList<Value> vs = new ArrayList<>();
           try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
@@ -462,10 +462,10 @@ public class SysVals {
   ////////////////////// I/O \\\\\\\\\\\\\\\\\\\\\\
   static class Out extends FnBuiltin {
     public String ln(FmtInfo f) { return "•Out"; }
-  
+    
     private final Scope sc;
     Out(Scope sc) { this.sc = sc; }
-  
+    
     public Value call(Value x) {
       sc.sys.println(Format.outputFmt(x));
       return x;
@@ -565,8 +565,11 @@ public class SysVals {
         byte[] out = readAllBytes(p.getInputStream());
         byte[] err = readAllBytes(p.getErrorStream());
         if (raw) return new HArr(new Value[]{ret, new IntArr(out), new IntArr(err)});
-        else return new HArr(new Value[]{ret, new ChrArr(new String(out, StandardCharsets.UTF_8)),
-          new ChrArr(new String(err, StandardCharsets.UTF_8))});
+        else return new HArr(new Value[]{
+          ret,
+          new ChrArr(new String(out, StandardCharsets.UTF_8)),
+          new ChrArr(new String(err, StandardCharsets.UTF_8))
+        });
       } catch (Throwable e) {
         throw new DomainError("Failed to execute: "+e.getMessage());
       }
@@ -777,7 +780,7 @@ public class SysVals {
     
     private final Scope sc;
     Compiler(Scope sc) { this.sc = sc; Main.unsafe("•Comp"); }
-        
+    
     /* Argument structure:
          total: ⟨bytecode ⋄ constants ⋄ inner blocks ⋄ main block ⋄ bodies ⋄ [sind [⋄ eind] ⋄ src]⟩
          block: ⟨type ⋄ immediateness ⋄ monadic ⋄ dyadic⟩
@@ -796,7 +799,7 @@ public class SysVals {
       Value inds = x.ia<6?null:x.get(5);
       Value inde = x.ia<6?null:x.get(x.ia<=7?5:6); // incl
       Value src  = x.ia<6?null:x.get(x.ia<=7?6:7);
-    
+      
       int[] bcp = bc.asIntVec();
       Token[] ref = new Token[bcp.length];
       if(inds!=null) {
@@ -805,11 +808,11 @@ public class SysVals {
         String srcS = src.asString();
         for (int i = 0; i < is.length; i++) ref[i] = new CompToken(srcS, is[i], ie[i]+1);
       }
-    
-    
+      
+      
       Value[] objp = new Value[obj.ia];
       for (int i = 0; i < objp.length; i++) objp[i] = obj.get(i);
-    
+      
       Body[] bodies = new Body[bdy.ia];
       for (int i = 0; i < bodies.length; i++) {
         Value bd = bdy.get(i);
@@ -820,7 +823,7 @@ public class SysVals {
         int[] exp = bd.ia >= 3? SlashBuiltin.on(bd.get(2), null).asIntArr() : null;
         bodies[i] = new Body(off, vns, exp);
       }
-    
+      
       BlockTok[] blocks = new BlockTok[blk.ia];
       BlockTok outBlock = null;
       ArrayList<BlockTok> newBlocks = new ArrayList<>();
@@ -865,7 +868,7 @@ public class SysVals {
       // for (int i = 0; i < blksP.length; i++) blksN[i] = new BlockTok.Wrapper(blksP[i]);
       Value[] blksN = new Value[blksP.length];
       for (int i = 0; i < blksP.length; i++) blksN[i] = new BlockTok.Wrapper(blksP[i]);
-    
+      
       ArrayList<Value> bodies = new ArrayList<>();
       HashMap<Body, Integer> bodyMap = new HashMap<>();
       int[] mbs = body(bodies, bodyMap, bt.bdM);
@@ -876,7 +879,7 @@ public class SysVals {
       HArr   blksR   = new HArr(blksN);
       Value  blkR    = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
       HArr   bodiesR = new HArr(bodies);
-    
+      
       int[] inds = new int[ref.length];
       int[] inde = new int[ref.length];
       int cIs=0, cIe=-1;
@@ -894,7 +897,7 @@ public class SysVals {
       if (cIe!=-1) return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR, new IntArr(inds), new IntArr(inde), new ChrArr(src)});
       else         return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR});
     }
-  
+    
     private int[] body(ArrayList<Value> bodies, HashMap<Body, Integer> map, Body[] bs) {
       int[] r = new int[bs.length];
       for (int i = 0; i < bs.length; i++) {
@@ -915,7 +918,7 @@ public class SysVals {
   }
   static class Eraser extends FnBuiltin { // leaves a hole in the local variable map and probably breaks many things; TODO should maybe be a ucmd?
     public String ln(FmtInfo f) { return "•Erase"; }
-  
+    
     private final Scope sc;
     Eraser(Scope sc) { this.sc = sc; Main.unsafe("•Decomp"); }
     public Value call(Value x) {

@@ -208,13 +208,13 @@ public final class BitArr extends Arr {
   }
   
   public static void copy(long[] src, int srcS, long[] dst, int dstS, int len) {
-  //   for (int i = 0; i < len; i++) {
-  //     int si = i+srcS;
-  //     int di = i+dstS;
-  //     dst[di>>6]|= (src[si>>6]>>(si&63)&1) << (di&63);
-  //   }
-  // }
-  // public static void copyn(long[] src, int srcS, long[] dst, int dstS, int len) {
+    //   for (int i = 0; i < len; i++) {
+    //     int si = i+srcS;
+    //     int di = i+dstS;
+    //     dst[di>>6]|= (src[si>>6]>>(si&63)&1) << (di&63);
+    //   }
+    // }
+    // public static void copyn(long[] src, int srcS, long[] dst, int dstS, int len) {
     int s = srcS;
     int e = srcS+len;
     if (len==0) return;
@@ -254,14 +254,14 @@ public final class BitArr extends Arr {
       int shr = 64-shl;
       // System.out.println("shl="+shl+"; shr="+shr);
       // System.out.println(i+"…"+Li+": s="+s+" o="+o+" e="+e+" pG="+pG+" shl="+shl);
-        
-        /* some unrolling of
-              for (int pT = i; pT <= Li; pT++) {
-                if (pG<garr.length) a[pT]|= garr[pG]<<shl;
-                if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
-                pG++;
-              }
-        */
+      
+      /* some unrolling of
+           for (int pT = i; pT <= Li; pT++) {
+             if (pG<garr.length) a[pT]|= garr[pG]<<shl;
+             if (pG-1>=0) a[pT]|= garr[pG-1]>>>shr;
+             pG++;
+           }
+      */
       {
         int pT = sI;
         if (pG< src.length) dst[pT]|= src[pG]<<shl;

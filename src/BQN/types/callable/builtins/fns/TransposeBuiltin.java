@@ -132,7 +132,7 @@ public class TransposeBuiltin extends FnBuiltin {
       while (oc[k]) k++;
       t[i] = k;
     }
-
+    
     int[] sh = new int[r];
     for (int i = 0; i < r; i++) sh[i] = x.shape[t[i]];
     Value[] res = new Value[x.ia];

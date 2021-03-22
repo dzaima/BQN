@@ -46,7 +46,7 @@ public abstract class Fun extends Callable {
     public Value call(BigValue x) {
       throw new DomainError("bigintegers not allowed here");
     }
-  
+    
     public Value call(int[] x, int[] sh) {
       double[] res = new double[x.length];
       double[] d = new double[x.length];

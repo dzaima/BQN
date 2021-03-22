@@ -39,7 +39,7 @@ public class RepeatBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value gf = g.call(w, x);
-  
+    
     if (gf instanceof Num) {
       int l = gf.asInt();
       Value c = x;

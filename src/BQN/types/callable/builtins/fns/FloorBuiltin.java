@@ -36,9 +36,13 @@ public class FloorBuiltin extends FnBuiltin {
       Value[] vs = new Value[x.ia];
       for (int i = 0; i < vs.length; i++) vs[i] = call(x.get(i));
       return new HArr(vs, x.shape);
-    } else if (x instanceof Num) return new Num(Math.floor(((Num) x).num));
-      else if (x instanceof Char) return ((Char) x).lower();
-      else throw new DomainError("⌊: argument contained "+x.humanType(true), this);
+    } else if (x instanceof Num) {
+      return new Num(Math.floor(((Num) x).num));
+    } else if (x instanceof Char) {
+      return ((Char) x).lower();
+    } else {
+      throw new DomainError("⌊: argument contained "+x.humanType(true), this);
+    }
   }
   
   public Pervasion.NN2N dyNum() { return DF; }

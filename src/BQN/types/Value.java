@@ -186,7 +186,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     if (w instanceof BigValue  && x instanceof BigValue ) return ((BigValue) w).i.compareTo(((BigValue) x).i);
     if (w instanceof Primitive && x instanceof Primitive) throw new DomainError("Cannot compare "+w+" and "+x);
     if (Math.min(w.ia, x.ia) == 0) return Integer.compare(w.ia, x.ia);
-  
+    
     int rc = Integer.compare(w.r()+(w instanceof Primitive?0:1), x.r()+(x instanceof Primitive?0:1));
     int rr = Math.min(w.r(), x.r());
     int ri = 0; // matching shape tail
@@ -198,7 +198,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
       rc = Integer.compare(wm, xm);
       rm*= Math.min(wm, xm);
     }
-  
+    
     for (int i = 0; i < rm; i++) {
       int c = w.get(i).compareTo(x.get(i));
       if (c!=0) return c;

@@ -29,7 +29,7 @@ public class RandBuiltin extends FnBuiltin {
         res[i] = x[i]==0? sc.rand(1d) : Math.floor(sc.rand(x[i]));
       }
     }
-  
+    
     public Value call(int[] x, int[] sh) {
       int[] res = new int[x.length];
       for (int i = 0; i < res.length; i++) {
@@ -38,7 +38,7 @@ public class RandBuiltin extends FnBuiltin {
       }
       return new IntArr(res, sh);
     }
-  
+    
     public Value call(BigValue x) {
       if (x.i.signum()==0) throw new DomainError("?0L");
       BigInteger n;

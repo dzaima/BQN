@@ -37,22 +37,22 @@ public abstract class BQNObj extends Primitive {
       this.map = map;
       this.k = k;
     }
-  
+    
     public Value get(Scope sc) {
       return map.get(k);
     }
-  
+    
     public void set(Value x, boolean update, Scope sc, Callable blame) {
       boolean prev = map.get(k) != null;
       if (prev && !update) throw new SyntaxError("←: Cannot redefine map key '"+k+"'", blame);
       if (!prev && update) throw new SyntaxError("↩: Cannot update non-existing key '"+k+"'", blame);
       map.set(k, x);
     }
-  
+    
     public boolean seth(Value x, Scope sc) {
       throw new SyntaxError("map key cannot be a part of a header");
     }
-  
+    
     public String toString() {
       Value v = get(null);
       if (Main.debug) return v == null? "map@"+k : "ptr@"+k+":"+v;

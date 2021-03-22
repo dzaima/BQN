@@ -34,7 +34,7 @@ public class StarBuiltin extends FnBuiltin {
     public void on(double[] w, double   x, double[] res) { if (x == 2) for (int i = 0; i < w.length; i++) res[i] = w[i]*w[i];
                                                       else for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x   ); }
     public void on(double[] w, double[] x, double[] res) { for (int i = 0; i < w.length; i++) res[i] = Math.pow(w[i], x[i]); }
-  
+    
     public int[] on(int w, int[] x) {
       if (w == -1) {
         int[] r = new int[x.length];
@@ -43,7 +43,7 @@ public class StarBuiltin extends FnBuiltin {
       }
       return null;
     }
-  
+    
     public int[] on(int[] w, int x) {
       if (x==2) {
         int[] r = new int[w.length];
@@ -56,7 +56,7 @@ public class StarBuiltin extends FnBuiltin {
       }
       return null;
     }
-  
+    
     public Value on(BigValue w, BigValue x) {
       if (w.i.signum() == 0) return BigValue.ZERO;
       if (w.i.equals(BigInteger.ONE)) return BigValue.ONE;

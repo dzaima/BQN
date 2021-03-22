@@ -155,7 +155,7 @@ public class GroupBuiltin extends FnBuiltin {
       }
       return new HArr(res);
     }
-  
+    
     int csz = Arr.prod(x.shape, wsz, xsz);
     int[] rsh = new int[wsz];
     for (int i = 0; i < wsz; i++) {
@@ -186,7 +186,7 @@ public class GroupBuiltin extends FnBuiltin {
       repl*= rsh[i];
     }
     for (int[] c : rshs) System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
-  
+    
     MutVal[] vs = new MutVal[sz];
     for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);
     recIns(vs, new int[sz], rsh, 0, 0, 0, wp, x, csz);

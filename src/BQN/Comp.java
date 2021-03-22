@@ -513,7 +513,7 @@ public class Comp {
   public static class Mut {
     Mut p;
     public Mut(Mut p) { this.p = p; }
-  
+    
     ArrayList<Value> objs = new ArrayList<>(16);
     ArrayList<BlockTok> blocks = new ArrayList<>(16);
     MutIntArr bc = new MutIntArr(16);
@@ -872,13 +872,13 @@ public class Comp {
       m.add(tk, mut? FLDM : FLDO);
       m.add(m.addObj(new ChrArr(k)));
     }
-  
+    
     Res mut(boolean create, boolean export) { // TODO use create?
       mut = true;
       if (export) throw new SyntaxError("Cannot export field access", tk);
       return this;
     }
-  
+    
     public Token lastTok() {
       return tk;
     }
@@ -910,21 +910,21 @@ public class Comp {
   }
   static class ResCf extends Res {
     private final Token last;
-  
+    
     public ResCf(char type, Value val, Token last) {
       super(type);
       this.c = val;
       this.last = last;
     }
-  
+    
     void add(Mut m) {
       m.push(last, c);
     }
-  
+    
     public Token lastTok() {
       return last;
     }
-  
+    
     public String toString() {
       return "C:"+c.ln(FmtInfo.def);
     }
@@ -945,7 +945,7 @@ public class Comp {
       char fType = tps.peekFirst().type;
       char lType = tps.peekLast().type;
       if (tps.size()>=3 && (
-           last && tps.get(1).type=='.' 
+           last && tps.get(1).type=='.'
         || tps.get(2).type=='.')
       ) {
         int s = tps.get(1).type=='.'? 0 : 1;
@@ -1210,7 +1210,7 @@ public class Comp {
     if (t instanceof ParenTok) return t.flags = flags(((ParenTok) t).ln);
     if (t instanceof TokArr) {
       List<? extends Token> ts = ((TokArr) t).tokens;
-      if (t instanceof ArrayTok || t instanceof StrandTok 
+      if (t instanceof ArrayTok || t instanceof StrandTok
       ||  t instanceof LineTok && ts.size()==1) {
         t.flags = 7;
       } else t.flags = 6;
@@ -1508,10 +1508,10 @@ public class Comp {
       // case '⍮': return new SemiUBBuiltin();
       // case '⍧': return new LShoeStileBuiltin();
       // case '%': return new MergeBuiltin();
-  
-  
-  
-  
+      
+      
+      
+      
       case '⍕': return new FormatBuiltin();
       case '!': return new AssertBuiltin();
       case '+': return new PlusBuiltin();
@@ -1598,12 +1598,12 @@ public class Comp {
       
       // case '@': return new AtBuiltin(sc);
       // case '⍬': return new DoubleArr(DoubleArr.EMPTY);
-  
-  
+      
+      
       case '⍎': case '•': // the lone double-struck
       case 55349: // double-struck surrogate pair
         return null;
-  
+      
       default: throw new SyntaxError("Unknown token `"+t.toRepr()+"` (\\u"+Tk2.hex4(c)+")", t);
     }
   }

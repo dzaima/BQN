@@ -137,7 +137,7 @@ public class Tokenizer {
             throw new SyntaxError("mismatched parentheses of " + closed.b + " and " + c, new ErrTok(raw, li));
           }
           if (lines.size() > 0 && lines.get(lines.size() - 1).size() == 0) lines.remove(lines.size() - 1); // no trailing empties!!
-  
+          
           ArrayList<Token> lineTokens = new ArrayList<>();
           for (Line ta : closed.a) lineTokens.add(ta.tok(pointless));
           Token r;
@@ -344,7 +344,7 @@ public class Tokenizer {
       // else, attempt to recover
       while (levels.size() > 1) {
         Block closed = levels.remove(levels.size() - 1);
-  
+        
         ArrayList<Token> lineTokens = new ArrayList<>();
         for (Line ta : closed.a) lineTokens.add(ta.tok(true));
         Token r;

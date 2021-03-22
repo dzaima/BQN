@@ -2,7 +2,7 @@ package BQN.tools;
 
 import java.util.Arrays;
 
-public class MutByteArr { 
+public class MutByteArr {
   public byte[] bs;
   public int len;
   

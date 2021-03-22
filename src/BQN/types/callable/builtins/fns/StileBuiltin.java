@@ -21,7 +21,7 @@ public class StileBuiltin extends FnBuiltin {
     public Value call(BigValue x) {
       return new BigValue(x.i.abs());
     }
-  
+    
     public Value call(int[] x, int[] sh) {
       int[] res = new int[x.length];
       for (int i = 0; i < res.length; i++) {

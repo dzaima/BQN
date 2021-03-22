@@ -174,7 +174,7 @@ public class Pervasion { // implementations must be okay with not being called o
     public abstract void on(double   w, double[] x, BitArr.BA res);
     public abstract void on(double[] w, double   x, BitArr.BA res);
     public abstract void on(double[] w, double[] x, BitArr.BA res);
-  
+    
     public abstract void on(int   w, int[] x, BitArr.BA res);
     public abstract void on(int[] w, int   x, BitArr.BA res);
     public abstract void on(int[] w, int[] x, BitArr.BA res);
@@ -182,7 +182,7 @@ public class Pervasion { // implementations must be okay with not being called o
     public abstract void on(char   w, char[] x, BitArr.BA res);
     public abstract void on(char[] w, char   x, BitArr.BA res);
     public abstract void on(char[] w, char[] x, BitArr.BA res);
-  
+    
     public abstract Value on(boolean w, BitArr  x);
     public abstract Value on(BitArr  w, boolean x);
     public abstract void  on(long[]  w, long[]  x, long[] res);

@@ -108,15 +108,15 @@ public class JBC {
   }
   public static String fname(Class<?> c) {
     if (c.isPrimitive()) {
-        if (c==boolean.class) return "Z";
-        if (c==byte   .class) return "B";
-        if (c==char   .class) return "C";
-        if (c==double .class) return "D";
-        if (c==float  .class) return "F";
-        if (c==int    .class) return "I";
-        if (c==long   .class) return "J";
-        if (c==short  .class) return "S";
-        if (c==void   .class) return "V";
+      if (c==boolean.class) return "Z";
+      if (c==byte   .class) return "B";
+      if (c==char   .class) return "C";
+      if (c==double .class) return "D";
+      if (c==float  .class) return "F";
+      if (c==int    .class) return "I";
+      if (c==long   .class) return "J";
+      if (c==short  .class) return "S";
+      if (c==void   .class) return "V";
     }
     String n = c.getName().replace('.', '/');
     if (c.isArray()) return n;
@@ -132,9 +132,9 @@ public class JBC {
   
   public static class Const implements Comparable<Const> {
     public byte[] bs;
-  
+    
     public Const(byte[] bs) { this.bs = bs; }
-  
+    
     public int compareTo(JBC.Const o) {
       int c;
       c = Integer.compare(bs.length, o.bs.length);
@@ -155,7 +155,7 @@ public class JBC {
     }
     
     public int hashCode() { return Arrays.hashCode(bs); }
-  
+    
     public String toString() {
       return Arrays.toString(bs);
     }
@@ -170,14 +170,14 @@ public class JBC {
     
     // public BA smt = new BA(); // StackMapTable bytes
     // public int smtc; // StackMapTable entry count 
-  
+    
     public Met(int acc, String name, String type, int argc) { // argc should include `this` if applicable
       this.acc = acc;
       this.name = CONSTANT_Utf8(name);
       this.type = CONSTANT_Utf8(type);
       this.localc = argc; // in case the arguments aren't used
     }
-  
+    
     public void aload(int i) { // get local variable
       localc = Math.max(i+1, localc);
       if (i<4) u(42+i);
@@ -218,14 +218,14 @@ public class JBC {
       if (v < 256) u(18, v);
       else { u(19); u2(v); }
     }
-  
+    
     public void invvirt  (String cls, String name, String type) { u(182); u2(CONSTANT_Methodref(cls, name, type)); } // invoke virtual
     public void invspec  (String cls, String name, String type) { u(183); u2(CONSTANT_Methodref(cls, name, type)); } // invoke special
     public void invstat  (String cls, String name, String type) { u(184); u2(CONSTANT_Methodref(cls, name, type)); } // invoke static
     public void getfield (String cls, String name, String type) { u(180); u2(CONSTANT_Fieldref (cls, name, type)); } // get field from pop
     public void getstatic(String cls, String name, String type) { u(178); u2(CONSTANT_Fieldref (cls, name, type)); } // get static field from pop
     public void putstatic(String cls, String name, String type) { u(179); u2(CONSTANT_Fieldref (cls, name, type)); } // push static field
-  
+    
     public void invvirt  (Class<?> cls, String name, String   type) { invvirt  (name(cls), name,       type ); }
     public void invspec  (Class<?> cls, String name, String   type) { invspec  (name(cls), name,       type ); }
     public void invstat  (Class<?> cls, String name, String   type) { invstat  (name(cls), name,       type ); }
@@ -275,7 +275,7 @@ public class JBC {
     public void ifle0   (Lbl l) { u(158); l.add2(); }
     public void goto_   (Lbl l) { u(167); l.add2(); }
     public void ifnenull(Lbl l) { u(199); l.add2(); } // branch if pop!=null
-  
+    
     public void i2f() { u(134); }
     public void i2d() { u(135); }
     public void i2c() { u(146); }
@@ -303,7 +303,7 @@ public class JBC {
       ls.add(c);
       return c;
     }
-  
+    
     public class Lbl {
       MutIntArr fr2 = new MutIntArr(1);
       MutIntArr fr4p= new MutIntArr(1);
@@ -318,13 +318,13 @@ public class JBC {
         fr4r.add(rel);
         u4(-1);
       }
-  
+      
       public void here() {
         assert pos==-1;
         pos = len;
       }
     }
-  
+    
     public void finish() {
       // ArrayList<Integer> lend = new ArrayList<>();
       for (Lbl l : ls) {
@@ -413,7 +413,7 @@ public class JBC {
   
   public class Fld {
     public final int acc, name, type;
-  
+    
     public Fld(int acc, String name, Class<?> cls) {
       this(acc, name, fname(cls));
     }

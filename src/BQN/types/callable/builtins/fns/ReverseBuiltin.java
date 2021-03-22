@@ -33,7 +33,7 @@ public class ReverseBuiltin extends FnBuiltin {
     if (wi.length > x.r()) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.fArr(x.shape))+" ≡ ≢𝕩, "+Main.fArr(wi)+" ≡ 𝕨)", this);
     wi = Arrays.copyOf(wi, x.r()); // pads with 0s; also creates a mutable copy for moduloing
     if (x.scalar()) return x; // so recursion doesn't have to worry about it
-  
+    
     for (int i = 0; i < wi.length; i++) {
       int l = x.shape[i];
       if (l==0) return x;

@@ -20,13 +20,13 @@ public class MulBuiltin extends FnBuiltin {
     public void call(double[] res, double[] x) {
       for (int i = 0; i < x.length; i++) res[i] = x[i]>0? 1 : x[i]<0? -1 : 0;
     }
-  
+    
     public Value call(int[] x, int[] sh) {
       int[] res = new int[x.length];
       for (int i = 0; i < x.length; i++) res[i] = x[i]>0? 1 : x[i]<0? -1 : 0;
       return new IntArr(res, sh);
     }
-  
+    
     public Value call(BigValue x) {
       return Num.of(x.i.signum());
     }
