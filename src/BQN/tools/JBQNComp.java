@@ -315,7 +315,7 @@ public class JBQNComp extends JBC {
           }
           case FLDO: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
-            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof BQNObj)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");
               fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
@@ -329,7 +329,7 @@ public class JBQNComp extends JBC {
           }
           case FLDM: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
-            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof APLMap)) {
+            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof BQNObj)) {
               fn.new_(DomainError.class); fn.dup();
               fn.ldc("Expected value to the left of '.' to be a namespace");
               fn.invspec(DomainError.class, "<init>", met(void.class, String.class));

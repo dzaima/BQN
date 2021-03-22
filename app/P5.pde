@@ -385,7 +385,7 @@ static Value[] cs(Value v) {
     return res;
   }
   if (v.r() == 2) return CellBuiltin.cells(new TransposeBuiltin().call(v));
-  throw new DomainError("Expected rank∊1‿2, got shape "+Main.formatAPL(v.shape));
+  throw new DomainError("Expected rank∊1‿2, got shape "+Main.fArr(v.shape));
 }
 static float[][] csF(Value[] cs) {
   if (cs.length==0) return new float[0][0];
@@ -434,7 +434,7 @@ static int col(Value v) {
   throw new DomainError("bad color "+v);
 }
 static float fg(Value v, int i) {
-  if (v.r()>1) throw new RankError("Expected vector argument, got shape "+Main.formatAPL(v.shape), null);
+  if (v.r()>1) throw new RankError("Expected vector argument, got shape "+Main.fArr(v.shape), null);
   if (i >= v.ia) throw new LengthError("Expected at least "+(i+1)+" items, got "+v.ia);
   return (float) v.get(i).asDouble();
 }

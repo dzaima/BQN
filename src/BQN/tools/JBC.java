@@ -408,12 +408,6 @@ public class JBC {
       }
     }
     res.u2(0); // attribute count
-    // no attributes
-    // try {
-    //   Files.write(Path.of("src","APL","tools","gen0.class"), res.get());
-    // } catch (Throwable e) {
-    //   e.printStackTrace();
-    // }
     return res.get();
   }
   

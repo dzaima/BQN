@@ -5,7 +5,7 @@ BQN.jar
 nBQN
 BQN.iml
 
-app/code/APL8\.jar
+app/code/*.jar
 app/android/
 app/build
 

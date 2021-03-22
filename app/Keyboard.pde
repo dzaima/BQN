@@ -34,7 +34,7 @@ static class Keyboard extends Drawable {
         keys[y][x].load(row.getJSONObject(x));
       }
     }
-    if (layoutUpdate != null) layoutUpdate.call(Main.toAPL(data.getString("fullName")), Main.toAPL(name));
+    if (layoutUpdate != null) layoutUpdate.call(new ChrArr(data.getString("fullName")), new ChrArr(name));
     redraw();
   }
   void redraw() {
@@ -60,7 +60,7 @@ static class Keyboard extends Drawable {
       start = null;
       t.redraw();
       if (a != null) {
-        if (actionCalled != null) if (actionCalled.call(new HArr(new Value[]{new Num(t.x), new Num(t.y), new Num(actionId()), Main.toAPL(kb.layout)})).equals(Main.toAPL("stop"))) return;
+        if (actionCalled != null) if (actionCalled.call(new HArr(new Value[]{new Num(t.x), new Num(t.y), new Num(actionId()), new ChrArr(kb.layout)})).equals(new ChrArr("stop"))) return;
         a.call();
       }
     }

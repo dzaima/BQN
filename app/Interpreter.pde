@@ -25,7 +25,7 @@ static class AppMap extends SimpleMap {
     switch (s) {
       case "update":
         layoutUpdate = (Fun) v;
-        layoutUpdate.call(Main.toAPL(kb.data.getString("fullName")), Main.toAPL(kb.layout));
+        layoutUpdate.call(new ChrArr(kb.data.getString("fullName")), new ChrArr(kb.layout));
         kb.redraw();
       return;
       case "action": actionCalled = (Fun) v; return;
@@ -39,7 +39,7 @@ static class AppMap extends SimpleMap {
       if (i < topbar.tabs.size()) return topbar.tabs.get(i);
     }
     switch (s) {
-      case "layout": return Main.toAPL(kb.data.getString("fullName"));
+      case "layout": return new ChrArr(kb.data.getString("fullName"));
       case "set": return new Fun() {
         public String ln(FmtInfo f) { return "app.set"; }
         public Value call(Value w, Value x) {
@@ -94,6 +94,7 @@ static Sys glSys = new Sys() {
   String input() {
     return "";
   }
+  boolean hasInput() { return false; }
   void println(String s) {
     System.out.println(s);
     mainREPL.hist.appendLns(s);

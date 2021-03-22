@@ -11,7 +11,7 @@ abstract static class Tab extends SimpleMap {
   
   Value getv(String k) {
     switch (k) {
-      case "name": return Main.toAPL(name());
+      case "name": return new ChrArr(name());
       case "close": return new Fun() {
         public String ln(FmtInfo f) { return Tab.this+".close"; }
         public Value call(Value w) {
@@ -69,7 +69,7 @@ static class REPL extends Tab {
   int iptr = 0; // can be ==input.size()
   String name() { return "REPL"; }
   Value getv(String k) {
-    if (k.equals("eq")) return Main.toAPL(inp.lns.get(0).toString());
+    if (k.equals("eq")) return new ChrArr(inp.lns.get(0).toString());
     return super.getv(k);
   }
   void setv(String k, Value v) {
@@ -344,7 +344,7 @@ static class Grapher extends Tab {
     return "grapher";
   }
   Value getv(String k) {
-    if (k.equals("eq")) return Main.toAPL(input.lns.get(0).toString());
+    if (k.equals("eq")) return new ChrArr(input.lns.get(0).toString());
     if (k.equals("am")) return new Num(g.pts);
     if (k.equals("ln")) return new Num(g.joined? 1 : 0);
     if (k.equals("sz")) return new Num(g.ph);
