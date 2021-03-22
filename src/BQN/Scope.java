@@ -51,6 +51,11 @@ public final class Scope {
     sys = p.sys;
     rnd = p.rnd;
   }
+  public Scope(Scope p, String IWillHandleVariables) {
+    parent = p;
+    sys = p.sys;
+    rnd = p.rnd;
+  }
   public Scope(Scope p, String[] varNames) {
     varMap = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
     parent = p;

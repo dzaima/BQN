@@ -217,7 +217,7 @@ public class BlockTok extends TokArr {
   }
   
   public Value exec(Scope psc, Value w, Value[] vb, int inv) {
-    Scope sc = new Scope(psc);
+    Scope sc = new Scope(psc, "sure");
     boolean dy = w != null;
     for (Body b : inv==0? (dy? bdD : bdM) : inv==1? (dy? bdDxi : bdMxi) : bdDwi) {
       sc.varNames = b.vars; // no cloning is suuuuurely fiiine
@@ -226,6 +226,7 @@ public class BlockTok extends TokArr {
       sc.varAm = b.vars.length;
       Value res = comp.exec(sc, b);
       if (res != null) return res;
+      sc.removeMap();
     }
     throw new DomainError("No header matched", this);
   }
