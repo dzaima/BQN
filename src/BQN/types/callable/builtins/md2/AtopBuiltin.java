@@ -1,7 +1,7 @@
 package BQN.types.callable.builtins.md2;
 
 import BQN.tools.FmtInfo;
-import BQN.types.Value;
+import BQN.types.*;
 import BQN.types.callable.Md2Derv;
 import BQN.types.callable.builtins.Md2Builtin;
 
@@ -26,5 +26,12 @@ public class AtopBuiltin extends Md2Builtin {
   public Value callInvW(Value f, Value g, Value w, Value x) {
     return g.callInvW(f.callInv(w), x);
   }
-  // TODO under
+  
+  public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
+    return g.under(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi); }
+      public Value call(Value x) {
+        return f.under(o, x);
+      }
+    }, x);
+  }
 }
