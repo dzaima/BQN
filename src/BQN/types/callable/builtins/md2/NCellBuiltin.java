@@ -16,7 +16,7 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value x, Md2Derv derv) {
     Value ra = g.call(x);
-    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.fArr(ra.shape), this);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this);
     int rx = dim(ra.get(ra.ia==2? 1 : 0), x.r());
     int[] rsh = Arrays.copyOf(x.shape, rx);
@@ -30,14 +30,14 @@ public class NCellBuiltin extends Md2Builtin {
   
   public Value call(Value f, Value g, Value w, Value x, Md2Derv derv) {
     Value ra = g.call(w, x);
-    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.formatAPL(ra.shape), this);
+    if (ra.r() > 1) throw new RankError("⎉: rank of 𝕘 must be ≤1 (shape ≡ "+Main.fArr(ra.shape), this);
     if (ra.ia<1 || ra.ia>3) throw new LengthError("⎉: 𝕘 must have 1 to 3 items (had "+ra.ia+")", this);
     int rw = dim(ra.get(ra.ia==1? 0 : ra.ia-2), w.r());
     int rx = dim(ra.get(ra.ia==1? 0 : ra.ia-1), x.r());
     
     int min = Math.min(rw, rx);
     int max = Math.max(rw, rx);
-    if (!Arr.eqPrefix(x.shape, w.shape, min)) throw new LengthError("Array prefixes don't match (first "+min+" of "+Main.formatAPL(x.shape)+" vs "+Main.formatAPL(w.shape)+")", this);
+    if (!Arr.eqPrefix(x.shape, w.shape, min)) throw new LengthError("Array prefixes don't match (first "+min+" of "+Main.fArr(x.shape)+" vs "+Main.fArr(w.shape)+")", this);
     Value[] wv = cells(w, rw);
     Value[] xv = cells(x, rx);
     boolean we = rw<rx; // w is expanded

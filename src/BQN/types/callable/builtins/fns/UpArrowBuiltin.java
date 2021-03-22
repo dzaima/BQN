@@ -170,7 +170,7 @@ public class UpArrowBuiltin extends FnBuiltin {
         }
         break chk;
       }
-      throw new LengthError("x⌾(N↓): x didn't match expected shape ("+Main.formatAPL(w.shape)+" ≡ ≢x; expected "+Main.formatAPL(e)+")", blame);
+      throw new LengthError("x⌾(N↓): x didn't match expected shape ("+Main.fArr(w.shape)+" ≡ ≢x; expected "+Main.fArr(e)+")", blame);
     }
     Value[] r = new Value[origW.ia];
     int[] s = origW.shape;

@@ -15,7 +15,7 @@ public final class BitArr extends Arr {
   
   public BitArr(long[] arr, int[] shape) {
     super(shape);
-    assert sizeof(shape) == arr.length : arr.length+" not expected for shape "+Main.formatAPL(shape);
+    assert sizeof(shape) == arr.length : arr.length+" not expected for shape "+Main.fArr(shape);
     this.arr = arr;
   }
   

@@ -57,7 +57,7 @@ public class OldKeyBuiltin extends Md1Builtin {
     if (f instanceof Fun) {
       if (!Arrays.equals(w.shape, x.shape)) {
         if (w.r() != x.r()) throw new RankError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal ranks ("+w.r()+" vs "+x.r()+")", derv);
-        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", derv);
+        throw new LengthError("dyadic ⌸ expected 𝕨 & 𝕩 to have equal shapes ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", derv);
       }
       HashMap<Value, ArrayList<Value>> vals = new HashMap<>();
       ArrayList<Value> order = new ArrayList<>();

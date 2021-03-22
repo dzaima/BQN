@@ -13,7 +13,7 @@ public class FoldBuiltin extends Md1Builtin {
   public String ln(FmtInfo f) { return "´"; }
   
   public Value call(Value f, Value x, Md1Derv derv) {
-    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this);
+    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.fArr(x.shape)+")", this);
     if (x.ia==0) {
       Value id = f.identity();
       if (id == null) throw new DomainError("no identity defined for "+f, this);
@@ -82,7 +82,7 @@ public class FoldBuiltin extends Md1Builtin {
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
-    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.formatAPL(x.shape)+")", this);
+    if (x.r() != 1) throw new DomainError("´: argument must have rank 1 (shape ≡ "+Main.fArr(x.shape)+")", this);
   
     if (x.quickDoubleArr() && w instanceof Num) {
       Pervasion.NN2N fd = f.dyNum();

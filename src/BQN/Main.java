@@ -168,7 +168,7 @@ public class Main {
   public static void println(String s) {
     System.out.println(s);
   }
-  public static String formatAPL(int[] ia) {
+  public static String fArr(int[] ia) {
     if (ia.length == 0) return "⟨⟩";
     StringBuilder r = new StringBuilder(Num.formatInt(ia[0]));
     for (int i = 1; i < ia.length; i++) {

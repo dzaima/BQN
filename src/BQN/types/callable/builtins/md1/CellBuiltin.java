@@ -35,7 +35,7 @@ public class CellBuiltin extends Md1Builtin {
     if (w.r()==0 && x.r()==0) return rq1(f.call(w, x));
     Value[] wc = w.r()==0? ext(w, x.shape[0]) : cells(w);
     Value[] xc = x.r()==0? ext(x, w.shape[0]) : cells(x);
-    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", this);
     if (wc.length == 0) return EmptyArr.SHAPE0Q;
     
     Value[] res = new Value[wc.length];
@@ -63,7 +63,7 @@ public class CellBuiltin extends Md1Builtin {
     if (x.r()==0) throw new DomainError("F˘⁼: 𝕩 had rank 0", this);
     Value[] wc = w.r()==0? ext(w, x.shape[0]) : cells(w);
     Value[] xc = cells(x);
-    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", this);
     if (wc.length == 0) return EmptyArr.SHAPE0Q;
     
     Value[] res = new Value[wc.length];
@@ -78,7 +78,7 @@ public class CellBuiltin extends Md1Builtin {
     if (w.r()==0) throw new DomainError("F˘˜⁼: 𝕨 had rank 0", this);
     Value[] wc = cells(w);
     Value[] xc = x.r()==0? ext(x, w.shape[0]) : cells(x);
-    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+    if (wc.length != xc.length) throw new LengthError("˘: expected first item of shape to match (shapes "+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", this);
     if (wc.length == 0) return EmptyArr.SHAPE0Q;
     
     Value[] res = new Value[wc.length];

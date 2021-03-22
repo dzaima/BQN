@@ -26,7 +26,7 @@ public class Pervasion { // implementations must be okay with not being called o
         boolean we = wr < xr; // w is expanded
         int max = Math.max(w.ia, x.ia);
         int min = Math.min(w.ia, x.ia);
-        if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")");
+        if (!Arr.eqPrefix(w.shape, x.shape, Math.min(wr, xr))) throw new LengthError("shape prefixes not equal ("+ Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")");
         if (min>0) {
           Value[] n = new Value[max];
           int ext = max/min;

@@ -49,7 +49,7 @@ public class GroupBuiltin extends FnBuiltin {
     int[] args = new int[x.ia];
     for (int i = 0; i < args.length; i++) {
       Value c = x.get(i);
-      if (c.r() != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.formatAPL(c.shape)+")", this);
+      if (c.r() != 1) throw new DomainError("⊔: expected items of argument to be vectors (contained item with shape "+Main.fArr(c.shape)+")", this);
       args[i] = c.ia;
     }
     return call(x, UDBuiltin.on(new IntArr(args), null)); // gives strange errors but whatever
@@ -66,7 +66,7 @@ public class GroupBuiltin extends FnBuiltin {
     if (depth <= 1) {
       wsz = 1;
       if (w.r() != 1) {
-        if (x.shape.length<w.r() || !Arr.eqPrefix(w.shape, x.shape, w.r())) throw new RankError("⊔: shape of depth 1 rank "+w.r()+" 𝕨 must be a prefix of 𝕩 ("+Main.formatAPL(w.shape)+" ≡ ≢𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)");
+        if (x.shape.length<w.r() || !Arr.eqPrefix(w.shape, x.shape, w.r())) throw new RankError("⊔: shape of depth 1 rank "+w.r()+" 𝕨 must be a prefix of 𝕩 ("+Main.fArr(w.shape)+" ≡ ≢𝕨; "+Main.fArr(x.shape)+" ≡ ≢𝕩)");
         int[] xsh;
         if (w.r()==0) {
           xsh = new int[x.r()+1]; System.arraycopy(x.shape, 0, xsh, 1, x.r());
@@ -81,7 +81,7 @@ public class GroupBuiltin extends FnBuiltin {
       if (xsz==0) throw new RankError("⊔: 𝕩 cannot be scalar if 𝕨 has depth 1", this);
       int[] wi = w.asIntArr();
       if (w.ia != x.shape[0]) {
-        if (w.ia != x.shape[0]+1) throw new LengthError("⊔: length of 𝕨 must be one of 0‿1+⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
+        if (w.ia != x.shape[0]+1) throw new LengthError("⊔: length of 𝕨 must be one of 0‿1+⊑≢𝕩 ("+w.ia+" ≡ ≠𝕨; "+Main.fArr(x.shape)+" ≡ ≢𝕩)", this);
         max = wi[wi.length-1];
         if (max<-1) throw new DomainError("⊔: didn't expect "+max+" in 𝕨", this);
         wp = new int[][]{Arrays.copyOf(wi, w.ia-1)};
@@ -89,15 +89,15 @@ public class GroupBuiltin extends FnBuiltin {
       } else wp = new int[][]{wi};
     } else if (depth == 2) {
       wsz = w.ia;
-      if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.formatAPL(w.shape)+")", this);
-      if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this);
+      if (w.r() > 1) throw new RankError("⊔: depth 2 𝕨 must have rank ≤1 (had shape "+Main.fArr(w.shape)+")", this);
+      if (wsz > xsz) throw new DomainError("⊔: length of depth 2 𝕨 must be greater than rank of 𝕩 ("+wsz+" ≡ ≠𝕨; "+Main.fArr(x.shape)+" ≡ ≢𝕩)", this);
       wp = new int[wsz][];
       for (int i = 0; i < wsz; i++) {
         Value c = w.get(i);
         if (c.r()!=1) throw new RankError("⊔: items of 𝕨 must be of rank 1", this);
         wp[i] = c.asIntArr();
         if (c.ia != x.shape[i]) { int[] shs = new int[w.ia]; for (int j = 0; j < w.ia; j++) shs[j] = w.get(j).ia;
-          throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.formatAPL(shs)+" ≡ ≠¨𝕨; "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", this); }
+          throw new LengthError("⊔: lengths of 𝕨 must be a prefix of ≢𝕩 ("+Main.fArr(shs)+" ≡ ≠¨𝕨; "+Main.fArr(x.shape)+" ≡ ≢𝕩)", this); }
       }
     } else throw new DomainError("⊔: depth of 𝕨 must be 1 or 2 (was "+depth+")", this);
     

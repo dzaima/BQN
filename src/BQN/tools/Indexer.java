@@ -91,25 +91,25 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
     return x;
   }
   public static int fromShapeChk(int[] sh, int[] pos, Callable blame) {
-    if (sh.length != pos.length) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
+    if (sh.length != pos.length) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.fArr(sh)+"; pos ≡ "+Main.fArr(pos)+")", blame);
     int x = 0;
     for (int i = 0; i < sh.length; i++) {
       int c = pos[i];
       x+= c;
-      if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+Main.formatAPL(pos)+")", blame);
+      if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(sh)+"; pos ≡ "+Main.fArr(pos)+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
     }
     return x;
   }
   public static int fromShapeChk(int[] sh, Value pos, Callable blame) {
-    if (pos.r() > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.formatAPL(pos.shape)+")", blame);
-    if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
+    if (pos.r() > 1) throw new DomainError(blame+": index rank should be ≤1 (shape ≡ "+Main.fArr(pos.shape)+")", blame);
+    if (sh.length != pos.ia) throw new RankError(blame+": indexing at wrong rank (shape ≡ "+Main.fArr(sh)+"; pos ≡ "+pos+")", blame);
     int x = 0;
     int[] ds = pos.asIntArr();
     for (int i = 0; i < sh.length; i++) {
       int c = ds[i];
       x+= c;
-      if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(sh)+"; pos ≡ "+pos+")", blame);
+      if (c<0 || c>=sh[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(sh)+"; pos ≡ "+pos+")", blame);
       if (i != sh.length-1) x*= sh[i+1];
     }
     return x;
@@ -141,8 +141,8 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
           }
         }
       }
-      if (v.r() > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
-      if (!(!deep && ish.length==1) && ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
+      if (v.r() > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.fArr(v.shape)+")", blame);
+      if (!(!deep && ish.length==1) && ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.fArr(ish)+")", blame);
       if (!deep) { // either the rank==1 case or a single position
         int[] res = v.asIntArr();
         if (ish.length == 1) return new PosSh(res, new int[]{res.length});
@@ -154,7 +154,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
         Value c = v.get(i);
         if (c instanceof Primitive) {
           int n = c.asInt();
-          if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+c+")", blame);
+          if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(ish)+"; pos["+i+"] ≡ "+c+")", blame);
           for (int j = 0; j < res.length; j++) res[j]+= n;
         } else {
           int[] ns = c.asIntArr();
@@ -162,7 +162,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
             int n = ns[j];
             n-= 0;
             res[j]+= n;
-            if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+n+")", blame);
+            if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(ish)+"; pos["+i+"] ≡ "+n+")", blame);
           }
         }
         if (i != v.ia-1) {
@@ -175,7 +175,7 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       if (v.quickDoubleArr()) {
         int[] res = v.asIntArr();
         if (v.ia == 0) return new PosSh(EmptyArr.NOINTS, rsh);
-        if (ish.length != 1) throw new RankError(blame+": indexing at rank 1 (indexing by scalars in shape "+Main.formatAPL(ish)+" array)", blame);
+        if (ish.length != 1) throw new RankError(blame+": indexing at rank 1 (indexing by scalars in shape "+Main.fArr(ish)+" array)", blame);
         for (int c : res) if (c<0 || c>=ish[0]) throw new LengthError(blame+": indexing out-of bounds (shape ≡ "+rsh[0]+"; pos ≡ " + c + ")", blame);
         return new PosSh(res, rsh);
       }
@@ -189,14 +189,14 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   // v is an index vector
   // checks for rank & bound errors and returns a ravel index
   public static int vec(Value v, int[] ish, Callable blame) {
-    if (ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.formatAPL(ish)+")", blame);
-    if (v.r() != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.formatAPL(v.shape)+")", blame);
+    if (ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.fArr(ish)+")", blame);
+    if (v.r() != 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.fArr(v.shape)+")", blame);
     int ind = 0;
     int[] vi = v.asIntArr();
     for (int i = 0; i < v.ia; i++) {
       int n = vi[i];
       if (n<0) n+= ish[i];
-      if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos["+i+"] ≡ "+n+")", blame);
+      if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(ish)+"; pos["+i+"] ≡ "+n+")", blame);
       ind = ish[i]*ind + n;
     }
     return ind;
@@ -204,10 +204,10 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
   
   // same, with scalar index into vector
   public static int scal(int n, int[] ish, Callable blame) {
-    if (ish.length!=1) throw new LengthError(blame+": amount of index parts should equal rank (scalar index, shape ≡ "+Main.formatAPL(ish)+")", blame);
+    if (ish.length!=1) throw new LengthError(blame+": amount of index parts should equal rank (scalar index, shape ≡ "+Main.fArr(ish)+")", blame);
     int o = n;
     if (n<0) n+= ish[0];
-    if (n<0 || n>=ish[0]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.formatAPL(ish)+"; pos ≡ "+Num.formatInt(o)+")", blame);
+    if (n<0 || n>=ish[0]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(ish)+"; pos ≡ "+Num.formatInt(o)+")", blame);
     return n;
   }
   

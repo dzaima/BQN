@@ -70,7 +70,7 @@ public class GradeDownBuiltin extends FnBuiltin {
   
   
   public Value call(Value w, Value x) {
-    if (w.r() > x.r()+1) throw new DomainError("⍒: =𝕨 cannot be greater than =𝕩 ("+Main.formatAPL(w.shape)+"≡≢𝕨; "+Main.formatAPL(x.shape)+"≡≢𝕩)", this);
+    if (w.r() > x.r()+1) throw new DomainError("⍒: =𝕨 cannot be greater than =𝕩 ("+Main.fArr(w.shape)+"≡≢𝕨; "+Main.fArr(x.shape)+"≡≢𝕩)", this);
     if (w.r() == 0) throw new DomainError("⍒: 𝕨 cannot be a scalar", this);
     if (w.r() > 1) {
       int xr = x.r()-w.r()+1;

@@ -30,7 +30,7 @@ public class ReverseBuiltin extends FnBuiltin {
     }
     if (w instanceof Primitive) return on(w.asInt(), x);
     int[] wi = w.asIntVec();
-    if (wi.length > x.r()) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.formatAPL(x.shape))+" ≡ ≢𝕩, "+Main.formatAPL(wi)+" ≡ 𝕨)", this);
+    if (wi.length > x.r()) throw new DomainError("⌽: length of 𝕨 was greater than rank of 𝕩 ("+(Main.fArr(x.shape))+" ≡ ≢𝕩, "+Main.fArr(wi)+" ≡ 𝕨)", this);
     wi = Arrays.copyOf(wi, x.r()); // pads with 0s; also creates a mutable copy for moduloing
     if (x.scalar()) return x; // so recursion doesn't have to worry about it
   

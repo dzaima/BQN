@@ -162,7 +162,7 @@ public class JoinBuiltin extends FnBuiltin {
     int c = Math.max(1,Math.max(a,b));
     if (c-a > 1 || c-b > 1) throw new RankError(blame+": argument ranks must differ by 1 or less (were "+a+" and "+b+")", blame);
     for (int i = 1; i < c; i++) {
-      if (w.shape[i+a-c] != x.shape[i+b-c]) throw new LengthError(blame+": lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+      if (w.shape[i+a-c] != x.shape[i+b-c]) throw new LengthError(blame+": lengths not matchable ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", blame);
     }
   }
   public static Value on(Value w, Value x, Callable blame) {
@@ -173,7 +173,7 @@ public class JoinBuiltin extends FnBuiltin {
     int[] sh = new int[c];
     for (int i = 1; i < c; i++) {
       int s = x.shape[i+b-c];
-      if (w.shape[i+a-c] != s) throw new LengthError(blame+": lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+      if (w.shape[i+a-c] != s) throw new LengthError(blame+": lengths not matchable ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", blame);
       sh[i] = s;
     }
     sh[0] = (a==c? w.shape[0] : 1) + (b==c? x.shape[0] : 1);
@@ -237,7 +237,7 @@ public class JoinBuiltin extends FnBuiltin {
     if (!wScalar && !xScalar) {
       if (w.r() != x.r()) throw new RankError("ranks not matchable", blame);
       for (int i = 0; i < w.r(); i++) {
-        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+        if (i != k && w.shape[i] != x.shape[i]) throw new LengthError("lengths not matchable ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", blame);
       }
     }
     int[] rs = !wScalar? w.shape.clone() : x.shape.clone(); // shape of the result

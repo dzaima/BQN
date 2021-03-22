@@ -25,7 +25,7 @@ public abstract class Arr extends Value {
     if (ia == 0) {
       Value pr = fItemS();
       if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : pr==null? "⟨⟩" : "0⥊<"+pr.ln(FmtInfo.def); // def is fine as it's gonna be just 0s and spaces anyways
-      else return Main.formatAPL(shape) + "⥊" + (pr instanceof Char? "@" : pr instanceof Num? "0" : pr==null? "⟨⟩" : "<"+pr.ln(FmtInfo.def));
+      else return Main.fArr(shape) + "⥊" + (pr instanceof Char? "@" : pr instanceof Num? "0" : pr==null? "⟨⟩" : "<"+pr.ln(FmtInfo.def));
     }
     if (r() == 1) { // strings
       StringBuilder all = new StringBuilder();
@@ -121,7 +121,7 @@ public abstract class Arr extends Value {
     return create(v, vecsh(v.length));
   }
   public static Arr create(Value[] v, int[] sh) { // note, doesn't attempt individual item squeezing
-    assert Arr.prod(sh) == v.length : v.length+" ≢ ×´"+Main.formatAPL(sh);
+    assert Arr.prod(sh) == v.length : v.length+" ≢ ×´"+Main.fArr(sh);
     if (v.length == 0) return new EmptyArr(sh, null);
     da: if (v[0] instanceof Num) {
       ia: if (Num.isInt(((Num) v[0]).num)) {
@@ -263,15 +263,15 @@ public abstract class Arr extends Value {
   public static void eqShapes(Value w, Value x) {
     int[] ws = w.shape;
     int[] xs = x.shape;
-    if (ws.length != xs.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")");
+    if (ws.length != xs.length) throw new RankError("ranks don't equal (shapes: " + Main.fArr(ws) + " vs " + Main.fArr(xs) + ")");
     for (int i = 0; i < ws.length; i++) {
-      if (ws[i] != xs[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(ws) + " vs " + Main.formatAPL(xs) + ")");
+      if (ws[i] != xs[i]) throw new LengthError("shapes don't match (" + Main.fArr(ws) + " vs " + Main.fArr(xs) + ")");
     }
   }
   public static void eqShapes(int[] w, int[] x, Callable blame) {
-    if (w.length != x.length) throw new RankError("ranks don't equal (shapes: " + Main.formatAPL(w) + " vs " + Main.formatAPL(x) + ")", blame);
+    if (w.length != x.length) throw new RankError("ranks don't equal (shapes: " + Main.fArr(w) + " vs " + Main.fArr(x) + ")", blame);
     for (int i = 0; i < w.length; i++) {
-      if (w[i] != x[i]) throw new LengthError("shapes don't match (" + Main.formatAPL(w) + " vs " + Main.formatAPL(x) + ")", blame);
+      if (w[i] != x[i]) throw new LengthError("shapes don't match (" + Main.fArr(w) + " vs " + Main.fArr(x) + ")", blame);
     }
   }
   

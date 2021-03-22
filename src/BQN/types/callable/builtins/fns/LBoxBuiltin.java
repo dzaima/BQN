@@ -15,7 +15,7 @@ public class LBoxBuiltin extends FnBuiltin {
   
   public Value call(Value x) {
     if (x.r()==0) throw new RankError("⊏: scalar argument isn't allowed", this);
-    if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.formatAPL(x.shape)+")", this);
+    if (x.shape[0]==0) throw new LengthError("⊏: argument shape cannot start with 0 (had shape "+Main.fArr(x.shape)+")", this);
     int[] nsh = new int[x.r()-1];
     System.arraycopy(x.shape, 1, nsh, 0, nsh.length);
     return MutVal.cut(x, 0, Arr.prod(nsh), nsh);
@@ -93,7 +93,7 @@ public class LBoxBuiltin extends FnBuiltin {
       for (int i = 0; i < wi.length; i++) res.copy(getCell(wi[i], x, this), 0, csz*i, csz);
       return res.get();
     } else {
-      if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.formatAPL(w.shape)+")", this);
+      if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.fArr(w.shape)+")", this);
       if (xr<w.ia) throw new RankError("⊏: =𝕩 can't be greater than ≠𝕨", this);
       
       int shl = 0;
@@ -142,7 +142,7 @@ public class LBoxBuiltin extends FnBuiltin {
     Value call = call(w, x);
     Value v = o instanceof Fun? o.call(call) : o;
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this);
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")", this);
+    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(call.shape)+", got "+Main.fArr(v.shape)+")", this);
     int[] is = w.asIntArr();
     if (x.quickIntArr() && v.quickIntArr()) {
       int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();
@@ -157,7 +157,7 @@ public class LBoxBuiltin extends FnBuiltin {
     Value call = call(x);
     Value v = o instanceof Fun? o.call(call) : o;
     MutVal m = new MutVal(x.shape, x, x.ia);
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.formatAPL(call.shape)+", got "+Main.formatAPL(v.shape)+")", this);
+    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(call.shape)+", got "+Main.fArr(v.shape)+")", this);
     m.copy(v, 0, 0, call.ia);
     m.copy(x, call.ia, call.ia, x.ia-call.ia);
     return m.get();

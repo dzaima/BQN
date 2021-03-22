@@ -136,9 +136,9 @@ public class SlashBuiltin extends FnBuiltin {
     if (x.r()==0) throw new RankError(blame+": 𝕩 cannot be scalar", blame);
     int depth = MatchBuiltin.full(w);
     if (w.r() > 1) {
-      if (!Main.vind) throw new DomainError(blame+": 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", blame);
+      if (!Main.vind) throw new DomainError(blame+": 𝕨 must have rank≤1 (was shape "+Main.fArr(w.shape)+")", blame);
       if (w.r() != x.r()) throw new DomainError(blame+": if 1<=𝕨 then 𝕨 and 𝕩 must have equal ranks ("+w.r()+" vs "+x.r()+")", blame);
-      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError(blame+": if 1<=𝕨 then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", blame);
+      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError(blame+": if 1<=𝕨 then 𝕨 and 𝕩 must have equal shapes ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", blame);
       int[] sh = {w.ia};
       w = w.ofShape(sh);
       x = x.ofShape(sh);
@@ -147,7 +147,7 @@ public class SlashBuiltin extends FnBuiltin {
     if (w.ia == 0) { // TODO reduce empty dimensions as if it were replicated
       return x;
     } else if (depth <= 1) {
-      if (w.r()==1 && w.ia!=x.shape[0]) throw new LengthError(blame+": wrong replicate length (length ≡ "+w.ia+", shape ≡ "+Main.formatAPL(x.shape)+")", blame);
+      if (w.r()==1 && w.ia!=x.shape[0]) throw new LengthError(blame+": wrong replicate length (length ≡ "+w.ia+", shape ≡ "+Main.fArr(x.shape)+")", blame);
       if (w instanceof BitArr && w.r()==1 && x.r()==1) {
         BitArr wb = (BitArr) w;
         wb.setEnd(false);
@@ -309,12 +309,12 @@ public class SlashBuiltin extends FnBuiltin {
       am = new int[1][];
       am[0] = w.asIntVec();
     } else {
-      if (w.ia > x.r()) throw new DomainError(blame+": 𝕨 must have less items than ≠≢𝕩 ("+w.ia+" ≡ ≠𝕨, "+Main.formatAPL(x.shape)+" ≡ ≢𝕩)", blame);
+      if (w.ia > x.r()) throw new DomainError(blame+": 𝕨 must have less items than ≠≢𝕩 ("+w.ia+" ≡ ≠𝕨, "+Main.fArr(x.shape)+" ≡ ≢𝕩)", blame);
       am = new int[w.ia][];
       for (int i = 0; i < w.ia; i++) {
         Value c = w.get(i);
-        if (c.r() > 1) throw new RankError(blame+": depth 2 𝕨 cannot have rank "+c.r()+" items (contained shape "+Main.formatAPL(c.shape)+")", blame);
-        if (c.r()==1 && c.ia!=x.shape[i]) throw new LengthError(blame+": wrong replicate length ("+c.ia+" ≡ ≠"+i+"⊏𝕨, shape ≡ "+Main.formatAPL(x.shape)+")", blame);
+        if (c.r() > 1) throw new RankError(blame+": depth 2 𝕨 cannot have rank "+c.r()+" items (contained shape "+Main.fArr(c.shape)+")", blame);
+        if (c.r()==1 && c.ia!=x.shape[i]) throw new LengthError(blame+": wrong replicate length ("+c.ia+" ≡ ≠"+i+"⊏𝕨, shape ≡ "+Main.fArr(x.shape)+")", blame);
         am[i] = c.asIntArr();
       }
     }
@@ -385,9 +385,9 @@ public class SlashBuiltin extends FnBuiltin {
     }
     int[] sh;
     if (w.r() > 1) {
-      if (!Main.vind) throw new DomainError("𝔽⌾(b⊸/): 𝕨 must have rank≤1 (was shape "+Main.formatAPL(w.shape)+")", this);
+      if (!Main.vind) throw new DomainError("𝔽⌾(b⊸/): 𝕨 must have rank≤1 (was shape "+Main.fArr(w.shape)+")", this);
       if (w.r() != x.r()) throw new DomainError("𝔽⌾(b⊸/): if `1 < =b` then b and 𝕩 must have equal ranks ("+w.r()+" vs "+x.r()+")", this);
-      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError("⌾/: if `1 < =b` then 𝕨 and 𝕩 must have equal shapes ("+Main.formatAPL(w.shape)+" vs "+Main.formatAPL(x.shape)+")", this);
+      if (!Arrays.equals(w.shape, x.shape)) throw new DomainError("⌾/: if `1 < =b` then 𝕨 and 𝕩 must have equal shapes ("+Main.fArr(w.shape)+" vs "+Main.fArr(x.shape)+")", this);
       sh = w.shape;
       int[] fsh = {w.ia};
       w = w.ofShape(fsh);
@@ -396,7 +396,7 @@ public class SlashBuiltin extends FnBuiltin {
     if (w.r()!=1 | x.r()!=1) throw new DomainError("𝔽⌾(b⊸/): dyadic inverting only possible on rank 1 arguments", this);
     if (v.r()!=1) throw new DomainError("𝔽⌾(b⊸/): expected 𝔽 to not change rank", this);
     double asum = w.sum();
-    if (asum != v.ia) throw new LengthError("𝔽⌾(b⊸/): expected 𝔽 to not change shape (was "+asum+", got "+Main.formatAPL(v.shape)+")", this);
+    if (asum != v.ia) throw new LengthError("𝔽⌾(b⊸/): expected 𝔽 to not change shape (was "+asum+", got "+Main.fArr(v.shape)+")", this);
     int ipos = 0;
     int[] wi = w.asIntArr();
     

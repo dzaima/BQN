@@ -25,7 +25,7 @@ public class ShapeBuiltin extends FnBuiltin {
   
   
   public Value call(Value w, Value x) {
-    if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.formatAPL(w.shape)+")", this);
+    if (w.r() > 1) throw new DomainError("⥊: multidimensional shape (≢𝕨 is "+Main.fArr(w.shape)+")", this);
     int[] sh;
     int emptyPos = -1;
     int emptyMode = 2; // 0-∘(exact); 1-⌊(discard); 2-⌽(recycle); 3-↑(pad)
