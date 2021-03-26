@@ -273,21 +273,21 @@ public class SysVals {
   static class Import extends RelFn {
     public String ln(FmtInfo f) { return "•Import"; }
     
-    private final Scope sc;
-    Import(Scope sc) { this.sc = sc; Main.unsafe(this); }
+    private final Sys sys;
+    Import(Scope sc) { sys = sc.sys; }
     
     public Value call(String path, Value x) {
       Path p = Sys.path(path, x.asString());
-      Value val = sc.sys.imported.get(p);
+      Value val = sys.imported.get(p);
       if (val == null) {
-        val = sc.sys.execFile(p, new Scope(sc));
-        sc.sys.imported.put(p, val);
+        val = sys.execFile(p, new Scope(sys));
+        sys.imported.put(p, val);
       }
       return val;
     }
     
     public Value call(String path, Value w, Value x) {
-      return sc.sys.execFile(Sys.path(path, x.asString()), w, new Scope(sc));
+      return sys.execFile(Sys.path(path, x.asString()), w, new Scope(sys));
     }
   }
   static class FLines extends RelFn {
