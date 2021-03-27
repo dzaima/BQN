@@ -617,8 +617,8 @@ public class SysVals {
       if (x instanceof      Fun) return Num.NUMS[3];
       if (x instanceof      Md1) return Num.NUMS[4];
       if (x instanceof      Md2) return Num.NUMS[5];
-      if (x instanceof BigValue) return Num.NUMS[6];
-      if (x instanceof BQNObj) return Num.NUMS[7];
+      if (x instanceof   BQNObj) return Num.NUMS[6];
+      if (x instanceof BigValue) return Num.NUMS[7];
       return Num.NUMS[99];
     }
   }
@@ -663,9 +663,9 @@ public class SysVals {
        30=100| - function
        40=100| - 1-modifier
        50=100| - 2-modifier
-       60=100| - bigint
-       70=100| - namespace object
-       71=100| - native namespace
+       60=100| - namespace object
+       61=100| - native namespace
+       70=100| - bigint
       
       0=⌊𝕩÷100 - primitive
       1=⌊𝕩÷100 - array
@@ -687,9 +687,9 @@ public class SysVals {
         if (x instanceof       Fun) return Num.NUMS[30];
         if (x instanceof       Md1) return Num.NUMS[40];
         if (x instanceof       Md2) return Num.NUMS[50];
-        if (x instanceof  BigValue) return Num.NUMS[60];
-        if (x instanceof Namespace) return Num.NUMS[70];
-        if (x instanceof BQNObj) return Num.NUMS[71];
+        if (x instanceof Namespace) return Num.NUMS[60];
+        if (x instanceof    BQNObj) return Num.NUMS[61];
+        if (x instanceof  BigValue) return Num.NUMS[70];
         return Num.NUMS[0];
       }
     }
@@ -703,8 +703,8 @@ public class SysVals {
       if (wi.length == 2) {
         int f = wi[0];
         int t = wi[1];
-        if ((f==10 || f==11 || f==60)
-          && (t==10 || t==11 || t==60)
+        if ((f==10 || f==11 || f==70)
+          && (t==10 || t==11 || t==70)
           && (f==11 ^ t==11)) { // convert float to/from bits/long
           if (t==11) {
             if (f==10) return DepthBuiltin.on(new Fun() {
@@ -713,7 +713,7 @@ public class SysVals {
                 return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
               }
             }, 1, x, this);
-            if (f==60) return DepthBuiltin.on(new Fun() {
+            if (f==70) return DepthBuiltin.on(new Fun() {
               public String ln(FmtInfo f) { return "•DR"; }
               public Value call(Value x) {
                 return new Num(Double.longBitsToDouble(((BigValue) x).longValue()));
@@ -726,7 +726,7 @@ public class SysVals {
                 return new BitArr(new long[]{Long.reverse(Double.doubleToRawLongBits(x.asDouble()))}, Arr.vecsh(64));
               }
             }, 0, x, this);
-            if (t==60) return DepthBuiltin.on(new Fun() {
+            if (t==70) return DepthBuiltin.on(new Fun() {
               public String ln(FmtInfo f) { return "•DR"; }
               public Value call(Value x) {
                 return new BigValue(Double.doubleToRawLongBits(x.asDouble()));
