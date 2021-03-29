@@ -518,7 +518,7 @@ public class SysVals {
     
     Shell() { Main.unsafe(this); }
     public Value call(Value x) {
-      return exec(x, null, null, false);
+      return exec(x, null, null, false, EmptyArr.NOSTRS);
     }
     public Value call(Value w, Value x) {
       BQNObj m = (BQNObj) w;
@@ -539,26 +539,32 @@ public class SysVals {
           }
         }
       }
+      Value env = m.get("env");
+      String[] enva = EmptyArr.NOSTRS;
+      if (env != null) {
+        enva = new String[env.ia];
+        for (int i = 0; i < enva.length; i++) enva[i] = env.get(i).asString();
+      }
       
       boolean raw = false;
       Value rawo = m.get("raw");
       if (rawo != null) raw = Main.bool(rawo);
       
-      return exec(x, dir, inp, raw);
+      return exec(x, dir, inp, raw, enva);
     }
     
-    public Value exec(Value w, File f, byte[] inp, boolean raw) {
+    public Value exec(Value w, File f, byte[] inp, boolean raw, String[] env) {
       try {
         Process p;
         if (w.get(0) instanceof Char) {
           String cmd = w.asString();
-          p = java.lang.Runtime.getRuntime().exec(cmd, EmptyArr.NOSTRS, f);
+          p = java.lang.Runtime.getRuntime().exec(cmd, env, f);
         } else {
           String[] parts = new String[w.ia];
           for (int i = 0; i < parts.length; i++) {
             parts[i] = w.get(i).asString();
           }
-          p = java.lang.Runtime.getRuntime().exec(parts, EmptyArr.NOSTRS, f);
+          p = java.lang.Runtime.getRuntime().exec(parts, env, f);
         }
         Num ret = Num.of(p.waitFor());
         if (inp != null) p.getOutputStream().write(inp);
