@@ -1,6 +1,7 @@
 package BQN;
 
 import BQN.errors.*;
+import BQN.errors.AssertionError;
 import BQN.tokenizer.Tk2;
 import BQN.tokenizer.types.BasicLines;
 import BQN.tools.Format;
@@ -117,6 +118,9 @@ public class Main {
             throw new DomainError("Unknown command-line argument "+p);
           }
         }
+      } catch (AssertionError e) {
+        e.print(sys);
+        if (!REPL) System.exit(1);
       } catch (BQNError e) {
         e.print(sys);
         System.out.println("Stack:");

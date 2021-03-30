@@ -38,7 +38,7 @@ public class Comp {
   public static final byte ARRM =  4; // N; create a mutable vector of top N items
   public static final byte FN1C =  5; // monadic function call ⟨…,x,f  ⟩ → F x
   public static final byte FN2C =  6; //  dyadic function call ⟨…,x,f,w⟩ → w F x
-  public static final byte OP1D =  7; // derive 1-modifier to function; ⟨…,  _m,f⟩ → (f _m) 
+  public static final byte OP1D =  7; // derive 1-modifier to function; ⟨…,  _m,f⟩ → (f _m)
   public static final byte OP2D =  8; // derive 2-modifier to function; ⟨…,g,_m,f⟩ → (f _m_ g)
   public static final byte TR2D =  9; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
   public static final byte TR3D = 10; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
