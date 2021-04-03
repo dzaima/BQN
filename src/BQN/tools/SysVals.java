@@ -566,8 +566,9 @@ public class SysVals {
           }
           p = java.lang.Runtime.getRuntime().exec(parts, env, f);
         }
-        Num ret = Num.of(p.waitFor());
         if (inp != null) p.getOutputStream().write(inp);
+        p.getOutputStream().close();
+        Num ret = Num.of(p.waitFor());
         byte[] out = readAllBytes(p.getInputStream());
         byte[] err = readAllBytes(p.getErrorStream());
         if (raw) return new HArr(new Value[]{ret, new IntArr(out), new IntArr(err)});
