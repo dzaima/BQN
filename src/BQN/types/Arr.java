@@ -42,7 +42,7 @@ public abstract class Arr extends Value {
     return null;
   }
   public final String ln(FmtInfo fi) {
-    String f = basicFormat(true);
+    String f = basicFormat(Main.quotestrings);
     if (f != null) return f;
     if (r() == 0) return "<" + get(0).ln(fi);
     if (r() == 1) {
@@ -295,11 +295,11 @@ public abstract class Arr extends Value {
       int sl = s.length();
       
       if (r==1) {
-        MutVal m = new MutVal(new int[]{2+ia}, Char.SPACE);
+        MutVal m = new MutVal(new int[]{ia+(Main.quotestrings?2:0)}, Char.SPACE);
         int i = 0;
         int o = 0;
         
-        m.set(o++, Char.ASCII['"']);
+        if (Main.quotestrings) m.set(o++, Char.ASCII['"']);
         while (i != sl) {
           int c = s.codePointAt(i);
           int csz = Character.charCount(c);
@@ -308,7 +308,7 @@ public abstract class Arr extends Value {
           m.set(o++, Format.chr(c, csz));
           i+= csz;
         }
-        m.set(o++, Char.ASCII['"']);
+        if (Main.quotestrings) m.set(o++, Char.ASCII['"']);
         Value mv = m.get();
         if (i==o-2) return mv;
         return MutVal.cut(mv, 0, o, new int[]{o});

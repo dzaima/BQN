@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class Main {
   public static boolean debug = false;
   public static boolean vind = false; // vector indexing
-  public static boolean quotestrings = false; // whether to quote strings & chars in non-oneline mode
+  public static boolean quotestrings = true; // whether to quote strings & chars in non-oneline mode
   public static boolean colorful = true;
   public static final boolean SAFE = false;
   static int printlvl = 0;
@@ -40,19 +40,18 @@ public class Main {
             if (p.charAt(1) == '-') {
               switch (p) {
                 case "--help":
-                  println("Usage: BQN [options]");
+                  println("Usage: BQN [options] [file.bqn arguments]");
                   println("Options:");
                   println("-f file: execute the contents of the file with all further arguments as •args");
                   println("-e code: execute the argument as BQN");
-                  println("-p code: execute the argument as BQN and print its result");
+                  println("-p code: execute the argument as BQN and print its result pretty-printed");
+                  println("-o code: execute the argument as BQN and print its raw result");
                   println("-i     : execute STDIN as BQN");
                   println("-r     : start the REPL after everything else");
                   println("-s     : start the REPL without indenting input after everything else");
                   println("-d     : enable debug mode");
-                  println("-q     : quote strings in output");
-                  println("-b     : disable boxing");
+                  println("-b     : disable pretty-printing");
                   println("-c     : disable colorful printing");
-                  println("-q     : enable quoting strings");
                   println("If given no arguments, an implicit -r will be added");
                   System.exit(0);
                   break;
@@ -75,6 +74,10 @@ public class Main {
                     break;
                   case 'p':
                     code = args[++i];
+                    println(Format.outputFmt(exec(code, sys.gsc, sys.defArgs).pretty(sys.fi)));
+                    break;
+                  case 'o':
+                    code = args[++i];
                     println(Format.outputFmt(exec(code, sys.gsc, sys.defArgs)));
                     break;
                   case 'i':
@@ -94,9 +97,6 @@ public class Main {
                   case 'd':
                     debug = true;
                     break;
-                  case 'q':
-                    quotestrings = true;
-                    break;
                   case 'b':
                     sys.ln = true;
                     break;
@@ -108,14 +108,13 @@ public class Main {
                 }
               }
             }
-          } else if (p.charAt(0)=='•') {
-            int si = p.indexOf('←');
-            if (si == -1) throw new DomainError("argument `"+p+"` didn't contain a `←`");
-            String qk = p.substring(0, si);
-            String qv = p.substring(si+1);
-            sys.gsc.set(qk, exec(qv, sys.gsc, sys.defArgs));
           } else {
-            throw new DomainError("Unknown command-line argument "+p);
+            String name = p; i++;
+            Value[] gargs = new Value[args.length-i];
+            for (int j = 0; j < gargs.length; j++) gargs[j] = new ChrArr(args[i+j]);
+            sys.execFile(Sys.path(sys.cd, name), new HArr(gargs), sys.gsc);
+            i = args.length;
+            break;
           }
         }
       } catch (AssertionError e) {
