@@ -3,7 +3,7 @@ package BQN;
 import BQN.errors.*;
 import BQN.tokenizer.*;
 import BQN.tokenizer.types.*;
-import BQN.tools.FmtInfo;
+import BQN.tools.*;
 import BQN.types.*;
 import BQN.types.arrs.*;
 import BQN.types.callable.blocks.*;
@@ -177,18 +177,21 @@ public abstract class Sys {
     } else {
       Comp.SingleComp comp = Comp.comp(Main.tokenize(s, defArgs), csc, true);
       if (comp.c.bc.length==0) return;
-      int ci = 0;
-      while (true) {
-        int ni = comp.c.next(ci);
-        if (ni == comp.c.bc.length) break;
-        ci = ni;
-      }
-      int lins = comp.c.bc[ci];
       Value r = comp.exec(csc);
-      if (r!=null && lins!=Comp.SETN && lins!=Comp.SETU && lins!=Comp.SETM) {
-        println(r);
-      }
+      if (r!=null && !shy(comp.c)) println(r);
     }
+  }
+  
+  public static boolean shy(Comp c) {
+    if (c.bc.length==0) return true;
+    int ci = 0;
+    while (true) {
+      int ni = c.next(ci);
+      if (ni == c.bc.length) break;
+      ci = ni;
+    }
+    int lins = c.bc[ci];
+    return lins==Comp.SETN || lins==Comp.SETU || lins==Comp.SETM || (ci>2 && lins==Comp.FN1C && c.bc[ci-2]==Comp.SYSV && c.bc[ci-1]==SysVals.getID("•out"));
   }
   
   public void lineCatch(String s) {
