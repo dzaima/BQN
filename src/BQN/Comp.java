@@ -62,7 +62,8 @@ public class Comp {
   public static final byte NSPM = 28; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
   public static final byte RETD = 29; // return a namespace of exported items
   public static final byte SYSV = 30; // N; get system function N
-  public static final byte SPEC = 31; // special
+  public static final byte LOCU = 31; // N; get system function N
+  public static final byte SPEC = 32; // special
   public static final byte   EVAL   = 0; // ⍎
   public static final byte   STDIN  = 1; // •
   public static final byte   STDOUT = 2; // •←
@@ -124,6 +125,14 @@ public class Comp {
             int depth = bc[c++];
             int index = bc[c++];
             Value got = sc.getL(depth, index);
+            if (got==null) throw new ValueError("Reading variable before creation");
+            s.push(got);
+            break;
+          }
+          case LOCU: {
+            int depth = bc[c++];
+            int index = bc[c++];
+            Value got = sc.getDel(depth, index);
             if (got==null) throw new ValueError("Reading variable before creation");
             s.push(got);
             break;
@@ -392,6 +401,7 @@ public class Comp {
           case OP2H: cs = "OP2H"; break;
           case VFYM: cs = "VFYM"; break;
           case LOCO: cs = "LOCO " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case LOCU: cs = "LOCU " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
           case LOCM: cs = "LOCM " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
           case NSPM: cs = "NSPM " + l7dec(bc, i) + " " + safeObj(l7dec(bc, i=l7end(bc, i))); i = l7end(bc, i); break;
           case RETN: cs = "RETN"; break;
@@ -474,7 +484,7 @@ public class Comp {
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case SPEC: return i+2;
-      case LOCO: case LOCM: case NSPM:
+      case LOCO: case LOCM: case LOCU: case NSPM:
         return l7end(bc, l7end(bc, i+1));
       default  : return -1;
     }

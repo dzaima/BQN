@@ -163,6 +163,12 @@ public final class Scope {
   public Value getL(int depth, int n) {
     return owner(depth).vars[n];
   }
+  public Value getDel(int depth, int n) {
+    Value[] v = owner(depth).vars;
+    Value r = v[n];
+    v[n] = null;
+    return r;
+  }
   
   
   public String toString() {

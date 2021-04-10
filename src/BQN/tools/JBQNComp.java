@@ -88,6 +88,20 @@ public class JBQNComp extends JBC {
             cstack++;
             break;
           }
+          case LOCU: {
+            int n0 = bc[i++];
+            int n1 = bc[i++];
+            fn.aload(SC);
+            for (int j = 0; j < n0; j++) fn.getfield(Scope.class, "parent", Scope.class);
+            fn.getfield(Scope.class, "vars", Value[].class);
+            fn.dup();
+            fn.iconst(n1); fn.aaload();
+            fn.swap();
+            fn.iconst(n1); fn.aconst_null(); fn.aastore();
+            mstack = Math.max(mstack, cstack+4);
+            cstack++;
+            break;
+          }
           case LOCM: {
             int n0 = bc[i++];
             int n1 = bc[i++];
