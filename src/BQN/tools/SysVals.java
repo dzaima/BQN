@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Supplier;
+import java.time.Instant;
 
 public class SysVals {
   public static HashMap<String, Value> vsMap = new HashMap<>();
@@ -36,6 +37,8 @@ public class SysVals {
     define("•runtime", new Runtime());
     define("•time", Timer::new);
     define("•timed", new Timed());
+    define("•monotime", new MonoTime());
+    define("•unixtime", new UnixTime());
     define("•ctime", CompTimer::new);
     
     define ("•import", Import::new); REL.put("•import", 5);
@@ -168,6 +171,16 @@ public class SysVals {
         else return formatTime(ns);
       }
     }
+  }
+  static class MonoTime extends Fun {
+    public String ln(FmtInfo f) { return "•MonoTime"; }
+    
+    public Value call(Value x) { return new Num(System.nanoTime()*1e-9); }
+  }
+  static class UnixTime extends Fun {
+    public String ln(FmtInfo f) { return "•UnixTime"; }
+    
+    public Value call(Value x) { return new Num(Instant.now().toEpochMilli()/1000d); }
   }
   static class Timer extends Fun {
     public String ln(FmtInfo f) { return "•TIME"; }
