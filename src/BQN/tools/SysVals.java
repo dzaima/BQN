@@ -60,8 +60,9 @@ public class SysVals {
     define("•gc", sc -> { Main.unsafe("GC"); System.gc(); return new Num(java.lang.Runtime.getRuntime().totalMemory() - java.lang.Runtime.getRuntime().freeMemory()); });
     
     define("•out", Out::new);
+    define("•show", Show::new);
     define("•stdin", Stdin::new);
-    define("•pretty", Pretty::new);
+    define("•fmt", Fmt::new);
     define("•sh", sc -> new Shell());
     
     define("•type", new Type());
@@ -484,6 +485,15 @@ public class SysVals {
       return x;
     }
   }
+  static class Show extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Show"; }
+    
+    private final Scope sc;
+    Show(Scope sc) { this.sc = sc; }
+    
+    public Value call(         Value x) { sc.sys.println(Format.outputFmt(Fmt.on(sc,    x))); return x; }
+    public Value call(Value w, Value x) { sc.sys.println(Format.outputFmt(Fmt.on(sc, w, x))); return x; }
+  }
   static class Stdin extends FnBuiltin {
     public String ln(FmtInfo f) { return "•STDIN"; }
     
@@ -505,17 +515,18 @@ public class SysVals {
       throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
     }
   }
-  static class Pretty extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•Pretty"; }
+  static class Fmt extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Fmt"; }
     
     private final Scope sc;
-    Pretty(Scope sc) { this.sc = sc; }
+    Fmt(Scope sc) { this.sc = sc; }
+    public Value call(         Value x) { return on(sc,    x); }
+    public Value call(Value w, Value x) { return on(sc, w, x); }
     
-    public Value call(Value x) {
-      return call(Num.ONE, x);
+    public static Value on(Scope sc, Value x) {
+      return on(sc, Num.ONE, x);
     }
-    
-    public Value call(Value w, Value x) {
+    public static Value on(Scope sc, Value w, Value x) {
       int wi = w.asInt();
       if (Math.abs(wi)==2) {
         String v = x.ln(sc.sys.fi);
