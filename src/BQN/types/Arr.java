@@ -283,19 +283,18 @@ public abstract class Arr extends Value {
     
     spec: if (g0 instanceof Char && r<=2) { // strings
       String s;
-      if (this instanceof ChrArr) s = ((ChrArr) this).s;
-      else {
-        StringBuilder b = new StringBuilder(ia);
-        for (Value c : this) {
-          if (!(c instanceof Char)) break spec;
-          b.append(((Char) c).chr);
-        }
-        s = b.toString();
+      StringBuilder b = new StringBuilder(ia);
+      for (Value c : this) {
+        if (!(c instanceof Char)) break spec;
+        char cc = ((Char) c).chr;
+        if (r!=1 | !Main.quotestrings | cc!='"') b.append(cc);
+        else b.append("\"\"");
       }
+      s = b.toString();
       int sl = s.length();
       
       if (r==1) {
-        MutVal m = new MutVal(new int[]{ia+(Main.quotestrings?2:0)}, Char.SPACE);
+        MutVal m = new MutVal(new int[]{s.length()+(Main.quotestrings?2:0)}, Char.SPACE);
         int i = 0;
         int o = 0;
         
