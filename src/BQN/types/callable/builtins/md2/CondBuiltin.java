@@ -2,6 +2,7 @@ package BQN.types.callable.builtins.md2;
 
 import BQN.errors.*;
 import BQN.tools.FmtInfo;
+import BQN.tools.Indexer;
 import BQN.types.*;
 import BQN.types.callable.Md2Derv;
 import BQN.types.callable.builtins.Md2Builtin;
@@ -21,7 +22,8 @@ public class CondBuiltin extends Md2Builtin {
     if (F instanceof Num) {
       int f = F.asInt();
       if (g.r() != 1) throw new RankError("◶: Expected 𝕘 to be a vector, had rank "+g.r(), this);
-      if (f>=g.ia || f<0) throw new LengthError("◶: 𝔽 out of bounds of 𝕘 (𝔽 = "+f+")", this);
+      if (f>=g.ia) throw new LengthError("◶: 𝔽 out of bounds of 𝕘 (𝔽 = "+f+")", this);
+      if (f<0) return g.get(Indexer.scal(f, g.shape, this));
       return g.get(f);
     }
     return LBoxUBBuiltin.on(F, g, this);
