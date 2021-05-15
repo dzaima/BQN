@@ -49,7 +49,7 @@ public class MathNS extends SimpleMap {
       case "acos": return acos;
       case "atan": return atan;
     }
-    throw new ValueError("No key "+s+" for •math");
+    throw new ValueError("No key "+s+" in •math");
   }
   
   public void setv(String s, Value v) {

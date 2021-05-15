@@ -63,6 +63,7 @@ public class SysVals {
     define("•show", Show::new);
     define("•stdin", Stdin::new);
     define("•fmt", Fmt::new);
+    define("•repr", new Repr());
     define("•sh", sc -> new Shell());
     
     define("•type", new Type());
@@ -83,6 +84,7 @@ public class SysVals {
     defineU("•jload", JLoad::new);
     
     define("•rand", Rand::new);
+    define("•cmp", new Cmp());
     define("•r", new Replace());
     define("•hash", new Hash());
     define("•fillfn", new FillFn());
@@ -535,6 +537,14 @@ public class SysVals {
         Value v = x.pretty(sc.sys.fi);
         return wi<0? v : new ChrArr(FmtInfo.fmt(v));
       }
+    }
+  }
+  static class Repr extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Repr"; }
+    public Value call(Value x) { return on(x); }
+    public static Value on(Value x) {
+      if (x instanceof Num) return new ChrArr(x.ln(FmtInfo.def));
+      throw new Error("•Repr currently only allowed on numbers");
     }
   }
   static class Shell extends FnBuiltin {
@@ -1022,6 +1032,11 @@ public class SysVals {
     private final Scope sc;
     Rand(Scope sc) { this.sc = sc; }
     public Value call(Value x) { return RandBuiltin.on(x, sc); }
+  }
+  static class Cmp extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Cmp"; }
+    
+    public Value call(Value w, Value x) { return Num.of(w.compareTo(x)); }
   }
   static class Replace extends Md2Builtin {
     public String ln(FmtInfo f) { return "•_R_"; }
