@@ -87,7 +87,7 @@ public class Comp {
   }
   
   
-  public static final boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable");
+  public static final boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable") && !Main.SAFE;
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
