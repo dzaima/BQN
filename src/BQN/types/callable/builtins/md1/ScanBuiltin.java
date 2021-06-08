@@ -117,7 +117,7 @@ public class ScanBuiltin extends Md1Builtin {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         final double[] dres;
-        ia: if (x.quickIntArr() && w.quickDoubleArr()) {
+        ia: if (x.quickIntArr() && w.quickIntArr()) {
           if (x.r()==1 && x instanceof BitArr && Main.isBool(w)) {
             if (f instanceof NEBuiltin) {
               long[] xl = ((BitArr) x).arr;
