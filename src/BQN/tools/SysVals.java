@@ -602,34 +602,46 @@ public class SysVals {
         }
         if (inp != null) p.getOutputStream().write(inp);
         p.getOutputStream().close();
+        ISReader ir = new ISReader(p.getInputStream()); // god dammit everything sucks man
+        ISReader er = new ISReader(p.getErrorStream());
+        while (ir.cont() || er.cont());
         Num ret = Num.of(p.waitFor());
-        byte[] out = readAllBytes(p.getInputStream());
-        byte[] err = readAllBytes(p.getErrorStream());
-        if (raw) return new HArr(new Value[]{ret, new IntArr(out), new IntArr(err)});
+        while (ir.cont() || er.cont());
+        if (raw) return new HArr(new Value[]{ret, new IntArr(ir.get()), new IntArr(er.get())});
         else return new HArr(new Value[]{
           ret,
-          new ChrArr(new String(out, StandardCharsets.UTF_8)),
-          new ChrArr(new String(err, StandardCharsets.UTF_8))
+          new ChrArr(new String(ir.get(), StandardCharsets.UTF_8)),
+          new ChrArr(new String(er.get(), StandardCharsets.UTF_8))
         });
       } catch (Throwable e) {
-        throw new DomainError("Failed to execute: "+e.getMessage());
+        throw new DomainError("Failed to execute: "+e.getClass().getName()+": "+e.getMessage());
       }
     }
-    private byte[] readAllBytes(InputStream is) {
-      try {
-        byte[] res = new byte[512];
-        int used = 0;
-        read: while (true) {
-          while (used < res.length) {
-            int n = is.read(res, used, res.length-used);
-            if (n==-1) break read;
-            used+= n;
-          }
-          if (used==res.length) res = Arrays.copyOf(res, res.length*2);
+    private static class ISReader {
+      final ArrayList<byte[]> lists = new ArrayList<>();
+      final InputStream s;
+      int size;
+      ISReader(InputStream s) {
+        this.s = s;
+      }
+            
+      boolean cont() throws IOException {
+        byte[] t = new byte[1024];
+        int read = s.read(t);
+        if (read<=0) return read!=-1;
+        size+= read;
+        lists.add(read==1024? t : Arrays.copyOf(t, read));
+        return true;
+      }
+      byte[] get() throws IOException {
+        s.close();
+        byte[] res = new byte[size];
+        int pos = 0;
+        for (byte[] c : lists) {
+          System.arraycopy(c, 0, res, pos, c.length);
+          pos+= c.length;
         }
-        return Arrays.copyOf(res, used);
-      } catch (IOException e) {
-        throw new DomainError("failed to read I/O", this);
+        return res;
       }
     }
   }
