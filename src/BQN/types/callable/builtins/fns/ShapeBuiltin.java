@@ -72,13 +72,8 @@ public class ShapeBuiltin extends FnBuiltin {
       ia*= r;
     }
     
-    if (x.ia == 0) {
-      Value fill = x.fItemS();
-      if (ia==0) return new EmptyArr(sh, fill);
-      if (fill==null) throw new DomainError("⥊: unknown fill when resizing empty array to shape "+w.ln(FmtInfo.def), this);
-      return new SingleItemArr(fill, sh);
-    }
     if (ia == 0) return new EmptyArr(sh, x.fItemS());
+    if (x.ia == 0) throw new DomainError("⥊: resizing empty array to non-empty (𝕨 ≡ "+w.ln(FmtInfo.def)+")", this);
     if (ia == x.ia) return x.ofShape(sh);
     
     if (emptyMode==3) {

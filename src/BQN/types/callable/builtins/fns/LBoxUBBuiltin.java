@@ -14,7 +14,7 @@ public class LBoxUBBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⊑"; }
   
   public Value call(Value x) {
-    if (x.ia == 0) return x.fItem();
+    if (x.ia == 0) throw new LengthError("⊑: called on empty array", this);
     return x.first();
   }
   
