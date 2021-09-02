@@ -332,6 +332,11 @@ public class Comp {
             s.push(new SettableNS(vs, objs[n1]));
             break;
           }
+          case ALIM: {
+            int n = bc[c++];
+            s.push(new Alias((Settable)s.pop(), body, n));
+            break;
+          }
           case SPEC: {
             switch(bc[c++]) {
               case EVAL:
@@ -413,6 +418,7 @@ public class Comp {
           case VARU: cs = "VARU "+bc[i++]+" "+        bc[i++];  break;
           case VARM: cs = "VARM "+bc[i++]+" "+        bc[i++];  break;
           case NSPM: cs = "NSPM "+bc[i++]+" "+safeObj(bc[i++]); break;
+          case ALIM: cs = "ALIM "+            safeObj(bc[i++]); break;
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
           case SYSV: cs = "SYSV " +         bc[i++]; break;
@@ -491,9 +497,10 @@ public class Comp {
       case ARRO: case ARRM:
       case FLDO: case FLDM:
       case SYSV: case SPEC:
+      case ALIM:
         return i+2;
       case VARO: case VARM: case VARU: case NSPM:
-        return i + 3;
+        return i+3;
       default: return -1;
     }
   }

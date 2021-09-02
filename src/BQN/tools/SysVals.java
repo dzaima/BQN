@@ -849,9 +849,10 @@ public class SysVals {
       Value blk = x.get(2);
       Value out = x.get(3);
       Value bdy = x.get(4);
-      Value inds = x.ia<6?null:x.get(5);
-      Value inde = x.ia<6?null:x.get(x.ia<=7?5:6); // incl
-      Value src  = x.ia<6?null:x.get(x.ia<=7?6:7);
+      Value names = x.get(5);
+      Value inds = x.ia<7?null:x.get(6);
+      Value inde = x.ia<7?null:x.get(x.ia<=8?6:7); // incl
+      Value src  = x.ia<7?null:x.get(x.ia<=8?7:8);
       
       int[] bcp = bc.asIntVec();
       Token[] ref = new Token[bcp.length];
@@ -862,6 +863,8 @@ public class SysVals {
         for (int i = 0; i < is.length; i++) ref[i] = new CompToken(srcS, is[i], ie[i]+1);
       }
       
+      String[] nameArr = new String[names.ia];
+      for (int i = 0; i < nameArr.length; i++) nameArr[i] = names.get(i).asString();
       
       Value[] objp = new Value[obj.ia];
       for (int i = 0; i < objp.length; i++) objp[i] = obj.get(i);
@@ -874,7 +877,7 @@ public class SysVals {
         String[] vns = new String[vno.length];
         for (int j = 0; j < vno.length; j++) vns[j] = vno[j].asString();
         int[] exp = bd.ia >= 3? SlashBuiltin.on(bd.get(2), null).asIntArr() : null;
-        bodies[i] = new Body(off, vns, exp);
+        bodies[i] = new Body(off, vns, exp, nameArr);
       }
       
       BlockTok[] blocks = new BlockTok[blk.ia];
@@ -947,8 +950,8 @@ public class SysVals {
         inds[i] = cIs;
         inde[i] = cIe-1;
       }
-      if (cIe!=-1) return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR, new IntArr(inds), new IntArr(inde), new ChrArr(src)});
-      else         return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR});
+      if (cIe!=-1) return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR, EmptyArr.SHAPE0S, new IntArr(inds), new IntArr(inde), new ChrArr(src)});
+      else         return new HArr(new Value[]{bcR, objR, blksR, blkR, bodiesR, EmptyArr.SHAPE0S});
     }
     
     private int[] body(ArrayList<Value> bodies, HashMap<Body, Integer> map, Body[] bs) {

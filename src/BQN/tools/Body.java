@@ -22,6 +22,7 @@ public class Body {
   public int start;
   public String[] vars;
   public HashMap<String, Integer> exp;
+  public String[] nameMap; // ID→name for ALIM
   
   // unimportant
   public final boolean immediate;
@@ -30,7 +31,7 @@ public class Body {
   
   
   
-  public Body(int off, String[] vars, int[] exp) { // •COMPiled body
+  public Body(int off, String[] vars, int[] exp, String[] names) { // •COMPiled body
     lns = null;
     
     self = null;
@@ -44,6 +45,7 @@ public class Body {
     type = '⍰';
     arity = 'a';
     inverse = 0; // TODO
+    nameMap = names;
   }
   
   public Body(ArrayList<Token> lns, char arity, boolean immediate) { // no header
