@@ -72,6 +72,8 @@ public class Comp {
   
   public static final byte NSPM = 0x50; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
   public static final byte SPEC = 0x51; // special
+  public static final byte NFLO = 0x52; // N; get field with name objs[N] of ToS
+  public static final byte NFLM = 0x53; // N; set field with name objs[N] from ToS
   public static final byte   EVAL   = 0; // ⍎
   public static final byte   STDIN  = 1; // •
   public static final byte   STDOUT = 2; // •←
@@ -306,7 +308,7 @@ public class Comp {
             s.push(SysVals.get(id, sc));
             break;
           }
-          case FLDO: {
+          case NFLO: {
             int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
@@ -314,7 +316,7 @@ public class Comp {
             s.push(((BQNObj) m).getChk(k));
             break;
           }
-          case FLDM: {
+          case NFLM: {
             int n = bc[c++];
             Obj m = s.pop();
             String k = objs[n].asString();
@@ -330,6 +332,14 @@ public class Comp {
               vs[n0-j-1] = (Settable) s.pop();
             }
             s.push(new SettableNS(vs, objs[n1]));
+            break;
+          }
+          case FLDO: {
+            int n = bc[c++];
+            Obj m = s.pop();
+            String k = body.nameMap[n];
+            if (!(m instanceof BQNObj)) throw new DomainError("Expected value to the left of '.' to be a map");
+            s.push(((BQNObj) m).getChk(k));
             break;
           }
           case ALIM: {
@@ -422,8 +432,8 @@ public class Comp {
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
           case SYSV: cs = "SYSV " +         bc[i++]; break;
-          case FLDO: cs = "FLDO " + safeObj(bc[i++]); break;
-          case FLDM: cs = "FLDM " + safeObj(bc[i++]); break;
+          case NFLO: cs = "FLDO " + safeObj(bc[i++]); break;
+          case NFLM: cs = "FLDM " + safeObj(bc[i++]); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
           default  : cs = "unknown";
         }
@@ -495,7 +505,7 @@ public class Comp {
       case PUSH: case DFND:
       case DYNO: case DYNM:
       case ARRO: case ARRM:
-      case FLDO: case FLDM:
+      case NFLO: case NFLM:
       case SYSV: case SPEC:
       case ALIM:
         return i+2;
@@ -887,7 +897,7 @@ public class Comp {
     }
     void add(Mut m) {
       o.add(m);
-      m.add(tk, mut? FLDM : FLDO);
+      m.add(tk, mut? NFLM : NFLO);
       m.add(m.addObj(new ChrArr(k)));
     }
     

@@ -45,6 +45,7 @@ public class JBQNComp extends JBC {
       int[] bc = comp.bc;
       int i = start;
       int cstack=0;
+      String[] nameMap = null;
       loop: while (i != bc.length) {
         int pi = i;
         i++;
@@ -327,7 +328,7 @@ public class JBQNComp extends JBC {
             cstack++;
             break;
           }
-          case FLDO: { Met.Lbl l = fn.lbl();
+          case NFLO: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
             fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof BQNObj)) {
               fn.new_(DomainError.class); fn.dup();
@@ -341,7 +342,33 @@ public class JBQNComp extends JBC {
             mstack = Math.max(mstack, cstack+3);
             break;
           }
-          case FLDM: { Met.Lbl l = fn.lbl();
+          case FLDO: { Met.Lbl l = fn.lbl();
+            int n = bc[i++];
+            fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof BQNObj)) {
+              fn.new_(DomainError.class); fn.dup();
+              fn.ldc("Expected value to the left of '.' to be a namespace");
+              fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
+              fn.athrow();
+            l.here(); // }
+            fn.cast(BQNObj.class);
+            getMap: if (nameMap==null) {
+              for (BlockTok c : comp.blocks) {
+                if (c.singleBody!=null) nameMap = c.singleBody.nameMap;
+                else for (Body[] cb : new Body[][]{c.bdD, c.bdM, c.bdMxi, c.bdDwi, c.bdDxi}) {
+                  if (cb.length>0) {
+                    nameMap = cb[0].nameMap;
+                    break getMap;
+                  }
+                }
+              }
+            }
+            // noinspection ConstantConditions // it's true that nameMap could still be null, but won't happen if the compiler is used correctly
+            fn.ldc(nameMap[n]);
+            fn.invvirt(BQNObj.class, "getChk", met(Value.class, String.class));
+            mstack = Math.max(mstack, cstack+3);
+            break;
+          }
+          case NFLM: { Met.Lbl l = fn.lbl();
             int n = bc[i++];
             fn.dup(); fn.is(BQNObj.class); fn.ifne0(l); // if (!(ToS instanceof BQNObj)) {
               fn.new_(DomainError.class); fn.dup();
@@ -353,6 +380,17 @@ public class JBQNComp extends JBC {
             fn.ldc(comp.objs[n].asString());
             fn.invvirt(BQNObj.class, "getMut", met(BQNObj.MapPointer.class, String.class));
             mstack = Math.max(mstack, cstack+3);
+            break;
+          }
+          case ALIM: {
+            int n = bc[i++];
+            fn.cast(Settable.class); // s
+            fn.new_(Alias.class);    // s a
+            fn.dup_x1(); fn.swap();  // a a s
+            fn.aload(BODY);          // a a s b
+            fn.iconst(n);            // a a s b i
+            fn.invspec(Alias.class, "<init>", met(void.class, Settable.class, Body.class, int.class));
+            mstack = Math.max(mstack, cstack+4);
             break;
           }
           case NSPM: {
@@ -399,7 +437,7 @@ public class JBQNComp extends JBC {
             fn.getfield(Body.class, "exp", HashMap.class);
             fn.invspec(Namespace.class, "<init>", met(void.class, Scope.class, HashMap.class));
             mstack = Math.max(mstack, cstack+4);
-            cstack++;
+            if (cstack!=1) cstack++;
             break loop;
           }
           case SYSV: {
