@@ -1,6 +1,5 @@
 package BQN.types.callable.builtins.fns;
 
-import BQN.errors.AssertionError;
 import BQN.tools.*;
 import BQN.types.*;
 import BQN.types.callable.builtins.FnBuiltin;

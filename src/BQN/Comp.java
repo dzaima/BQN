@@ -385,12 +385,12 @@ public class Comp {
         i++;
         String cs;
         switch (bc[pi]) {
-          case PUSH: cs = "PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case DYNO: cs = "DYNO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case DYNM: cs = "DYNM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case DFND: cs = "DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case ARRO: cs = "ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case ARRM: cs = "ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
+          case PUSH: cs = "PUSH "+safeObj(bc[i++]); break;
+          case DYNO: cs = "DYNO "+safeObj(bc[i++]); break;
+          case DYNM: cs = "DYNM "+safeObj(bc[i++]); break;
+          case DFND: cs = "DFND "+        bc[i++] ; break;
+          case ARRO: cs = "ARRO "+        bc[i++] ; break;
+          case ARRM: cs = "ARRM "+        bc[i++] ; break;
           case FN1C: cs = "FN1C"; break;
           case FN2C: cs = "FN2C"; break;
           case MD1C: cs = "MD1C"; break;
@@ -409,15 +409,15 @@ public class Comp {
           case MD2L: cs = "MD2L"; break;
           case MD2R: cs = "MD2R"; break;
           case VFYM: cs = "VFYM"; break;
-          case VARO: cs = "VARO " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
-          case VARU: cs = "VARU " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
-          case VARM: cs = "VARM " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
-          case NSPM: cs = "NSPM " + l7dec(bc, i) + " " + safeObj(l7dec(bc, i=l7end(bc, i))); i = l7end(bc, i); break;
+          case VARO: cs = "VARO "+bc[i++]+" "+        bc[i++];  break;
+          case VARU: cs = "VARU "+bc[i++]+" "+        bc[i++];  break;
+          case VARM: cs = "VARM "+bc[i++]+" "+        bc[i++];  break;
+          case NSPM: cs = "NSPM "+bc[i++]+" "+safeObj(bc[i++]); break;
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
-          case SYSV: cs = "SYSV " +         l7dec(bc, i) ; i = l7end(bc, i); break;
-          case FLDO: cs = "FLDO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case FLDM: cs = "FLDM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case SYSV: cs = "SYSV " +         bc[i++]; break;
+          case FLDO: cs = "FLDO " + safeObj(bc[i++]); break;
+          case FLDM: cs = "FLDM " + safeObj(bc[i++]); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
           default  : cs = "unknown";
         }
@@ -480,32 +480,24 @@ public class Comp {
   
   public int next(int i) {
     switch (bc[i]) {
-      case PUSH: case DFND:
-      case DYNO: case DYNM:
-      case ARRO: case ARRM:
-      case FLDO: case FLDM:
-      case SYSV:
-        return l7end(bc, i+1);
       case FN1C: case FN2C: case FN1O: case FN2O:
       case MD1C: case MD2C: case MD2R:
       case TR2D: case TR3D: case TR3O:
       case SETN: case SETU: case SETM: case SETH:
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
-      case SPEC: return i+2;
+      case PUSH: case DFND:
+      case DYNO: case DYNM:
+      case ARRO: case ARRM:
+      case FLDO: case FLDM:
+      case SYSV: case SPEC:
+        return i+2;
       case VARO: case VARM: case VARU: case NSPM:
-        return l7end(bc, l7end(bc, i+1));
-      default  : return -1;
+        return i + 3;
+      default: return -1;
     }
   }
   
-  
-  private int l7dec(int[] bc, int i) {
-    return bc[i];
-  }
-  private int l7end(int[] bc, int i) { // returns first index after end
-    return i+1;
-  }
   
   private String safeObj(int l) {
     if (l>=objs.length) return l+" INVALID";
@@ -948,9 +940,6 @@ public class Comp {
       return "C:"+c.ln(FmtInfo.def);
     }
   }
-  
-  private static final int[] NOINTS = EmptyArr.NOINTS;
-  private static final int[] CHKV_A = new int[]{CHKV};
   
   
   private static void printlvl(String s) {
