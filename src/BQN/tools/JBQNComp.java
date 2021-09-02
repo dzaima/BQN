@@ -57,7 +57,7 @@ public class JBQNComp extends JBC {
             break;
           }
           
-          case VARO: {
+          case DYNO: {
             int n = bc[i++];
             fn.aload(SC);
             fn.ldc(comp.objs[n].asString());
@@ -66,7 +66,7 @@ public class JBQNComp extends JBC {
             cstack++;
             break;
           }
-          case VARM: {
+          case DYNM: {
             int n = bc[i++];
             fn.new_(Variable.class); fn.dup();
             fn.ldc(comp.objs[n].asString());
@@ -77,7 +77,7 @@ public class JBQNComp extends JBC {
           }
           
           
-          case LOCO: {
+          case VARO: {
             int n0 = bc[i++];
             int n1 = bc[i++];
             fn.aload(SC);
@@ -88,7 +88,7 @@ public class JBQNComp extends JBC {
             cstack++;
             break;
           }
-          case LOCU: {
+          case VARU: {
             int n0 = bc[i++];
             int n1 = bc[i++];
             fn.aload(SC);
@@ -102,7 +102,7 @@ public class JBQNComp extends JBC {
             cstack++;
             break;
           }
-          case LOCM: {
+          case VARM: {
             int n0 = bc[i++];
             int n1 = bc[i++];
             fn.new_(Local.class); fn.dup();
@@ -208,14 +208,14 @@ public class JBQNComp extends JBC {
             cstack-= 2;
             break;
           }
-          case OP1D: {
+          case MD1C: {
             fn.swap(); fn.cast(Md1.class); fn.swap();
             
             fn.invvirt(Md1.class, "derive", met(Value.class, Value.class));
             cstack--;
             break;
           }
-          case OP2D: {                //                ; g d f
+          case MD2C: {                //                ; g d f
             fn.astore(TMP);           // store f        ; g d
             fn.cast(Md2.class);       // cast d to 2-mod; g D
             fn.swap();                // place d below f; D g
@@ -224,7 +224,7 @@ public class JBQNComp extends JBC {
             cstack-= 2;
             break;
           }
-          case OP2H: {
+          case MD2R: {
             // g d
             fn.cast(Md2.class);
             fn.swap();

@@ -139,7 +139,7 @@ public final class Scope {
     Scope c = this;
     while (true) {
       Integer pos = c.varMap().get(name);
-      if (pos!=null && c.vars[pos]!=null) return c.vars[pos]; // TODO remove c.vars[pos]!=null once LOC_ usage is finished
+      if (pos!=null && c.vars[pos]!=null) return c.vars[pos]; // TODO remove c.vars[pos]!=null once DYN_ usage is finished
       c = c.parent;
       if (c == null) return null;
     }

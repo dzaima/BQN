@@ -8,5 +8,6 @@ BQN.iml
 app/code/*.jar
 app/android/
 app/build
+app/application*/
 
 *.apk

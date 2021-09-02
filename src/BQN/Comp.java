@@ -31,39 +31,47 @@ public class Comp {
     this.tk = tk;
   }
   
-  public static final byte PUSH =  0; // N; push object from objs[N]
-  public static final byte VARO =  1; // N; push variable with name strs[N]
-  public static final byte VARM =  2; // N; push mutable variable with name strs[N]
-  public static final byte ARRO =  3; // N; create a vector of top N items
-  public static final byte ARRM =  4; // N; create a mutable vector of top N items
-  public static final byte FN1C =  5; // monadic function call ⟨…,x,f  ⟩ → F x
-  public static final byte FN2C =  6; //  dyadic function call ⟨…,x,f,w⟩ → w F x
-  public static final byte OP1D =  7; // derive 1-modifier to function; ⟨…,  _m,f⟩ → (f _m)
-  public static final byte OP2D =  8; // derive 2-modifier to function; ⟨…,g,_m,f⟩ → (f _m_ g)
-  public static final byte TR2D =  9; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
-  public static final byte TR3D = 10; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
-  public static final byte SETN = 11; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
-  public static final byte SETU = 12; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
-  public static final byte SETM = 13; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
-  public static final byte POPS = 14; // pop object from stack
-  public static final byte DFND = 15; // N; push dfns[N], derived to current scope
-  public static final byte FN1O = 16; // optional monadic call (FN1C but checks for · at 𝕩)
-  public static final byte FN2O = 17; // optional  dyadic call (FN2C but checks for · at 𝕩 & 𝕨)
-  public static final byte CHKV = 18; // throw error if top of stack is ·
-  public static final byte TR3O = 19; // TR3D but creates an atop if F is ·
-  public static final byte OP2H = 20; // derive 2-modifier to 1-modifier ⟨…,g,_m_⟩ → (_m_ g)
-  public static final byte LOCO = 21; // N0,N1; push variable at depth N0 and position N1
-  public static final byte LOCM = 22; // N0,N1; push mutable variable at depth N0 and position N1
-  public static final byte VFYM = 23; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
-  public static final byte SETH = 24; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
-  public static final byte RETN = 25; // returns top of stack
-  public static final byte FLDO = 26; // N; get field objs[N] of ToS
-  public static final byte FLDM = 27; // N; set field objs[N] from ToS
-  public static final byte NSPM = 28; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
-  public static final byte RETD = 29; // return a namespace of exported items
-  public static final byte SYSV = 30; // N; get system function N
-  public static final byte LOCU = 31; // N; get system function N
-  public static final byte SPEC = 32; // special
+  public static final byte PUSH = 0x00; // N; push object from objs[N]
+  public static final byte DFND = 0x01; // N; push dfns[N], derived to current scope
+  public static final byte SYSV = 0x02; // N; get system function N
+  
+  public static final byte POPS = 0x06; // pop object from stack
+  public static final byte RETN = 0x07; // returns top of stack
+  public static final byte RETD = 0x08; // return a namespace of exported items
+  public static final byte ARRO = 0x0B; // N; create a vector of top N items
+  public static final byte ARRM = 0x0C; // N; create a mutable vector of top N items
+  
+  public static final byte FN1C = 0x10; // monadic function call ⟨…,x,f  ⟩ → F x
+  public static final byte FN2C = 0x11; //  dyadic function call ⟨…,x,f,w⟩ → w F x
+  public static final byte FN1O = 0x12; // optional monadic call (FN1C but checks for · at 𝕩)
+  public static final byte FN2O = 0x13; // optional  dyadic call (FN2C but checks for · at 𝕩 & 𝕨)
+  public static final byte TR2D = 0x14; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
+  public static final byte TR3D = 0x15; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
+  public static final byte CHKV = 0x16; // throw error if top of stack is ·
+  public static final byte TR3O = 0x17; // TR3D but creates an atop if F is ·
+  
+  public static final byte MD1C = 0x1A; // call/derive 1-modifier; ⟨…,  _m,f⟩ → (f _m)
+  public static final byte MD2C = 0x1B; // call/derive 2-modifier; ⟨…,g,_m,f⟩ → (f _m_ g)
+  public static final byte MD2L = 0x1C; // derive 2-modifier to 1-modifier with 𝔽 ⟨…,_m_,f⟩ → (f _m_)
+  public static final byte MD2R = 0x1D; // derive 2-modifier to 1-modifier with 𝔾 ⟨…,g,_m_⟩ → (_m_ g)
+  
+  public static final byte VARO = 0x20; // N0,N1; push variable at depth N0 and position N1
+  public static final byte VARM = 0x21; // N0,N1; push mutable variable at depth N0 and position N1
+  public static final byte VARU = 0x22; // N0,N1; like VARO but overrides the slot with bi_optOut
+  public static final byte DYNO = 0x26; // N; push variable with name objs[N]
+  public static final byte DYNM = 0x27; // N; push mutable variable with name objs[N]
+  
+  public static final byte VFYM = 0x2B; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
+  public static final byte SETH = 0x2F; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
+  public static final byte SETN = 0x30; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
+  public static final byte SETU = 0x31; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
+  public static final byte SETM = 0x32; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
+  public static final byte FLDO = 0x40; // N; get field nameList[N] from ToS
+  public static final byte FLDM = 0x41; // N; get mutable field nameList[N] from ToS
+  public static final byte ALIM = 0x42; // N; replace ToS with one with a namespace field alias N
+  
+  public static final byte NSPM = 0x50; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
+  public static final byte SPEC = 0x51; // special
   public static final byte   EVAL   = 0; // ⍎
   public static final byte   STDIN  = 1; // •
   public static final byte   STDOUT = 2; // •←
@@ -110,18 +118,18 @@ public class Comp {
             s.push(objs[n]);
             break;
           }
-          case VARO: {
+          case DYNO: {
             int n = bc[c++];
             Value got = sc.getC(objs[n].asString());
             s.push(got);
             break;
           }
-          case VARM: {
+          case DYNM: {
             int n = bc[c++];
             s.push(new Variable(objs[n].asString()));
             break;
           }
-          case LOCO: {
+          case VARO: {
             int depth = bc[c++];
             int index = bc[c++];
             Value got = sc.getL(depth, index);
@@ -129,7 +137,7 @@ public class Comp {
             s.push(got);
             break;
           }
-          case LOCU: {
+          case VARU: {
             int depth = bc[c++];
             int index = bc[c++];
             Value got = sc.getDel(depth, index);
@@ -137,7 +145,7 @@ public class Comp {
             s.push(got);
             break;
           }
-          case LOCM: {
+          case VARM: {
             int depth = bc[c++];
             int index = bc[c++];
             s.push(new Local(depth, index));
@@ -190,7 +198,7 @@ public class Comp {
             else s.push(f.call(w, x));
             break;
           }
-          case OP1D: {
+          case MD1C: {
             Value f = (Value) s.pop();
             Value r = (Value) s.pop();
             if (!(r instanceof Md1)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 1-modifier");
@@ -198,7 +206,7 @@ public class Comp {
             s.push(d);
             break;
           }
-          case OP2D: {
+          case MD2C: {
             Value f = (Value) s.pop();
             Value r = (Value) s.pop();
             Value g = (Value) s.pop();
@@ -207,7 +215,7 @@ public class Comp {
             s.push(d);
             break;
           }
-          case OP2H: {
+          case MD2R: {
             Value r = (Value) s.pop();
             Value g = (Value) s.pop();
             if (!(r instanceof Md2)) throw new SyntaxError("Cannot interpret "+r.humanType(true)+" as a 2-modifier");
@@ -378,15 +386,15 @@ public class Comp {
         String cs;
         switch (bc[pi]) {
           case PUSH: cs = "PUSH " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARO: cs = "VARO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
-          case VARM: cs = "VARM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case DYNO: cs = "DYNO " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
+          case DYNM: cs = "DYNM " + safeObj(l7dec(bc, i)); i = l7end(bc, i); break;
           case DFND: cs = "DFND " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case ARRO: cs = "ARRO " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case ARRM: cs = "ARRM " +         l7dec(bc, i) ; i = l7end(bc, i); break;
           case FN1C: cs = "FN1C"; break;
           case FN2C: cs = "FN2C"; break;
-          case OP1D: cs = "OP1D"; break;
-          case OP2D: cs = "OP2D"; break;
+          case MD1C: cs = "MD1C"; break;
+          case MD2C: cs = "MD2C"; break;
           case TR2D: cs = "TR2D"; break;
           case TR3D: cs = "TR3D"; break;
           case SETN: cs = "SETN"; break;
@@ -398,11 +406,12 @@ public class Comp {
           case FN2O: cs = "FN2O"; break;
           case CHKV: cs = "CHKV"; break;
           case TR3O: cs = "TR3O"; break;
-          case OP2H: cs = "OP2H"; break;
+          case MD2L: cs = "MD2L"; break;
+          case MD2R: cs = "MD2R"; break;
           case VFYM: cs = "VFYM"; break;
-          case LOCO: cs = "LOCO " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
-          case LOCU: cs = "LOCU " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
-          case LOCM: cs = "LOCM " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case VARO: cs = "VARO " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case VARU: cs = "VARU " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
+          case VARM: cs = "VARM " + l7dec(bc, i) + " " +         l7dec(bc, i=l7end(bc, i)) ; i = l7end(bc, i); break;
           case NSPM: cs = "NSPM " + l7dec(bc, i) + " " + safeObj(l7dec(bc, i=l7end(bc, i))); i = l7end(bc, i); break;
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
@@ -472,19 +481,19 @@ public class Comp {
   public int next(int i) {
     switch (bc[i]) {
       case PUSH: case DFND:
-      case VARO: case VARM:
+      case DYNO: case DYNM:
       case ARRO: case ARRM:
       case FLDO: case FLDM:
       case SYSV:
         return l7end(bc, i+1);
       case FN1C: case FN2C: case FN1O: case FN2O:
-      case OP1D: case OP2D: case OP2H:
+      case MD1C: case MD2C: case MD2R:
       case TR2D: case TR3D: case TR3O:
       case SETN: case SETU: case SETM: case SETH:
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case SPEC: return i+2;
-      case LOCO: case LOCM: case LOCU: case NSPM:
+      case VARO: case VARM: case VARU: case NSPM:
         return l7end(bc, l7end(bc, i+1));
       default  : return -1;
     }
@@ -590,7 +599,7 @@ public class Comp {
       do {
         Integer pos = c.vars.get(s);
         if (pos!=null) {
-          add(t, mut? LOCM : LOCO);
+          add(t, mut? VARM : VARO);
           add(d);
           add(pos);
           return;
@@ -610,7 +619,7 @@ public class Comp {
           return;
         }
       }
-      add(t, mut? VARM : VARO);
+      add(t, mut? DYNM : DYNO);
       add(addObj(new ChrArr(s)));
     }
     
@@ -1062,7 +1071,7 @@ public class Comp {
               tps.add(i, new ResCf('f', ((Md1) c.c).derive(f.c), c.lastTok()));
             } else tps.add(i, new ResMix('f', c, f,
               new ResChk(f.lastTok(), f.type=='A'),
-              new ResBC(c.lastTok(), OP1D)
+              new ResBC(c.lastTok(), MD1C)
             ));
             continue;
           }
@@ -1078,7 +1087,7 @@ public class Comp {
               g, new ResChk(g.lastTok(), g.type=='A'),
               c,
               f, new ResChk(f.lastTok(), f.type=='A'),
-              new ResBC(c.lastTok(), OP2D)
+              new ResBC(c.lastTok(), MD2C)
             ));
             continue;
           }
@@ -1091,7 +1100,7 @@ public class Comp {
               (f=tps.remove(i+1)),
               new ResChk(f.type=='A'),
               (  tps.remove(i  )),
-              new ResBC(f.lastTok(), OP2H)
+              new ResBC(f.lastTok(), MD2R)
             ));
             continue;
           }
@@ -1422,7 +1431,7 @@ public class Comp {
         } else if (rel==5) {
           m.var(tk, n, false);
           m.push(tk, ((NameTok) tk).val);
-          m.add(OP1D);
+          m.add(MD1C);
         } else throw new IllegalStateException();
       }
       else m.var(tk, n, false);

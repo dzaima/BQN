@@ -2,7 +2,7 @@
 eval ← (1≤≠)◶{𝕩:•BQN}‿{⍎⊑𝕩}•args # use 1st argument as the interpreter
 err←"err"
 { 𝕊path:
-  lns ← (('#'⊸∊¨∧'#'≠⊑¨)/⊢) •FLines path
+  lns ← ('#'⊸∊¨∧'#'≠(⊑1↑⊢)¨)⊸/ •FLines path
   
   msgs←∾{
     p←⊑𝕩⊐'#'
