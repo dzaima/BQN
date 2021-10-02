@@ -1,0 +1,99 @@
+p5.size ← 600‿800
+g←p5.g
+
+colors ← ∾⟜(⊑ .3 p5._lerp¨ ⊢) p5.Col¨ "0"‿"00fdff"‿"ff00ff"‿"ffff00"‿"ff8000"‿"0000ff"‿"00ff00"‿"ff0000"
+sz ← 23‿10
+b ← sz⥊0
+T ← {<˘⍉>𝕩}
+
+pcs ← T ⟨ # tetromino definitions: (blank) I T O L J S Z
+  ⟨⟩‿⟨⟩ # blank
+  ⟨¯1,0,1, 2⟩‿⟨ 0, 0,0, 0⟩ # I
+  ⟨ 0,0,0,¯1⟩‿⟨ 0,¯1,1, 0⟩ # T
+  ⟨ 0,1,0, 1⟩‿⟨ 0, 0,1, 1⟩ # O
+  ⟨¯1,0,1, 1⟩‿⟨ 0, 0,0, 1⟩ # L
+  ⟨¯1,0,1, 1⟩‿⟨ 0, 0,0,¯1⟩ # J
+  ⟨ 0,0,1, 1⟩‿⟨ 1, 0,0,¯1⟩ # S
+  ⟨ 0,0,1, 1⟩‿⟨¯1, 0,0, 1⟩ # Z
+⟩
+
+hpn ← 0   # held piece number
+hpu ← 0   # is held piece used up
+cpn ← 4   # current piece number
+cpp ← 5‿5 # current piece position
+cpr ← 0   # current piece rotation
+
+bsz ← 30 # block size
+osz ← 20 # UI block icon size
+speed ← 15 # how many frames between dropping due to gravity
+nextDown ← speed # current frame
+nextAm ← 4 # how many pieces to preview
+nextPcs←⟨⟩ # future pieces
+
+ResetTime ← {𝕊: nextDown ↩ speed}
+
+
+
+Blks ← {(1‿¯1×⌽)⍟𝕨 𝕩⊑¨pcs}
+WithPc ← {n‿i𝕊b: n¨⌾((T i+cpr Blks cpn)⊸⊑) b}
+
+OK ← {
+  nps ← 𝕩+𝕨 Blks cpn
+  ¬(∨´⥊>(nps<0)∨nps≥sz)◶{𝕊: ∨´⥊0≠(T nps)⊑b}‿1 @
+}
+Move ← {
+  npp ← cpp+𝕩
+  ok ← cpr OK npp
+  ok◶(NextPiece⍟𝕨)‿{𝕊: cpp↩npp} @
+  ok
+}
+
+SetPiece ← {
+  cpn ↩ 𝕩
+  cpp ↩ 2‿(4+cpn=5)
+  cpr ↩ 0
+}
+RandPiece ← {𝕤
+  {𝕊: nextPcs∾↩1+•rand.Deal 7}⍟⊢(1+nextAm)>≠nextPcs
+  SetPiece ⊑nextPcs
+  nextPcs↓˜↩ 1
+  hpu ↩ 0
+}
+NextPiece ← {𝕤
+  b ↩ (-∘≠↑(∨˝˘0=⊢)⊸/) cpn‿cpp WithPc b
+  RandPiece@
+}
+
+
+p5.Setup ← RandPiece
+NoLock ← {𝕊: ResetTime⍟¬ cpr OK cpp+1‿0}
+keys ← ⟨
+  {k⇐"down"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐0 ⋄ d⇐2 ⋄ F⇐{𝕊:ResetTime@⋄1 Move 1‿0 }}
+  {k⇐"left"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿¯1}}
+  {k⇐"right" ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿1 }}
+⟩
+
+DrawPiece ← {off𝕊n: (n⊑colors)‿"2"‿1 g.Rect (⊢∾osz+⊢) off+⌽osz×0 Blks n}
+p5.Draw ← {𝕤
+  g.BG "2"
+  off ← .5×p5.sz-bsz×⌽sz # offset to center board
+  db ← (¯20↑ cpn‿cpp WithPc ⟨cpn+8 ⋄ {cpr⊸OK◶𝕩‿𝕊 𝕩+1‿0}cpp⟩ WithPc b) # drawn board
+  "2"‿1 g.Rect ((⊢∾bsz+⊢) off+⌽bsz×<˘⍉⁼>↕≢db)∾<db⊏colors # draw board
+  h ← .5×⊑off # half of sidebar size
+  ((<⟨p5.w-h⋄osz×5⟩)+0∾¨(6×osz)×↕nextAm) DrawPiece¨ nextAm↑nextPcs # next pieces
+  ⟨h⋄osz×5⟩ DrawPiece hpn # held piece
+  
+  nextDown-↩ 1
+  {𝕊: ResetTime@ ⋄ 1 Move 1‿0}⍟⊢ 0=nextDown # gravity
+  {𝕊k: # left/right/down logic
+    t←k.t
+    k.ST (p5.Pressed k.k) × t+1
+    k.F⍟⊢ ((t=1) ∨ t>𝕩.s) ∧ 1=𝕩.d|t
+  }¨ keys
+}
+
+p5.OnKey ← {
+  {𝕊⍟(1⊸Move) 1‿0}⍟(" "≡⊢) 𝕩 # hard drop
+  {𝕊: {cpr↩𝕩}⍟(OK⟜cpp) 4|cpr+1}⍟((cpn≢3)∧"up"≡⊢) 𝕩 # rotate
+  {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟(hpu<"z"≡⊢) 𝕩 # hold
+}
