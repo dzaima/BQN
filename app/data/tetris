@@ -53,13 +53,13 @@ SetPiece ← {
   cpp ↩ 2‿(4+cpn=5)
   cpr ↩ 0
 }
-RandPiece ← {𝕤
+RandPiece ← {𝕊:
   {𝕊: nextPcs∾↩1+•rand.Deal 7}⍟⊢(1+nextAm)>≠nextPcs
   SetPiece ⊑nextPcs
   nextPcs↓˜↩ 1
   hpu ↩ 0
 }
-NextPiece ← {𝕤
+NextPiece ← {𝕊:
   b ↩ (-∘≠↑(∨˝˘0=⊢)⊸/) cpn‿cpp WithPc b
   RandPiece@
 }
@@ -74,7 +74,7 @@ keys ← ⟨
 ⟩
 
 DrawPiece ← {off𝕊n: (n⊑colors)‿"2"‿1 g.Rect (⊢∾osz+⊢) off+⌽osz×0 Blks n}
-p5.Draw ← {𝕤
+p5.Draw ← {𝕊:
   g.BG "2"
   off ← .5×p5.sz-bsz×⌽sz # offset to center board
   db ← (¯20↑ cpn‿cpp WithPc ⟨cpn+8 ⋄ {cpr⊸OK◶𝕩‿𝕊 𝕩+1‿0}cpp⟩ WithPc b) # drawn board
@@ -92,8 +92,11 @@ p5.Draw ← {𝕤
   }¨ keys
 }
 
+Rot ← {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr + (cpn≢3)×𝕩}
 p5.OnKey ← {
-  {𝕊⍟(1⊸Move) 1‿0}⍟(" "≡⊢) 𝕩 # hard drop
-  {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr + -⍟(𝕩≡"z")1}⍟((cpn≢3)∧("up"≡⊢)∨"z"≡⊢) 𝕩 # rotate
-  {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟(hpu<"c"≡⊢) 𝕩 # hold
-}
+  " ": {𝕊⍟(1⊸Move) 1‿0}@; # hard drop
+  "c": {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟¬ hpu; # hold
+  "z": Rot ¯1;
+  "up": Rot 1;
+  @
+}∘⊢
