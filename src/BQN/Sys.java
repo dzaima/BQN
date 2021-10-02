@@ -8,6 +8,7 @@ import BQN.types.*;
 import BQN.types.arrs.*;
 import BQN.types.callable.blocks.*;
 import BQN.types.callable.builtins.fns.EvalBuiltin;
+import BQN.types.callable.builtins.RandNS;
 
 import java.io.*;
 import java.nio.file.*;
@@ -180,6 +181,13 @@ public abstract class Sys {
       Value r = comp.exec(csc);
       if (r!=null && !shy(comp.c)) println(r);
     }
+  }
+  
+  
+  Value rand;
+  public Value getRand() {
+    if (rand==null) rand = new RandNS(System.nanoTime());
+    return rand;
   }
   
   public static boolean shy(Comp c) {

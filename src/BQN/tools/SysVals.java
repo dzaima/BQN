@@ -83,7 +83,7 @@ public class SysVals {
     define("•jclass", new JClass());
     defineU("•jload", JLoad::new);
     
-    define("•rand", Rand::new);
+    define("•rand", sc -> sc.sys.getRand());
     define("•cmp", new Cmp());
     define("•r", new Replace());
     define("•hash", new Hash());
@@ -1041,13 +1041,6 @@ public class SysVals {
   }
   
   ////////////////////// EXTRA BUILTINS \\\\\\\\\\\\\\\\\\\\\\
-  static class Rand extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•RAND"; }
-    
-    private final Scope sc;
-    Rand(Scope sc) { this.sc = sc; }
-    public Value call(Value x) { return RandBuiltin.on(x, sc); }
-  }
   static class Cmp extends FnBuiltin {
     public String ln(FmtInfo f) { return "•Cmp"; }
     
