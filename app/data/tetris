@@ -94,6 +94,6 @@ p5.Draw ← {𝕤
 
 p5.OnKey ← {
   {𝕊⍟(1⊸Move) 1‿0}⍟(" "≡⊢) 𝕩 # hard drop
-  {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr+1}⍟((cpn≢3)∧"up"≡⊢) 𝕩 # rotate
-  {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟(hpu<"z"≡⊢) 𝕩 # hold
+  {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr + -⍟(𝕩≡"z")1}⍟((cpn≢3)∧("up"≡⊢)∨"z"≡⊢) 𝕩 # rotate
+  {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟(hpu<"c"≡⊢) 𝕩 # hold
 }
