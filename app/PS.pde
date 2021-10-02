@@ -120,6 +120,9 @@ static class PWindow extends PApplet {
   }
   void mousePressed (MouseEvent e) { tu.mouseEvent(e, true ); }
   void mouseReleased(MouseEvent e) { tu.mouseEvent(e, false); }
+  
+  void keyPressed (KeyEvent e) { tu.keyEvent(e, key, true); keyCode=key=0; /* bad processing and your tendency to close the sketch :| */ }
+  void keyReleased(KeyEvent e) { tu.keyEvent(e, key, false); }
 }
 
 /*/ // ANDROID

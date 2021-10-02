@@ -42,7 +42,7 @@ static class P5Tab extends Tab {
     Scope sc = new Scope(sys.gsc);
     
     e = new WP5Disp();
-    // e = new TP5Disp();
+    //e = new TP5Disp();
     
     final P5Obj p5 = new P5Obj(e);
     sc.set("p5", p5);
@@ -88,6 +88,24 @@ static class P5Tab extends Tab {
         }
         p5.mb(mb, p);
       }
+      public void keyEvent(KeyEvent e, char k, boolean press) {
+        if (e.getNative() instanceof java.awt.event.KeyEvent) {
+          java.awt.event.KeyEvent ne = (java.awt.event.KeyEvent) e.getNative();
+          String skey = java.awt.event.KeyEvent.getKeyText(e.getKeyCode());
+          if (skey.length()!=1) skey = skey.toLowerCase();
+          Value v;
+          if (k==65535 || k==127) v = new ChrArr(skey);
+          else v = new ChrArr(k<32? skey : String.valueOf(k));
+          if (press) p5.kp(arr(ne.isControlDown(), ne.isShiftDown(), ne.isAltDown(), ne.isAltGraphDown(), ne.isMetaDown()), v);
+          if (press) p5.pressedKeys.add(v.asString());
+          else p5.pressedKeys.remove(v.asString());
+        }
+      }
+      Arr arr(boolean... ia) {
+        int[] vs = new int[ia.length];
+        for (int i = 0; i < ia.length; i++) vs[i] = ia[i]? 1 : 0;
+        return new IntArr(vs);
+      }
       public void closed() { }
     });
   }
@@ -96,6 +114,15 @@ static class P5Tab extends Tab {
 static void inv(P5Disp e, Value f, Value x) {
   try {
     if (f!=null) f.call(x);
+  } catch (Throwable t) {
+    t.printStackTrace();
+    glSys.report(t);
+    e.stop();
+  }
+}
+static void inv(P5Disp e, Value f, Value w, Value x) {
+  try {
+    if (f!=null) f.call(w, x);
   } catch (Throwable t) {
     t.printStackTrace();
     glSys.report(t);
@@ -111,7 +138,8 @@ static class P5Obj extends SimpleMap {
   P5Obj(P5Disp e) {
     this.e = e;
   }
-  Value setup, draw, resized;
+  Value setup, draw, resized, onKey;
+  HashSet<String> pressedKeys = new HashSet();
   GObj g = new GObj(null);
   int[] sz; // length==0 means fullscreen
   int fc;
@@ -123,6 +151,9 @@ static class P5Obj extends SimpleMap {
       default    : lm.p(p); break;
     }
   }
+  void kp(Value w, Value x) {
+    inv(e, onKey, w, x);
+  }
   void setv(String k, Value v) {
     switch (k) {
       case "size": case "sz":
@@ -133,6 +164,7 @@ static class P5Obj extends SimpleMap {
       case "draw": draw = v; break;
       case "setup": setup = v; break;
       case "resized": resized = v; break;
+      case "onkey": onKey = v; break;
       default: throw new DomainError("Setting non-existing key "+k+" for p5");
     }
   }
@@ -142,14 +174,31 @@ static class P5Obj extends SimpleMap {
       case "setup"  : return setup;
       case "resized": return resized;
       case "size": case "sz": return sz==null? null : new IntArr(sz);
+      case "w": case "width":  return sz==null? null : new Num(sz[0]);
+      case "h": case "height": return sz==null? null : new Num(sz[0]);
       case "g": return g;
       case "fc": case "framecount": return new Num(fc);
       case "mp": return new IntArr(e.mpos());
       case "mm": return mm; case "rm": return rm; case "lm": return lm;
       // case "fps": return new Num(a.frameRate);
       case "touches": int[] ts = e.touches(); return new IntArr(ts, new int[]{ts.length/2, 2});
-      case "img": return new FnBuiltin() {
-        public String ln(FmtInfo f) { return "p5.Img"; }
+      case "pressed": return new FnBuiltin() { public String ln(FmtInfo f) { return "p5.Pressed"; }
+        public Value call(Value x) {
+          String s = x.asString();
+          return new Num(pressedKeys.contains(s.length()==1? s : s.toLowerCase())? 1 : 0);
+        }
+      };
+      case "lerp": return new Md1Builtin() { public String ln(FmtInfo f) { return "p5._lerp"; }
+        public Value call(Value f, Value w, Value x, Md1Derv derv) {
+          return new Num(lerpColorW(col(w), col(x), f.asDouble()));
+        }
+      };
+      case "col": return new FnBuiltin() { public String ln(FmtInfo f) { return "p5.Col"; }
+        public Value call(Value x) {
+          return new Num(col(x));
+        }
+      };
+      case "img": return new FnBuiltin() { public String ln(FmtInfo f) { return "p5.Img"; }
         public Value call(Value x) {
           if (x.r()!=2) throw new DomainError("p5.Img: Expected argument to be a rank 2 array");
           return new ImgObj(x);
@@ -158,6 +207,9 @@ static class P5Obj extends SimpleMap {
       default: return null;
     }
   }
+}
+static int lerpColorW(int w, int x, double f) {
+  return a.lerpColor(w,x,(float)f);
 }
 static class MB extends SimpleMap {
   public String ln(FmtInfo f) { return "p5."+(d==LEFT? "lm" : d==CENTER? "mm" : "rm"); }
@@ -450,6 +502,7 @@ abstract static class P5Impl {
   abstract void setup(PGraphics g);
   abstract void draw(PGraphics g);
   abstract void mouseEvent(MouseEvent e, boolean pressed);
+  abstract void keyEvent(KeyEvent e, char k, boolean pressed);
   abstract void resized(PGraphics g, int w, int h);
   abstract void closed();
 }
