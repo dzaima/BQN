@@ -97,7 +97,7 @@ void keyPressed(KeyEvent e) {
   //}
   //println("P", +key, keyCode, shift, ctrl, e.getNative());
   //println("P", e.getNative());
-  println(+key,keyCode);
+  //println(+key,keyCode);
   if (key==5 && keyCode==69) {
     println("clearing..");
     background(0);
