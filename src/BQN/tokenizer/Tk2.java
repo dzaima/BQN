@@ -6,7 +6,7 @@ import BQN.tools.Format;
 import BQN.types.*;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
 
 // TODO try storing current index in the Tk2
 public class Tk2 {

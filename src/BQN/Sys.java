@@ -1,14 +1,14 @@
 package BQN;
 
 import BQN.errors.*;
-import BQN.tokenizer.*;
+import BQN.tokenizer.Tk2;
 import BQN.tokenizer.types.*;
 import BQN.tools.*;
 import BQN.types.*;
 import BQN.types.arrs.*;
 import BQN.types.callable.blocks.*;
-import BQN.types.callable.builtins.fns.EvalBuiltin;
 import BQN.types.callable.builtins.RandNS;
+import BQN.types.callable.builtins.fns.EvalBuiltin;
 
 import java.io.*;
 import java.nio.file.*;

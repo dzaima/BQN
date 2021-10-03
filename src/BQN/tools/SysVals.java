@@ -18,9 +18,9 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
-import java.time.Instant;
 
 public class SysVals {
   public static HashMap<String, Value> vsMap = new HashMap<>();

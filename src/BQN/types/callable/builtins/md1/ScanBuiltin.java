@@ -1,7 +1,7 @@
 package BQN.types.callable.builtins.md1;
 
 import BQN.Main;
-import BQN.errors.*;
+import BQN.errors.DomainError;
 import BQN.tools.*;
 import BQN.types.*;
 import BQN.types.arrs.*;

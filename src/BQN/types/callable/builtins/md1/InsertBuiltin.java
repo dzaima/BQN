@@ -3,7 +3,7 @@ package BQN.types.callable.builtins.md1;
 import BQN.Main;
 import BQN.errors.*;
 import BQN.tools.FmtInfo;
-import BQN.types.*;
+import BQN.types.Value;
 import BQN.types.arrs.*;
 import BQN.types.callable.Md1Derv;
 import BQN.types.callable.builtins.Md1Builtin;

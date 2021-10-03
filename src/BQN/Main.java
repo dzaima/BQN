@@ -1,7 +1,7 @@
 package BQN;
 
-import BQN.errors.*;
 import BQN.errors.AssertionError;
+import BQN.errors.*;
 import BQN.tokenizer.Tk2;
 import BQN.tokenizer.types.BasicLines;
 import BQN.tools.Format;

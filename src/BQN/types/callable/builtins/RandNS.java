@@ -3,8 +3,8 @@ package BQN.types.callable.builtins;
 import BQN.errors.*;
 import BQN.tools.FmtInfo;
 import BQN.types.*;
-import BQN.types.mut.SimpleMap;
 import BQN.types.arrs.IntArr;
+import BQN.types.mut.SimpleMap;
 
 import java.util.*;
 

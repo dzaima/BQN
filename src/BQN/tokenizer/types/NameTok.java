@@ -1,6 +1,5 @@
 package BQN.tokenizer.types;
 
-import BQN.Scope;
 import BQN.errors.SyntaxError;
 import BQN.tokenizer.Token;
 import BQN.tools.SysVals;

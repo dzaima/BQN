@@ -1,7 +1,7 @@
 package BQN.types.mut;
 
 import BQN.Scope;
-import BQN.errors.*;
+import BQN.errors.ImplementationError;
 import BQN.tools.Body;
 import BQN.types.*;
 
