@@ -39,12 +39,12 @@ WithPc ← {n‿i𝕊b: n¨⌾((T i+cpr Blks cpn)⊸⊑) b}
 
 OK ← {
   nps ← 𝕩+𝕨 Blks cpn
-  ¬(∨´⥊>(nps<0)∨nps≥sz)◶{𝕊: ∨´⥊0≠(T nps)⊑b}‿1 @
+  {∨´⥊>(nps<0)∨nps≥sz? 0; ∧´⥊0=nps T⊸⊑b}
 }
-Move ← {
-  npp ← cpp+𝕩
+Move ← {drop𝕊d:
+  npp ← cpp+d
   ok ← cpr OK npp
-  ok◶(NextPiece⍟𝕨)‿{𝕊: cpp↩npp} @
+  {ok? cpp↩npp; NextPiece⍟drop @}
   ok
 }
 
@@ -54,7 +54,7 @@ SetPiece ← {
   cpr ↩ 0
 }
 RandPiece ← {𝕊:
-  {𝕊: nextPcs∾↩1+•rand.Deal 7}⍟⊢(1+nextAm)>≠nextPcs
+  {𝕊: nextPcs∾↩1+•rand.Deal 7}⍟⊢ (1+nextAm)>≠nextPcs
   SetPiece ⊑nextPcs
   nextPcs↓˜↩ 1
   hpu ↩ 0
@@ -95,7 +95,7 @@ p5.Draw ← {𝕊:
 Rot ← {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr + (cpn≢3)×𝕩}
 p5.OnKey ← {
   " ": {𝕊⍟(1⊸Move) 1‿0}@; # hard drop
-  "c": {𝕊: hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t}⍟¬ hpu; # hold
+  "c": ¬hpu? hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t; # hold
   "z": Rot ¯1;
   "up": Rot 1;
   @
