@@ -199,7 +199,7 @@ public abstract class Sys {
       ci = ni;
     }
     int lins = c.bc[ci];
-    return lins==Comp.SETN || lins==Comp.SETU || lins==Comp.SETM || (ci>2 && lins==Comp.FN1C && c.bc[ci-2]==Comp.SYSV && (c.bc[ci-1]==SysVals.getID("•out") || c.bc[ci-1]==SysVals.getID("•show")));
+    return lins==Comp.SETN || lins==Comp.SETU || lins==Comp.SETM || lins==Comp.SETC || (ci>2 && lins==Comp.FN1C && c.bc[ci-2]==Comp.SYSV && (c.bc[ci-1]==SysVals.getID("•out") || c.bc[ci-1]==SysVals.getID("•show")));
   }
   
   public void lineCatch(String s) {

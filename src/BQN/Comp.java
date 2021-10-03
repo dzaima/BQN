@@ -67,6 +67,7 @@ public class Comp {
   public static final byte SETN = 0x30; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
   public static final byte SETU = 0x31; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
   public static final byte SETM = 0x32; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
+  public static final byte SETC = 0x33; // set call; _ F↩; (…,  F,mut) → mut F↩
   public static final byte FLDO = 0x40; // N; get field nameList[N] from ToS
   public static final byte FLDM = 0x41; // N; get mutable field nameList[N] from ToS
   public static final byte ALIM = 0x42; // N; replace ToS with one with a namespace field alias N
@@ -272,6 +273,14 @@ public class Comp {
             s.push(r);
             break;
           }
+          case SETC: {
+            Settable k = (Settable) s.pop();
+            Value    f = (Value   ) s.pop();
+            Value    r = f.call(k.get(sc));
+            k.set(r, true, sc, null);
+            s.push(r);
+            break;
+          }
           case SETH: {
             Settable k = (Settable) s.pop();
             Value    v = (Value   ) s.pop();
@@ -423,6 +432,7 @@ public class Comp {
           case SETN: cs = "SETN"; break;
           case SETU: cs = "SETU"; break;
           case SETM: cs = "SETM"; break;
+          case SETC: cs = "SETC"; break;
           case SETH: cs = "SETH"; break;
           case PRED: cs = "PRED"; break;
           case POPS: cs = "POPS"; break;
@@ -508,7 +518,7 @@ public class Comp {
       case FN1C: case FN2C: case FN1O: case FN2O:
       case MD1C: case MD2C: case MD2R:
       case TR2D: case TR3D: case TR3O:
-      case SETN: case SETU: case SETM: case SETH: case PRED:
+      case SETN: case SETU: case SETM: case SETH: case PRED: case SETC:
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case PUSH: case DFND:
@@ -1128,13 +1138,21 @@ public class Comp {
         }
       }
       
+      if (isE(tps, ".!|af↩", 4, last)) {
+        if (Main.debug) printlvl("match af↩");
+                  tps.removeLast(); // ↩
+        Res fn  = tps.removeLast();
+        Res mut = tps.removeLast().mut(false, false);
+        tps.addLast(new ResMix('a', fn, mut, new ResBC(SETC)));
+        continue;
+      }
       if (isE(tps, ".!|af↩a", 5, last)) { //tps.sz>=4+i && isArr(lType) && tps.getL(1).type=='↩' && tps.getL(2).type=='f' && isArr(tps.getL(3).type) 
-        if (Main.debug) printlvl("af↩a");
+        if (Main.debug) printlvl("match af↩a");
         Res val = tps.removeLast();
                   tps.removeLast(); // ↩
         Res fn  = tps.removeLast();
         Res mut = tps.removeLast().mut(false, false);
-        tps.addLast(new ResMix('a', val, fn, mut, new ResBC(SETM) ));
+        tps.addLast(new ResMix('a', val, fn, mut, new ResBC(SETM)));
         continue;
       }
       set: if (tps.size() >= (last? 3 : 4)) {
@@ -1149,7 +1167,7 @@ public class Comp {
           k = norm(k); // 𝕨↩ is a possibility
           if (k==v) {
             if (k!='a'&k!='A'&k!='f'&k!='m'&k!='d') throw new SyntaxError("Cannot assign", ((ResTk) tps.getL(1)).tk);
-            if (Main.debug) printlvl(k+" "+a+" "+v);
+            if (Main.debug) printlvl("match "+k+" "+a+" "+v);
             Res val = tps.removeLast();
                       tps.removeLast(); // ↩/←/⇐
             Res mut = tps.removeLast().mut(a!='↩', a=='⇐');
@@ -1218,6 +1236,7 @@ public class Comp {
         }
         return t.type = 'm';
       } else {
+        if (last == '↩') return t.type = 'a';
         if (last == 'd') return t.type = 'd'; // (_d_←{𝔽𝕘}) should be the only case (+ more variable assignment)
         if (isArr(last)) {
           for (char tp : tps) if (tp=='←' || tp=='↩' || tp=='⇐') return t.type = 'a'; // {x←𝕨} discards the optionality property
@@ -1391,7 +1410,7 @@ public class Comp {
       Res t0 = new ResTk(ts.get(i));
       tps.addFirst(t0);
       i--;
-      final boolean train = (t0.type!='a' && t0.type!='A')  ||  (ts.size()>=2 && ts.get(i).type=='d');
+      final boolean train = (t0.type!='a' && t0.type!='A' && t0.type!='↩')  ||  (ts.size()>=2 && ts.get(i).type=='d');
       
       
       if (Main.debug) {

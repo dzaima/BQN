@@ -333,6 +333,18 @@ public class JBQNComp extends JBC {
             cstack-= 2;
             break;
           }
+          case SETC: {       // f k
+            fn.dup_x1();     // k f k
+            fn.aload(SC);    // k f k sc
+            fn.invvirt(Settable.class, "get", met(Value.class, Scope.class)); // k f K
+            fn.invvirt(Value.class, "call",  met(Value.class, Value.class)); // k n
+            fn.dup_x1();     // n k n
+            fn.iconst(1); fn.aload(SC); fn.aconst_null(); // n k n true sc null
+            fn.invvirt(Settable.class, "set", met(void.class, Value.class, boolean.class, Scope.class, Callable.class)); // n
+            mstack = Math.max(mstack, cstack+4);
+            cstack-= 1;
+            break;
+          }
           case POPS: {
             fn.pop();
             cstack--;
