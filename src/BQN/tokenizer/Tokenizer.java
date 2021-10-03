@@ -304,12 +304,13 @@ public class Tokenizer {
           
           if (tokens.size() > 0) lines.add(new Line(raw, li));
           i++;
-        } else if (c==';' || c==':') {
+        } else if (c==';' || c==':' || c=='?') {
           i++;
           if (tokens.size()==0) throw new SyntaxError("Expected something before "+c, new ErrTok(raw, li));
           Line nln = new Line(raw, li);
           if (c==';') nln.add(new SemiTok (raw, li, i));
           if (c==':') nln.add(new ColonTok(raw, li, i));
+          if (c=='?') nln.add(new PredTok (raw, li, i));
           lines.add(nln);
           lines.add(new Line(raw, li));
         } else if (c == '#') {

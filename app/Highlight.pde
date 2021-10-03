@@ -115,7 +115,7 @@ static class SyntaxHighlight {
     if (t instanceof StranderTok) set(t, th.arr);
     
     if (t instanceof CommentTok) set(t, th.com);
-    if (t instanceof ColonTok || t instanceof SemiTok) set(t, dfncol);
+    if (t instanceof ColonTok || t instanceof SemiTok || t instanceof PredTok) set(t, dfncol);
     if (t instanceof DiamondTok) set(t, th.dmd);
     
     if (t instanceof NameTok) {
