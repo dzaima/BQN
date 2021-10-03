@@ -432,8 +432,8 @@ public class Comp {
           case RETN: cs = "RETN"; break;
           case RETD: cs = "RETD"; break;
           case SYSV: cs = "SYSV " +         bc[i++]; break;
-          case NFLO: cs = "FLDO " + safeObj(bc[i++]); break;
-          case NFLM: cs = "FLDM " + safeObj(bc[i++]); break;
+          case NFLO: cs = "NFLO " + safeObj(bc[i++]); break;
+          case NFLM: cs = "NFLM " + safeObj(bc[i++]); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
           default  : cs = "unknown";
         }
