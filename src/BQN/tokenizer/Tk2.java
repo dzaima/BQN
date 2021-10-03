@@ -60,6 +60,7 @@ public class Tk2 {
       if (c==')' | c=='⟩' | c=='}') break;
       else if (c==';') lns.add(lnWrap(new SemiTok (r, i, ++i)));
       else if (c==':') lns.add(lnWrap(new ColonTok(r, i, ++i)));
+      else if (c=='?') lns.add(lnWrap(new PredTok (r, i, ++i)));
       else i++; // skip [\n\r⋄,]
     }
     return new TkRes<>(lns, i);
@@ -111,7 +112,7 @@ public class Tk2 {
           res.add(t);
           break;
         case '\n': case '\r': case ',': case '⋄':
-        case ';': case ':':
+        case ';': case ':': case '?':
         case ')': case '⟩': case '}':
           break loop;
         case '#':

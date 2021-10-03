@@ -267,12 +267,20 @@ public class JBC {
     public void dup_x2() { u( 91); } // abc → cabc
     public void pop   () { u( 87); } // .. a → ..
     
-    public void ifeq0   (Lbl l) { u(153); l.add2(); }
-    public void ifne0   (Lbl l) { u(154); l.add2(); }
-    public void iflt0   (Lbl l) { u(155); l.add2(); }
-    public void ifge0   (Lbl l) { u(156); l.add2(); }
-    public void ifgt0   (Lbl l) { u(157); l.add2(); }
-    public void ifle0   (Lbl l) { u(158); l.add2(); }
+    public void ifeq0(Lbl l) { u(153); l.add2(); }
+    public void ifne0(Lbl l) { u(154); l.add2(); }
+    public void iflt0(Lbl l) { u(155); l.add2(); }
+    public void ifge0(Lbl l) { u(156); l.add2(); }
+    public void ifgt0(Lbl l) { u(157); l.add2(); }
+    public void ifle0(Lbl l) { u(158); l.add2(); }
+    
+    public void ifeq(Lbl l) { u(159); l.add2(); }
+    public void ifne(Lbl l) { u(160); l.add2(); }
+    public void iflt(Lbl l) { u(161); l.add2(); }
+    public void ifge(Lbl l) { u(162); l.add2(); }
+    public void ifgt(Lbl l) { u(163); l.add2(); }
+    public void ifle(Lbl l) { u(164); l.add2(); }
+    
     public void goto_   (Lbl l) { u(167); l.add2(); }
     public void ifnenull(Lbl l) { u(199); l.add2(); } // branch if pop!=null
     

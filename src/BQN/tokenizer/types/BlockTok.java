@@ -24,6 +24,7 @@ public class BlockTok extends TokArr {
   public BlockTok(String line, int spos, int epos, ArrayList<Token> tokens) {
     super(line, spos, epos, tokens);
     type = 'f'; boolean canBeImmediate = funType(tokens, this);
+    boolean hasPred = false;
     if (tokens.size()==0) throw new SyntaxError("Empty block", this);
     ArrayList<List<Token>> bodyTks = new ArrayList<>();
     int li = 0;
@@ -38,18 +39,22 @@ public class BlockTok extends TokArr {
     ArrayList<Body> bodies = new ArrayList<>();
     for (List<Token> part : bodyTks) {
       boolean header = false;
+      boolean pred = false;
       for (int j = 0; j < part.size(); j++) {
         List<Token> cln = ((LineTok) part.get(j)).tokens;
-        if (cln.size()==1 && cln.get(0) instanceof ColonTok) {
-          if (j != 1) throw new SyntaxError("Function header mid-body", cln.get(0));
-          header = true;
+        if (cln.size()==1) {
+          Token t0 = cln.get(0);
+          if (t0 instanceof ColonTok) {
+            if (j!=1) throw new SyntaxError("Function header mid-body", cln.get(0));
+            header = true;
+          } else if (t0 instanceof PredTok) hasPred = pred = true;
         }
       }
       ArrayList<Token> src = new ArrayList<>(header? part.subList(2, part.size()) : part);
       if (src.size() == 0) throw new SyntaxError("Block contains empty body", this);
       Body body;
-      if (header) body = new Body(src, part.get(0), funType(src, this));
-      else        body = new Body(src, '\0'       , funType(src, this));
+      if (header) body = new Body(src, part.get(0),   funType(src, this));
+      else        body = new Body(src, pred?'a':'\0', funType(src, this));
       bodies.add(body);
     }
     for (int i = 0; i < bodies.size()-2; i++) {
@@ -62,7 +67,7 @@ public class BlockTok extends TokArr {
       else if (p) throw new SyntaxError("Header-less bodies must be at the end", bodies.get(bodies.size()-2).lns.get(0));
       else if (l) { lb.arity='a'; }
     }
-    if (immBlock && canBeImmediate && type=='f' && bodies.size()==1) type = 'a';
+    if (immBlock && canBeImmediate && type=='f' && (bodies.size()==1 || hasPred)) type = 'a';
     
     char htype = 0;
     for (Body b : bodies) {
@@ -216,8 +221,17 @@ public class BlockTok extends TokArr {
       case '?': if (Main.vind) return new FunBlock(this, sc);
         /* fallthrough */
       case 'a': {
-        Body b = bdD[0];
-        return comp.exec(new Scope(sc, b.vars), b);
+        Body b0 = bdD[0];
+        Value r0 = comp.exec(new Scope(sc, b0.vars), b0);
+        if (r0==null) {
+          for (int i = 1; i < bdD.length; i++) {
+            Body b = bdD[i];
+            Value r = comp.exec(new Scope(sc, b.vars), b);
+            if (r!=null) return r;
+          }
+          throw new DomainError("Immediate block didn't match any predicates");
+        }
+        return r0;
       }
       default: throw new IllegalStateException(this.type+"");
     }

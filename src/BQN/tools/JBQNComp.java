@@ -287,7 +287,26 @@ public class JBQNComp extends JBC {
               fn.aconst_null();
               fn.aret();
             l.here();    // }
+            mstack = Math.max(mstack, cstack+1);
             cstack-= 2;
+            break;
+          }
+          case PRED: { Met.Lbl l1=fn.lbl(); Met.Lbl l2=fn.lbl();
+            fn.invvirt(Value.class, "asInt", met(int.class));
+            fn.dup();
+            fn.ifne0(l1); // if (n==0) {
+              fn.aconst_null();
+              fn.aret();
+            l1.here();    // }
+            fn.iconst(1);
+            fn.ifeq(l2); // if (n!=1) {
+              fn.new_(DomainError.class); fn.dup();
+              fn.ldc("Expression left of `?` must return 0 or 1");
+              fn.invspec(DomainError.class, "<init>", met(void.class, String.class));
+              fn.athrow();
+            l2.here();   // }
+            mstack = Math.max(mstack, cstack+2);
+            cstack-= 1;
             break;
           }
           case VFYM: {

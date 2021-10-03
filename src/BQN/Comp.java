@@ -61,6 +61,7 @@ public class Comp {
   public static final byte DYNO = 0x26; // N; push variable with name objs[N]
   public static final byte DYNM = 0x27; // N; push mutable variable with name objs[N]
   
+  public static final byte PRED = 0x2A; // pop item, go to next body if 0, continue if 1
   public static final byte VFYM = 0x2B; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
   public static final byte SETH = 0x2F; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
   public static final byte SETN = 0x30; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
@@ -277,6 +278,13 @@ public class Comp {
             if (!k.seth(v, sc)) return null;
             break;
           }
+          case PRED: {
+            Value v = (Value) s.pop();
+            int n = v.asInt();
+            if (n==0) return null;
+            if (n!=1) throw new DomainError("Expression left of `?` must return 0 or 1");
+            break;
+          }
           case VFYM: {
             Value x = (Value) s.pop();
             s.push(new MatchSettable(x));
@@ -416,6 +424,7 @@ public class Comp {
           case SETU: cs = "SETU"; break;
           case SETM: cs = "SETM"; break;
           case SETH: cs = "SETH"; break;
+          case PRED: cs = "PRED"; break;
           case POPS: cs = "POPS"; break;
           case FN1O: cs = "FN1O"; break;
           case FN2O: cs = "FN2O"; break;
@@ -499,7 +508,7 @@ public class Comp {
       case FN1C: case FN2C: case FN1O: case FN2O:
       case MD1C: case MD2C: case MD2R:
       case TR2D: case TR3D: case TR3O:
-      case SETN: case SETU: case SETM: case SETH:
+      case SETN: case SETU: case SETM: case SETH: case PRED:
       case POPS: case CHKV: case VFYM: case RETN: case RETD:
         return i+1;
       case PUSH: case DFND:
@@ -721,15 +730,21 @@ public class Comp {
       if (sz==0) throw new SyntaxError("Executing empty code");
       LineTok last = null;
       for (int j = 0; j < sz; j++) {
-        if (last!=null) mut.add(POPS);
         LineTok ln = (LineTok) b.lns.get(j);
-        if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
-          compE(mut, ln.tokens.get(0));
+        if (ln.tokens.size()==1 && ln.tokens.get(0).type=='?') {
+          if (last==null) throw new SyntaxError("`?` must be preceded by an expression");
+          mut.add(PRED);
           last = null;
         } else {
-          typeof(ln); flags(ln);
-          compO(mut, ln);
-          last = ln;
+          if (last!=null) mut.add(POPS);
+          if (ln.tokens.size()==2 && ln.tokens.get(1).type=='⇐') {
+            compE(mut, ln.tokens.get(0));
+            last = null;
+          } else {
+            typeof(ln); flags(ln);
+            compO(mut, ln);
+            last = ln;
+          }
         }
       }
       b.vars = mut.getVars();
@@ -1467,7 +1482,7 @@ public class Comp {
       m.add(tk, ARRO); m.add(tks.size());
       return;
     }
-    if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok || tk instanceof StranderTok || tk instanceof ColonTok || tk instanceof SemiTok || tk instanceof DotTok) {
+    if (tk instanceof SetTok || tk instanceof ModTok || tk instanceof ExportTok || tk instanceof StranderTok || tk instanceof ColonTok || tk instanceof PredTok || tk instanceof SemiTok || tk instanceof DotTok) {
       throw new SyntaxError("Standalone `"+tk.source()+"`");
     }
     if (tk instanceof BlockTok) {
