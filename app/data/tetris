@@ -68,7 +68,7 @@ NextPiece ← {𝕊:
 p5.Setup ← RandPiece
 NoLock ← {𝕊: ResetTime⍟¬ cpr OK cpp+1‿0}
 keys ← ⟨
-  {k⇐"down"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐0 ⋄ d⇐2 ⋄ F⇐{𝕊:ResetTime@⋄1 Move 1‿0 }}
+  {k⇐"down"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐0 ⋄ d⇐2 ⋄ F⇐{𝕊:ResetTime⍟⊢0 Move 1‿0 }}
   {k⇐"left"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿¯1}}
   {k⇐"right" ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿1 }}
 ⟩
@@ -84,11 +84,11 @@ p5.Draw ← {𝕊:
   ⟨h⋄osz×5⟩ DrawPiece hpn # held piece
   
   nextDown-↩ 1
-  {𝕊: ResetTime@ ⋄ 1 Move 1‿0}⍟⊢ 0=nextDown # gravity
+  {0≥nextDown? ResetTime@ ⋄ 1 Move 1‿0; @} # gravity
   {𝕊k: # left/right/down logic
     t←k.t
     k.ST (p5.Pressed k.k) × t+1
-    k.F⍟⊢ ((t=1) ∨ t>𝕩.s) ∧ 1=𝕩.d|t
+    (t=1) ∨ t>𝕩.s? 1=𝕩.d|t? k.F 1; @
   }¨ keys
 }
 
