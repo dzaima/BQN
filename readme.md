@@ -14,7 +14,7 @@ java -jar /path/to/dzaima/BQN/BQN.jar -f "$@"
 With GraalVM's Native Image, you can build a complete binary (≈10MB, doesn't need Java at all, startup time <10ms):
 
 ```bash
-native-image --report-unsupported-elements-at-runtime -jar BQN.jar nBQN
+native-image --report-unsupported-elements-at-runtime -J-Dfile.encoding=UTF-8 -jar BQN.jar nBQN
 ```
 This generates a regular executable file `nBQN`, usable in place of `java -jar BQN.jar`. Note that this also disables compilation to Java bytecode, and has different performance characteristics to a regular JVM.
 
