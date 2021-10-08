@@ -121,11 +121,16 @@ static class PWindow extends PApplet {
   void mousePressed (MouseEvent e) { tu.mouseEvent(e, true ); }
   void mouseReleased(MouseEvent e) { tu.mouseEvent(e, false); }
   
-  void keyPressed (KeyEvent e) { tu.keyEvent(e, key, true); keyCode=key=0; /* bad processing and your tendency to close the sketch :| */ }
+  void keyPressed (KeyEvent e) { tu.keyEvent(e, key, true); keyCode=key=0; } // bad processing and your tendency to close the sketch :|
   void keyReleased(KeyEvent e) { tu.keyEvent(e, key, false); }
+}
+static void selectOutput2(String prompt, String callbackName, File f, Object callbackObj) {
+  a.selectOutput(prompt, callbackName, f, callbackObj);
 }
 
 /*/ // ANDROID
+
+static void selectOutput2(String prompt, String callbackName, File f, Object callbackObj) { }
 
 import android.content.ClipboardManager;
 import android.content.*;

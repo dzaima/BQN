@@ -65,6 +65,7 @@ public class SysVals {
     define("•fmt", Fmt::new);
     define("•repr", new Repr());
     define("•sh", sc -> new Shell());
+    define("•exit", Exit::new);
     
     define("•type", new Type());
     define("•glyph", new Glyph());
@@ -515,6 +516,18 @@ public class SysVals {
         return new HArr(res);
       }
       throw new DomainError("•STDIN needs either ⟨⟩ or a number as 𝕩", this);
+    }
+  }
+  static class Exit extends FnBuiltin {
+    public String ln(FmtInfo f) { return "•Exit"; }
+    
+    private final Scope sc;
+    Exit(Scope sc) { this.sc = sc; }
+    
+    public Value call(Value x) {
+      Main.unsafe("•Exit");
+      sc.sys.off(x instanceof Num? x.asInt() : 0);
+      throw new IllegalStateException();
     }
   }
   static class Fmt extends FnBuiltin {

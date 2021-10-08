@@ -147,7 +147,7 @@ public class Main {
   
   static class CliSys extends Sys {
     public void off(int code) {
-      System.exit(0);
+      System.exit(code);
     }
     
     public String input() { return Main.console.nextLine(); }

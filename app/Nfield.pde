@@ -597,7 +597,7 @@ public static class SaveNfield extends Nfield {
   }
   void saved() {
     if (file==null) {
-      a.selectOutput("Save to file", "savecb", new File(a.dataPath(".")), this);
+      selectOutput2("Save to file", "savecb", new File(a.dataPath(".")), this);
     } else {
       println("saving to "+file);
       a.saveBytes(file, allText().getBytes(StandardCharsets.UTF_8));

@@ -209,7 +209,7 @@ static class P5Obj extends SimpleMap {
   }
 }
 static int lerpColorW(int w, int x, double f) {
-  return a.lerpColor(w,x,(float)f);
+  return PGraphics.lerpColor(w,x,(float)f,RGB);
 }
 static class MB extends SimpleMap {
   public String ln(FmtInfo f) { return "p5."+(d==LEFT? "lm" : d==CENTER? "mm" : "rm"); }
