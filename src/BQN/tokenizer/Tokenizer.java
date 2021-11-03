@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class Tokenizer {
-  private static final String ops = "+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶◴⍕⎊˝˙!»«";
+  private static final String ops = "+∘-⊸×⟜÷○*⋆⌾√⎉⌊⚇•⌈⍟∧∨¬|=˜≠˘≤¨<⌜>⁼≥´≡`≢⊣⊢⥊∾≍⋈↑↓↕⌽⍉/⍋⍒⊏⊑⊐⊒∊⍷⊔ℝ⍎⊘◶◴⍕⎊˝˙!»«";
   private static final HashSet<Character> opsHS = new HashSet<>();
   static {
     for (int i = 0; i < ops.length(); i++) {

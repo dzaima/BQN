@@ -1596,6 +1596,7 @@ public class Comp {
       case '↓': return new DownArrowBuiltin();
       case '∾': return new JoinBuiltin();
       case '≍': return new LaminateBuiltin();
+      case '⋈': return new PairBuiltin();
       case '⍉': return new TransposeBuiltin();
       case '⌽': return new ReverseBuiltin();
       case '»': return new ShBBuiltin();

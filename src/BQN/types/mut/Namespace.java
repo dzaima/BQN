@@ -9,7 +9,7 @@ import BQN.types.arrs.ChrArr;
 import java.util.HashMap;
 
 public class Namespace extends BQNObj {
-  private final Scope sc;
+  public final Scope sc;
   private final HashMap<String, Integer> exports;
   public Namespace(Scope sc, HashMap<String, Integer> exports) {
     this.sc = sc;

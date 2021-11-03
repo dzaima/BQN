@@ -9,6 +9,7 @@ import BQN.types.arrs.*;
 import BQN.types.callable.blocks.*;
 import BQN.types.callable.builtins.RandNS;
 import BQN.types.callable.builtins.fns.EvalBuiltin;
+import BQN.types.mut.Namespace;
 
 import java.io.*;
 import java.nio.file.*;
@@ -110,7 +111,7 @@ public abstract class Sys {
               if (nsc == null) throw new DomainError("argument to )cs didn't contain scope information");
               else csc = nsc;
               break;
-            }
+            } else if (v instanceof Namespace) csc = ((Namespace) v).sc;
             else throw new DomainError("argument to )cs wasn't scoped");
           }
         }
