@@ -183,6 +183,9 @@ public abstract class Sys {
       if (r!=null && !shy(comp.c)) println(r);
     }
   }
+  public Value exec(String s) {
+    return Comp.comp(Main.tokenize(s, defArgs), csc, true).exec(csc);
+  }
   
   
   Value rand;

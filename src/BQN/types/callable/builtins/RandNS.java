@@ -3,7 +3,7 @@ package BQN.types.callable.builtins;
 import BQN.errors.*;
 import BQN.tools.FmtInfo;
 import BQN.types.*;
-import BQN.types.arrs.IntArr;
+import BQN.types.arrs.*;
 import BQN.types.mut.SimpleMap;
 
 import java.util.*;
@@ -18,16 +18,24 @@ public class RandNS extends SimpleMap {
   
   private final Value range = new RB("Range") {
     public Value call(Value x) {
-      return new Num(r.nextInt(x.asInt()));
+      int xi = x.asInt();
+      if (xi==0) return new Num(r.nextDouble());
+      return new Num(r.nextInt(xi));
     }
     public Value call(Value w, Value x) {
       int[] wi = w.asIntArr();
       int xv = x.asInt();
       int ia = 1;
       for (int i : wi) ia*= i;
-      int[] ra = new int[ia];
-      for (int i = 0; i < ia; i++) ra[i] = r.nextInt(xv);
-      return new IntArr(ra, wi);
+      if (xv==0) {
+        double[] ra = new double[ia];
+        for (int i = 0; i < ia; i++) ra[i] = r.nextDouble();
+        return new DoubleArr(ra, wi);
+      } else {
+        int[] ra = new int[ia];
+        for (int i = 0; i < ia; i++) ra[i] = r.nextInt(xv);
+        return new IntArr(ra, wi);
+      }
     }
   };
   
