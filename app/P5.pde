@@ -59,7 +59,7 @@ static class P5Tab extends Tab {
     
     if (p5.sz==null) p5.sz = new int[]{100, 100};
     
-    e.start(p5.sz, new P5Impl() {
+    e.start(p5.sz, p5.smooth, new P5Impl() {
       public void setup(PGraphics g) {
         inv(e, p5.setup, Num.ONE);
         g.background(0);
@@ -77,34 +77,18 @@ static class P5Tab extends Tab {
       }
       public void mouseEvent(MouseEvent e, boolean p) {
         int mb = e.getButton();
-        if (!MOBILE) {
-          Object n = e.getNative();
-          if (n instanceof java.awt.event.MouseEvent) {
-            int b = ((java.awt.event.MouseEvent) n).getButton();
-            if      (b==java.awt.event.MouseEvent.BUTTON1) mb = LEFT;
-            else if (b==java.awt.event.MouseEvent.BUTTON2) mb = CENTER;
-            else if (b==java.awt.event.MouseEvent.BUTTON3) mb = RIGHT;
-          }
-        }
+        mb = fixMouseButton(e, mb);
         p5.mb(mb, p);
       }
       public void keyEvent(KeyEvent e, char k, boolean press) {
-        if (e.getNative() instanceof java.awt.event.KeyEvent) {
-          java.awt.event.KeyEvent ne = (java.awt.event.KeyEvent) e.getNative();
-          String skey = java.awt.event.KeyEvent.getKeyText(e.getKeyCode());
-          if (skey.length()!=1) skey = skey.toLowerCase();
-          Value v;
-          if (k==65535 || k==127) v = new ChrArr(skey);
-          else v = new ChrArr(k<32? skey : String.valueOf(k));
-          if (press) p5.kp(arr(ne.isControlDown(), ne.isShiftDown(), ne.isAltDown(), ne.isAltGraphDown(), ne.isMetaDown()), v);
-          if (press) p5.pressedKeys.add(v.asString());
-          else p5.pressedKeys.remove(v.asString());
-        }
-      }
-      Arr arr(boolean... ia) {
-        int[] vs = new int[ia.length];
-        for (int i = 0; i < ia.length; i++) vs[i] = ia[i]? 1 : 0;
-        return new IntArr(vs);
+        String skey = getKeyCodeText(e.getKeyCode());
+        if (skey.length()!=1) skey = skey.toLowerCase();
+        Value v;
+        if (k==65535 || k==127) v = new ChrArr(skey);
+        else v = new ChrArr(k<32? skey : String.valueOf(k));
+        if (press) p5.kp(modArray(e), v);
+        if (press) p5.pressedKeys.add(v.asString());
+        else p5.pressedKeys.remove(v.asString());
       }
       public void closed() { }
     });
@@ -143,6 +127,7 @@ static class P5Obj extends SimpleMap {
   GObj g = new GObj(null);
   int[] sz; // length==0 means fullscreen
   int fc;
+  boolean smooth = true;
   MB lm=new MB(LEFT), mm=new MB(CENTER), rm=new MB(RIGHT);
   void mb(int b, boolean p) {
     switch(b) {
@@ -160,6 +145,9 @@ static class P5Obj extends SimpleMap {
         if (sz!=null) throw new DomainError("Calling p5.Size twice");
         if (v.ia!=2 && v.ia!=0) throw new DomainError("p5.size expected to be set to two integers or an empty array for fullscreen");
         sz = v.asIntVec();
+        break;
+      case "smooth":
+        smooth = Main.bool(v);
         break;
       case "draw": draw = v; break;
       case "setup": setup = v; break;
@@ -493,7 +481,7 @@ static float fg(Value v, int i) {
 
 abstract static class P5Disp {
   AtomicBoolean running = new AtomicBoolean();
-  abstract void start(int[] sz, P5Impl u); // only called once
+  abstract void start(int[] sz, boolean smooth, P5Impl u); // only called once
   abstract void stop(); // should handle multiple calls from multiple threads safely
   abstract int[] touches();
   abstract int[] mpos();
@@ -517,9 +505,9 @@ abstract static class P5Impl {
 
 static class WP5Disp extends P5Disp {
   PWindow win = new PWindow();
-  void start(int[] sz, P5Impl u) {
+  void start(int[] sz, boolean smooth, P5Impl u) {
     assert running.compareAndSet(false, true);
-    win.create(sz, u, this);
+    win.create(sz, smooth, u, this);
   }
   void stop() {
     if (running.compareAndSet(true, false)) {
@@ -540,7 +528,7 @@ static class WP5Disp extends P5Disp {
 static class TP5Disp extends P5Disp {
   P5Tab tab;
   P5Impl u;
-  void start(int[] sz, P5Impl u) {
+  void start(int[] sz, boolean smooth, P5Impl u) {
     boolean was = running.compareAndSet(false, true); assert was;
     this.u = u;
     topbar.toNew(tab = new P5Tab(sz));

@@ -1,4 +1,4 @@
-//* PC
+/* PC
 import java.awt.Toolkit;
 static boolean MOBILE = false;
 class FakeTouch { // for interoperability with android mode
@@ -73,20 +73,23 @@ static void endClip(PGraphics g) {
 
 static class PWindow extends PApplet {
   int tw, th;
+  boolean smooth;
   P5Impl tu;
   WP5Disp td;
-  void create(int[] sz, P5Impl u, WP5Disp d) {
+  void create(int[] sz, boolean smooth, P5Impl u, WP5Disp d) {
     if (sz.length==2) {
       tw = sz[0];
       th = sz[1];
     } else tw=-1;
     tu = u;
     td = d;
+    this.smooth = smooth;
     PApplet.runSketch(new String[]{getClass().getName()}, this);
   }
   void settings() {
     if (tw==-1) fullScreen();
     else size(tw, th);
+    if (!smooth) noSmooth();
   }
   void setup() {
     tu.setup(g);
@@ -128,6 +131,29 @@ static void selectOutput2(String prompt, String callbackName, File f, Object cal
   a.selectOutput(prompt, callbackName, f, callbackObj);
 }
 
+static int fixMouseButton(MouseEvent e, int mb) {
+  Object n = e.getNative();
+  if (n instanceof java.awt.event.MouseEvent) {
+    int b = ((java.awt.event.MouseEvent) n).getButton();
+    if      (b==java.awt.event.MouseEvent.BUTTON1) mb = LEFT;
+    else if (b==java.awt.event.MouseEvent.BUTTON2) mb = CENTER;
+    else if (b==java.awt.event.MouseEvent.BUTTON3) mb = RIGHT;
+  }
+  return mb;
+}
+
+static Value modArray(KeyEvent e) {
+  if (e.getNative() instanceof java.awt.event.KeyEvent) {
+    java.awt.event.KeyEvent ne = (java.awt.event.KeyEvent) e.getNative();
+    return boolarr(ne.isControlDown(), ne.isShiftDown(), ne.isAltDown(), ne.isAltGraphDown(), ne.isMetaDown());
+  }
+  return boolarr(false, false, false, false, false);
+}
+
+static String getKeyCodeText(int code) {
+  return java.awt.event.KeyEvent.getKeyText(code);
+}
+      
 /*/ // ANDROID
 
 static void selectOutput2(String prompt, String callbackName, File f, Object callbackObj) { }
@@ -236,8 +262,19 @@ static void endClip(PGraphics g) {
 }
 
 static class PWindow extends PApplet {
-  void create(int[] sz, P5Impl u, WP5Disp d) { throw new Error("stub"); }
+  void create(int[] sz, boolean smooth, P5Impl u, WP5Disp d) { throw new Error("stub"); }
   void close() { throw new Error("stub"); }
+}
+
+static int fixMouseButton(MouseEvent e, int mb) {
+  return mb;
+}
+
+static Value modArray(KeyEvent e) {
+  return boolarr(false, false, false, false, false);
+}
+static String getKeyCodeText(int code) {
+  return new String(Character.toChars(code));
 }
 
 //*/

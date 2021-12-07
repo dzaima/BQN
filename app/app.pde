@@ -110,8 +110,8 @@ void keyPressed(KeyEvent e) {
   }
   if (textInput != null) {
     if (key == 65535) {
-           if (keyCode == java.awt.event.KeyEvent.VK_PAGE_UP   && ctrl) topbar.move(-1);
-      else if (keyCode == java.awt.event.KeyEvent.VK_PAGE_DOWN && ctrl) topbar.move( 1);
+           if (keyCode == 33 && ctrl) topbar.move(-1);
+      else if (keyCode == 34 && ctrl) topbar.move( 1);
       else handleCoded(keyCode);
     } else {
       if (ctrl && key>='0' && key<='9') {

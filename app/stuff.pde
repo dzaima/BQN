@@ -19,6 +19,11 @@ static String repeat(String s, int am) {
   return r.toString();
 }
 
+static Arr boolarr(boolean... ia) {
+  int[] vs = new int[ia.length];
+  for (int i = 0; i < ia.length; i++) vs[i] = ia[i]? 1 : 0;
+  return new IntArr(vs);
+}
 
 
 
