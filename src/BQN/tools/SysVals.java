@@ -56,6 +56,7 @@ public class SysVals {
     define("•l"   , new ChrArr("abcdefghijklmnopqrstuvwxyz"));
     define("•la"  , new ChrArr("abcdefghijklmnopqrstuvwxyz"));
     define("•math", MathNS.INSTANCE);
+    define("•b", BaseNS.INSTANCE);
     define("•vi", sc -> Main.vind? Num.ONE : Num.ZERO);
     define("•gc", sc -> { Main.unsafe("GC"); System.gc(); return new Num(java.lang.Runtime.getRuntime().totalMemory() - java.lang.Runtime.getRuntime().freeMemory()); });
     
