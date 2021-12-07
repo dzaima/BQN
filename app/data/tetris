@@ -25,9 +25,11 @@ cpr ← 0   # current piece rotation
 
 bsz ← 30 # block size
 osz ← 20 # UI block icon size
-speed ← 15 # how many frames between dropping due to gravity
+speed ← 7 # how many frames between dropping due to gravity
 nextDown ← speed # current frame
 nextAm ← 4 # how many pieces to preview
+lockDelay ← 0 # frames to not lock down
+lockDef ← 15 # frames of default lock delaying on action
 nextPcs←⟨⟩ # future pieces
 
 ResetTime ← {𝕊: nextDown ↩ speed}
@@ -41,11 +43,9 @@ OK ← {
   nps ← 𝕩+𝕨 Blks cpn
   {∨´⥊>(nps<0)∨nps≥sz? 0; ∧´⥊0=nps T⊸⊑b}
 }
-Move ← {drop𝕊d:
-  npp ← cpp+d
-  ok ← cpr OK npp
-  {ok? cpp↩npp; NextPiece⍟drop @}
-  ok
+Move ← {
+  npp ← cpp+𝕩
+  {cpp↩npp⋄𝕩}⍟⊢ cpr OK npp
 }
 
 SetPiece ← {
@@ -58,6 +58,7 @@ RandPiece ← {𝕊:
   SetPiece ⊑nextPcs
   nextPcs↓˜↩ 1
   hpu ↩ 0
+  lockDelay ↩ lockDef
 }
 NextPiece ← {𝕊:
   b ↩ (-∘≠↑(∨˝˘0=⊢)⊸/) cpn‿cpp WithPc b
@@ -66,11 +67,11 @@ NextPiece ← {𝕊:
 
 
 p5.Setup ← RandPiece
-NoLock ← {𝕊: ResetTime⍟¬ cpr OK cpp+1‿0}
+NoLock ← {𝕊: {𝕊: lockDelay↩lockDef}⍟¬ cpr OK cpp+1‿0}
 keys ← ⟨
-  {k⇐"down"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐0 ⋄ d⇐2 ⋄ F⇐{𝕊:ResetTime⍟⊢0 Move 1‿0 }}
-  {k⇐"left"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿¯1}}
-  {k⇐"right" ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock   @⋄0 Move 0‿1 }}
+  {k⇐"down"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐0 ⋄ d⇐2 ⋄ F⇐{𝕊:NoLock⍟⊢Move 1‿0 }}
+  {k⇐"left"  ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock@⋄Move 0‿¯1}}
+  {k⇐"right" ⋄ t⇐0 ⋄ ST⇐{t↩𝕩} ⋄ s⇐7 ⋄ d⇐4 ⋄ F⇐{𝕊:NoLock@⋄Move 0‿1 }}
 ⟩
 
 DrawPiece ← {off𝕊n: (n⊑colors)‿"2"‿1 g.Rect (⊢∾osz+⊢) off+⌽osz×0 Blks n}
@@ -83,8 +84,8 @@ p5.Draw ← {𝕊:
   ((<⟨p5.w-h⋄osz×5⟩)+0∾¨(6×osz)×↕nextAm) DrawPiece¨ nextAm↑nextPcs # next pieces
   ⟨h⋄osz×5⟩ DrawPiece hpn # held piece
   
-  nextDown-↩ 1
-  {0≥nextDown? ResetTime@ ⋄ 1 Move 1‿0; @} # gravity
+  nextDown-↩ 1 ⋄ lockDelay-↩ ¬cpr OK cpp+1‿0
+  {nextDown≤0? ResetTime@ ⋄ ¬Move 1‿0? lockDelay≤0? NextPiece@; @} # gravity
   {𝕊k: # left/right/down logic
     t←k.t
     k.ST (p5.Pressed k.k) × t+1
@@ -92,9 +93,9 @@ p5.Draw ← {𝕊:
   }¨ keys
 }
 
-Rot ← {𝕊: {cpr↩𝕩 ⋄ NoLock@}⍟(OK⟜cpp) 4|cpr + (cpn≢3)×𝕩}
+Rot ← {𝕊: NoLock@ ⋄ {cpr↩𝕩}⍟(OK⟜cpp) 4|cpr + (cpn≢3)×𝕩}
 p5.OnKey ← {
-  " ": {𝕊⍟(1⊸Move) 1‿0}@; # hard drop
+  " ": {𝕊⍟Move 1‿0}@ ⋄ NextPiece@; # hard drop
   "c": ¬hpu? hpu↩1 ⋄ t←hpn ⋄ hpn↩cpn ⋄ 0⊸≡◶SetPiece‿RandPiece t; # hold
   "z": Rot ¯1;
   "up": Rot 1;
