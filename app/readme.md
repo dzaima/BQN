@@ -1,6 +1,8 @@
-A PC & Android app made in [Processing](https://processing.org/)
+A PC & Android app for BQN made in [Processing](https://processing.org/); [download APK](https://github.com/dzaima/BQN/releases/latest)
 
-## Usage
+Contains a REPL, a calculator-like keyboard for Android, and a very basic editor. Interprets dzaima/BQN.
+
+### Run on PC:
 1. build dzaima/BQN for java 8 (by running `./build8` in the base directory)
 2. run `./cpJar` in the `app` directory
 3. Open `app/` in Processing and run
@@ -16,7 +18,7 @@ A PC & Android app made in [Processing](https://processing.org/)
 ```
 swipe on characters to enter ones around it
 A - switch to text layout
-F - change capitalization of the name
+F - change capitalization of the name under the cursor
 ⇧ - shift - caps letters, select with «»; double tap to hold
 X - close tab (where applicable - grapher & editor)
 K - open virtual keyboard
