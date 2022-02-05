@@ -41,15 +41,17 @@ public class SysVals {
     define("•unixtime", new UnixTime());
     define("•ctime", CompTimer::new);
     
-    define ("•import", Import::new); REL.put("•import", 5);
-    defineU("•flines", FLines::new); REL.put("•flines", 5);
-    defineU("•fchars", FChars::new); REL.put("•fchars", 5);
-    defineU("•fbytes", FBytes::new); REL.put("•fbytes", 5);
-    defineU("•lns"   , Lns::new   ); REL.put("•lns"   , 5);
+    define ("•import", Import::new); REL.put("•import", 10);
+    defineU("•flines", FLines::new); REL.put("•flines", 10);
+    defineU("•fchars", FChars::new); REL.put("•fchars", 10);
+    defineU("•fbytes", FBytes::new); REL.put("•fbytes", 10);
+    defineU("•lns"   , Lns::new   ); REL.put("•lns"   , 10);
     REL.put("•path"  , 1);
     REL.put("•name"  , 2);
     REL.put("•args"  , 3);
     REL.put("•state" , 4);
+    REL.put("•wdpath", 5);
+    REL.put("•file"  , 6);
     
     define("•a"   , new ChrArr("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
     define("•d"   , new ChrArr("0123456789"));
@@ -947,7 +949,7 @@ public class SysVals {
       IntArr bcR     = new IntArr(bt.comp.bc);
       HArr   objR    = new HArr(bt.comp.objs);
       HArr   blksR   = new HArr(blksN);
-      Value  blkR    = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
+      Value  blkR    = new HArr(new Value[]{Num.NUMS[bt.type=='m'? 1 : bt.type=='d'? 2 : 0], bt.type=='a'||bt.immediate? Num.ONE : Num.ZERO, new IntArr(mbs), new IntArr(dbs)});
       HArr   bodiesR = new HArr(bodies);
       
       int[] inds = new int[ref.length];

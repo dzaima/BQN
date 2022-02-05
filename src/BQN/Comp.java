@@ -1466,9 +1466,9 @@ public class Comp {
       String n = ((NameTok) tk).name;
       if (((NameTok) tk).val != null) {
         int rel = SysVals.rel(n);
-        if (rel<=4) {
+        if (rel<10) {
           m.push(tk, ((NameTok) tk).val);
-        } else if (rel==5) {
+        } else if (rel==10) {
           m.var(tk, n, false);
           m.push(tk, ((NameTok) tk).val);
           m.add(MD1C);

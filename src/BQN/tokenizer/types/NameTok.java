@@ -1,10 +1,12 @@
 package BQN.tokenizer.types;
 
+import java.nio.file.*;
 import BQN.errors.SyntaxError;
 import BQN.tokenizer.Token;
 import BQN.tools.SysVals;
 import BQN.types.*;
 import BQN.types.arrs.*;
+import BQN.types.callable.builtins.FileNS;
 
 public class NameTok extends Token {
   public final String name;
@@ -21,14 +23,20 @@ public class NameTok extends Token {
     String name1 = name0.replace("_", "");
     name = isSys? '•'+name1 : name1;
     if (isSys) switch (SysVals.rel(name)) {
-      case 1: if (args==null||args[0]==null) throw new SyntaxError("•path hasn't been defined", this); val=args[0]; break;
-      case 2: if (args==null||args[1]==null) throw new SyntaxError("•name hasn't been defined", this); val=args[1]; break;
-      case 3: if (args==null||args[2]==null) throw new SyntaxError("•args hasn't been defined", this); val=args[2]; break;
+      case 1: if (args==null||args[0]==null) throw new SyntaxError("•path hasn't been defined", this); val = args[0]; break;
+      case 2: if (args==null||args[1]==null) throw new SyntaxError("•name hasn't been defined", this); val = args[1]; break;
+      case 3: if (args==null||args[2]==null) throw new SyntaxError("•args hasn't been defined", this); val = args[2]; break;
       case 4:
         if (args==null) val = EmptyArr.SHAPE0SV;
         else val = new HArr(args);
         break;
       case 5:
+        val = new ChrArr(Paths.get("").toAbsolutePath().toString());
+        break;
+      case 6: if (args==null||args[0]==null) throw new SyntaxError("•path hasn't been defined for •file", this);
+        val = new FileNS(Paths.get(args[0].asString()));
+        break;
+      case 10:
         if (args==null) val = Nothing.inst;
         else val = args[0];
         break;
