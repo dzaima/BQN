@@ -60,13 +60,15 @@ public class BlockTok extends TokArr {
     for (int i = 0; i < bodies.size()-2; i++) {
       if (bodies.get(i).arity=='\0') throw new SyntaxError("Header-less bodies must be the last two", bodies.get(i).lns.get(0));
     }
+    boolean twoHeaderless;
     if (bodies.size()>=2) {
       Body pb = bodies.get(bodies.size()-2); boolean p = pb.arity=='\0';
       Body lb = bodies.get(bodies.size()-1); boolean l = lb.arity=='\0';
       if (p && l) { pb.arity='m'; lb.arity='d'; }
       else if (p) throw new SyntaxError("Header-less bodies must be at the end", bodies.get(bodies.size()-2).lns.get(0));
       else if (l) { lb.arity='a'; }
-    }
+      twoHeaderless = p && l;
+    } else twoHeaderless = false;
     if (immBlock && canBeImmediate && type=='f' && (bodies.size()==1 || hasPred)) type = 'a';
     
     char htype = 0;
@@ -88,8 +90,10 @@ public class BlockTok extends TokArr {
       if (bodies.size() == 1) {
         immediate = bodies.get(0).immediate;
       } else {
-        immediate = false;
-        for (Body b : bodies) if (b.immediate) throw new SyntaxError("Immediate operators cannot have multiple bodies", this);
+        boolean allImmediate = true;
+        for (Body b : bodies) allImmediate&= b.immediate; // throw new SyntaxError("Immediate operators cannot have multiple bodies", this);
+        immediate = allImmediate;
+        if (allImmediate && twoHeaderless) throw new SyntaxError("Immediate operators cannot have arity-dependent bodies");
       }
     } else {
       immediate = false;
