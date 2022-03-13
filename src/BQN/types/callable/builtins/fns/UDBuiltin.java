@@ -80,6 +80,35 @@ public class UDBuiltin extends FnBuiltin {
   }
   
   public Value call(Value w, Value x) {
-    throw new NYIError("dyadic ↕", this);
+    int[] wsh = w.asIntVec();
+    int wr = wsh.length;
+    if (wr == 0) return x;
+    int xr = x.r();
+    if (wr>xr) throw new RankError("↕: length of 𝕨 must be less than or equal to rank of 𝕩 ("+wr+" ≡ ≠𝕨, "+Main.fArr(x.shape)+" ≡ ≢𝕩)", this);
+
+    int[] sh = new int[wr+xr];
+    int ia = 1;
+    for (int i = 0; i < wr; i++) {
+      int wl = wsh[i];
+      if (wl<0) throw new LengthError("↕: negative entry in 𝕨 ("+wl+" ≡ "+i+"⊑𝕨)", this);
+      ia *= sh[wr+i] = wl;
+      ia *= sh[i] = 1 + x.shape[i] - wl;
+      if (sh[i]<0) throw new LengthError("↕: window length can be at most 1 more than existing shape ("+wl+" ≡ "+i+"⊑𝕨, "+x.shape[i]+" ≡ "+i+"⊑≢𝕩)", this);
+    }
+    for (int i = wr; i < xr; i++) {
+      ia *= sh[wr+i] = x.shape[i];
+    }
+
+    Value[] xv = x.values();
+    Value[] res = new Value[ia];
+    for (int[] c : new Indexer(sh)) {
+      int[] d = new int[xr];
+      for (int i = 0; i < wr; i++) {
+        d[i] = c[i] + c[wr+i];
+      }
+      System.arraycopy(d, wr, c, 2*wr, xr-wr);
+      res[Indexer.fromShape(sh, c)] = x.simpleAt(d);
+    }
+    return Arr.create(res, sh);
   }
 }
