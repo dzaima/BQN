@@ -18,16 +18,16 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.time.Instant;
+// import java.time.Instant;
 import java.util.*;
-import java.util.function.Supplier;
+// import java.util.function.Supplier;
 
 public class SysVals {
-  public static HashMap<String, Value> vsMap = new HashMap<>();
-  public static HashMap<String, Integer> fnsMap = new HashMap<>();
+  public static HashMap<String, Value> vsMap = new HashMap<String, Value>();
+  public static HashMap<String, Integer> fnsMap = new HashMap<String, Integer>();
   public static SysVal[] fns = new SysVal[64];
   private static int fnsNext;
-  private static final HashMap<String, Integer> REL = new HashMap<>();
+  private static final HashMap<String, Integer> REL = new HashMap<String, Integer>();
   
   public interface SysVal {
     Value get(Scope sc);
@@ -35,17 +35,17 @@ public class SysVals {
   static {
     define("•millis", sc->new Num(System.currentTimeMillis() - Main.startingMillis));
     define("•runtime", new Runtime());
-    define("•time", Timer::new);
+    define("•time", sc -> new Timer(sc));
     define("•timed", new Timed());
     define("•monotime", new MonoTime());
-    define("•unixtime", new UnixTime());
-    define("•ctime", CompTimer::new);
-    
-    define ("•import", Import::new); REL.put("•import", 10);
-    defineU("•flines", FLines::new); REL.put("•flines", 10);
-    defineU("•fchars", FChars::new); REL.put("•fchars", 10);
-    defineU("•fbytes", FBytes::new); REL.put("•fbytes", 10);
-    defineU("•lns"   , Lns::new   ); REL.put("•lns"   , 10);
+    // define("•unixtime", new UnixTime());
+    define("•ctime", sc -> new CompTimer(sc));
+    //
+    define ("•import", sc -> new Import(sc)); REL.put("•import", 10);
+    defineU("•flines", () -> new FLines()); REL.put("•flines", 10);
+    defineU("•fchars", () -> new FChars()); REL.put("•fchars", 10);
+    defineU("•fbytes", () -> new FBytes()); REL.put("•fbytes", 10);
+    // defineU("•lns"   , Lns::new   ); REL.put("•lns"   , 10);
     REL.put("•path"  , 1);
     REL.put("•name"  , 2);
     REL.put("•args"  , 3);
@@ -60,32 +60,32 @@ public class SysVals {
     define("•math", MathNS.INSTANCE);
     define("•b", BaseNS.INSTANCE);
     define("•vi", sc -> Main.vind? Num.ONE : Num.ZERO);
-    define("•gc", sc -> { Main.unsafe("GC"); System.gc(); return new Num(java.lang.Runtime.getRuntime().totalMemory() - java.lang.Runtime.getRuntime().freeMemory()); });
+    // define("•gc", sc -> { Main.unsafeTest("GC"); System.gc(); return new Num(java.lang.Runtime.getRuntime().totalMemory() - java.lang.Runtime.getRuntime().freeMemory()); });
     
-    define("•out", Out::new);
-    define("•show", Show::new);
-    define("•stdin", Stdin::new);
-    define("•fmt", Fmt::new);
+    define("•out", sc -> new Out(sc));
+    define("•show", sc -> new Show(sc));
+    define("•stdin", sc -> new Stdin(sc));
+    define("•fmt", sc -> new Fmt(sc));
     define("•repr", new Repr());
-    define("•sh", sc -> new Shell());
-    define("•exit", Exit::new);
+    // define("•sh", sc -> new Shell());
+    define("•exit", sc -> new Exit(sc));
     
     define("•type", new Type());
     define("•glyph", new Glyph());
     define("•source", new Source());
     define("•decompose", new Decompose());
     define("•dr", new DR());
-    define("•eval", EvalBuiltin::new);
+    define("•eval", sc -> new EvalBuiltin(sc));
     define("•bqn", sc -> new EvalBuiltin.NewEval(sc.sys));
-    define("•cmd", CMD::new);
-    define("•bc", BC::new);
-    define("•comp", Compiler::new);
-    define("•decomp", Decompiler::new);
-    define("•erase", Eraser::new);
-    define("•gclog", GCLog::new);
+    define("•cmd", sc -> new CMD(sc));
+    define("•bc", sc -> new BC(sc));
+    define("•comp", sc -> new Compiler(sc));
+    define("•decomp", sc -> new Decompiler(sc));
+    define("•erase", sc -> new Eraser(sc));
+    define("•gclog", sc -> new GCLog(sc));
     define("•opt", new Optimizer());
     define("•jclass", new JClass());
-    defineU("•jload", JLoad::new);
+    // defineU("•jload", sc -> new JLoad(sc));
     
     define("•rand", sc -> sc.sys.getRand());
     define("•cmp", new Cmp());
@@ -94,37 +94,41 @@ public class SysVals {
     define("•fillfn", new FillFn());
     define("•fillby", new FillBy());
     define("•big", new Big());
-    defineU("•delay", Delay::new);
+    defineU("•delay", () -> new Delay());
     
-    define("•pfx", sc -> { Main.unsafe("•pfx"); return new Profiler(sc); });
-    define("•pfo", sc -> { Main.unsafe("•pfo"); return new ProfilerOp(sc); });
-    define("•pfc", sc -> { Main.unsafe("•pfc"); return new ProfilerMd2(sc); });
-    define("•pfr", sc -> { Main.unsafe("•pfr"); return Profiler.results(); });
+    define("•pfx", sc -> { Main.unsafeTest("•pfx"); return new Profiler(sc); });
+    define("•pfo", sc -> { Main.unsafeTest("•pfo"); return new ProfilerOp(sc); });
+    define("•pfc", sc -> { Main.unsafeTest("•pfc"); return new ProfilerMd2(sc); });
+    define("•pfr", sc -> { Main.unsafeTest("•pfr"); return Profiler.results(); });
   }
   
   
-  public static void define(String name, SysVal fn) {
+  public static void define(String name, Func<Scope,Value> fn) {
     assert name.equals(name.toLowerCase()) && name.startsWith("•") && name.indexOf('_')==-1;
     if (fnsNext>=fns.length) fns = Arrays.copyOf(fns, fns.length*2);
     fnsMap.put(name, fnsNext);
-    fns[fnsNext++] = fn;
+    fns[fnsNext++] = new SysF(fn);
+  }
+  static class SysF : SysVal {
+    Func<Scope,Value> fn;
+    SysF(Func<Scope,Value> fn) { this.fn = fn; }
+    public Value get(Scope sc) { return fn(sc); }
   }
   public static void define(String name, Value obj) {
     assert name.equals(name.toLowerCase()) && name.startsWith("•") && name.indexOf('_')==-1;
     vsMap.put(name, obj);
   }
-  public static void defineU(String name, Supplier<Value> f) {
-    if (!Main.SAFE) { define(name, f.get()); return; }
-    define(name, sc -> { Main.unsafe(name); return null; });
+  public static void defineU(String name, Func<Value> f) {
+    if (!Main.SAFE) { define(name, f()); return; }
+    define(name, sc -> { Main.unsafeTest(name); return null; });
   }
   
   public static Value getStatic(String name) {
     return vsMap.get(name);
   }
   public static int getID(String name) {
-    Integer v = fnsMap.get(name);
-    if (v==null) return -1;
-    return v;
+    if (!fnsMap.containsKey(name)) return -1;
+    return fnsMap.get(name);
   }
   
   public static Value getDyn(String name, Scope sc) {
@@ -184,11 +188,11 @@ public class SysVals {
     
     public Value call(Value x) { return new Num(System.nanoTime()*1e-9); }
   }
-  static class UnixTime extends Fun {
-    public String ln(FmtInfo f) { return "•UnixTime"; }
+  // static class UnixTime extends Fun {
+  //   public String ln(FmtInfo f) { return "•UnixTime"; }
     
-    public Value call(Value x) { return new Num(Instant.now().toEpochMilli()/1000d); }
-  }
+  //   public Value call(Value x) { return new Num(Instant.now().toEpochMilli()/1000d); }
+  // }
   static class Timer extends Fun {
     public String ln(FmtInfo f) { return "•TIME"; }
     
@@ -268,19 +272,21 @@ public class SysVals {
   ////////////////////// FILES \\\\\\\\\\\\\\\\\\\\\\
   abstract static class RelFn extends Md1 {
     RelFn() {
-      Main.unsafe(this);
+      Main.unsafeTest(this);
     }
     public Value derive(Value f) {
       String path = f==Nothing.inst? null : f.asString();
-      return new FnBuiltin() {
-        public String ln(FmtInfo f) { return RelFn.this.ln(f); }
+      RelFn rThis = this;
+      return new FnBuiltin(/*AA Value f,String path,RelFn rThis*/) {
+        public String ln(FmtInfo f) { return rThis.ln(f); }
         public Value call(Value w, Value x) {
-          return RelFn.this.call(path, w, x);
+          return rThis.call(path, w, x);
         }
         public Value call(Value x) {
-          return RelFn.this.call(path, x);
+          return rThis.call(path, x);
         }
       };
+      return f;
     }
     
     public Value call(String path, Value w, Value x) { return call(w, x); }
@@ -402,82 +408,6 @@ public class SysVals {
       }
     }
   }
-  static class Lns extends RelFn {
-    public String ln(FmtInfo f) { return "•LNS"; }
-    
-    public Value call(String path, Value x) {
-      Path p = Sys.path(path, x.asString());
-      String[] a = Main.readFile(p).split("\n");
-      Value[] o = new Value[a.length];
-      for (int i = 0; i < a.length; i++) o[i] = new ChrArr(a[i]);
-      return Arr.create(o);
-    }
-    
-    String get(BQNObj m, String key, String def) {
-      Value got = m.get(key);
-      if (got != null) return got.asString();
-      return def;
-    }
-    
-    public Value call(String path, Value w, Value x) {
-      if (w instanceof BQNObj) {
-        try {
-          URL url = new URL(x.asString());
-          HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-          BQNObj m = (BQNObj) w;
-          String content = get(m, "content", "");
-          conn.setRequestMethod(get(m, "method", "POST"));
-          
-          conn.setRequestProperty("Content-Type", get(m, "type", "POST"));
-          conn.setRequestProperty("Content-Language", get(m, "language", "en-US"));
-          conn.setRequestProperty("Content-Length", Integer.toString(content.length()));
-          
-          Value eo = m.get("e");
-          if (eo != null) {
-            BQNObj e = (BQNObj) eo;
-            Value[][] kv = e.kvPair();
-            for (int i = 0; i < kv[0].length; i++) {
-              conn.setRequestProperty(kv[0][i].asString(), kv[1][i].asString());
-            }
-          }
-          
-          Value cache = m.get("cache");
-          conn.setUseCaches(cache!=null && Main.bool(cache));
-          conn.setDoOutput(true);
-          
-          if (content.length() != 0) {
-            DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-            os.writeBytes(content);
-            os.close();
-          }
-          
-          
-          InputStream is = conn.getInputStream();
-          ArrayList<Value> vs = new ArrayList<>();
-          try (BufferedReader rd = new BufferedReader(new InputStreamReader(is))) {
-            String ln;
-            while ((ln = rd.readLine()) != null) vs.add(new ChrArr(ln));
-          }
-          return new HArr(vs);
-        } catch (MalformedURLException e) {
-          throw new DomainError("bad URL: "+e.getMessage(), this);
-        } catch (ProtocolException e) {
-          throw new DomainError("ProtocolException: "+e.getMessage(), this);
-        } catch (IOException e) {
-          throw new DomainError("IOException: "+e.getMessage(), this);
-        }
-      } else {
-        Path p = Sys.path(path, w.asString());
-        String s = x.asString();
-        try (PrintWriter pw = new PrintWriter(p.toFile())) {
-          pw.write(s);
-        } catch (FileNotFoundException e) {
-          throw new DomainError("File "+p+" not found: "+e.getMessage(), this);
-        }
-        return x;
-      }
-    }
-  }
   
   ////////////////////// I/O \\\\\\\\\\\\\\\\\\\\\\
   static class Out extends FnBuiltin {
@@ -528,7 +458,7 @@ public class SysVals {
     Exit(Scope sc) { this.sc = sc; }
     
     public Value call(Value x) {
-      Main.unsafe("•Exit");
+      Main.unsafeTest("•Exit");
       sc.sys.off(x instanceof Num? x.asInt() : 0);
       throw new IllegalStateException();
     }
@@ -563,104 +493,104 @@ public class SysVals {
       throw new Error("•Repr currently only allowed on numbers");
     }
   }
-  static class Shell extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•SH"; }
+  // static class Shell extends FnBuiltin {
+  //   public String ln(FmtInfo f) { return "•SH"; }
     
-    Shell() { Main.unsafe(this); }
-    public Value call(Value x) {
-      return exec(x, null, null, false, EmptyArr.NOSTRS);
-    }
-    public Value call(Value w, Value x) {
-      BQNObj m = (BQNObj) w;
+  //   Shell() { Main.unsafeTest(this); }
+  //   public Value call(Value x) {
+  //     return exec(x, null, null, false, EmptyArr.NOSTRS);
+  //   }
+  //   public Value call(Value w, Value x) {
+  //     BQNObj m = (BQNObj) w;
       
-      File dir = null;
-      Value diro = m.get("dir");
-      if (diro != null) dir = new File(diro.asString());
+  //     File dir = null;
+  //     Value diro = m.get("dir");
+  //     if (diro != null) dir = new File(diro.asString());
       
-      byte[] inp = null;
-      Value inpo = m.get("inp");
-      if (inpo != null) {
-        if (inpo.ia > 0) {
-          if (inpo.first() instanceof Char) inp = inpo.asString().getBytes(StandardCharsets.UTF_8);
-          else {
-            inp = new byte[inpo.ia];
-            int[] ds = inpo.asIntArr();
-            for (int i = 0; i < ds.length; i++) inp[i] = (byte) ds[i];
-          }
-        }
-      }
-      Value env = m.get("env");
-      String[] enva = EmptyArr.NOSTRS;
-      if (env != null) {
-        enva = new String[env.ia];
-        for (int i = 0; i < enva.length; i++) enva[i] = env.get(i).asString();
-      }
+  //     byte[] inp = null;
+  //     Value inpo = m.get("inp");
+  //     if (inpo != null) {
+  //       if (inpo.ia > 0) {
+  //         if (inpo.first() instanceof Char) inp = inpo.asString().getBytes(StandardCharsets.UTF_8);
+  //         else {
+  //           inp = new byte[inpo.ia];
+  //           int[] ds = inpo.asIntArr();
+  //           for (int i = 0; i < ds.length; i++) inp[i] = (byte) ds[i];
+  //         }
+  //       }
+  //     }
+  //     Value env = m.get("env");
+  //     String[] enva = EmptyArr.NOSTRS;
+  //     if (env != null) {
+  //       enva = new String[env.ia];
+  //       for (int i = 0; i < enva.length; i++) enva[i] = env.get(i).asString();
+  //     }
       
-      boolean raw = false;
-      Value rawo = m.get("raw");
-      if (rawo != null) raw = Main.bool(rawo);
+  //     boolean raw = false;
+  //     Value rawo = m.get("raw");
+  //     if (rawo != null) raw = Main.bool(rawo);
       
-      return exec(x, dir, inp, raw, enva);
-    }
+  //     return exec(x, dir, inp, raw, enva);
+  //   }
     
-    public Value exec(Value w, File f, byte[] inp, boolean raw, String[] env) {
-      try {
-        Process p;
-        if (w.get(0) instanceof Char) {
-          String cmd = w.asString();
-          p = java.lang.Runtime.getRuntime().exec(cmd, env, f);
-        } else {
-          String[] parts = new String[w.ia];
-          for (int i = 0; i < parts.length; i++) {
-            parts[i] = w.get(i).asString();
-          }
-          p = java.lang.Runtime.getRuntime().exec(parts, env, f);
-        }
-        if (inp != null) p.getOutputStream().write(inp);
-        p.getOutputStream().close();
-        ISReader ir = new ISReader(p.getInputStream()); // god dammit everything sucks man
-        ISReader er = new ISReader(p.getErrorStream());
-        while (ir.cont() || er.cont());
-        Num ret = Num.of(p.waitFor());
-        while (ir.cont() || er.cont());
-        if (raw) return new HArr(new Value[]{ret, new IntArr(ir.get()), new IntArr(er.get())});
-        else return new HArr(new Value[]{
-          ret,
-          new ChrArr(new String(ir.get(), StandardCharsets.UTF_8)),
-          new ChrArr(new String(er.get(), StandardCharsets.UTF_8))
-        });
-      } catch (Throwable e) {
-        throw new DomainError("Failed to execute: "+e.getClass().getName()+": "+e.getMessage());
-      }
-    }
-    private static class ISReader {
-      final ArrayList<byte[]> lists = new ArrayList<>();
-      final InputStream s;
-      int size;
-      ISReader(InputStream s) {
-        this.s = s;
-      }
+  //   public Value exec(Value w, File f, byte[] inp, boolean raw, String[] env) {
+  //     try {
+  //       Process p;
+  //       if (w.get(0) instanceof Char) {
+  //         String cmd = w.asString();
+  //         p = java.lang.Runtime.getRuntime().exec(cmd, env, f);
+  //       } else {
+  //         String[] parts = new String[w.ia];
+  //         for (int i = 0; i < parts.length; i++) {
+  //           parts[i] = w.get(i).asString();
+  //         }
+  //         p = java.lang.Runtime.getRuntime().exec(parts, env, f);
+  //       }
+  //       if (inp != null) p.getOutputStream().write(inp);
+  //       p.getOutputStream().close();
+  //       ISReader ir = new ISReader(p.getInputStream()); // god dammit everything sucks man
+  //       ISReader er = new ISReader(p.getErrorStream());
+  //       while (ir.cont() || er.cont());
+  //       Num ret = Num.of(p.waitFor());
+  //       while (ir.cont() || er.cont());
+  //       if (raw) return new HArr(new Value[]{ret, new IntArr(ir.get()), new IntArr(er.get())});
+  //       else return new HArr(new Value[]{
+  //         ret,
+  //         new ChrArr(new String(ir.get(), StandardCharsets.UTF_8)),
+  //         new ChrArr(new String(er.get(), StandardCharsets.UTF_8))
+  //       });
+  //     } catch (Throwable e) {
+  //       throw new DomainError("Failed to execute: "+e.getClass().getName()+": "+e.getMessage());
+  //     }
+  //   }
+  //   private static class ISReader {
+  //     final ArrayList<byte[]> lists = new ArrayList<>();
+  //     final InputStream s;
+  //     int size;
+  //     ISReader(InputStream s) {
+  //       this.s = s;
+  //     }
             
-      boolean cont() throws IOException {
-        byte[] t = new byte[1024];
-        int read = s.read(t);
-        if (read<=0) return read!=-1;
-        size+= read;
-        lists.add(read==1024? t : Arrays.copyOf(t, read));
-        return true;
-      }
-      byte[] get() throws IOException {
-        s.close();
-        byte[] res = new byte[size];
-        int pos = 0;
-        for (byte[] c : lists) {
-          System.arraycopy(c, 0, res, pos, c.length);
-          pos+= c.length;
-        }
-        return res;
-      }
-    }
-  }
+  //     boolean cont() {
+  //       byte[] t = new byte[1024];
+  //       int read = s.read(t);
+  //       if (read<=0) return read!=-1;
+  //       size+= read;
+  //       lists.add(read==1024? t : Arrays.copyOf(t, read));
+  //       return true;
+  //     }
+  //     byte[] get() {
+  //       s.close();
+  //       byte[] res = new byte[size];
+  //       int pos = 0;
+  //       for (byte[] c : lists) {
+  //         System.arraycopy(c, 0, res, pos, c.length);
+  //         pos+= c.length;
+  //       }
+  //       return res;
+  //     }
+  //   }
+  // }
   
   ////////////////////// BQN INTERNALS \\\\\\\\\\\\\\\\\\\\\\
   static class Type extends FnBuiltin {
@@ -776,10 +706,11 @@ public class SysVals {
           && (t==10 || t==11 || t==70)
           && (f==11 ^ t==11)) { // convert float to/from bits/long
           if (t==11) {
-            if (f==10) return DepthBuiltin.on(new Fun() {
+            DR drThis = this;
+            if (f==10) return DepthBuiltin.on(new Fun(/*AA DR drThis*/) {
               public String ln(FmtInfo f) { return "•DR"; }
               public Value call(Value x) {
-                return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, DR.this)).longValue()));
+                return new Num(Double.longBitsToDouble(((BigValue) UTackBuiltin.on(BigValue.TWO, x, drThis)).longValue()));
               }
             }, 1, x, this);
             if (f==70) return DepthBuiltin.on(new Fun() {
@@ -822,7 +753,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•U"; }
     
     final Scope sc;
-    CMD(Scope sc) { this.sc = sc; Main.unsafe("•U"); }
+    CMD(Scope sc) { this.sc = sc; Main.unsafeTest("•U"); }
     public Value call(Value x) {
       sc.sys.ucmd(x.asString());
       return null;
@@ -848,7 +779,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•Comp"; }
     
     private final Scope sc;
-    Compiler(Scope sc) { this.sc = sc; Main.unsafe("•Comp"); }
+    Compiler(Scope sc) { this.sc = sc; Main.unsafeTest("•Comp"); }
     
     /* Argument structure:
          total: ⟨bytecode ⋄ constants ⋄ inner blocks ⋄ main block ⋄ bodies ⋄ [sind [⋄ eind] ⋄ src]⟩
@@ -931,7 +862,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•Decomp"; }
     
     private final Scope sc;
-    Decompiler(Scope sc) { this.sc = sc; Main.unsafe("•Decomp"); }
+    Decompiler(Scope sc) { this.sc = sc; Main.unsafeTest("•Decomp"); }
     
     public Value call(Value x) {
       BlockTok bt = BlockTok.get(x, this);
@@ -942,7 +873,7 @@ public class SysVals {
       for (int i = 0; i < blksP.length; i++) blksN[i] = new BlockTok.Wrapper(blksP[i]);
       
       ArrayList<Value> bodies = new ArrayList<>();
-      HashMap<Body, Integer> bodyMap = new HashMap<>();
+      HashMap<Body, Integer> bodyMap = new HashMap<Body, Integer>();
       int[] mbs = body(bodies, bodyMap, bt.bdM);
       int[] dbs = body(bodies, bodyMap, bt.bdD);
       Token[] ref    = bt.comp.ref;
@@ -992,7 +923,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•Erase"; }
     
     private final Scope sc;
-    Eraser(Scope sc) { this.sc = sc; Main.unsafe("•Decomp"); }
+    Eraser(Scope sc) { this.sc = sc; Main.unsafeTest("•Decomp"); }
     public Value call(Value x) {
       String k = x.asString();
       Scope o = sc.owner(k);
@@ -1006,7 +937,7 @@ public class SysVals {
     public String ln(FmtInfo f) { return "•GCLog"; }
     
     private final Scope sc;
-    protected GCLog(Scope sc) { this.sc = sc; Main.unsafe("GCLog"); }
+    protected GCLog(Scope sc) { this.sc = sc; Main.unsafeTest("GCLog"); }
     public Value call(Value x) {
       return new Logger(sc, x.ln(sc.sys.fi));
     }
@@ -1043,18 +974,6 @@ public class SysVals {
     
     public Value call(Value x) { return new ChrArr(x.getClass().getCanonicalName()); }
   }
-  static class JLoad extends FnBuiltin {
-    public String ln(FmtInfo f) { return "•JLoad"; }
-    
-    JLoad() { Main.unsafe("•JLoad");}
-    public Value call(Value x) {
-      try {
-        return (Value) Class.forName(x.asString()).getConstructor().newInstance();
-      } catch (Throwable e) {
-        throw new ImplementationError(e);
-      }
-    }
-  }
   
   ////////////////////// EXTRA BUILTINS \\\\\\\\\\\\\\\\\\\\\\
   static class Cmp extends FnBuiltin {
@@ -1072,7 +991,7 @@ public class SysVals {
   static class Delay extends FnBuiltin {
     public String ln(FmtInfo f) { return "•Delay"; }
     
-    Delay() { Main.unsafe("•Delay"); }
+    Delay() { Main.unsafeTest("•Delay"); }
     
     public Value call(Value x) {
       long nsS = System.nanoTime();
@@ -1128,11 +1047,11 @@ public class SysVals {
     }
   }
   static class CustomFillArr extends Arr {
-    public final Arr v;
+    public final Arr val;
     private final Value fill;
     public CustomFillArr(Arr r, Value fill) {
       super(r.shape, r.ia);
-      this.v = r;
+      this.val = r;
       this.fill = fill;
     }
     
@@ -1141,34 +1060,34 @@ public class SysVals {
         assert base.fItemS().eq(fill);
         return base;
       }
-      if (base instanceof CustomFillArr) return new CustomFillArr(((CustomFillArr) base).v, fill);
+      if (base instanceof CustomFillArr) return new CustomFillArr(((CustomFillArr) base).val, fill);
       if (base.ia==0) return new EmptyArr(base.shape, fill);
       return new CustomFillArr(base, fill);
     }
     
-    public Arr v(Arr v) { return new CustomFillArr(v, fill); }
+    public Arr v(Arr val) { return new CustomFillArr(val, fill); }
     
     public Value fItemS() { return fill; }
     public Value fMineS() { return v(((Arr) super.fMineS())); }
     
-    public Value            get(int i) { return v.get(i);             }
-    public Arr      reverseOn(int dim) { return v(v.reverseOn(dim));  }
-    public Value     ofShape(int[] sh) { return v((Arr)v.ofShape(sh));}
-    public int              hashCode() { return v.hashCode();         }
-    public String           asString() { return v.asString();         }
-    public Value[]            values() { return v.values();           }
-    public Value[]       valuesClone() { return v.valuesClone();      }
-    public int[]            asIntArr() { return v.asIntArr();         }
-    public int[]       asIntArrClone() { return v.asIntArrClone();    }
-    public double[]      asDoubleArr() { return v.asDoubleArr();      }
-    public double[] asDoubleArrClone() { return v.asDoubleArrClone(); }
-    public double                sum() { return v.sum();              }
-    public long[]         asBitLongs() { return v.asBitLongs();       }
-    public boolean    quickDoubleArr() { return v.quickDoubleArr();   }
-    public boolean       quickIntArr() { return v.quickIntArr();      }
-    public boolean       quickDepth1() { return v.quickDepth1();      }
-    public int               arrInfo() { return v.arrInfo();          }
-    public Iterator<Value>  iterator() { return v.iterator();         }
+    public Value            get(int i) { return val.get(i);             }
+    public Arr      reverseOn(int dim) { return v(val.reverseOn(dim));  }
+    public Value     ofShape(int[] sh) { return v((Arr)val.ofShape(sh));}
+    public int              hashCode() { return val.hashCode();         }
+    public String           asString() { return val.asString();         }
+    public Value[]            values() { return val.values();           }
+    public Value[]       valuesClone() { return val.valuesClone();      }
+    public int[]            asIntArr() { return val.asIntArr();         }
+    public int[]       asIntArrClone() { return val.asIntArrClone();    }
+    public double[]      asDoubleArr() { return val.asDoubleArr();      }
+    public double[] asDoubleArrClone() { return val.asDoubleArrClone(); }
+    public double                sum() { return val.sum();              }
+    public long[]         asBitLongs() { return val.asBitLongs();       }
+    public boolean    quickDoubleArr() { return val.quickDoubleArr();   }
+    public boolean       quickIntArr() { return val.quickIntArr();      }
+    public boolean       quickDepth1() { return val.quickDepth1();      }
+    public int               arrInfo() { return val.arrInfo();          }
+    // public Iterator<Value>  iterator() { return val.iterator();         }
   }
   static class Big extends FnBuiltin {
     public String ln(FmtInfo f) { return "•BIG"; }
@@ -1204,14 +1123,14 @@ public class SysVals {
     private final Scope sc;
     Profiler(Scope sc) { this.sc = sc; }
     
-    static final HashMap<String, Pr> pfRes = new HashMap<>();
+    static final HashMap<String, Pr> pfRes = new HashMap<String, Pr>();
     static Value results() {
       Value[] arr = new Value[pfRes.size()*4+4];
       arr[0] = new ChrArr("expr");
       arr[1] = new ChrArr("calls");
       arr[2] = new ChrArr("total ms");
       arr[3] = new ChrArr("avg ms");
-      final int[] p = {4};
+      int[] p = {4};
       ArrayList<String> ks = new ArrayList<>(pfRes.keySet());
       // ks.sort(Comparator.comparingDouble(a -> -pfRes.get(a).ms));
       ks.sort((a, b) -> Double.compare(pfRes.get(b).ms, pfRes.get(a).ms));

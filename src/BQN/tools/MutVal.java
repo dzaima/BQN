@@ -85,15 +85,17 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
             return;
           }
         }
-        int rSc = rS;
-        for (int i = 0; i < len; i++) {
-          Value c = x.get(xS+i);
-          if (c instanceof Num) {
-            double d = ((Num) c).num;
-            if (d!=1 & d!=0) { move(Num.isInt(d)? 4 : 2); copy(x, xS+i, rS+i, len-i); return; }
-            if (d==1) ls[rSc>>6]|= 1L<<(rSc&63);
-            rSc++;
-          } else { move(5); copy(x, xS+i, rS+i, len-i); return; }
+        {
+          int rSc = rS;
+          for (int i = 0; i < len; i++) {
+            Value c = x.get(xS+i);
+            if (c instanceof Num) {
+              double d = ((Num) c).num;
+              if (d!=1 & d!=0) { move(Num.isInt(d)? 4 : 2); copy(x, xS+i, rS+i, len-i); return; }
+              if (d==1) ls[rSc>>6]|= 1L<<(rSc&63);
+              rSc++;
+            } else { move(5); copy(x, xS+i, rS+i, len-i); return; }
+          }
         }
         break;
         
@@ -231,6 +233,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
         return;
       case 5:
         vs[p] = x;
+        return;
     }
   }
   
@@ -280,6 +283,7 @@ public class MutVal { // inserts can be in any order (might change to a sequenti
       }
       case 5:
         for (int i = s; i < e; i++) vs[i] = x;
+        return;
     }
   }
   

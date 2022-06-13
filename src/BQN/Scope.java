@@ -12,7 +12,7 @@ public final class Scope {
   public final Sys sys;
   public Random rnd;
   
-  private HashMap<String, Integer> varMap;
+  public HashMap<String, Integer> varMapF;
   public Value[] vars;
   public String[] varNames;
   //    𝕊𝕩𝕨𝕣𝕗𝕘 | 012345
@@ -26,13 +26,13 @@ public final class Scope {
   public int varAm;
   
   public Scope(Sys s) {
-    varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
+    varMapF = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = null;
     sys = s;
     rnd = new Random();
   }
   public Scope(Scope p) {
-    varMap = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
+    varMapF = null; varNames = new String[1]; vars = new Value[1]; varAm = 0;
     parent = p;
     sys = p.sys;
     rnd = p.rnd;
@@ -43,7 +43,7 @@ public final class Scope {
     rnd = p.rnd;
   }
   public Scope(Scope p, String[] varNames) {
-    varMap = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
+    varMapF = null; this.varNames = varNames; vars = new Value[varNames.length]; varAm = varNames.length;
     parent = p;
     sys = p.sys;
     rnd = p.rnd;
@@ -54,14 +54,14 @@ public final class Scope {
   }
   
   public HashMap<String, Integer> varMap() {
-    if (varMap==null) {
-      varMap = new HashMap<>();
-      for (int i = 0; i < varAm; i++) varMap.put(varNames[i], i);
+    if (varMapF==null) {
+      varMapF = new HashMap<String, Integer>();
+      for (int i = 0; i < varAm; i++) varMapF.put(varNames[i], i);
     }
-    return varMap;
+    return varMapF;
   }
   public boolean hasMap() {
-    return varMap!=null;
+    return varMapF!=null;
   }
   
   public Scope owner(String name) {
@@ -87,11 +87,11 @@ public final class Scope {
     }
     int idx = varAm++;
     varNames[idx] = name;
-    if (varMap!=null) varMap.put(name, idx);
+    if (varMapF!=null) varMapF.put(name, idx);
     return idx;
   }
   public void removeMap() {
-    varMap = null;
+    varMapF = null;
   }
   
   

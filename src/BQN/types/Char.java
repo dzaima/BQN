@@ -7,14 +7,15 @@ import BQN.types.arrs.ChrArr;
 public class Char extends Primitive {
   public char chr;
   public static final Char[] ASCII;
+  public static final Char SPACE;
   static {
     ASCII = new Char[128];
     for (int i = 0; i < 128; i++) {
       ASCII[i] = new Char((char) i);
     }
+    SPACE = ASCII[' '];
   }
   
-  public static final Char SPACE = ASCII[' '];
   
   public Char(char c) {
     chr = c;
@@ -54,10 +55,10 @@ public class Char extends Primitive {
   public String ln(FmtInfo f) {
     if (spec()) {
       switch (chr) {
-        case 0: return "@";
-        case 9: return "\\t";
-        case 10: return "\\n";
-        case 13: return "\\r";
+        case (char)0: return "@";
+        case (char)9: return "\\t";
+        case (char)10: return "\\n";
+        case (char)13: return "\\r";
         default:
           String s = Integer.toHexString(chr);
           if (s.length()==1) s = "0"+s;

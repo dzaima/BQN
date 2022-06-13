@@ -13,7 +13,7 @@ public class RBoxBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⊐"; }
   
   public Value call(Value x) {
-    HashMap<Value, Integer> map = new HashMap<>();
+    HashMap<Value, Integer> map = new HashMap<Value, Integer>();
     if (x.r() == 0) throw new DomainError("⊐: argument cannot be a scalar", this);
     Value[] xv = x.r()==1? x.values() : CellBuiltin.cells(x);
     int[] res = new int[xv.length];
@@ -39,7 +39,7 @@ public class RBoxBuiltin extends FnBuiltin {
     if (w.r() > 1) throw new RankError("⊐: 𝕨 had rank > 1", blame);
     if (x.ia > 20 && w.ia > 20) {
       if (w.quickIntArr() && x.quickIntArr()) {
-        HashMap<Integer, Integer> map = new HashMap<>();
+        HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
         int ctr = 0;
         for (int v : w.asIntArr()) map.putIfAbsent(v, ctr++);
         int[] res = new int[x.ia];
@@ -49,41 +49,43 @@ public class RBoxBuiltin extends FnBuiltin {
           res[i] = f==null? w.ia : f;
         }
         return new IntArr(res, x.shape);
+      } else {
+        HashMap<Value, Integer> map = new HashMap<Value, Integer>();
+        int ctr = 0;
+        for (Value v : w) map.putIfAbsent(v, ctr++);
+        int[] res = new int[x.ia];
+        ctr = 0;
+        for (Value v : x) {
+          Integer f = map.get(v);
+          res[ctr++] = f==null? w.ia : f;
+        }
+        return new IntArr(res, x.shape);
       }
-      HashMap<Value, Integer> map = new HashMap<>();
-      int ctr = 0;
-      for (Value v : w) map.putIfAbsent(v, ctr++);
+    } else {
       int[] res = new int[x.ia];
-      ctr = 0;
-      for (Value v : x) {
-        Integer f = map.get(v);
-        res[ctr++] = f==null? w.ia : f;
+      int i = 0;
+      if (w.quickIntArr() && x.quickIntArr()) {
+        int[] wi = w.asIntArr();
+        for (int cx : x.asIntArr()) {
+          int j = 0;
+          for (int cw : wi) {
+            if (cw == cx) break;
+            j++;
+          }
+          res[i++] = j;
+        }
+      } else {
+        Value[] wv = w.values();
+        for (Value cx : x) {
+          int j = 0;
+          for (Value cw : wv) {
+            if (cw.eq(cx)) break;
+            j++;
+          }
+          res[i++] = j;
+        }
       }
       return new IntArr(res, x.shape);
     }
-    int[] res = new int[x.ia];
-    int i = 0;
-    if (w.quickIntArr() && x.quickIntArr()) {
-      int[] wi = w.asIntArr();
-      for (int cx : x.asIntArr()) {
-        int j = 0;
-        for (int cw : wi) {
-          if (cw == cx) break;
-          j++;
-        }
-        res[i++] = j;
-      }
-    } else {
-      Value[] wv = w.values();
-      for (Value cx : x) {
-        int j = 0;
-        for (Value cw : wv) {
-          if (cw.eq(cx)) break;
-          j++;
-        }
-        res[i++] = j;
-      }
-    }
-    return new IntArr(res, x.shape);
   }
 }

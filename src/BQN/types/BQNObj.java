@@ -28,6 +28,7 @@ public abstract class BQNObj extends Primitive {
   abstract public void set(Value k, Value v);
   abstract public Value[][] kvPair();
   abstract public int size();
+  public int Count { get { return size(); } }
   
   public static class MapPointer extends Settable {
     private final BQNObj map;

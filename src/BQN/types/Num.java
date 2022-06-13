@@ -4,8 +4,6 @@ import BQN.errors.DomainError;
 import BQN.tools.*;
 import BQN.types.arrs.*;
 
-import java.util.Locale;
-
 public class Num extends Primitive {
   public static final long MAX_SAFE_DOUBLE = 9007199254740992L;
   
@@ -16,10 +14,15 @@ public class Num extends Primitive {
   public static final Num ONE   = new Num(1d);
   public static final Num[] NUMS = new Num[256];
   private static final Num NEG_ZERO = new Num(-0.0);
+  
+  public static int pp;
+  public static int sEr, eEr;
+  
   static {
     for (int i = 0; i < NUMS.length; i++) {
       NUMS[i] = new Num(i);
     }
+    // setPrecision(14, -10, 10);
   }
   
   
@@ -62,7 +65,7 @@ public class Num extends Primitive {
   
   
   public Value ofShape(int[] sh) { assert Arr.prod(sh) == 1;
-    return isInt(num)? new IntArr(new int[]{(int) num}, sh) : new DoubleArr(new double[]{num}, sh);
+    return isInt(num)? (Value)new IntArr(new int[]{(int) num}, sh) : new DoubleArr(new double[]{num}, sh);
   }
   
   
@@ -127,6 +130,7 @@ public class Num extends Primitive {
   }
   private static final char[] buf = new char[400];
   public static String format(double d, int pp, int pns, int pne) {
+    return d+"";
     pp--; // too lazy to change all uses of this
     double a = Math.abs(d);
     if (d == 0) {
@@ -134,7 +138,8 @@ public class Num extends Primitive {
       else return "¯0";
     }
     
-    String f = String.format(Locale.ENGLISH, "%."+pp+"e",  a);
+    String f = a.toString("E"+pp);
+    // Console.WriteLine(f);
     char[] fa = f.toCharArray();
     if (fa[0] > '9') {
       if (fa[0] == 'N') return "NaN";
@@ -173,48 +178,78 @@ public class Num extends Primitive {
       
       
       return new String(buf, 0, len);
-    }
-    
-    
-    // generic positional notation
-    /* )nf 5 (pp==4):
-       _31416e+00
-       01234567890
-     ∆ 432101234567
-       ¯¯¯¯
-    */
-    int len = 0;
-    if (d < 0) buf[len++] = '¯';
-    fa[1] = fa[0]; // put all the significant digits in order
-    fa[0] = '0'; // 0 so ls calculation doesn't have to special-case
-    
-    
-    int ls = pp+1; // length of significant digits
-    while (fa[ls] == '0') ls--;
-    
-    if (negExp) {
-      buf[len] = '0';
-      buf[len+1] = '.';
-      len+= 2;
-      for (int i = 0; i < exp-1; i++) buf[len+i] = '0'; // zero padding
-      len+= exp-1;
-      System.arraycopy(fa, 1, buf, len, ls); // actual digits; ≡  for (int i = 0; i < ls; i++) buf[len+i] = fa[i+1];
-      len+= ls;
     } else {
-      if (exp+1 < ls) {
-        System.arraycopy(fa, 1, buf, len, exp+1); // digits before '.'; ≡  for (int i = 0; i < exp+1; i++) buf[len+i] = fa[i+1];
-        len+= exp+1;
-        buf[len++] = '.';
-        System.arraycopy(fa, 2+exp, buf, len, ls-exp-1); // ≡  for (int i = 0; i < ls-exp-1; i++) buf[len+i] = fa[i+(2+exp)];
-        len+= ls-exp-1;
-      } else {
-        System.arraycopy(fa, 1, buf, len, ls); // all given digits; ≡  for (int i = 0; i < ls; i++) buf[len+i] = fa[i+1];
+      
+      
+      // generic positional notation
+      /* )nf 5 (pp==4):
+         _31416e+00
+         01234567890
+       ∆ 432101234567
+         ¯¯¯¯
+      */
+      int len = 0;
+      if (d < 0) buf[len++] = '¯';
+      fa[1] = fa[0]; // put all the significant digits in order
+      fa[0] = '0'; // 0 so ls calculation doesn't have to special-case
+      
+      
+      int ls = pp+1; // length of significant digits
+      while (fa[ls] == '0') ls--;
+      
+      if (negExp) {
+        buf[len] = '0';
+        buf[len+1] = '.';
+        len+= 2;
+        for (int i = 0; i < exp-1; i++) buf[len+i] = '0'; // zero padding
+        len+= exp-1;
+        System.arraycopy(fa, 1, buf, len, ls); // actual digits; ≡  for (int i = 0; i < ls; i++) buf[len+i] = fa[i+1];
         len+= ls;
-        for (int i = 0; i < exp-ls+1; i++) buf[len+i] = '0'; // pad with zeroes
-        len+= exp-ls+1;
+      } else {
+        
+        
+        // generic standard notation
+        /* •pp←4:
+           _31416e+00
+           01234567890
+         ∆ 432101234567
+           ¯¯¯¯
+        */
+        if (d < 0) {
+          buf[len++] = '¯';
+        }
+        fa[1] = fa[0]; // put all the significant digits in order
+        fa[0] = '0'; // 0 so ls calculation doesn't have to special-case
+        
+        
+        ls = pp+1; // length of significant digits
+        while (fa[ls] == '0') ls--;
+        
+        if (fa[pp+3] == '-') {
+          buf[len] = '0';
+          buf[len+1] = '.';
+          len+= 2;
+          for (int i = 0; i < exp-1; i++) buf[len+i] = '0'; // zero padding
+          len+= exp-1;
+          System.arraycopy(fa, 1, buf, len, ls); // actual digits; ≡  for (int i = 0; i < ls; i++) buf[len+i] = fa[i+1];
+          len+= ls;
+        } else {
+          if (exp+1 < ls) {
+            System.arraycopy(fa, 1, buf, len, exp+1); // digits before '.'; ≡  for (int i = 0; i < exp+1; i++) buf[len+i] = fa[i+1];
+            len+= exp+1;
+            buf[len++] = '.';
+            System.arraycopy(fa, 2+exp, buf, len, ls-exp-1); // ≡  for (int i = 0; i < ls-exp-1; i++) buf[len+i] = fa[i+(2+exp)];
+            len+= ls-exp-1;
+          } else {
+            System.arraycopy(fa, 1, buf, len, ls); // all given digits; ≡  for (int i = 0; i < ls; i++) buf[len+i] = fa[i+1];
+            len+= ls;
+            for (int i = 0; i < exp-ls+1; i++) buf[len+i] = '0'; // pad with zeroes
+            len+= exp-ls+1;
+          }
+        }
+        // System.out.println(f+": sig="+ls+"; exp="+exp+"; len="+len);
       }
+      return new String(buf, 0, len);
     }
-    // System.out.println(f+": sig="+ls+"; exp="+exp+"; len="+len);
-    return new String(buf, 0, len);
   }
 }

@@ -46,7 +46,7 @@ public class SlashBuiltin extends FnBuiltin {
       int[] xi = x.asIntArr();
       for (int c : xi) if (c<0) throw new DomainError(blame+": argument contained "+c, blame);
       if (Main.vind) { // •VI←1
-        int[][] res = new int[x.r()][sum];
+        int[][] res = new int[x.r()][]; for (int i = 0; i < res.length; i++) res[i] = new int[sum];
         int ri = 0;
         Indexer idx = new Indexer(x.shape);
         int rank = res.length;
@@ -161,7 +161,7 @@ public class SlashBuiltin extends FnBuiltin {
           int[] res = new int[sum];
           int[] xv = x.asIntArr();
           int rp=0, ip=0;
-          for (long l : wl) {
+          for (long l_ : wl) { long l = l_;
             for (int j = 0; j < 64; j++) {
               if ((l&1)!=0) res[rp++] = xv[ip];
               l>>= 1;
@@ -170,10 +170,11 @@ public class SlashBuiltin extends FnBuiltin {
           }
           return new IntArr(res);
         }
+        {
         Value[] res = new Value[sum];
         Value[] xv = x.values();
         int rp=0, ip=0;
-        for (long l : wl) {
+        for (long l_ : wl) { long l = l_;
           for (int j = 0; j < 64; j++) {
             if ((l&1)!=0) res[rp++] = xv[ip];
             l>>= 1;
@@ -181,6 +182,7 @@ public class SlashBuiltin extends FnBuiltin {
           }
         }
         return Arr.create(res);
+        }
         
         
         
@@ -333,11 +335,12 @@ public class SlashBuiltin extends FnBuiltin {
       }
       rsh[i] = s;
     }
-    
-    MutVal res = new MutVal(rsh, x);
-    
-    recReplicate(res, 0, 0, 0, x.ia, x, x.shape, am);
-    return res.get();
+    {
+      MutVal res = new MutVal(rsh, x);
+      
+      recReplicate(res, 0, 0, 0, x.ia, x, x.shape, am);
+      return res.get();
+    }
   }
   
   private static int recReplicate(MutVal res, int rpos, int ipos, int d, int rsz, Value x, int[] xsh, int[][] am) {
@@ -369,16 +372,16 @@ public class SlashBuiltin extends FnBuiltin {
   // }
   
   public Value underW(Value o, Value w, Value x) {
-    Value call = call(w, x);
-    Value v = o instanceof Fun? o.call(call) : o;
+    Value cr = call(w, x);
+    Value v = o instanceof Fun? o.call(cr) : o;
     int depth = MatchBuiltin.full(w);
     if (depth!=1) {
       if (depth>1) throw new NYIError("𝔽⌾(b⊸/): 𝕨 of / must be a boolean vector", this);
-      int wi = w.asInt();
-      if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("𝔽⌾(b⊸/): Expected F to not change its arguments shape", this);
-      if (wi==0) return x;
+      int wi2 = w.asInt();
+      if (!Arrays.equals(cr.shape, v.shape)) throw new DomainError("𝔽⌾(b⊸/): Expected F to not change its arguments shape", this);
+      if (wi2==0) return x;
       Value[] vs = new Value[x.ia];
-      for (int i = 0; i < x.ia; i++) vs[i] = v.get(i*wi);
+      for (int i = 0; i < x.ia; i++) vs[i] = v.get(i*wi2);
       Value r = new HArr(vs);
       if (!replicate(w, r, this).eq(v)) throw new DomainError("𝔽⌾(b⊸/): Result of F not invertible", this);
       return r;
@@ -411,14 +414,23 @@ public class SlashBuiltin extends FnBuiltin {
         else res[i] = xi[i];
       }
       return new IntArr(res, sh);
+    } else {
+      Value[] res = new Value[x.ia];
+      for (int i = 0; i < wi.length; i++) {
+        int d = wi[i];
+        if (d!=0 && d!=1) throw new DomainError("⌾(𝕨⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d));
+        if (d == 1) res[i] = v.get(ipos++);
+        else res[i] = x.get(i);
+      }
+      return Arr.create(res, sh);
     }
-    Value[] res = new Value[x.ia];
+    Value[] res2 = new Value[x.ia];
     for (int i = 0; i < wi.length; i++) {
       int d = wi[i];
       if (d!=0 && d!=1) throw new DomainError("𝔽⌾(b⊸/): 𝕨 must be a boolean vector, contained "+Num.fmt(d), this);
-      if (d == 1) res[i] = v.get(ipos++);
-      else res[i] = x.get(i);
+      if (d == 1) res2[i] = v.get(ipos++);
+      else res2[i] = x.get(i);
     }
-    return Arr.create(res, sh);
+    return Arr.create(res2, sh);
   }
 }

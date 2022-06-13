@@ -1,6 +1,7 @@
 package BQN.tokenizer;
 
 import BQN.types.Tokenable;
+import BQN.errors.ImplementationError;
 
 public abstract class Token implements Tokenable {
   public char type; // \0 by default
@@ -27,9 +28,13 @@ public abstract class Token implements Tokenable {
   }
   
   
-  public static Token COMP = new Token("•COMPiled function", 0, 18) {
+  public static Token COMP = new ET();
+  public class ET extends Token {
+    ET() { super("•COMPiled function", 0, 18); }
     public String toRepr() {
       return "•COMPiled function";
     }
   };
+  public boolean isArr() { return false; }
+  public ArrayList<Token> tkList() { throw new ImplementationError("tkList on non-array"); }
 }

@@ -32,7 +32,7 @@ public class MulBuiltin extends FnBuiltin {
     }
   };
   public Value call(Value x) {
-    return numChrMapM(NF, c -> Num.of(c.getCase()), c -> c.size()>0? Num.ONE : Num.ZERO, x);
+    return numChrMapM(NF, (Func<Chr,Value>)(c -> Num.of(c.getCase())), (Func<BQNObj,Value>)(c -> c.size()>0? Num.ONE : Num.ZERO), x);
   }
   
   public Pervasion.NN2N dyNum() { return DF; }

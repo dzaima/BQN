@@ -12,10 +12,10 @@ import java.util.Arrays;
 public class GroupBuiltin extends FnBuiltin {
   public String ln(FmtInfo f) { return "⊔"; }
   
-  private static class MutIA {
-    int[] ds = new int[4];
-    int sz;
-    void add(int i) {
+  public static class MutIA {
+    public int[] ds = new int[4];
+    public int sz;
+    public void add(int i) {
       if (sz >= ds.length) {
         ds = Arrays.copyOf(ds, ds.length*2);
       }
@@ -142,58 +142,59 @@ public class GroupBuiltin extends FnBuiltin {
         for (int i = 0; i < sz; i++) res[i] = new ChrArr(vs[i]);
         return new HArr(res);
       }
-      int[] idxs = new int[sz];
-      Value[][] vs = new Value[sz][];
-      for (int i = 0; i < sz; i++) vs[i] = new Value[rshs[i]];
+      int[] idxs2 = new int[sz];
+      Value[][] vs2 = new Value[sz][];
+      for (int i = 0; i < sz; i++) vs2[i] = new Value[rshs[i]];
       for (int i = 0; i < x.ia; i++) {
         int c = poss[i];
-        if (c>=0) vs[c][idxs[c]++] = x.get(i);
+        if (c>=0) vs2[c][idxs2[c]++] = x.get(i);
       }
-      Value[] res = new Value[sz];
+      Value[] res2 = new Value[sz];
       for (int i = 0; i < sz; i++) {
-        res[i] = vs[i].length>0? Arr.create(vs[i]) : new EmptyArr(EmptyArr.SHAPE0, x.fItemS());
+        res2[i] = vs2[i].length>0? Arr.create(vs2[i]) : new EmptyArr(EmptyArr.SHAPE0, x.fItemS());
       }
-      return new HArr(res);
-    }
-    
-    int csz = Arr.prod(x.shape, wsz, xsz);
-    int[] rsh = new int[wsz];
-    for (int i = 0; i < wsz; i++) {
-      int sz = -1;
-      if (max==-1) {
-        for (int c : wp[i]) sz = Math.max(sz, c);
-        sz++;
-      } else sz = max;
-      rsh[i] = sz;
-    }
-    int sz = Arr.prod(rsh);
-    if (sz==0) return new EmptyArr(rsh, new EmptyArr(rsh, x.fItemS()));
-    int[][] rshs = new int[sz][xsz];
-    int repl = 1;
-    for (int i = wsz-1; i >= 0; i--) {
-      int[] ca = new int[rsh[i]];
-      int[] cwp = wp[i];
-      for (int c : cwp) {
-        if (c>=0) ca[c]++;
-        else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this);
+      return new HArr(res2);
+    } else {
+      
+      int csz = Arr.prod(x.shape, wsz, xsz);
+      int[] rsh = new int[wsz];
+      for (int i = 0; i < wsz; i++) {
+        int sz2 = -1;
+        if (max==-1) {
+          for (int c : wp[i]) sz2 = Math.max(sz2, c);
+          sz2++;
+        } else sz2 = max;
+        rsh[i] = sz2;
       }
-      int rp = 0;
-      while (rp < sz) {
-        for (int c : ca) {
-          for (int k = 0; k < repl; k++) rshs[rp++][i] = c;
+      int sz = Arr.prod(rsh);
+      if (sz==0) return new EmptyArr(rsh, new EmptyArr(rsh, x.fItemS()));
+      int[][] rshs = new int[sz][]; for (int i = 0; i < rshs.length; i++) rshs[i] = new int[xsz];
+      int repl = 1;
+      for (int i = wsz-1; i >= 0; i--) {
+        int[] ca = new int[rsh[i]];
+        int[] cwp = wp[i];
+        for (int c : cwp) {
+          if (c>=0) ca[c]++;
+          else if (c!=-1) throw new DomainError("⊔: didn't expect "+c+" in 𝕨", this);
         }
+        int rp = 0;
+        while (rp < sz) {
+          for (int c : ca) {
+            for (int k = 0; k < repl; k++) rshs[rp++][i] = c;
+          }
+        }
+        repl*= rsh[i];
       }
-      repl*= rsh[i];
+      for (int[] c : rshs) System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
+      
+      MutVal[] vs = new MutVal[sz];
+      for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);
+      recIns(vs, new int[sz], rsh, 0, 0, 0, wp, x, csz);
+      
+      Value[] res = new Value[sz];
+      for (int i = 0; i < sz; i++) res[i] = vs[i].get();
+      return new HArr(res, rsh);
     }
-    for (int[] c : rshs) System.arraycopy(x.shape, wsz, c, wsz, xsz-wsz);
-    
-    MutVal[] vs = new MutVal[sz];
-    for (int i = 0; i < sz; i++) vs[i] = new MutVal(rshs[i]);
-    recIns(vs, new int[sz], rsh, 0, 0, 0, wp, x, csz);
-    
-    Value[] res = new Value[sz];
-    for (int i = 0; i < sz; i++) res[i] = vs[i].get();
-    return new HArr(res, rsh);
   }
   
   private void recIns(MutVal[] vs, int[] ram, int[] rsh, int rp, int k, int ip, int[][] w, Value x, int csz) {

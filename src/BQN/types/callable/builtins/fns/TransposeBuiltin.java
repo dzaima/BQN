@@ -147,10 +147,10 @@ public class TransposeBuiltin extends FnBuiltin {
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value call = call(w, x);
-    Value v = o instanceof Fun? o.call(call) : o;
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊘: Expected F to not change its arguments shape", this);
-    if (call.r()==x.r()) return callInvX(w, v);
+    Value r = call(w, x);
+    Value v = o instanceof Fun? o.call(r) : o;
+    if (!Arrays.equals(r.shape, v.shape)) throw new DomainError("F⌾⊘: Expected F to not change its arguments shape", this);
+    if (r.r()==x.r()) return callInvX(w, v);
     int[] inds = call(w, new IntArr(UDBuiltin.on(x.ia), x.shape)).asIntArr();
     MutVal mv = new MutVal(x.shape, x, x.ia);
     mv.copy(x, 0, 0, x.ia);

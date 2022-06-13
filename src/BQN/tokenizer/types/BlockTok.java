@@ -71,7 +71,7 @@ public class BlockTok extends TokArr {
     } else twoHeaderless = false;
     if (immBlock && canBeImmediate && type=='f' && (bodies.size()==1 || hasPred)) type = 'a';
     
-    char htype = 0;
+    char htype = '\0';
     for (Body b : bodies) {
       if (b.type != 0) {
         if (b.type=='a' && !canBeImmediate) throw new SyntaxError("Using function tokens in a value block", this);
@@ -131,7 +131,7 @@ public class BlockTok extends TokArr {
   
   
   public BlockTok(char type, boolean imm, Body[] mb, Body[] db) {
-    super(Token.COMP.raw, 0, 18, new ArrayList<>());
+    super(Token.COMP.raw, 0, 18, new ArrayList<Token>());
     this.type = type;
     immediate = imm;
     bdM = mb;
@@ -223,7 +223,7 @@ public class BlockTok extends TokArr {
       case 'm': return new Md1Block(this, sc);
       case 'd': return new Md2Block(this, sc);
       case '?': if (Main.vind) return new FunBlock(this, sc);
-        /* fallthrough */
+        goto case 'a'; /* fallthrough */
       case 'a': {
         Body b0 = bdD[0];
         Value r0 = comp.exec(new Scope(sc, b0.vars), b0);

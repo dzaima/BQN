@@ -37,20 +37,21 @@ public class Tokenizer {
     }
     
     Line(String line, int pos) {
-      this(line, pos, new ArrayList<>());
+      this(line, pos, new ArrayList<Token>());
     }
     
-    public int size() {
+    public int sz() {
       return ts.size();
     }
+    public int Count { get { return sz(); } }
     
     public void add(Token r) {
       ts.add(r);
     }
     
     LineTok tok(boolean pointless) { // also handles strands because why not
-      int spos = size()==0? pos : ts.get(0).spos;
-      int epos = size()==0? pos : ts.get(size()-1).epos;
+      int spos = sz()==0? pos : ts.get(0).spos;
+      int epos = sz()==0? pos : ts.get(sz()-1).epos;
       if (pointless) return new LineTok(line, spos, epos, ts);
       ArrayList<Token> pts = new ArrayList<>();
       
@@ -79,7 +80,7 @@ public class Tokenizer {
   static class Block { // temp storage of multiple lines
     final ArrayList<Line> a;
     final char b;
-    private final int pos;
+    final int pos;
     
     Block(ArrayList<Line> a, char b, int pos) {
       this.a = a;
@@ -100,8 +101,8 @@ public class Tokenizer {
     int len = raw.length();
     
     ArrayList<Block> levels = new ArrayList<>();
-    levels.add(new Block(new ArrayList<>(), '⋄', 0));
-    levels.get(0).a.add(new Line(raw, 0, new ArrayList<>()));
+    levels.add(new Block(new ArrayList<Line>(), '⋄', 0));
+    levels.get(0).a.add(new Line(raw, 0, new ArrayList<Token>()));
     
     for (int i = 0; i < len; li = i) {
       Block expr = levels.get(levels.size() - 1);
@@ -112,7 +113,7 @@ public class Tokenizer {
         char next = i+1 < len? raw.charAt(i + 1) : ' ';
         String cS = String.valueOf(c);
         if (c == '(' || c == '{' || c == '[' || c == '⟨') {
-          levels.add(new Block(new ArrayList<>(), c, i));
+          levels.add(new Block(new ArrayList<Line>(), c, i));
           lines = levels.get(levels.size() - 1).a;
           lines.add(new Line(raw, i));
           
@@ -125,7 +126,7 @@ public class Tokenizer {
             case ']': match = '['; break;
             case '⟩': match = '⟨'; break;
             default:
-              throw new Error("this should really not happen");
+              throw new ImplementationError("this should really not happen");
           }
           Block closed = levels.remove(levels.size() - 1);
           if (match != closed.b) {
@@ -351,7 +352,7 @@ public class Tokenizer {
         Token r;
         switch (closed.b) {
           case '(':
-            ArrayList<Token> ts = new ArrayList<>(lineTokens);
+            ArrayList<Token> ts = new ArrayList<Token>(lineTokens);
             r = new ParenTok(raw, closed.pos, len, new LineTok(raw, closed.pos, len, ts));
             break;
           case '{':
@@ -368,10 +369,10 @@ public class Tokenizer {
         tokens.add(r);
       }
     }
-    ArrayList<Line> lines = levels.get(0).a;
-    if (lines.size() > 0 && lines.get(lines.size()-1).size() == 0) lines.remove(lines.size()-1); // no trailing empties!!
+    ArrayList<Line> lines2 = levels.get(0).a;
+    if (lines2.size() > 0 && lines2.get(lines2.size()-1).size() == 0) lines2.remove(lines2.size()-1); // no trailing empties!!
     ArrayList<Token> expressions = new ArrayList<>();
-    for (Line line : lines) {
+    for (Line line : lines2) {
       expressions.add(line.tok(pointless));
     }
     return new BasicLines(raw, 0, len, expressions);

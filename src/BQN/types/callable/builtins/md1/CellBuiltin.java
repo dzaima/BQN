@@ -20,11 +20,11 @@ public class CellBuiltin extends Md1Builtin {
     //if (w.rank == 0) throw new RankError(f+"˘: scalar 𝕩 isn't allowed", this, w);
     if (x.shape[0] == 0) return EmptyArr.SHAPE0Q;
     
-    Value[] cells = cells(x);
-    if (f instanceof LTBuiltin) return Arr.create(cells);
+    Value[] cellsF = cells(x);
+    if (f instanceof LTBuiltin) return Arr.create(cellsF);
     
-    for (int i = 0; i < cells.length; i++) cells[i] = f.call(cells[i]);
-    return GTBuiltin.merge(cells, new int[]{cells.length}, this);
+    for (int i = 0; i < cellsF.length; i++) cellsF[i] = f.call(cellsF[i]);
+    return GTBuiltin.merge(cellsF, new int[]{cellsF.length}, this);
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {
@@ -51,13 +51,13 @@ public class CellBuiltin extends Md1Builtin {
   public Value callInv(Value f, Value x) {
     if (x.r()==0) throw new DomainError("F˘⁼: argument had rank 0", this);
     if (x.ia==0) throw new DomainError("F˘⁼: argument had 0 items", this);
-    Value[] cells = cells(x);
-    for (int i = 0; i < cells.length; i++) {
-      Value c = f.callInv(cells[i]);
+    Value[] cellsF = cells(x);
+    for (int i = 0; i < cellsF.length; i++) {
+      Value c = f.callInv(cellsF[i]);
       if (c instanceof Primitive) throw new DomainError("F˘⁼: F returned an atom", this);
-      cells[i] = c;
+      cellsF[i] = c;
     }
-    return GTBuiltin.merge(cells, new int[]{cells.length}, this);
+    return GTBuiltin.merge(cellsF, new int[]{cellsF.length}, this);
   }
   public Value callInvX(Value f, Value w, Value x) {
     if (x.r()==0) throw new DomainError("F˘⁼: 𝕩 had rank 0", this);
@@ -99,11 +99,11 @@ public class CellBuiltin extends Md1Builtin {
   public static Value[] cells(Value x) {
     assert x.r() != 0;
     int cam = x.shape[0];
-    int csz = csz(x);
+    int cszF = csz(x);
     int[] csh = Arrays.copyOfRange(x.shape, 1, x.r());
     
     Value[] res = new Value[cam];
-    for (int i = 0; i < cam; i++) res[i] = MutVal.cut(x, i*csz, csz, csh);
+    for (int i = 0; i < cam; i++) res[i] = MutVal.cut(x, i*cszF, cszF, csh);
     return res;
   }
   

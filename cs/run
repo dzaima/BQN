@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+(
+cd BQNApp
+dotnet run -c Release
+)

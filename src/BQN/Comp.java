@@ -31,54 +31,54 @@ public class Comp {
     this.tk = tk;
   }
   
-  public static final byte PUSH = 0x00; // N; push object from objs[N]
-  public static final byte DFND = 0x01; // N; push dfns[N], derived to current scope
-  public static final byte SYSV = 0x02; // N; get system function N
+  public const byte PUSH = 0x00; // N; push object from objs[N]
+  public const byte DFND = 0x01; // N; push dfns[N], derived to current scope
+  public const byte SYSV = 0x02; // N; get system function N
   
-  public static final byte POPS = 0x06; // pop object from stack
-  public static final byte RETN = 0x07; // returns top of stack
-  public static final byte RETD = 0x08; // return a namespace of exported items
-  public static final byte ARRO = 0x0B; // N; create a vector of top N items
-  public static final byte ARRM = 0x0C; // N; create a mutable vector of top N items
+  public const byte POPS = 0x06; // pop object from stack
+  public const byte RETN = 0x07; // returns top of stack
+  public const byte RETD = 0x08; // return a namespace of exported items
+  public const byte ARRO = 0x0B; // N; create a vector of top N items
+  public const byte ARRM = 0x0C; // N; create a mutable vector of top N items
   
-  public static final byte FN1C = 0x10; // monadic function call ⟨…,x,f  ⟩ → F x
-  public static final byte FN2C = 0x11; //  dyadic function call ⟨…,x,f,w⟩ → w F x
-  public static final byte FN1O = 0x12; // optional monadic call (FN1C but checks for · at 𝕩)
-  public static final byte FN2O = 0x13; // optional  dyadic call (FN2C but checks for · at 𝕩 & 𝕨)
-  public static final byte TR2D = 0x14; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
-  public static final byte TR3D = 0x15; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
-  public static final byte CHKV = 0x16; // throw error if top of stack is ·
-  public static final byte TR3O = 0x17; // TR3D but creates an atop if F is ·
+  public const byte FN1C = 0x10; // monadic function call ⟨…,x,f  ⟩ → F x
+  public const byte FN2C = 0x11; //  dyadic function call ⟨…,x,f,w⟩ → w F x
+  public const byte FN1O = 0x12; // optional monadic call (FN1C but checks for · at 𝕩)
+  public const byte FN2O = 0x13; // optional  dyadic call (FN2C but checks for · at 𝕩 & 𝕨)
+  public const byte TR2D = 0x14; // derive 2-train aka atop; ⟨…,  g,f⟩ → (f g)
+  public const byte TR3D = 0x15; // derive 3-train aka fork; ⟨…,h,g,f⟩ → (f g h)
+  public const byte CHKV = 0x16; // throw error if top of stack is ·
+  public const byte TR3O = 0x17; // TR3D but creates an atop if F is ·
   
-  public static final byte MD1C = 0x1A; // call/derive 1-modifier; ⟨…,  _m,f⟩ → (f _m)
-  public static final byte MD2C = 0x1B; // call/derive 2-modifier; ⟨…,g,_m,f⟩ → (f _m_ g)
-  public static final byte MD2L = 0x1C; // derive 2-modifier to 1-modifier with 𝔽 ⟨…,_m_,f⟩ → (f _m_)
-  public static final byte MD2R = 0x1D; // derive 2-modifier to 1-modifier with 𝔾 ⟨…,g,_m_⟩ → (_m_ g)
+  public const byte MD1C = 0x1A; // call/derive 1-modifier; ⟨…,  _m,f⟩ → (f _m)
+  public const byte MD2C = 0x1B; // call/derive 2-modifier; ⟨…,g,_m,f⟩ → (f _m_ g)
+  public const byte MD2L = 0x1C; // derive 2-modifier to 1-modifier with 𝔽 ⟨…,_m_,f⟩ → (f _m_)
+  public const byte MD2R = 0x1D; // derive 2-modifier to 1-modifier with 𝔾 ⟨…,g,_m_⟩ → (_m_ g)
   
-  public static final byte VARO = 0x20; // N0,N1; push variable at depth N0 and position N1
-  public static final byte VARM = 0x21; // N0,N1; push mutable variable at depth N0 and position N1
-  public static final byte VARU = 0x22; // N0,N1; like VARO but overrides the slot with bi_optOut
-  public static final byte DYNO = 0x26; // N; push variable with name objs[N]
-  public static final byte DYNM = 0x27; // N; push mutable variable with name objs[N]
+  public const byte VARO = 0x20; // N0,N1; push variable at depth N0 and position N1
+  public const byte VARM = 0x21; // N0,N1; push mutable variable at depth N0 and position N1
+  public const byte VARU = 0x22; // N0,N1; like VARO but overrides the slot with bi_optOut
+  public const byte DYNO = 0x26; // N; push variable with name objs[N]
+  public const byte DYNM = 0x27; // N; push mutable variable with name objs[N]
   
-  public static final byte PRED = 0x2A; // pop item, go to next body if 0, continue if 1
-  public static final byte VFYM = 0x2B; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
-  public static final byte SETH = 0x2F; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
-  public static final byte SETN = 0x30; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
-  public static final byte SETU = 0x31; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
-  public static final byte SETM = 0x32; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
-  public static final byte SETC = 0x33; // set call; _ F↩; (…,  F,mut) → mut F↩
-  public static final byte FLDO = 0x40; // N; get field nameList[N] from ToS
-  public static final byte FLDM = 0x41; // N; get mutable field nameList[N] from ToS
-  public static final byte ALIM = 0x42; // N; replace ToS with one with a namespace field alias N
+  public const byte PRED = 0x2A; // pop item, go to next body if 0, continue if 1
+  public const byte VFYM = 0x2B; // push a mutable version of ToS that fails if set to a non-equal value (for header assignment)
+  public const byte SETH = 0x2F; // set header; acts like SETN, but it doesn't push to stack, and, instead of erroring in cases it would, it skips to the next body
+  public const byte SETN = 0x30; // set new; _  ←_; ⟨…,x,  mut⟩ → mut←x
+  public const byte SETU = 0x31; // set upd; _  ↩_; ⟨…,x,  mut⟩ → mut↩x
+  public const byte SETM = 0x32; // set mod; _ F↩_; ⟨…,x,F,mut⟩ → mut F↩x
+  public const byte SETC = 0x33; // set call; _ F↩; (…,  F,mut) → mut F↩
+  public const byte FLDO = 0x40; // N; get field nameList[N] from ToS
+  public const byte FLDM = 0x41; // N; get mutable field nameList[N] from ToS
+  public const byte ALIM = 0x42; // N; replace ToS with one with a namespace field alias N
   
-  public static final byte NSPM = 0x50; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
-  public static final byte SPEC = 0x51; // special
-  public static final byte NFLO = 0x52; // N; get field with name objs[N] of ToS
-  public static final byte NFLM = 0x53; // N; set field with name objs[N] from ToS
-  public static final byte   EVAL   = 0; // ⍎
-  public static final byte   STDIN  = 1; // •
-  public static final byte   STDOUT = 2; // •←
+  public const byte NSPM = 0x50; // N0,N1; create a destructible namespace from top N0 items, with the keys objs[N1]
+  public const byte SPEC = 0x51; // special
+  public const byte NFLO = 0x52; // N; get field with name objs[N] of ToS
+  public const byte NFLM = 0x53; // N; set field with name objs[N] from ToS
+  public const byte   EVAL   = 0; // ⍎
+  public const byte   STDIN  = 1; // •
+  public const byte   STDOUT = 2; // •←
   
   
   static class Stk {
@@ -99,7 +99,7 @@ public class Comp {
   }
   
   
-  public static final boolean JCOMP = !System.getProperty("org.graalvm.nativeimage.kind", "-").equals("executable") && !Main.SAFE;
+  public static final boolean JCOMP = false;
   public Value exec(Scope sc, Body body) {
     int i = body.start;
     try {
@@ -246,7 +246,7 @@ public class Comp {
             Value f = (Value) s.pop();
             Value g = (Value) s.pop();
             Value h = (Value) s.pop();
-            Obj d = f instanceof Nothing? new Atop(g, h) : new Fork(f, g, h);
+            Obj d = f instanceof Nothing? (Value)new Atop(g, h) : new Fork(f, g, h);
             s.push(d);
             break;
           }
@@ -396,7 +396,7 @@ public class Comp {
       if (e.blame == null) {
         e.blame = fn!=null? fn : tk;
       }
-      ArrayList<BQNError.Mg> mgs = new ArrayList<>();
+      ArrayList<BQNError.Mg> mgs = new ArrayList<BQNError.Mg>();
       BQNError.Mg.add(mgs, tk, '¯');
       BQNError.Mg.add(mgs, fn, '^');
       e.trace.add(new BQNError.Frame(sc, mgs, this, body.start));
@@ -454,7 +454,7 @@ public class Comp {
           case NFLO: cs = "NFLO " + safeObj(bc[i++]); break;
           case NFLM: cs = "NFLM " + safeObj(bc[i++]); break;
           case SPEC: cs = "SPEC " + (bc[i++]&0xff); break;
-          default  : cs = "unknown";
+          default  : cs = "unknown"; break;
         }
         if (hl<0 || Math.abs(hl-pi) < am || Math.abs(hl-i) < am) {
           if (hl<0) b.append(' ');
@@ -485,11 +485,11 @@ public class Comp {
         char tp = blk.type;
         b.append(' ').append(j).append(": ").append(tp=='a'? "immediate block" : (blk.immediate?"immediate ":"") + (tp=='f'? "function" : tp=='d'? "2-modifier" : tp=='m'? "1-modifier" : tp+"")).append(" \n");
         b.append("  flags: ").append(blk.flags).append('\n');
-        HashSet<Body> mb = new HashSet<>(); mb.addAll(Arrays.asList(blk.bdM)); mb.addAll(Arrays.asList(blk.bdMxi));
-        HashSet<Body> db = new HashSet<>(); db.addAll(Arrays.asList(blk.bdD)); db.addAll(Arrays.asList(blk.bdDxi)); db.addAll(Arrays.asList(blk.bdDwi));
-        HashSet<Body> done = new HashSet<>();
+        HashSet<Body> mb = new HashSet<Body>(); mb.addAll(Arrays.asList(blk.bdM)); mb.addAll(Arrays.asList(blk.bdMxi));
+        HashSet<Body> db = new HashSet<Body>(); db.addAll(Arrays.asList(blk.bdD)); db.addAll(Arrays.asList(blk.bdDxi)); db.addAll(Arrays.asList(blk.bdDwi));
+        HashSet<Body> done = new HashSet<Body>();
         for (int k = 0; k < 3; k++) {
-          for (Body[] bs : new Body[][][]{{blk.bdM, blk.bdD}, {blk.bdMxi, blk.bdDxi}, {blk.bdDwi}}[k]) {
+          for (Body[] bs : new Body[][][]{new Body[][]{blk.bdM, blk.bdD}, new Body[][]{blk.bdMxi, blk.bdDxi}, new Body[][]{blk.bdDwi}}[k]) {
             for (Body bd : bs) {
               if (done.contains(bd)) continue;
               boolean mq = mb.contains(bd);
@@ -566,7 +566,7 @@ public class Comp {
     MutIntArr bc = new MutIntArr(16);
     ArrayList<Token> ref = new ArrayList<>(16);
     
-    HashMap<String, Integer> vars; // map of varName→index
+    public HashMap<String, Integer?> vars; // map of varName→index
     ArrayList<String> varnames;
     ArrayList<BlockTok> cBlocks = new ArrayList<>(16);
     HashSet<String> exported;
@@ -576,8 +576,8 @@ public class Comp {
       varnames = new ArrayList<>(preset.length);
       Collections.addAll(varnames, preset);
       exported = null;
-      vars = new HashMap<>(preset.length);
-      for (int i = 0; i < preset.length; i++) vars.put(preset[i], i);
+      vars = new HashMap<String, Integer?>();
+      for (int i = 0; i < preset.length; i++) if (preset[i]!=null) vars.put(preset[i], i);
     }
     
     public void export(String name) {
@@ -593,8 +593,8 @@ public class Comp {
       int[] exp = new int[exported.size()];
       int i = 0;
       for (String name : exported) {
-        Integer pos = vars.get(name);
-        if (pos == null) throw new SyntaxError("Exporting non-defined variable "+name);
+        if (vars.get(name)==null) throw new SyntaxError("Exporting non-defined variable "+name);
+        Integer pos = vars.get(name).Value;
         exp[i++] = pos;
       }
       return exp;
@@ -625,8 +625,8 @@ public class Comp {
       Mut c = this;
       int d = 0;
       do {
-        Integer pos = c.vars.get(s);
-        if (pos!=null) {
+        if (c.vars.ContainsKey(s) && c.vars.get(s).Value!=null) {
+          Integer pos = c.vars.get(s).Value;
           add(t, mut? VARM : VARO);
           add(d);
           add(pos);
@@ -692,11 +692,11 @@ public class Comp {
     sc.varAm = sc.varNames.length;
     if (sc.vars.length < sc.varAm) sc.vars = Arrays.copyOf(sc.vars, sc.varAm);
     sc.removeMap();
-    return new SingleComp(mut.finish(lns), new Body(new ArrayList<>(lns.tokens), 'a', false));
+    return new SingleComp(mut.finish(lns), new Body(new ArrayList<Token>(lns.tokens), 'a', false));
   }
   public static SingleComp compN(TokArr lns, Scope sc) { // non-block
     Mut mut = new Mut(null);
-    Body b = new Body(new ArrayList<>(lns.tokens), 'a', false);
+    Body b = new Body(new ArrayList<Token>(lns.tokens), 'a', false);
     mut.newBody(sc.varNames);
     int sz = lns.tokens.size();
     if (sz==0) throw new SyntaxError("Executing empty code");
@@ -807,22 +807,22 @@ public class Comp {
     return true;
   }
   
-  static abstract class Res {
+  public static abstract class Res {
     char type;
     Value c;
     public Res(char type) {
       this.type = type;
     }
     
-    abstract void add(Mut m);
-    Res mut(boolean create, boolean export) { throw new SyntaxError("This cannot be mutated", lastTok()); }
+    public abstract void add(Mut m);
+    public Res mut(boolean create, boolean export) { throw new SyntaxError("This cannot be mutated", lastTok()); }
     
     public abstract Token lastTok();
   }
   
   static class ResTk extends Res {
     Token tk;
-    private boolean mut;
+    private boolean mutF;
     private boolean create;
     private boolean export;
     
@@ -833,15 +833,15 @@ public class Comp {
       type = tk.type;
     }
     
-    void add(Mut m) {
+    public void add(Mut m) {
       if (export) compE(m, tk);
-      if (mut) compM(m, tk, create, false);
+      if (mutF) compM(m, tk, create, false);
       else compO(m, tk);
     }
     
     Res mut(boolean create, boolean export) {
-      assert !mut;
-      mut = true;
+      assert !mutF;
+      mutF = true;
       this.create = create;
       this.export = export;
       return this;
@@ -870,7 +870,7 @@ public class Comp {
       this.tk = tk;
     }
     
-    void add(Mut m) {
+    public void add(Mut m) {
       if (check) m.add(tk, CHKV);
     }
     
@@ -897,7 +897,7 @@ public class Comp {
       this.tk = tk;
     }
     
-    void add(Mut m) {
+    public void add(Mut m) {
       m.add(tk, bc);
     }
     
@@ -913,21 +913,21 @@ public class Comp {
     private final Res o;
     private final String k;
     private final Token tk;
-    private boolean mut;
+    private boolean mutF;
     public ResGet(Res o, String k, char t, Token tk) {
       super(t);
       this.o = o;
       this.k = k;
       this.tk = tk;
     }
-    void add(Mut m) {
+    public void add(Mut m) {
       o.add(m);
-      m.add(tk, mut? NFLM : NFLO);
+      m.add(tk, mutF? NFLM : NFLO);
       m.add(m.addObj(new ChrArr(k)));
     }
     
     Res mut(boolean create, boolean export) { // TODO use create?
-      mut = true;
+      mutF = true;
       if (export) throw new SyntaxError("Cannot export field access", tk);
       return this;
     }
@@ -944,7 +944,7 @@ public class Comp {
       this.all = all;
     }
     
-    void add(Mut m) {
+    public void add(Mut m) {
       for (Res r : all) r.add(m);
     }
     
@@ -970,7 +970,7 @@ public class Comp {
       this.last = last;
     }
     
-    void add(Mut m) {
+    public void add(Mut m) {
       m.push(last, c);
     }
     
@@ -1038,7 +1038,7 @@ public class Comp {
           }
         } else { // value expressions
           if (tps.getL(1).type=='f' && isArr(lType)) {
-            char g3 = tps.sz>2? norm(tps.getL(2).type) : 0;
+            char g3 = tps.sz>2? norm(tps.getL(2).type) : (char)0;
             if (g3=='a') {
               if (tps.sz>3? tps.getL(3).type!='d' : last) {
                 if (Main.debug) printlvl("match a F a");
@@ -1160,7 +1160,7 @@ public class Comp {
         if (a=='←' || a=='↩' || a=='⇐') {
           char k = tps.getL(2).type;
           char v = lType;
-          char p = tps.size()>=4? tps.getL(3).type : 0;
+          char p = tps.size()>=4? tps.getL(3).type : (char)0;
           if (p=='d') break set;
           char ov = v;
           v = norm(v);
@@ -1268,7 +1268,7 @@ public class Comp {
     
     if (t instanceof ParenTok) return t.flags = flags(((ParenTok) t).ln);
     if (t instanceof TokArr) {
-      List<? extends Token> ts = ((TokArr) t).tokens;
+      List<Token> ts = t.tkList();
       if (t instanceof ArrayTok || t instanceof StrandTok
       ||  t instanceof LineTok && ts.size()==1) {
         t.flags = 7;
@@ -1410,7 +1410,7 @@ public class Comp {
       Res t0 = new ResTk(ts.get(i));
       tps.addFirst(t0);
       i--;
-      final boolean train = (t0.type!='a' && t0.type!='A' && t0.type!='↩')  ||  (ts.size()>=2 && ts.get(i).type=='d');
+      boolean train = (t0.type!='a' && t0.type!='A' && t0.type!='↩')  ||  (ts.size()>=2 && ts.get(i).type=='d');
       
       
       if (Main.debug) {
@@ -1455,7 +1455,7 @@ public class Comp {
           m.var(tk, s, false);
           return;
         case "𝕎": case "𝔾": case "𝔽": case "𝕏": case "𝕊":
-          m.var(tk, new String(new char[]{55349, (char) (s.charAt(1)+26)}), false); // lowercase
+          m.var(tk, new String(new char[]{(char)55349, (char) (s.charAt(1)+26)}), false); // lowercase
           return;
         case "⍎": m.add(op, SPEC, EVAL ); return;
         case "•": m.add(op, SPEC, STDIN); return;
@@ -1661,7 +1661,7 @@ public class Comp {
       
       
       case '⍎': case '•': // the lone double-struck
-      case 55349: // double-struck surrogate pair
+      case (char)55349: // double-struck surrogate pair
         return null;
       
       default: throw new SyntaxError("Unknown token `"+t.toRepr()+"` (\\u"+Tk2.hex4(c)+")", t);
@@ -1669,16 +1669,17 @@ public class Comp {
   }
   
   /*
-  static final class DQ extends LinkedList<Res> {
+  public static final class DQ extends LinkedList<Res> {
     
   }
   /*/
-  static final class DQ { // double-ended queue
+  public static final class DQ { // double-ended queue
     // static final Object[] none = new Object[1];
     // Object[] es = none;
     private Res[] es = new Res[16];
     private int s, e; // s - 1st elem; e - after last elem (but still a valid index in es)
     private int sz;
+    public int Count { get { return sz; } }
     int size() {
       return sz;
     }
@@ -1751,7 +1752,7 @@ public class Comp {
       if(e+1 >= es.length) e = 0;
       else e++;
     }
-    void add(int i, Res t) {
+    public void add(int i, Res t) {
       // System.out.println(this);
       // System.out.println("add "+t+"@"+i+":     "+hashCode());
       if (++sz == es.length) dc();

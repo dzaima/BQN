@@ -31,9 +31,9 @@ public class InsertBuiltin extends Md1Builtin {
       return new SingleItemArr(id, csh);
     }
     Value[] vs = CellBuiltin.cells(x);
-    Value c = vs[vs.length-1];
-    for (int i = vs.length-2; i >= 0; i--) c = f.call(vs[i], c);
-    return c;
+    Value c2 = vs[vs.length-1];
+    for (int i = vs.length-2; i >= 0; i--) c2 = f.call(vs[i], c2);
+    return c2;
   }
   
   public Value call(Value f, Value w, Value x, Md1Derv derv) {

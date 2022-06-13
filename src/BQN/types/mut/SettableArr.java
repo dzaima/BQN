@@ -12,7 +12,7 @@ public class SettableArr extends Settable {
     this.arr = arr;
   }
   
-  public Arr get(Scope sc) {
+  public Value get(Scope sc) {
     Value[] res = new Value[arr.length];
     for (int i = 0; i < ia; i++) res[i] = arr[i].get(sc);
     return Arr.create(res);

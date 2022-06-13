@@ -226,16 +226,21 @@ public class Pervasion { // implementations must be okay with not being called o
           long[] res = new long[wl.length];
           on(wl, ((BitArr) x).arr, res);
           return new BitArr(res, x.shape);
+        } else {
+          BitArr.BA res = new BitArr.BA(x.shape,true);
+          if (w.quickIntArr() && x.quickIntArr()) on(w.asIntArr(), x.asIntArr(), res);
+          else on(w.asDoubleArr(), x.asDoubleArr(), res);
+          return res.finish();
         }
-        BitArr.BA res = new BitArr.BA(x.shape,true);
-        if (w.quickIntArr() && x.quickIntArr()) on(w.asIntArr(), x.asIntArr(), res);
-        else on(w.asDoubleArr(), x.asDoubleArr(), res);
-        return res.finish();
+        BitArr.BA res2 = new BitArr.BA(x.shape,true);
+        if (w.quickIntArr() && x.quickIntArr()) on(w.asIntArr(), x.asIntArr(), res2);
+        else on(w.asDoubleArr(), x.asDoubleArr(), res2);
+        return res2.finish();
       }
       if (w instanceof ChrArr && x instanceof ChrArr) {
-        BitArr.BA res = new BitArr.BA(x.shape,true);
-        on(((ChrArr) w).s.toCharArray(), ((ChrArr) x).s.toCharArray(), res);
-        return res.finish();
+        BitArr.BA res3 = new BitArr.BA(x.shape,true);
+        on(((ChrArr) w).s.toCharArray(), ((ChrArr) x).s.toCharArray(), res3);
+        return res3.finish();
       }
       return super.each(w, x);
     }
@@ -268,16 +273,16 @@ public class Pervasion { // implementations must be okay with not being called o
   
   private Pervasion() { }
   
-  public static final int ARR_ANY = 0; // Value::arrInfo
-  public static final int ARR_F64 = 1; // ordered so the max would get the most important
-  public static final int ARR_I32 = 2;
-  public static final int ARR_BIT = 3;
-  public static final int ARR_C16 = 4;
-  public static final int ARR_ATM = 5;
+  public const int ARR_ANY = 0; // Value::arrInfo
+  public const int ARR_F64 = 1; // ordered so the max would get the most important
+  public const int ARR_I32 = 2;
+  public const int ARR_BIT = 3;
+  public const int ARR_C16 = 4;
+  public const int ARR_ATM = 5;
   
-  public static final int ATM_BIT = 0; // Value::atomInfo
-  public static final int ATM_I32 = 1;
-  public static final int ATM_F64 = 2;
-  public static final int ATM_CHR = 3;
-  public static final int ATM_UNK = 4;
+  public const int ATM_BIT = 0; // Value::atomInfo
+  public const int ATM_I32 = 1;
+  public const int ATM_F64 = 2;
+  public const int ATM_CHR = 3;
+  public const int ATM_UNK = 4;
 }

@@ -11,3 +11,8 @@ app/build*
 app/application*/
 
 *.apk
+
+cs/BQNApp/Program.exe
+cs/BQNApp/obj
+cs/BQNApp/BQN
+cs/BQNApp/bin

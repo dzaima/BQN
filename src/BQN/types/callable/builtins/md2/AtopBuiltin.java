@@ -28,7 +28,7 @@ public class AtopBuiltin extends Md2Builtin {
   }
   
   public Value under(Value f, Value g, Value o, Value x, Md2Derv derv) {
-    return g.under(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi); }
+    return g.under(new Fun(/*AA Value f,Value o*/) { public String ln(FmtInfo fi) { return f.ln(fi); }
       public Value call(Value x) {
         return f.under(o, x);
       }

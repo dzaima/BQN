@@ -12,7 +12,7 @@ public abstract class Settable extends Obj {
   public String name(Scope sc) {
     throw new SyntaxError("Expected a name");
   }
-  protected boolean hasName() {
+  public boolean hasName() {
     return false;
   }
 }

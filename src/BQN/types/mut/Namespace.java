@@ -34,14 +34,15 @@ public class Namespace extends BQNObj {
   }
   
   public Value[][] kvPair() {
-    Value[] ks = new Value[exports.size()];
-    Value[] vs = new Value[exports.size()];
-    final int[] i = {0};
-    exports.forEach((k, v) -> {
-      ks[i[0]++] = new ChrArr(k);
-      vs[i[0]++] = sc.vars[v];
-    });
-    return new Value[][]{ks, vs};
+    // Value[] ks = new Value[exports.size()];
+    // Value[] vs = new Value[exports.size()];
+    // int[] i = {0};
+    // exports.forEach((k, v) -> {
+    //   ks[i[0]++] = new ChrArr(k);
+    //   vs[i[0]++] = sc.vars[v];
+    // });
+    // return new Value[][]{ks, vs};
+    throw new NYIError("kvPair");
   }
   
   public int size() {
@@ -57,16 +58,17 @@ public class Namespace extends BQNObj {
   }
   
   public String ln(FmtInfo f) {
-    if (f.v.contains(this)) return "{...}";
-    f.v.add(this);
-    StringBuilder res = new StringBuilder("{");
-    exports.forEach((key, value) -> {
-      if (res.length() != 1) res.append(" ⋄ ");
-      String v = sc.vars[value].ln(f);
-      res.append(key).append("⇐").append(v);
-    });
-    f.v.remove(this);
-    return res + "}";
+    // if (f.v.contains(this)) return "{...}";
+    // f.v.add(this);
+    // StringBuilder res = new StringBuilder("{");
+    // exports.forEach((key, value) -> {
+    //   if (res.length() != 1) res.append(" ⋄ ");
+    //   String v = sc.vars[value].ln(f);
+    //   res.append(key).append("⇐").append(v);
+    // });
+    // f.v.remove(this);
+    // return res + "}";
+    return "(namespace)";
   }
   public Value pretty(FmtInfo f) {
     return Format.str(ln(f));

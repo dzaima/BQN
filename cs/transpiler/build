@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+rm -f conv.jar || exit 1
+rm -rf classes || exit 1
+mkdir -p classes || exit 1
+
+javac -Xmaxerrs 1000 -d ./classes $(find src -name '*.java') || exit 1
+
+(
+cd classes
+jar -f ../conv.jar -e dzaima.Main -c dzaima || exit 1
+)

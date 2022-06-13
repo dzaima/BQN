@@ -58,10 +58,10 @@ public class JoinBuiltin extends FnBuiltin {
     // System.out.println(Arrays.deepToString(lc));
     // System.out.println(Arrays.toString(fsh));
     MutVal res = new MutVal(fsh, vs[0]);
-    int i = 0;
+    int i2 = 0;
     int[] off = new int[ir];
     for (int[] pos : new Indexer(x.shape)) {
-      Value val = vs[i++];
+      Value val = vs[i2++];
       int[] sh = val.shape;
       for (int j = 0; j < or; j++) if (sh[j] != l[j][pos[j]]) throw new DomainError("∾: item shapes must be compatible", this);
       for (int j = or; j < ir; j++) if (sh[j]!=sh0[j]) throw new LengthError("∾: item trailing shapes must be equal", this);
@@ -143,13 +143,15 @@ public class JoinBuiltin extends FnBuiltin {
       am+= v.ia;
     }
     
-    Value[] vs = new Value[am];
-    int ri = 0;
-    for (Value v : x) {
-      System.arraycopy(v.values(), 0, vs, ri, v.ia);
-      ri+= v.ia;
+    {
+      Value[] vs = new Value[am];
+      int ri = 0;
+      for (Value v : x) {
+        System.arraycopy(v.values(), 0, vs, ri, v.ia);
+        ri+= v.ia;
+      }
+      return Arr.create(vs);
     }
-    return Arr.create(vs);
   }
   
   public Value call(Value w, Value x) {

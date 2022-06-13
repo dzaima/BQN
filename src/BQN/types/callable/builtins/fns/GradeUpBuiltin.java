@@ -44,11 +44,11 @@ public class GradeUpBuiltin extends FnBuiltin {
     
     Integer[] na = new Integer[x.ia];
     for (int i = 0; i < na.length; i++) na[i] = i;
-    Arrays.sort(na, (a, b) -> x.get(a).compareTo(x.get(b)));
+    Arrays.sort(na, Cmp<int>.cr((a, b) -> x.get(a).compareTo(x.get(b))));
     
-    int[] res = new int[na.length];
-    for (int i = 0; i < na.length; i++) res[i] = na[i];
-    return res;
+    int[] res2 = new int[na.length];
+    for (int i = 0; i < na.length; i++) res2[i] = na[i];
+    return res2;
   }
   private static int[] tmp = new int[100];
   private static void rec(int[] b, int[] I, int[] O, int s, int e) { // todo do this for ∧∨
@@ -87,8 +87,8 @@ public class GradeUpBuiltin extends FnBuiltin {
         if (wi[i] > wi[i+1]) throw new DomainError("⍋: 𝕨 must be sorted", this);
       }
       
-      int[] res = new int[x.ia];
-      for (int i = 0; i < res.length; i++) {
+      int[] res2 = new int[x.ia];
+      for (int i = 0; i < res2.length; i++) {
         int c = xi[i];
         int s = -1, e = wi.length;
         while (e-s > 1) {
@@ -96,9 +96,9 @@ public class GradeUpBuiltin extends FnBuiltin {
           if (c < wi[m]) e = m;
           else s = m;
         }
-        res[i] = s+1;
+        res2[i] = s+1;
       }
-      return new IntArr(res, x.shape);
+      return new IntArr(res2, x.shape);
     }
     
     for (int i = 0; i < w.ia-1; i++) {

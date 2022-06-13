@@ -49,11 +49,11 @@ public class HArr extends Arr {
   
   public String asString() {
     if (r() > 1) throw new DomainError("Using rank "+r()+" character array as string");
-    StringBuilder r = new StringBuilder(ia);
+    StringBuilder res = new StringBuilder(ia);
     for (Value v : arr) {
       if (!(v instanceof Char)) throw new DomainError("Using array containing "+v.humanType(true)+" as string");
-      r.append(((Char) v).chr);
+      res.append(((Char) v).chr);
     }
-    return r.toString();
+    return res.toString();
   }
 }

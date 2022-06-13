@@ -17,7 +17,7 @@ public class PairBuiltin extends FnBuiltin {
     if (w instanceof Num && x instanceof Num) {
       double wd = w.asDouble();
       double xd = x.asDouble();
-      return wd==(int)wd && xd==(int)xd? new IntArr(new int[]{(int)wd,(int)xd}) : new DoubleArr(new double[]{wd,xd});
+      return wd==(int)wd && xd==(int)xd? (Value)new IntArr(new int[]{(int)wd,(int)xd}) : new DoubleArr(new double[]{wd,xd});
     }
     if (w instanceof Char && x instanceof Char) return new ChrArr(w.asChar()+""+x.asChar());
     return Arr.create(new Value[]{w, x});
@@ -26,9 +26,9 @@ public class PairBuiltin extends FnBuiltin {
   public Value call(Value x) {
     if (x instanceof Num) {
       double xd = x.asDouble();
-      return xd==(int)xd? new IntArr(new int[]{(int)xd}) : new DoubleArr(new double[]{xd});
+      return xd==(int)xd? (Value)new IntArr(new int[]{(int)xd}) : new DoubleArr(new double[]{xd});
     }
-    if (x instanceof Char) return new ChrArr(Character.toString(x.asChar()));
+    if (x instanceof Char) return new ChrArr(""+(x.asChar()));
     return Arr.create(new Value[]{x});
   }
   

@@ -17,20 +17,20 @@ public class FileNS extends SimpleMap {
     this.path = path;
   }
   
-  private final Value at = new FB("At") {
-    public Value call(Value x) {
-      return new ChrArr(path.resolve(x.asString()).toString());
-    }
-    public Value call(Value w, Value x) {
-      return new ChrArr(Paths.get(w.asString()).resolve(x.asString()).toString());
-    }
-  };
+  // private final Value at2 = new FB("At") {
+  //   public Value call(Value x) {
+  //     return new ChrArr(path.resolve(x.asString()).toString());
+  //   }
+  //   public Value call(Value w, Value x) {
+  //     return new ChrArr(Paths.get(w.asString()).resolve(x.asString()).toString());
+  //   }
+  // };
   
   
   public Value getv(String s) {
-    switch (s) {
-      case "at": return at;
-    }
+    // switch (s) {
+    //   case "at": return at2;
+    // }
     throw new ValueError("No key "+s+" in •file");
   }
   
@@ -38,9 +38,9 @@ public class FileNS extends SimpleMap {
     throw new DomainError("Assigning into •file");
   }
   
-  private abstract class FB extends FnBuiltin {
-    private final String name;
-    public FB(String name) { this.name = "(file)."+name; }
-    public String ln(FmtInfo f) { return name; }
-  }
+  // private abstract class FB extends FnBuiltin {
+  //   private final String name;
+  //   public FB(String name) { this.name = "(file)."+name; }
+  //   public String ln(FmtInfo f) { return name; }
+  // }
 }

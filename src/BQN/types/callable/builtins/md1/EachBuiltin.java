@@ -99,7 +99,7 @@ public class EachBuiltin extends Md1Builtin {
       Value v = o instanceof Fun? o.call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
-      res[i] = f.under(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
+      res[i] = f.under(new /*IS*/Fun(/*AA Value f,Value o,Value x,int i,Value[] args,Value[] resPre,Value[] res*/) { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
         public Value call(Value x1) {
           args[i] = x1;
           rec(f, o, x, i+1, args, resPre, res);
@@ -129,7 +129,7 @@ public class EachBuiltin extends Md1Builtin {
       Value v = o instanceof Fun? o.call(Arr.create(args, x.shape)) : o;
       resPre[0] = v;
     } else {
-      res[i] = f.underW(new Fun() { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
+      res[i] = f.underW(new /*IS*/Fun(/*AA Value f,Value o,Value w,Value x,int i,Value[] args,Value[] resPre,Value[] res*/) { public String ln(FmtInfo fi) { return f.ln(fi)+"¨"; }
         public Value call(Value x1) {
           args[i] = x1;
           rec(f, o, w, x, i+1, args, resPre, res);

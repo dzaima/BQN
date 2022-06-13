@@ -6,40 +6,40 @@ import BQN.types.*;
 
 public class Variable extends Settable {
   
-  public final String name;
+  public final String nameF;
   
-  public Variable(String name) {
-    this.name = name;
+  public Variable(String nameF) {
+    this.nameF = nameF;
   }
   
   public Value get(Scope sc) {
-    Value got = sc.get(name);
-    if (got == null) throw new ValueError("getting value of non-existing variable \""+name+"\"");
+    Value got = sc.get(nameF);
+    if (got == null) throw new ValueError("getting value of non-existing variable \""+nameF+"\"");
     return got;
   }
   
   public void set(Value x, boolean update, Scope sc, Callable blame) {
     if (update) {
-      sc.update(name, x);
+      sc.update(nameF, x);
     } else {
-      if (sc.varMap().containsKey(name)) throw new SyntaxError("Cannot redefine \""+name+"\"", blame);
-      sc.set(name, x);
+      if (sc.varMap().containsKey(nameF)) throw new SyntaxError("Cannot redefine \""+nameF+"\"", blame);
+      sc.set(nameF, x);
     }
   }
   
   public boolean seth(Value x, Scope sc) {
-    sc.set(name, x);
+    sc.set(nameF, x);
     return true;
   }
   
   public String name(Scope sc) {
-    return name;
+    return nameF;
   }
-  protected boolean hasName() {
+  public boolean hasName() {
     return true;
   }
   
   public String toString() {
-    return "var("+name+")";
+    return "var("+nameF+")";
   }
 }

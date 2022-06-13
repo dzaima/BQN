@@ -43,7 +43,7 @@ public class Local extends Settable {
   @Override public String name(Scope sc) {
     return sc.owner(depth).varNames[index];
   }
-  @Override protected boolean hasName() {
+  @Override public boolean hasName() {
     return true;
   }
   

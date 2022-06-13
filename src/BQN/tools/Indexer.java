@@ -144,9 +144,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
       if (v.r() > 1) throw new RankError(blame+": rank of indices must be 1 (shape ≡ "+Main.fArr(v.shape)+")", blame);
       if (!(!deep && ish.length==1) && ish.length!=v.ia) throw new LengthError(blame+": amount of index parts should equal rank ("+v.ia+" index parts, shape ≡ "+Main.fArr(ish)+")", blame);
       if (!deep) { // either the rank==1 case or a single position
-        int[] res = v.asIntArr();
-        if (ish.length == 1) return new PosSh(res, new int[]{res.length});
-        return new PosSh(new int[]{fromShapeChk(ish, res, blame)}, EmptyArr.NOINTS);
+        int[] res2 = v.asIntArr();
+        if (ish.length == 1) return new PosSh(res2, new int[]{res2.length});
+        return new PosSh(new int[]{fromShapeChk(ish, res2, blame)}, EmptyArr.NOINTS);
       }
       
       int[] res = new int[Arr.prod(rsh)];
@@ -164,9 +164,9 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
             res[j]+= n;
             if (n<0 || n>=ish[i]) throw new LengthError(blame+": indexing out-of-bounds (shape ≡ "+Main.fArr(ish)+"; pos["+i+"] ≡ "+n+")", blame);
           }
-        }
-        if (i != v.ia-1) {
-          for (int j = 0; j < res.length; j++) res[j]*= ish[i+1];
+          if (i != v.ia-1) {
+            for (int j = 0; j < res.length; j++) res[j]*= ish[i+1];
+          }
         }
       }
       return new PosSh(res, rsh);
@@ -178,11 +178,11 @@ public final class Indexer implements Iterable<int[]>, Iterator<int[]> {
         if (ish.length != 1) throw new RankError(blame+": indexing at rank 1 (indexing by scalars in shape "+Main.fArr(ish)+" array)", blame);
         for (int c : res) if (c<0 || c>=ish[0]) throw new LengthError(blame+": indexing out-of bounds (shape ≡ "+rsh[0]+"; pos ≡ " + c + ")", blame);
         return new PosSh(res, rsh);
+      } else {
+        int[] res = new int[v.ia];
+        for (int i = 0; i < v.ia; i++) res[i] = fromShapeChk(ish, v.get(i), blame);
+        return new PosSh(res, rsh);
       }
-      
-      int[] res = new int[v.ia];
-      for (int i = 0; i < v.ia; i++) res[i] = fromShapeChk(ish, v.get(i), blame);
-      return new PosSh(res, rsh);
     }
   }
   

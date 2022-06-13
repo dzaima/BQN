@@ -48,24 +48,24 @@ public class LBoxBuiltin extends FnBuiltin {
               return new BitArr(res, sh);
             }
             int[] xi = x.asIntArr();
-            int[] res = new int[wi.length];
+            int[] res5 = new int[wi.length];
             for (int i = 0; i < wi.length; i++) {
               int c = wi[i];
               if (c<0) c+= xi.length;
               if (c<0 || c>=xi.length) break spec;
-              res[i] = xi[c];
+              res5[i] = xi[c];
             }
-            return new IntArr(res, sh);
+            return new IntArr(res5, sh);
           }
           double[] xd = x.asDoubleArr();
-          double[] res = new double[wi.length];
+          double[] res2 = new double[wi.length];
           for (int i = 0; i < wi.length; i++) {
             int c = wi[i];
             if (c<0) c+= xd.length;
             if (c<0 || c>=xd.length) break spec;
-            res[i] = xd[c];
+            res2[i] = xd[c];
           }
-          return new DoubleArr(res, sh);
+          return new DoubleArr(res2, sh);
         }
         if (x instanceof ChrArr) {
           String xs = ((ChrArr) x).s;
@@ -79,19 +79,19 @@ public class LBoxBuiltin extends FnBuiltin {
           return new ChrArr(res, sh);
         }
         Value[] xv = x.values();
-        Value[] res = new Value[wi.length];
+        Value[] res4 = new Value[wi.length];
         for (int i = 0; i < wi.length; i++) {
           int c = wi[i];
           if (c<0) c+= xv.length;
           if (c<0 || c>=xv.length) break spec;
-          res[i] = xv[c];
+          res4[i] = xv[c];
         }
-        return Arr.create(res, sh);
+        return Arr.create(res4, sh);
       }
-      MutVal res = new MutVal(sh);
+      MutVal res3 = new MutVal(sh);
       int csz = CellBuiltin.csz(x);
-      for (int i = 0; i < wi.length; i++) res.copy(getCell(wi[i], x, this), 0, csz*i, csz);
-      return res.get();
+      for (int i = 0; i < wi.length; i++) res3.copy(getCell(wi[i], x, this), 0, csz*i, csz);
+      return res3.get();
     } else {
       if (wr > 1) throw new RankError("⊏: depth 2 𝕨 must be of rank 0 or 1 (shape ≡ "+Main.fArr(w.shape)+")", this);
       if (xr<w.ia) throw new RankError("⊏: =𝕩 can't be greater than ≠𝕨", this);
@@ -107,12 +107,12 @@ public class LBoxBuiltin extends FnBuiltin {
         System.arraycopy(c.shape, 0, sh, cp, c.r());
         cp+= c.r();
       }
-      int[] c = new int[w.ia];
+      int[] c2 = new int[w.ia];
       int csz = 1;
       for (int i = shl; i < sh.length; i++) csz*= sh[i];
       
       MutVal res = new MutVal(sh, x);
-      cellRec(res, c, 0, w, x, csz, 0);
+      cellRec(res, c2, 0, w, x, csz, 0);
       return res.get();
     }
   }
@@ -139,10 +139,10 @@ public class LBoxBuiltin extends FnBuiltin {
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value call = call(w, x);
-    Value v = o instanceof Fun? o.call(call) : o;
+    Value cr = call(w, x);
+    Value v = o instanceof Fun? o.call(cr) : o;
     if (MatchBuiltin.full(w) > 1) throw new NYIError("⌾⊏ 1<≠≢𝕨", this);
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(call.shape)+", got "+Main.fArr(v.shape)+")", this);
+    if (!Arrays.equals(cr.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(cr.shape)+", got "+Main.fArr(v.shape)+")", this);
     if (w instanceof Primitive) {
       int ms = w.asInt()*v.ia;
       if (ms<0) ms+= x.ia; // regular call should have made sure it makes sense
@@ -158,19 +158,20 @@ public class LBoxBuiltin extends FnBuiltin {
         int[] res = x.asIntArrClone(); int[] vi = v.asIntArr();
         for (int i = 0; i < is.length; i++) res[Indexer.scal(is[i], res.length, this)] = vi[i];
         return new IntArr(res, x.shape);
+      } else {
+        Value[] res = x.valuesClone();
+        for (int i = 0; i < is.length; i++) res[is[i]] = v.get(i);
+        return Arr.create(res, x.shape);
       }
-      Value[] res = x.valuesClone();
-      for (int i = 0; i < is.length; i++) res[is[i]] = v.get(i);
-      return Arr.create(res, x.shape);
     }
   }
   public Value under(Value o, Value x) {
-    Value call = call(x);
-    Value v = o instanceof Fun? o.call(call) : o;
+    Value cr = call(x);
+    Value v = o instanceof Fun? o.call(cr) : o;
     MutVal m = new MutVal(x.shape, x, x.ia);
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(call.shape)+", got "+Main.fArr(v.shape)+")", this);
-    m.copy(v, 0, 0, call.ia);
-    m.copy(x, call.ia, call.ia, x.ia-call.ia);
+    if (!Arrays.equals(cr.shape, v.shape)) throw new DomainError("F⌾⊏: F didn't return equal shape array (was "+Main.fArr(cr.shape)+", got "+Main.fArr(v.shape)+")", this);
+    m.copy(v, 0, 0, cr.ia);
+    m.copy(x, cr.ia, cr.ia, x.ia-cr.ia);
     return m.get();
   }
   

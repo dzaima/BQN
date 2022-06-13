@@ -21,4 +21,11 @@ abstract public class TokArr extends Token {
     for (Token t : tokens) r.append(t.toTree(p));
     return r.toString();
   }
+  
+  public boolean isArr() { return true; }
+  public ArrayList<Token> tkList() {
+    ArrayList<Token> tks = new ArrayList<>();
+    for (Token c : tokens) tks.add(c);
+    return tks;
+  }
 }

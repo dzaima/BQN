@@ -30,7 +30,7 @@ public class Atop extends Fun {
   }
   
   public Value under(Value o, Value x) {
-    return h.under(new Fun() { public String ln(FmtInfo f) { return g.ln(f); }
+    return h.under(new Fun(/*AA Value o*/) { public String ln(FmtInfo f) { return g.ln(f); }
       public Value call(Value x) {
         return g.under(o, x);
       }

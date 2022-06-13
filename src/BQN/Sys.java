@@ -59,13 +59,6 @@ public abstract class Sys {
       case "CLASS"       : Value r = Main.exec(rest, csc, defArgs); println(r == null? "nothing" : r.getClass().getCanonicalName()); break;
       case "UOPT"        : Arr e = (Arr)csc.get(rest); csc.set(rest, new HArr(e.values(), e.shape)); break;
       case "ATYPE"       : println(Main.exec(rest, csc, defArgs).humanType(false)); break;
-      case "JSTACK":
-        if (lastError != null) {
-          ByteArrayOutputStream os = new ByteArrayOutputStream();
-          lastError.printStackTrace(new PrintStream(os));
-          println(os.toString());
-        } else println("no stack to view");
-        break;
       case "STACK": {
         if (lastError != null) lastError.stack(this);
         else println("no stack to view");
@@ -145,13 +138,13 @@ public abstract class Sys {
     }
   }
   
-  public static Path path(String path, String s) {
-    if (path == null) {
+  public static Path path(String path2, String s) {
+    if (path2 == null) {
       Path p = Paths.get(s);
       if (!p.isAbsolute()) throw new DomainError("Expected code outside files to only use absolute paths");
       return p.normalize();
     }
-    return Paths.get(path).resolve(s).toAbsolutePath().normalize();
+    return Paths.get(path2).resolve(s).toAbsolutePath().normalize();
   }
   
   public String[] split(Path p) {
@@ -171,7 +164,7 @@ public abstract class Sys {
   public Value execFile(Path path, Scope sc) {
     return execFile(path, EmptyArr.SHAPE0S, sc);
   }
-  public HashMap<Path, Value> imported = new HashMap<>();
+  public HashMap<Path, Value> imported = new HashMap<Path, Value>();
   
   public void line(String s) {
     if (s.startsWith(")")) {

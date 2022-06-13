@@ -21,9 +21,9 @@ public class ScanBuiltin extends Md1Builtin {
     if (x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
-        final double[] dres;
+        double[] dres;
         int i = l;
-        ia: if (x.quickIntArr()) {
+        if (x.quickIntArr()) {
           if (x.r()==1 && x instanceof BitArr) {
             if (f instanceof NEBuiltin) {
               long[] xl = ((BitArr) x).arr;
@@ -64,20 +64,21 @@ public class ScanBuiltin extends Md1Builtin {
               return new IntArr(res, x.shape);
             }
           }
-          int[] res = new int[x.ia];
+          int[] res3 = new int[x.ia];
           int[] xi = x.asIntArr();
-          System.arraycopy(xi, 0, res, 0, l);
+          System.arraycopy(xi, 0, res3, 0, l);
           while (i < x.ia) {
-            double n = fd.on(res[i-l], xi[i]);
+            double n = fd.on(res3[i-l], xi[i]);
             if ((int)n != n) {
-              dres = new double[x.ia]; for (int j = 0; j < dres.length; j++) dres[j] = res[j];
+              dres = new double[x.ia]; for (int j = 0; j < dres.length; j++) dres[j] = res3[j];
               dres[i++] = n;
-              break ia;
+              goto IA_END;
             }
-            res[i++] = (int) n;
+            res3[i++] = (int) n;
           }
-          return new IntArr(res, x.shape);
+          return new IntArr(res3, x.shape);
         } else dres = new double[x.ia];
+        IA_END:
         double[] xd = x.asDoubleArr();
         System.arraycopy(xd, 0, dres, 0, l);
         while (i < x.ia) {
@@ -87,11 +88,11 @@ public class ScanBuiltin extends Md1Builtin {
         return new DoubleArr(dres, x.shape);
       }
     }
-    Value[] res = new Value[x.ia];
-    int i = 0;
-    for (; i < l; i++) res[i] = x.get(i);
-    for (; i < x.ia; i++) res[i] = f.call(res[i-l], x.get(i));
-    return Arr.create(res, x.shape);
+    Value[] res2 = new Value[x.ia];
+    int i2 = 0;
+    for (; i2 < l; i2++) res2[i2] = x.get(i2);
+    for (; i2 < x.ia; i2++) res2[i2] = f.call(res2[i2-l], x.get(i2));
+    return Arr.create(res2, x.shape);
   }
   
   public Value callInv(Value f, Value x) {
@@ -116,8 +117,8 @@ public class ScanBuiltin extends Md1Builtin {
     if (w.quickDoubleArr() && x.quickDoubleArr()) {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
-        final double[] dres;
-        ia: if (x.quickIntArr() && w.quickIntArr()) {
+        double[] dres;
+        if (x.quickIntArr() && w.quickIntArr()) {
           if (x.r()==1 && x instanceof BitArr && Main.isBool(w)) {
             if (f instanceof NEBuiltin) {
               long[] xl = ((BitArr) x).arr;
@@ -145,7 +146,7 @@ public class ScanBuiltin extends Md1Builtin {
             }
           }
           double tmp;
-          int[] res = new int[x.ia];
+          int[] res2 = new int[x.ia];
           spec: {
             int[] xi = x.asIntArr();
             int[] wi = w.asIntArr();
@@ -153,37 +154,38 @@ public class ScanBuiltin extends Md1Builtin {
             while (i < l) {
               tmp = fd.on(wi[i], xi[i]);
               if ((int)tmp != tmp) break spec;
-              res[i++] = (int) tmp;
+              res2[i++] = (int) tmp;
             }
             while (i < x.ia) {
-              tmp = fd.on(res[i-l], xi[i]);
+              tmp = fd.on(res2[i-l], xi[i]);
               if ((int)tmp != tmp) break spec;
-              res[i++] = (int) tmp;
+              res2[i++] = (int) tmp;
             }
-            return new IntArr(res, x.shape);
+            return new IntArr(res2, x.shape);
           }
           dres = new double[x.ia];
-          for (int j = 0; j < i; j++) dres[j] = res[j];
+          for (int j = 0; j < i; j++) dres[j] = res2[j];
           dres[i++] = tmp;
-          break ia;
+          goto IA_END;
         } else {
           dres = new double[x.ia];
           double[] wd = w.asDoubleArr();
           double[] xd = x.asDoubleArr();
           for (i = 0; i < l; i++) dres[i] = fd.on(wd[i], xd[i]);
         }
-        double[] xd = x.asDoubleArr();
+        IA_END:
+        double[] xd2 = x.asDoubleArr();
         while (i < x.ia) {
-          dres[i] = fd.on(dres[i-l], xd[i]);
+          dres[i] = fd.on(dres[i-l], xd2[i]);
           i++;
         }
         return new DoubleArr(dres, x.shape);
       }
     }
-    MutVal res = new MutVal(x.shape, x);
-    for (i = 0; i < l; i++) res.set(i, f.call(w.get(i), x.get(i)));
-    for (; i < x.ia; i++) res.set(i, f.call(res.get(i-l), x.get(i)));
-    return res.get();
+    MutVal res3 = new MutVal(x.shape, x);
+    for (i = 0; i < l; i++) res3.set(i, f.call(w.get(i), x.get(i)));
+    for (; i < x.ia; i++) res3.set(i, f.call(res3.get(i-l), x.get(i)));
+    return res3.get();
   }
   
   public Value callInvX(Value f, Value w, Value x) {

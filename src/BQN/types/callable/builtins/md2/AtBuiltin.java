@@ -76,18 +76,19 @@ public class AtBuiltin extends Md2Builtin {
         Arr.eqShapes(n.shape, poss.sh, blame);
         for (int i = 0; i < is.length; i++) res[is[i]] = nd[i];
       }
-      return o.r()==0? Num.of(res[0]) : new DoubleArr(res, o.shape);
-    }
-    Value[] res = o.valuesClone();
-    int[] is = poss.vals;
-    if (n.r() == 0) {
-      Value f0 = n.first();
-      // noinspection ForLoopReplaceableByForEach
-      for (int i = 0; i < is.length; i++) res[is[i]] = f0;
+      return o.r()==0? (Value)Num.of(res[0]) : (Value)new DoubleArr(res, o.shape);
     } else {
-      Arr.eqShapes(n.shape, poss.sh, blame);
-      for (int i = 0; i < is.length; i++) res[is[i]] = n.get(i);
+      Value[] res = o.valuesClone();
+      int[] is = poss.vals;
+      if (n.r() == 0) {
+        Value f0 = n.first();
+        // noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < is.length; i++) res[is[i]] = f0;
+      } else {
+        Arr.eqShapes(n.shape, poss.sh, blame);
+        for (int i = 0; i < is.length; i++) res[is[i]] = n.get(i);
+      }
+      return Arr.create(res, o.shape);
     }
-    return Arr.create(res, o.shape);
   }
 }

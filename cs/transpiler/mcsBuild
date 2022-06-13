@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+(
+cd ../BQNApp
+mcs -r:System.Numerics.dll Program.cs $(find BQN -name '*.cs')
+)

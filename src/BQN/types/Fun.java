@@ -54,17 +54,36 @@ public abstract class Fun extends Callable {
       call(res, d);
       return new DoubleArr(res, sh);
     }
+    public static implicit operator NumMV(Func<Num,Value> f) { return new FNMV(f); }
+    public static class FNMV extends NumMV {
+      Func<Num,Value> f;
+      public FNMV(Func<Num,Value> f) { this.f = f; }
+      public Value call(Num x) { return f(x); }
+    }
   }
-  public interface ChrMV {
-    Value call(Char x);
-    default Arr call(ChrArr x) {
+  
+  public abstract class ChrMV {
+    public abstract Value call(Char x);
+    Arr call(ChrArr x) {
       Value[] res = new Value[x.ia];
       for (int i = 0; i < x.ia; i++) res[i] = call(Char.of(x.s.charAt(i)));
       return new HArr(res, x.shape);
     }
+    public static implicit operator ChrMV(Func<Char,Value> f) { return new FCMV(f); }
+    public static class FCMV extends ChrMV {
+      Func<Char,Value> f;
+      public FCMV(Func<Char,Value> f) { this.f = f; }
+      public Value call(Char x) { return f(x); }
+    }
   }
-  public interface MapMV {
-    Value call(BQNObj x);
+  public abstract class MapMV {
+    public abstract Value call(BQNObj x);
+    public static implicit operator MapMV(Func<BQNObj,Value> f) { return new FMMV(f); }
+    public static class FMMV extends MapMV {
+      Func<BQNObj,Value> f;
+      public FMMV(Func<BQNObj,Value> f) { this.f = f; }
+      public Value call(BQNObj x) { return f(x); }
+    }
   }
   
   

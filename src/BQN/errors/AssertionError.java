@@ -6,4 +6,7 @@ public class AssertionError extends BQNError {
   public AssertionError(String msg, AssertBuiltin b) {
     super(msg, b);
   }
+  public AssertionError() {
+    super("Assertion error");
+  }
 }

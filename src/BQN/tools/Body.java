@@ -50,7 +50,7 @@ public class Body {
   
   public Body(ArrayList<Token> lns, char arity, boolean immediate) { // no header
     this.lns = lns;
-    this.type = 0;
+    this.type = (char)0;
     this.arity = arity;
     this.immediate = immediate;
     self=null;
@@ -147,7 +147,7 @@ public class Body {
   
   public void setExp(int[] expi) {
     if (expi==null) return;
-    exp = new HashMap<>();
+    exp = new HashMap<String, Integer>();
     for (int id : expi) exp.put(vars[id], id);
   }
   

@@ -70,13 +70,14 @@ public class LBoxUBBuiltin extends FnBuiltin {
         res[i] = xd[idxs[i]];
       }
       return new DoubleArr(res, poss.sh);
+    } else {
+      Value[] res = new Value[Arr.prod(poss.sh)];
+      int[] idxs = poss.vals;
+      for (int i = 0; i < idxs.length; i++) {
+        res[i] = x.get(idxs[i]);
+      }
+      return Arr.create(res, poss.sh);
     }
-    Value[] res = new Value[Arr.prod(poss.sh)];
-    int[] idxs = poss.vals;
-    for (int i = 0; i < idxs.length; i++) {
-      res[i] = x.get(idxs[i]);
-    }
-    return Arr.create(res, poss.sh);
   }
   
   

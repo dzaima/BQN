@@ -26,9 +26,11 @@ public class CeilingBuiltin extends FnBuiltin {
           }
           return new IntArr(res, x.shape);
         }
-        double[] res = new double[x.ia];
-        for (int i = 0; i < res.length; i++) res[i] = Math.ceil(xd[i]);
-        return new DoubleArr(res, x.shape);
+        {
+          double[] res = new double[x.ia];
+          for (int i = 0; i < res.length; i++) res[i] = Math.ceil(xd[i]);
+          return new DoubleArr(res, x.shape);
+        }
       }
       if (x instanceof ChrArr) {
         return new ChrArr(((ChrArr) x).s.toUpperCase(), x.shape);

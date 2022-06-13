@@ -14,7 +14,7 @@ public class RBoxUBBuiltin extends FnBuiltin {
   public Value call(Value x) {
     if (x.r()==0) throw new DomainError("⊒: rank=0", this);
     if (x.r()!=1) throw new NYIError("⊒ on rank≠1", this);
-    HashMap<Value, Integer> vs = new HashMap<>();
+    HashMap<Value, Integer> vs = new HashMap<Value, Integer>();
     int[] res = new int[x.ia];
     int i = 0;
     for (Value v : x) {
@@ -32,7 +32,7 @@ public class RBoxUBBuiltin extends FnBuiltin {
   
   public Value call(Value w, Value x) {
     if (x.r()!=1 || w.r()!=1) throw new NYIError("⊒ on rank≠1", this);
-    HashMap<Value, MutIntArr> vs = new HashMap<>();
+    HashMap<Value, MutIntArr> vs = new HashMap<Value, MutIntArr>();
     int i = 0;
     for (Value v : w) {
       MutIntArr c = vs.get(v);

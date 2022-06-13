@@ -68,7 +68,8 @@ public class RepeatBuiltin extends Md2Builtin {
         if (n < res[0]) res[0] = n;
         else if (n > res[1]) res[1] = n;
       }
-    } else for (Value c : v) bounds(res, c);
+    } else if (v instanceof Arr) for (Value c : v) bounds(res, c);
+    else throw new DomainError("⍟: bad 𝕘");
   }
   private static Value replace(Value c, Value[] n, Value z, Value[] p) {
     if (c instanceof Num) {
@@ -101,7 +102,7 @@ public class RepeatBuiltin extends Md2Builtin {
       return o instanceof Fun? o.call(x) : o;
     }
     
-    return repeat(f, n-1, new Fun() { public String ln(FmtInfo fi) { return f.ln(fi); }
+    return repeat(f, n-1, new Fun(/*AA Value f,Value o*/) { public String ln(FmtInfo fi) { return f.ln(fi); }
       public Value call(Value x) {
         return f.under(o, x);
       }

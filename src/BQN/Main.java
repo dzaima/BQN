@@ -189,9 +189,9 @@ public class Main {
       return new String(encoded, StandardCharsets.UTF_8);
     } catch (IOException e) {
       String msg = "File " + path + " not found";
-      if (path.startsWith("'") && path.endsWith("'")  ||  path.startsWith("\"") && path.endsWith("\"")) {
-        msg+= " (argument shouldn't be surrounded in quotes)";
-      }
+      // if (path.startsWith("'") && path.endsWith("'")  ||  path.startsWith("\"") && path.endsWith("\"")) {
+      //   msg+= " (argument shouldn't be surrounded in quotes)";
+      // }
       DomainError ne = new DomainError(msg);
       ne.initCause(e);
       throw ne;
@@ -247,7 +247,7 @@ public class Main {
     return r.toString();
   }
   
-  public static void unsafe(Callable v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
-  public static void unsafe(String   v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
+  public static void unsafeTest(Callable v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
+  public static void unsafeTest(String   v) { if (SAFE) throw new DomainError("Cannot use "+v+" in safe mode"); }
   
 }

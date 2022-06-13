@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+(
+cd transpiler
+echo "building transpiler"
+./build || exit 1
+echo "running transpiler"
+./run || exit 1
+echo "done!"
+)

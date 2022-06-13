@@ -336,6 +336,10 @@ public final class BitArr extends Arr {
     return new BC(sh);
   }
   public final class BR { // boolean read
+    BitArr outer;
+    BR(BitArr outer) {
+      this.outer = outer;
+    }
     private int i, o = 0;
     public boolean read() {
       boolean r = (arr[i] & 1L<<o) != 0;
@@ -357,7 +361,7 @@ public final class BitArr extends Arr {
   }
   
   public BR read() {
-    return new BR();
+    return new BR(this);
   }
   
   public Value[] valuesClone() {

@@ -35,7 +35,7 @@ public class Fork extends Fun {
   
   public Value under(Value o, Value x) {
     Value cf = f.constant(this, true);
-    return h.under(new Fun() { public String ln(FmtInfo f) { return g.ln(f); }
+    return h.under(new Fun(/*AA Value o,Value cf*/) { public String ln(FmtInfo f) { return g.ln(f); }
       public Value call(Value x) {
         return g.underW(o, cf, x);
       }

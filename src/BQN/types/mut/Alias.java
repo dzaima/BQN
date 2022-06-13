@@ -7,11 +7,11 @@ import BQN.types.*;
 
 public class Alias extends Settable {
   public final Settable prev;
-  public final String name;
+  public final String nameF;
   
   public Alias(Settable prev, Body b, int n) {
     this.prev = prev;
-    name = b.nameMap[n];
+    nameF = b.nameMap[n];
   }
   
   public Value get(Scope sc) {
@@ -27,6 +27,6 @@ public class Alias extends Settable {
   }
   
   public String name(Scope sc) {
-    return name;
+    return nameF;
   }
 }

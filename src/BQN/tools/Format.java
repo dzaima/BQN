@@ -41,7 +41,7 @@ public class Format {
       if (v instanceof ChrArr) {
         String str = ((ChrArr) v).s;
         for (int y = 0; y < h; y++) {
-          b.append(str, y*w, (y+1)*w);
+          b.append(str, y*w, w);
           if (y!=h-1) b.append('\n');
         }
       } else {
@@ -74,9 +74,9 @@ public class Format {
   }
   
   public static Value chr(int c, int csz) {
-    return csz==1? Char.of((char) c) : new ChrArr(new String(Character.toChars(c)));
+    return csz==1? (Value)Char.of((char) c) : new ChrArr(new String(Character.toChars(c)));
   }
   public static String chr(int c) {
-    return Character.charCount(c)==1? Character.toString((char) c) : new String(Character.toChars(c));
+    return Character.charCount(c)==1? ""+((char) c) : new String(Character.toChars(c));
   }
 }

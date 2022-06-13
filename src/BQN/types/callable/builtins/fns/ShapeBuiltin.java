@@ -135,10 +135,10 @@ public class ShapeBuiltin extends FnBuiltin {
   }
   
   public Value underW(Value o, Value w, Value x) {
-    Value call = call(w, x);
-    Value v = o instanceof Fun? o.call(call) : o;
-    if (!Arrays.equals(call.shape, v.shape)) throw new DomainError("F⌾⥊: Expected F to not change its arguments shape", this);
-    if (call.ia > x.ia) throw new DomainError("⌾⥊: Result of ⥊ had more elements than 𝕩", this);
+    Value cr = call(w, x);
+    Value v = o instanceof Fun? o.call(cr) : o;
+    if (!Arrays.equals(cr.shape, v.shape)) throw new DomainError("F⌾⥊: Expected F to not change its arguments shape", this);
+    if (cr.ia > x.ia) throw new DomainError("⌾⥊: Result of ⥊ had more elements than 𝕩", this);
     MutVal r = new MutVal(x.shape, x, x.ia);
     r.copy(v, 0, 0, v.ia);
     r.copy(x, v.ia, v.ia, x.ia-v.ia);

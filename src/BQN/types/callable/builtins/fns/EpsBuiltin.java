@@ -28,8 +28,8 @@ public class EpsBuiltin extends FnBuiltin {
       res = new BitArr.BA(Arr.vecsh(x.shape[0]),true);
       vs = CellBuiltin.cells(x);
     }
-    HashSet<Value> seen = new HashSet<>();
-    for (Value c : vs) res.add(seen.add(c));
+    HashSet<Value> seen2 = new HashSet<>();
+    for (Value c : vs) res.add(seen2.add(c));
     return res.finish();
   }
   

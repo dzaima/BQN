@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+echo "removing old files"
+rm -rf ../BQNApp/BQN/
+echo "running transpiler"
+java -jar conv.jar

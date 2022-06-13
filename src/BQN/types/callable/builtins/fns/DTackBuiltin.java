@@ -30,16 +30,16 @@ public class DTackBuiltin extends FnBuiltin {
   public static Value on(Value w, Value x, Callable blame) {
     if (!(w instanceof Primitive)) {
       if (x instanceof BigValue) {
-        ArrayList<Value> res = new ArrayList<>();
-        BigInteger c = ((BigValue) x).i;
+        ArrayList<Value> res2 = new ArrayList<>();
+        BigInteger c2 = ((BigValue) x).i;
         for (int i = 0; i < w.ia; i++) {
           Value v = w.get(w.ia-i-1);
-          BigInteger[] dr = c.divideAndRemainder(BigValue.bigint(v));
-          res.add(v instanceof Num? new Num(dr[1].intValue()) : new BigValue(dr[1]));
-          c = dr[0];
+          BigInteger[] dr = c2.divideAndRemainder(BigValue.bigint(v));
+          res2.add(v instanceof Num? (Value)new Num(dr[1].intValue()) : (Value)new BigValue(dr[1]));
+          c2 = dr[0];
         }
-        Collections.reverse(res);
-        return HArr.create(res);
+        Collections.reverse(res2);
+        return HArr.create(res2);
       }
       int[] sh = new int[x.r() + w.r()];
       if (w.r() != 1) throw new NYIError(blame+": 𝕨 with rank≥2 not yet implemented", blame);
@@ -95,55 +95,59 @@ public class DTackBuiltin extends FnBuiltin {
             return new DoubleArr(res);
           }
         }
-        if (ibase <= Character.MAX_RADIX) { // utilize the actually optimized base conversion of BigInteger.toString
-          String str = wl.toString(ibase);
-          Value[] res = new Value[str.length()];
-          for (int i = 0; i < res.length; i++) {
-            char c = str.charAt(i);
-            int n = c<='9'? c-'0' : 10+c-'a';
-            if (sign==-1) n=-n;
-            res[i] = bigBase? new BigValue(BigInteger.valueOf(n)) : Num.of(n);
-          }
-          return new HArr(res);
-        }
+        // if (ibase <= Character.MAX_RADIX) { // utilize the actually optimized base conversion of BigInteger.toString
+        //   String str = wl.toString(ibase);
+        //   Value[] res = new Value[str.length()];
+        //   for (int i = 0; i < res.length; i++) {
+        //     char c = str.charAt(i);
+        //     int n = c<='9'? c-'0' : 10+c-'a';
+        //     if (sign==-1) n=-n;
+        //     res[i] = bigBase? new BigValue(BigInteger.valueOf(n)) : Num.of(n);
+        //   }
+        //   return new HArr(res);
+        // }
         ArrayList<Value> ns = new ArrayList<>(); // if we can't, just be lazy. ¯\_(ツ)_/¯
         while (wl.signum() != 0) {
           BigInteger[] c = wl.divideAndRemainder(base);
           wl = c[0];
-          ns.add(bigBase? new BigValue(sign==1? c[1] : c[1].negate()) : new Num(c[1].intValue()*sign));
+          ns.add(bigBase? (Value)new BigValue(sign==1? c[1] : c[1].negate()) : new Num(c[1].intValue()*sign));
         }
-        Value[] res = new Value[ns.size()];
-        for (int i = 0; i < res.length; i++) {
-          res[res.length-i-1] = ns.get(i);
+        {
+          Value[] res = new Value[ns.size()];
+          for (int i = 0; i < res.length; i++) {
+            res[res.length-i-1] = ns.get(i);
+          }
+          return new HArr(res);
         }
-        return new HArr(res);
       }
       throw new NYIError(blame+": scalar 𝕨 and non-scalar 𝕩 not implemented", blame);
     }
-    double base = w.asDouble();
-    double num = x.asDouble();
-    if (base <= 1) {
-      if (base == 0) return Num.of(num);
-      if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame);
-      throw new DomainError(blame+": 𝕨 < 1", blame);
-    }
-    ArrayList<Double> res = new ArrayList<>();
-    if (num < 0) {
-      num = -num;
-      while (num > 0) {
-        res.add(-num%base);
-        num = Math.floor(num/base);
+    {
+      double base = w.asDouble();
+      double num = x.asDouble();
+      if (base <= 1) {
+        if (base == 0) return Num.of(num);
+        if (base < 0) throw new DomainError(blame+": 𝕨 < 0", blame);
+        throw new DomainError(blame+": 𝕨 < 1", blame);
       }
-    } else {
-      while (num > 0) {
-        res.add(num%base);
-        num = Math.floor(num/base);
+      ArrayList<Double> res = new ArrayList<>();
+      if (num < 0) {
+        num = -num;
+        while (num > 0) {
+          res.add(-num%base);
+          num = Math.floor(num/base);
+        }
+      } else {
+        while (num > 0) {
+          res.add(num%base);
+          num = Math.floor(num/base);
+        }
       }
+      double[] f = new double[res.size()];
+      for (int i = res.size()-1, j = 0; i >= 0; i--, j++) {
+        f[j] = res.get(i);
+      }
+      return new DoubleArr(f);
     }
-    double[] f = new double[res.size()];
-    for (int i = res.size()-1, j = 0; i >= 0; i--, j++) {
-      f[j] = res.get(i);
-    }
-    return new DoubleArr(f);
   }
 }

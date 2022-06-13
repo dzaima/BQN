@@ -83,7 +83,7 @@ public class Tk2 {
     loop: while (i < len) {
       li = i;
       char c = rC[i];
-      char n = i+1<len? rC[i+1] : 0;
+      char n = i+1<len? rC[i+1] : '\0';
       switch (c) {
         // generic syntax & exit
         case ' ': case '\t':
@@ -128,7 +128,7 @@ public class Tk2 {
         case '‿': res.add(new StranderTok(r, li, ++i)); hasStrands = true; break;
         
         // double-struck chars
-        case 55349:
+        case (char)55349:
           if (i+1 >= len) err("Unfinished surrogate pair \\uD835", li);
           if (surrogateOps.indexOf(n) == -1) {
             err("Unknown token `\uD835"+n+"` (\\uD835\\u"+hex4(n)+")", li);
@@ -144,7 +144,7 @@ public class Tk2 {
             res.add(new DotTok(r, li, ++i));
             break;
           }
-          /* else fallthrough; n∊0…9 */
+          goto case '0'; /* else fallthrough; n∊0…9 */
         case'0':case'1':case'2':case'3':case'4':case'5':case'6':case'7':case'8':case'9':
         case'¯':case'π':case'∞':
           // if (c=='.' && n<'0' | n>'9') {
@@ -165,8 +165,8 @@ public class Tk2 {
           while (c>='0' & c<='9' | c=='_') { // regular integer part
             if (++i>=len) break; c = rC[i];
           }
-          dot: if (c=='.') { // fractional part
-            if (++i>=len) break dot; c = rC[i]; // skip '.'
+          if (c=='.') { // fractional part
+            if (++i>=len) goto dot_end; c = rC[i]; // skip '.'
             while (c>='0' & c<='9' | c=='_') {  // skip digits
               if (++i>=len) break; c = rC[i];
             }
@@ -176,6 +176,7 @@ public class Tk2 {
             res.add(new BigTok(r, li, i, new BigValue(neg? v.negate() : v)));
             break;
           }
+          dot_end:;
           if (c=='e' | c=='E') { // exponent
             if(         ++i>=len) err("Unfinished number",li,i); c = rC[i]; // skip e/E
             boolean eNeg = c=='¯'; int eNegPos = i-li-(neg?1:0);
@@ -247,7 +248,7 @@ public class Tk2 {
           res.add(new ChrTok(r, li, i, Format.chr(chr)));
           break;
         
-        default:
+        default:;
           if ((char)(c-'a')<=('z'-'a') | (char)(c-'A')<=('Z'-'A') | c=='_' | c=='•') {
             i++;
             if (c=='_') {

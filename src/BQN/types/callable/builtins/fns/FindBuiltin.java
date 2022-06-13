@@ -29,10 +29,10 @@ public class FindBuiltin extends FnBuiltin {
       for (int c : x.asIntArr()) if (vals.add(c)) res.add(c);
       return res.getA();
     }
-    HashSet<Value> vals = new HashSet<>();
-    ArrayList<Value> res = new ArrayList<>();
-    for (Value c : x) if (vals.add(c)) res.add(c);
-    return Arr.create(res);
+    HashSet<Value> vals2 = new HashSet<Value>();
+    ArrayList<Value> res2 = new ArrayList<Value>();
+    for (Value c : x) if (vals2.add(c)) res2.add(c);
+    return Arr.create(res2);
   }
   
   public Value call(Value w, Value x) {

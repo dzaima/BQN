@@ -31,30 +31,33 @@ public class FoldBuiltin extends Md1Builtin {
           double r = 1;
           for (int c : x.asIntArr()) r*= c;
           return new Num(r);
+        } else {
+          double r = 1;
+          for (double d : x.asDoubleArr()) r*= d;
+          return new Num(r);
         }
-        double r = 1;
-        for (double d : x.asDoubleArr()) r*= d;
-        return new Num(r);
       }
       if (f instanceof FloorBuiltin) {
         if (x.quickIntArr()) {
           int r = Integer.MAX_VALUE;
           for (int c : x.asIntArr()) r = Math.min(r, c);
           return new Num(r);
+        } else {
+          double r = Double.POSITIVE_INFINITY;
+          for (double d : x.asDoubleArr()) r = Math.min(r, d);
+          return new Num(r);
         }
-        double r = Double.POSITIVE_INFINITY;
-        for (double d : x.asDoubleArr()) r = Math.min(r, d);
-        return new Num(r);
       }
       if (f instanceof CeilingBuiltin) {
         if (x.quickIntArr()) {
           int r = Integer.MIN_VALUE;
           for (int c : x.asIntArr()) r = Math.max(r, c);
           return new Num(r);
+        } else {
+          double r = Double.NEGATIVE_INFINITY;
+          for (double d : x.asDoubleArr()) r = Math.max(r, d);
+          return new Num(r);
         }
-        double r = Double.NEGATIVE_INFINITY;
-        for (double d : x.asDoubleArr()) r = Math.max(r, d);
-        return new Num(r);
       }
     }
     join: if (f instanceof JoinBuiltin) {
@@ -70,11 +73,12 @@ public class FoldBuiltin extends Md1Builtin {
           double c = xi[xi.length-1];
           for (int i = x.ia-2; i >= 0; i--) c = fd.on(xi[i], c);
           return new Num(c);
+        } else {
+          double[] xd = x.asDoubleArr();
+          double c = xd[xd.length-1];
+          for (int i = x.ia-2; i >= 0; i--) c = fd.on(xd[i], c);
+          return new Num(c);
         }
-        double[] xd = x.asDoubleArr();
-        double c = xd[xd.length-1];
-        for (int i = x.ia-2; i >= 0; i--) c = fd.on(xd[i], c);
-        return new Num(c);
       }
     }
     Value[] a = x.values();

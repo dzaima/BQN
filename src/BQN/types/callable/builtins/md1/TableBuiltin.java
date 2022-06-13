@@ -27,11 +27,11 @@ public final class TableBuiltin extends Md1Builtin {
       Pervasion.NN2N fd = f.dyNum();
       if (fd != null) {
         double[] arr = new double[ia];
-        int i = 0;
+        int i2 = 0;
         double[] xd = x.asDoubleArr();
         for (double na : w.asDoubleArr()) {
           for (double nw : xd) {
-            arr[i++] = fd.on(na, nw);
+            arr[i2++] = fd.on(na, nw);
           }
         }
         return new DoubleArr(arr, sh);
@@ -83,18 +83,18 @@ public final class TableBuiltin extends Md1Builtin {
       }
       return Arr.create(res, sh);
     }
-    boolean firstSkipped = false;
-    Value[] arr = new Value[ia];
+    boolean firstSkipped2 = false;
+    Value[] arr2 = new Value[ia];
     for (Value na : w) {
       for (Value nw : x) {
-        if (firstSkipped) {
-          arr[i++] = f.call(na, nw);
+        if (firstSkipped2) {
+          arr2[i++] = f.call(na, nw);
         } else {
-          firstSkipped = true;
-          arr[i++] = first;
+          firstSkipped2 = true;
+          arr2[i++] = first;
         }
       }
     }
-    return Arr.create(arr, sh);
+    return Arr.create(arr2, sh);
   }
 }

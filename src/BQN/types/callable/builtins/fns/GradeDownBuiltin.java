@@ -43,11 +43,12 @@ public class GradeDownBuiltin extends FnBuiltin {
     
     Integer[] na = new Integer[x.ia];
     for (int i = 0; i < na.length; i++) na[i] = i;
-    Arrays.sort(na, (a, b) -> x.get(b).compareTo(x.get(a)));
-    
-    int[] res = new int[na.length];
-    for (int i = 0; i < na.length; i++) res[i] = na[i];
-    return res;
+    Arrays.sort(na, Cmp<int>.cr((a, b) -> x.get(b).compareTo(x.get(a))));
+    {
+      int[] res = new int[na.length];
+      for (int i = 0; i < na.length; i++) res[i] = na[i];
+      return res;
+    }
   }
   private static int[] tmp = new int[100];
   private static void rec(int[] b, int[] I, int[] O, int s, int e) {

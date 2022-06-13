@@ -139,13 +139,13 @@ public class UpArrowBuiltin extends FnBuiltin {
       }
       return new DoubleArr(arr, sh);
     }
-    Value[] arr = new Value[ia];
-    int i = 0;
+    Value[] arr2 = new Value[ia];
+    int i2 = 0;
     for (int[] index : new Indexer(sh, off)) {
-      arr[i] = x.at(index);
-      i++;
+      arr2[i2] = x.at(index);
+      i2++;
     }
-    return Arr.create(arr, sh);
+    return Arr.create(arr2, sh);
   }
   
   

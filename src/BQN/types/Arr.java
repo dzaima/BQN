@@ -18,10 +18,10 @@ public abstract class Arr extends Value {
     super(shape, ia);
   }
   
-  public final Value call(         Value x) { return this; }
-  public final Value call(Value w, Value x) { return this; }
+  public Value call(         Value x) { return this; }
+  public Value call(Value w, Value x) { return this; }
   
-  public final String basicFormat(boolean quote) {
+  public String basicFormat(boolean quote) {
     if (ia == 0) {
       Value pr = fItemS();
       if (r() == 1) return pr instanceof Char? "\"\"" : pr instanceof Num? "0⥊0" : pr==null? "⟨⟩" : "0⥊<"+pr.ln(FmtInfo.def); // def is fine as it's gonna be just 0s and spaces anyways
@@ -41,7 +41,7 @@ public abstract class Arr extends Value {
     }
     return null;
   }
-  public final String ln(FmtInfo fi) {
+  public String ln(FmtInfo fi) {
     String f = basicFormat(Main.quotestrings);
     if (f != null) return f;
     if (r() == 0) return "<" + get(0).ln(fi);
@@ -52,25 +52,25 @@ public abstract class Arr extends Value {
         if (!simple(c)) { vec = true; break; }
       }
       StringBuilder b = new StringBuilder();
-      char c = vec? (MatchBuiltin.full(this)<=2? ',' : '⋄') : '‿';
+      char c2 = vec? (MatchBuiltin.full(this)<=2? ',' : '⋄') : '‿';
       if (vec) b.append('⟨');
       boolean first = true;
       for (Value v : this) {
         if (first) first = false;
-        else b.append(c);
+        else b.append(c2);
         b.append(v.ln(fi));
       }
       if (vec) b.append('⟩');
       return b.toString();
     }
     
-    StringBuilder b = new StringBuilder(">⟨");
+    StringBuilder b2 = new StringBuilder(">⟨");
     for (int i = 0; i < shape[0]; i++) {
-      if (i != 0) b.append(",");
-      b.append(LBoxBuiltin.getCell(i, this, null).ln(fi));
+      if (i != 0) b2.append(",");
+      b2.append(LBoxBuiltin.getCell(i, this, null).ln(fi));
     }
-    b.append("⟩");
-    return b.toString();
+    b2.append("⟩");
+    return b2.toString();
   }
   public Arr reverseOn(int dim) {
     if (r() == 0) {
@@ -233,7 +233,7 @@ public abstract class Arr extends Value {
     return hash;
   }
   
-  protected final int shapeHash(int hash) {
+  protected int shapeHash(int hash) {
     int h = 0;
     for (int i : shape) {
       h = h*31 + i;
@@ -276,24 +276,24 @@ public abstract class Arr extends Value {
   }
   
   
-  public final Value pretty(FmtInfo f) { // assumes a single Char is guaranteed to be a single character
+  public Value pretty(FmtInfo f) { // assumes a single Char is guaranteed to be a single character
     if (ia==0) return Format.str(ln(f));
-    int r = r();
+    int rnk = r();
     Value g0 = first();
     
-    spec: if (g0 instanceof Char && r<=2) { // strings
+    spec: if (g0 instanceof Char && rnk<=2) { // strings
       String s;
       StringBuilder b = new StringBuilder(ia);
       for (Value c : this) {
         if (!(c instanceof Char)) break spec;
         char cc = ((Char) c).chr;
-        if (r!=1 | !Main.quotestrings | cc!='"') b.append(cc);
+        if (rnk!=1 | !Main.quotestrings | cc!='"') b.append(cc);
         else b.append("\"\"");
       }
       s = b.toString();
       int sl = s.length();
       
-      if (r==1) {
+      if (rnk==1) {
         MutVal m = new MutVal(new int[]{s.length()+(Main.quotestrings?2:0)}, Char.SPACE);
         int i = 0;
         int o = 0;
@@ -311,7 +311,7 @@ public abstract class Arr extends Value {
         Value mv = m.get();
         if (i==o-2) return mv;
         return MutVal.cut(mv, 0, o, new int[]{o});
-      } else if (r==2) {
+      } else if (rnk==2) {
         int w = shape[1];
         int h = shape[0];
         MutVal m = new MutVal(new int[]{h+2, w+4}); simpleBox(m);
@@ -325,15 +325,15 @@ public abstract class Arr extends Value {
             if (g == 127) g = '␡';
             boolean isH = Character.isHighSurrogate(g);
             boolean isD = isH && x+1<sl && Character.isLowSurrogate(s.charAt(x+1));
-            m.set(o++, isD? new ChrArr(s.substring(x,x+2)) : Character.isLowSurrogate(g)? Char.of('␠') : Char.of(g));
+            m.set(o++, isD? (Value)new ChrArr(s.substring(x,x+2)) : Character.isLowSurrogate(g)? Char.of('␠') : Char.of(g));
           }
           o+= 4;
         }
         return m.get();
       }
     }
-    spec: if (r==2 && g0 instanceof Num) { // number matrix
-      if (!this.quickDoubleArr()) for (Value c : this) if (!(c instanceof Num)) break spec;
+    spec2: if (rnk==2 && g0 instanceof Num) { // number matrix
+      if (!this.quickDoubleArr()) for (Value c : this) if (!(c instanceof Num)) break spec2;
       int w = shape[1]; int h = shape[0];
       Value[] v = new Value[ia];
       for (int i = 0; i < ia; i++) v[i] = get(i).pretty(f);
@@ -365,8 +365,8 @@ public abstract class Arr extends Value {
       return m.get();
     }
     
-    spec: if (r==1 && simple(g0)) { // simple vectors; assumes simple always make simple strings, which might break
-      if (!this.quickDoubleArr()) for (Value c : this) if (!simple(c)) break spec;
+    spec3: if (rnk==1 && simple(g0)) { // simple vectors; assumes simple always make simple strings, which might break
+      if (!this.quickDoubleArr()) for (Value c : this) if (!simple(c)) break spec3;
       if (ia == 1) return new ChrArr("⟨"+g0.pretty(f).asString()+"⟩");
       StringBuilder b = new StringBuilder(ia*2);
       boolean first = true;
@@ -378,11 +378,11 @@ public abstract class Arr extends Value {
       return new ChrArr(b.toString());
     }
     
-    if (r     == 0) return box(f, values(), 1, 1, reg, 0);
-    if (r     == 1) return box(f, values(), ia, 1, reg, 1);
-    if (r     == 2) return box(f, values(), shape[1], shape[0], reg, 2);
-    if ((r&1) == 0) return box(f, NCellBuiltin.cells(this, 2), shape[1], shape[0], nst, 2); // even dimensions
-    /*  (r&1) == 1*/return box(f, CellBuiltin.cells(this), shape[0], 1, nst, 1); // odd dimensions
+    if (rnk     == 0) return box(f, values(), 1, 1, reg, 0);
+    if (rnk     == 1) return box(f, values(), ia, 1, reg, 1);
+    if (rnk     == 2) return box(f, values(), shape[1], shape[0], reg, 2);
+    if ((rnk&1) == 0) return box(f, NCellBuiltin.cells(this, 2), shape[1], shape[0], nst, 2); // even dimensions
+    /*  (rnk&1) == 1*/return box(f, CellBuiltin.cells(this), shape[0], 1, nst, 1); // odd dimensions
   }
   static Char[] reg = chrs("┌┬┐├┼┤└┴┘─│");
   static Char[] nst = chrs("┏┳┓┣╋┫┗┻┛━┃");
@@ -460,8 +460,8 @@ public abstract class Arr extends Value {
   }
   
   
-  private static final int[][] is = new int[128][1];
-  static { for (int i = 0; i < is.length; i++) is[i][0] = i; }
+  private static final int[][] is = new int[128][];
+  static { for (int i = 0; i < is.length; i++) is[i] = new int[]{i}; }
   public static int[] vecsh(int l) {
     if (l>=0 && l<is.length) return is[l];
     return new int[]{l};

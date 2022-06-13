@@ -11,7 +11,7 @@ import java.util.Iterator;
 
 public abstract class Value extends Obj implements Iterable<Value>, Comparable<Value> {
   public final int[] shape;
-  public final int r() { return shape.length; }
+  public int r() { return shape.length; }
   public final int ia; // item amount
   Value(int[] shape) {
     this.shape = shape;
@@ -114,7 +114,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   public /*open*/ int atomInfo() {
     return Pervasion.ATM_UNK;
   }
-  public final boolean scalar() { return r() == 0; }
+  public boolean scalar() { return r() == 0; }
   public abstract Value ofShape(int[] sh); // don't call with ×/sh ≠ ×/shape!
   public abstract Value fItemS(); // fill item; returns null if unknown
   public Value fItem() { // must error if fill doesn't exist
@@ -137,7 +137,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   
   
   // outdated bad item getting methods; TODO don't use
-  public final Value at(int[] pos) {
+  public Value at(int[] pos) {
     if (pos.length != r()) throw new RankError("array rank was "+r()+", tried to get item at rank "+pos.length);
     int x = 0;
     for (int i = 0; i < r(); i++) {
@@ -148,7 +148,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return get(x);
   }
-  public final Value at(int[] pos, Value def) { // 0-indexed
+  public Value at(int[] pos, Value def) { // 0-indexed
     int x = 0;
     for (int i = 0; i < r(); i++) {
       if (pos[i] < 0 || pos[i] >= shape[i]) return def;
@@ -157,7 +157,7 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     }
     return get(x);
   }
-  public final Value simpleAt(int[] pos) {
+  public Value simpleAt(int[] pos) {
     int x = 0;
     for (int i = 0; i < r(); i++) {
       x+= pos[i];
@@ -166,13 +166,13 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
     return get(x);
   }
   
-  public final boolean equals(Object obj) {
+  public boolean equals(Object obj) {
     return obj instanceof Value && eq((Value) obj);
   }
   public abstract boolean eq(Value o);
   public abstract int hashCode();
   
-  public final int compareTo(Value x) {
+  public int compareTo(Value x) {
     Value w = this;
     
     if (w instanceof Num       && x instanceof Num) {
@@ -246,5 +246,5 @@ public abstract class Value extends Obj implements Iterable<Value>, Comparable<V
   // public String ln(FmtInfo f) { return FmtInfo.tmp(this); }
   public abstract String ln(FmtInfo f);
   public abstract Value pretty(FmtInfo f); // returns rank 1 or 2 array; elements must be characters or a string of a single glyph
-  public final String toString() { return ln(FmtInfo.def); }
+  public String toString() { return ln(FmtInfo.def); }
 }
