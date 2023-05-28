@@ -23,7 +23,7 @@ public class InvBuiltin extends Md1Builtin {
     return f.call(w, x);
   }
   public Value callInvW(Value f, Value w, Value x) {
-    throw new NYIError("⁼ inverting 𝕨", this);
+    return f.callInvW(x, w);
   }
   
   
