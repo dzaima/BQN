@@ -74,5 +74,6 @@ public class RandNS extends SimpleMap {
       this.name = "(random generator)."+name;
     }
     public String ln(FmtInfo f) { return name; }
+    public boolean eq(Value o) { return this==o; }
   }
 }

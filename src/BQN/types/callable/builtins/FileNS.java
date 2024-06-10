@@ -42,5 +42,6 @@ public class FileNS extends SimpleMap {
     private final String name;
     public FB(String name) { this.name = "(file)."+name; }
     public String ln(FmtInfo f) { return name; }
+    public boolean eq(Value o) { return this==o; }
   }
 }

@@ -72,5 +72,6 @@ public class MathNS extends SimpleMap {
     }
     
     public String ln(FmtInfo f) { return name; }
+    public boolean eq(Value o) { return this==o; }
   }
 }
