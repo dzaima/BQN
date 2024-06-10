@@ -423,6 +423,8 @@ public class Comp {
           case DFND: cs = "DFND "+        bc[i++] ; break;
           case ARRO: cs = "ARRO "+        bc[i++] ; break;
           case ARRM: cs = "ARRM "+        bc[i++] ; break;
+          case FLDM: cs = "FLDM "+        bc[i++] ; break;
+          case FLDO: cs = "FLDO "+        bc[i++] ; break;
           case FN1C: cs = "FN1C"; break;
           case FN2C: cs = "FN2C"; break;
           case MD1C: cs = "MD1C"; break;
