@@ -33,6 +33,30 @@ public class MathNS extends SimpleMap {
     public Value call(Num x) { return new Num(Math.atan(x.num)); }
     public void call(double[] res, double[] x) { for (int i = 0; i < x.length; i++) res[i] = Math.atan(x[i]); }
   });
+  public static final MB2 gcd = new MB2("GCD") { public Value call(Value w, Value x) { return new Num(gcd2(w.asDouble(), x.asDouble())); } };
+  public static final MB2 lcm = new MB2("LCM") { public Value call(Value w, Value x) { return new Num(lcm2(w.asDouble(), x.asDouble())); } };
+  public static double gcd2(double num0, double num1) {
+    double res = num0;
+    double b = num1;
+    while (b != 0) {
+      double t = b;
+      b = res % b;
+      res = t;
+    }
+    return res;
+  }
+  
+  public static double lcm2(double num0, double num1) {
+    double a = num1;
+    double b = num0;
+    if (a==0) return 0;
+    while (b != 0) {
+      double t = b;
+      b = a%b;
+      a = t;
+    }
+    return num0*num1 / a;
+  }
   
   static {
     sin.inv = asin; asin.inv = sin;
@@ -48,6 +72,8 @@ public class MathNS extends SimpleMap {
       case "asin": return asin;
       case "acos": return acos;
       case "atan": return atan;
+      case "gcd": return gcd;
+      case "lcm": return lcm;
     }
     throw new ValueError("No key "+s+" in •math");
   }
@@ -69,6 +95,16 @@ public class MathNS extends SimpleMap {
     public Value callInv(Value x) {
       if (inv==null) return super.callInv(x);
       return inv.call(x);
+    }
+    
+    public String ln(FmtInfo f) { return name; }
+    public boolean eq(Value o) { return this==o; }
+  }
+  
+  private static class MB2 extends FnBuiltin {
+    public final String name;
+    public MB2(String name) {
+      this.name = "•math."+name;
     }
     
     public String ln(FmtInfo f) { return name; }
