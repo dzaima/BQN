@@ -3,7 +3,7 @@ A PC & Android app for BQN made in [Processing](https://processing.org/); [downl
 Contains a REPL, a calculator-like keyboard for Android, and a very basic editor. Interprets dzaima/BQN.
 
 ### Run on PC:
-1. build dzaima/BQN for java 8 (by running `./build8` in the base directory)
+1. build dzaima/BQN with Java 8 (by running `./build` in the base directory; `./build8` with a newer Java might not work (does not with Java 21))
 2. run `./cpJar` in the `app` directory
 3. Open `app/` in Processing and run
 
