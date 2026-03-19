@@ -41,7 +41,7 @@
       { "col": 3,
          "def": {"chr": "«","spec": "left", "rep": true},
           "up": {"chr": "^","spec": "up"},
-        "down": {"chr": "v","spec": "down"},
+        "down": {"chr": "v","spec": "down"}
       },
       { "col": 3,
           "def": {"chr": "»","spec": "right", "rep": true},
@@ -203,7 +203,7 @@
          "col": 3,
          "def": {"chr": "«","spec": "left", "rep": true},
           "up": {"chr": "^","spec": "up"},
-        "down": {"chr": "v","spec": "down"},
+        "down": {"chr": "v","spec": "down"}
       },
       {
           "col": 3,
